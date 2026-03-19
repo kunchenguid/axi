@@ -1,0 +1,1 @@
+{"pass": true, "reason": "The agent ran the appropriate gh CLI command, retrieved the correct data, and accurately reported the PR title, author, and merged status."}

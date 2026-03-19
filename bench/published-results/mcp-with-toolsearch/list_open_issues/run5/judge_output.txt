@@ -1,0 +1,1 @@
+{"pass": true, "reason": "The agent called mcp__github__list_issues to fetch open issues, then used a command to parse the result file and correctly identified the most recent open issue as #51800 'Web UI: onAttachmentsChange callback is undefined, paste image not delivered to Gateway'."}

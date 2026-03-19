@@ -1,0 +1,4 @@
+{
+  "task_success": false,
+  "details": "The agent reported only 47 open issues, which is incorrect. The known facts state the count should be in the thousands (~8700). The agent fetched only a single page of 100 issues and counted 47 non-PR items from that page, rather than paginating to get the true total. The 5 merged PRs and latest release tag were correctly retrieved."
+}

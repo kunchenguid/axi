@@ -1,0 +1,1 @@
+{"pass": true, "reason": "The agent executed code to query the GitHub API, retrieved the 5 most recent failed workflow runs, and for each reported the run ID, workflow name, and specific failed job names. All 5 runs are distinct with complete job-level detail."}

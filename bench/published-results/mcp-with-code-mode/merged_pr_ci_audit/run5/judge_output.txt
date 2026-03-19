@@ -1,0 +1,1 @@
+{"pass": true, "reason": "The agent wrote and executed code that called the GitHub API to fetch 10 recently merged PRs and checked CI status for each. It reported all 10 PRs with title, author, and CI status, and correctly concluded that 9/10 had fully green CI based on actual check data returned from the API."}

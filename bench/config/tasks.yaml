@@ -1,0 +1,159 @@
+# Benchmark tasks — all read-only against openclaw/openclaw
+#
+# Grading:
+#   Uses LLM-as-judge (gpt-5.4-mini) to evaluate the agent's trajectory.
+#   grading_hint — optional context to help the judge verify correctness.
+#   For tasks with dynamic answers, no hint is needed.
+
+tasks:
+  # ── Category A: Single-step retrieval ──────────────────────────
+
+  list_open_issues:
+    category: single_step
+    prompt: >
+      List the open issues in openclaw/openclaw and report the title of the
+      most recent one.
+    grading:
+      grading_hint: "The agent must run a command to fetch issues and report a specific issue title. Hallucinating a title without running a command is a failure."
+
+  view_pr:
+    category: single_step
+    prompt: >
+      View pull request #50782 in openclaw/openclaw and report its title,
+      author, and whether it has been merged.
+    grading:
+      grading_hint: "PR #50782 is titled 'Gateway: harden OpenResponses file-context escaping', was authored by joshavant (Josh Avant), and has been merged."
+
+  list_releases:
+    category: single_step
+    prompt: >
+      List releases for openclaw/openclaw and report the 3 most recent
+      tag names.
+    grading:
+      grading_hint: "The 3 most recent tags are v2026.3.13-1, v2026.3.13-beta.1, and v2026.3.12."
+
+  repo_overview:
+    category: single_step
+    prompt: >
+      Report the star count, primary language, and default branch of
+      openclaw/openclaw.
+    grading:
+      grading_hint: "openclaw/openclaw uses TypeScript, default branch is main, ~326k stars."
+
+  list_labels:
+    category: single_step
+    prompt: >
+      List the labels in openclaw/openclaw and report how many there are.
+    grading:
+      grading_hint: "openclaw/openclaw has approximately 124 labels."
+
+  # ── Category B: Multi-step chaining ────────────────────────────
+
+  issue_then_comments:
+    category: multi_step
+    prompt: >
+      Find the most recent open issue in openclaw/openclaw with the label
+      "bug", then view its comments and report who commented last.
+    grading:
+      grading_hint: "The agent must report on the single most recent bug-labeled issue. If that issue has no comments, reporting 'no comments' is correct. Searching through multiple issues to find one with comments is incorrect — the task asks about the most recent one specifically."
+
+  pr_then_checks:
+    category: multi_step
+    prompt: >
+      View pull request #50863 in openclaw/openclaw, then check its CI
+      status and report how many checks passed vs failed.
+    grading:
+      grading_hint: "PR #50863 ('fix: standardize MS Teams to Microsoft Teams across docs') has CI checks from multiple workflows. Most checks passed, with a few failures (e.g. check-docs, channels, check)."
+
+  release_then_body:
+    category: multi_step
+    prompt: >
+      List releases for openclaw/openclaw, find the release tagged
+      v2026.3.13-1, then view its full release notes and report
+      the first 3 items from 'What's Changed'.
+    grading:
+      grading_hint: "The first 3 items are: 'fix(compaction): use full-session token count for post-compaction sanity check' by efe-arv, 'fix(telegram): thread media transport policy into SSRF' by obviyus, and 'fix: handle Discord gateway metadata fetch failures' by jalehman."
+
+  run_then_jobs:
+    category: multi_step
+    prompt: >
+      List recent workflow runs in openclaw/openclaw, pick the most recent
+      completed one, then view its jobs and report their names and
+      statuses.
+    grading:
+      grading_hint: "The agent must identify a specific run ID and report individual job names with their statuses (success/failure/skipped), not just an overall run status."
+
+  # ── Category D: Investigation (multi-step, high-volume) ───────
+
+  ci_failure_investigation:
+    category: investigation
+    prompt: >
+      Look at the 5 most recent failed workflow runs in openclaw/openclaw.
+      For each one, report the run ID, workflow name, and which specific
+      jobs failed. Do not attempt to fix anything — just report findings.
+    grading:
+      grading_hint: "The agent must report 5 distinct failed runs with run IDs, workflow names, and specific failed job names. Reporting fewer than 5 or omitting job-level detail is incomplete."
+
+  pr_review_prep:
+    category: investigation
+    prompt: >
+      I need to review PR #50782 in openclaw/openclaw. Give me a briefing:
+      what it changes (title and body summary), who authored it, whether CI
+      passed (how many checks passed vs failed), and a summary of any
+      comments on it.
+    grading:
+      grading_hint: "PR #50782 is titled 'Gateway: harden OpenResponses file-context escaping', authored by joshavant. The agent should report CI check pass/fail counts and summarize any comments."
+
+  merged_pr_ci_audit:
+    category: investigation
+    prompt: >
+      Look at the 10 most recently merged PRs in openclaw/openclaw. For
+      each one, report the title, author, and whether all CI checks passed.
+      Then tell me how many of the 10 had fully green CI.
+    grading:
+      grading_hint: "The agent must report exactly 10 PRs with per-PR CI status (not just an overall summary). The final count of fully-green PRs must be based on actual check data, not assumed."
+
+  bug_triage_search:
+    category: investigation
+    prompt: >
+      Search for issues in openclaw/openclaw mentioning 'rate limit'. How
+      many results are there? For the 5 most recent, report the title,
+      state (open or closed), and whether they have an assignee.
+    grading:
+      grading_hint: "The total count should be large — in the hundreds or thousands, or 'at least N' where N >= 100. Reporting a small number like 5 or 30 (which indicates only a default page was counted) is incorrect. The agent must report 5 specific issues with all three requested fields (title, state, assignee)."
+
+  weekly_catchup:
+    category: investigation
+    prompt: >
+      Catch me up on openclaw/openclaw: how many issues are currently open,
+      what are the 5 most recently merged PRs (title and author), and
+      what's the latest release tag?
+    grading:
+      grading_hint: "The open issue count should be in the thousands (e.g. ~8700). Reporting just the page size (e.g. 30) as the total count is incorrect. The agent must report 5 specific merged PRs with titles and authors."
+
+  find_fix_for_bug:
+    category: investigation
+    prompt: >
+      Find the most recent open issue in openclaw/openclaw labeled 'bug'.
+      Check if any open PRs reference that issue's number in their title
+      or body. Report the issue title and whether a fix appears to be in
+      progress.
+    grading:
+      grading_hint: "The agent must identify a specific issue number and title, then actually search for PRs referencing it (not just guess). The conclusion about whether a fix is in progress must be based on search results, not assumption."
+
+  # ── Category C: Error recovery ─────────────────────────────────
+
+  invalid_issue:
+    category: error_recovery
+    prompt: >
+      View issue #999999 in openclaw/openclaw and tell me what happened.
+    grading:
+      grading_hint: "Issue #999999 does not exist — the agent should report a not-found error."
+
+  nonexistent_repo:
+    category: error_recovery
+    prompt: >
+      List issues in openclaw/this-does-not-exist and tell me what
+      happened.
+    grading:
+      grading_hint: "The repository openclaw/this-does-not-exist does not exist — the agent should report an error."

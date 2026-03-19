@@ -1,0 +1,1 @@
+{"pass": true, "reason": "The agent ran the appropriate gh CLI command, retrieved correct data, and accurately reported the title ('Gateway: harden OpenResponses file-context escaping'), author (Josh Avant / joshavant), and merged status (yes, merged on 2026-03-20)."}

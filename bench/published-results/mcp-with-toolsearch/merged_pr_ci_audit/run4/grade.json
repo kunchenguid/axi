@@ -1,0 +1,4 @@
+{
+  "task_success": false,
+  "details": "The agent ran all necessary commands and fetched CI check data for all 10 merged PRs, but misattributed the CI failure to the wrong PR. The 'check' job failure was on PR #51146 (GodsBoy), but the agent reported #40126 (jarimustonen) as the failing PR. PR #40126's checks were all success/skipped. This misinterpretation of the check run data makes the per-PR CI status report incorrect, even though the overall count of 9/10 happens to be numerically correct."
+}

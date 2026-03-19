@@ -1,0 +1,1 @@
+{"pass": true, "reason": "The agent ran the correct command to fetch the release data, correctly parsed the JSON output, and reported all three items from What's Changed matching the known facts exactly."}

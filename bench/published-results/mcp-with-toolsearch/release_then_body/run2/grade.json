@@ -1,0 +1,4 @@
+{
+  "task_success": true,
+  "details": "The agent correctly used mcp__github__list_releases and mcp__github__get_release_by_tag tools to fetch the release data, then accurately reported all three required items from 'What's Changed': (1) fix(compaction) by efe-arv, (2) fix(telegram) by obviyus, and (3) fix: handle Discord gateway metadata fetch failures by jalehman — matching the known facts exactly."
+}

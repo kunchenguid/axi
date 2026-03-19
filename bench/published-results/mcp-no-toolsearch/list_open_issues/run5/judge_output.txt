@@ -1,0 +1,1 @@
+{"pass": true, "reason": "The agent ran a command to fetch issues from openclaw/openclaw, successfully parsed the results, and correctly reported the most recent open issue title 'Web UI: onAttachmentsChange callback is undefined, paste image not delivered to Gateway' (Issue #51800)."}

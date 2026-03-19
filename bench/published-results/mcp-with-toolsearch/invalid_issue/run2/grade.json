@@ -1,0 +1,4 @@
+{
+  "task_success": true,
+  "details": "The agent called the GitHub API to look up issue #999999, received a 404 Not Found error, and correctly reported that the issue does not exist. It did not hallucinate any issue data."
+}

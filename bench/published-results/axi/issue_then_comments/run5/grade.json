@@ -1,0 +1,4 @@
+{
+  "task_success": true,
+  "details": "The agent correctly identified the most recent open bug-labeled issue (#51809), viewed its comments, found no comments, and reported 'no comments' — which is the correct answer per the known facts."
+}

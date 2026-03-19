@@ -1,0 +1,4 @@
+{
+  "task_success": true,
+  "details": "The agent correctly retrieved all required information via appropriate tool calls. It accurately reported: title ('Gateway: harden OpenResponses file-context escaping'), author (joshavant), PR body summary (centralized file-context helper, escaping improvements, no schema changes), CI check counts (22 success, 4 failed, 7 skipped from 41 total checks with the correct failing checks identified), and the single comment from greptile-apps[bot] with its 5/5 confidence score and key points. All data matches the tool outputs."
+}

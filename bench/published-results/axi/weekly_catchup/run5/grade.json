@@ -1,0 +1,4 @@
+{
+  "task_success": true,
+  "details": "The agent ran appropriate commands to gather all required data, correctly reported 8,771 open issues (not just the page size of 30), listed all 5 most recently merged PRs with titles and authors, and reported the latest release tag v2026.3.13-1."
+}

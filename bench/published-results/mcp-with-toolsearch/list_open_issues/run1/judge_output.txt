@@ -1,0 +1,1 @@
+{"pass": true, "reason": "The agent ran mcp__github__list_issues to fetch open issues from openclaw/openclaw, then used jq/python to extract the most recent issue title from the results, and correctly reported 'Web UI: onAttachmentsChange callback is undefined, paste image not delivered to Gateway' as the most recent open issue."}

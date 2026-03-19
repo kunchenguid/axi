@@ -1,0 +1,4 @@
+{
+  "task_success": false,
+  "details": "The agent found 5 failed runs with run IDs and specific failed job names, but failed to report the workflow names as required by the task. The agent explicitly acknowledged this gap: 'The workflow name cannot be confirmed without direct workflow run API access,' and instead substituted a generic guess ('CI (main checks workflow)') for all five runs. The task specifically requires workflow names as one of the three required fields per run. Additionally, the agent's indirect approach of scanning PR check_runs (rather than directly querying failed workflow runs) did not guarantee these were the 5 most recent failed runs repo-wide — the agent may have missed failed runs on direct pushes or other branches not associated with PRs it checked."
+}

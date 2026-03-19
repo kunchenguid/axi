@@ -1,0 +1,1 @@
+{"pass": true, "reason": "The agent correctly listed releases, found v2026.3.13-1, retrieved the full release notes using --full flag, and accurately reported all 3 required items matching the known facts exactly."}

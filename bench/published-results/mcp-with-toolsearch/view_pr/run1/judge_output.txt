@@ -1,0 +1,1 @@
+{"pass": true, "reason": "The agent correctly used the GitHub MCP tool to fetch PR #50782, then accurately reported all three required facts: the title ('Gateway: harden OpenResponses file-context escaping'), the author (joshavant), and that it has been merged."}

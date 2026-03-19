@@ -1,0 +1,4 @@
+{
+  "task_success": true,
+  "details": "The agent ran appropriate gh commands to list 5 failed runs and then queried each run's failed jobs. All 5 runs are reported with correct run IDs, workflow names, and specific failed job names matching the command outputs. The data is accurate and complete."
+}

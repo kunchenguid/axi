@@ -1,0 +1,1 @@
+{"pass": true, "reason": "The agent ran the appropriate command (gh-axi pr view 50782 --repo openclaw/openclaw), correctly extracted all three required pieces of information from the output: title 'Gateway: harden OpenResponses file-context escaping', author 'joshavant', and merged status (yes, merged on 2026-03-20)."}

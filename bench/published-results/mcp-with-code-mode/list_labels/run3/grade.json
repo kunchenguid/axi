@@ -1,0 +1,4 @@
+{
+  "task_success": false,
+  "details": "The agent ran commands but produced an incomplete result. The known fact is ~124 labels, but the tool returned only 100 (likely hitting a pagination limit despite passing limit: 200). The agent reported 100 as the final answer without recognizing it was truncated, constituting a partial answer presented as complete."
+}

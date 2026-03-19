@@ -1,0 +1,1 @@
+{"pass": true, "reason": "The agent used the GitHub MCP tool to fetch issues, parsed the results to find the most recent one, and correctly reported the title 'Web UI: onAttachmentsChange callback is undefined, paste image not delivered to Gateway' (issue #51800)."}

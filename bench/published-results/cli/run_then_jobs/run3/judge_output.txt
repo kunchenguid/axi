@@ -1,0 +1,1 @@
+{"pass": true, "reason": "The agent correctly ran `gh run list` to find completed runs, identified run 23386009018 (Workflow Sanity) as the most recent completed run, ran `gh run view` to get job details, and accurately reported all three jobs with their correct statuses: actionlint (success), no-tabs (success), and config-docs-drift (skipped)."}

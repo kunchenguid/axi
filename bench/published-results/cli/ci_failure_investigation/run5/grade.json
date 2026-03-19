@@ -1,0 +1,4 @@
+{
+  "task_success": true,
+  "details": "The agent ran appropriate gh commands to list failed runs and view job details for each. It correctly identified all 5 failed runs with their run IDs, workflow names, and specific failed job names. The data matches the command outputs — run 23386042824 and 23385977675 (Install Smoke, install-smoke job), run 23385977677 (CI, 14 failed jobs), run 23385910064 (CI, check/check-additional/build-smoke), and run 23385802450 (CI, check). The answer is complete and accurate."
+}

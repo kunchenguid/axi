@@ -1,0 +1,1 @@
+{"pass": true, "reason": "The agent ran gh-axi repo view openclaw/openclaw, correctly retrieved the data, and reported all three required fields: star count (328,406), primary language (TypeScript), and default branch (main), all consistent with the known facts."}

@@ -1,0 +1,1 @@
+{"pass": true, "reason": "The agent ran `gh-axi label list --repo openclaw/openclaw`, got a count of 126 labels, correctly reported 126 labels, and provided a well-organized summary of the label categories."}

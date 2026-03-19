@@ -1,0 +1,4 @@
+{
+  "task_success": false,
+  "details": "The agent failed to complete the task. It searched for MCP tools but could not find workflow run tools, and concluded it was unable to proceed. However, the agent did not attempt to use the `gh` CLI or other available methods to list workflow runs and their jobs. The agent gave up without producing any answer about workflow run job names and statuses, which is what the task required."
+}

@@ -1,0 +1,4 @@
+{
+  "task_success": true,
+  "details": "The agent correctly fetched PR #50863 details and all 43 CI check runs across two pages, then accurately reported 32 passed, 3 failed (check-docs, channels, check), and 8 skipped - matching the known facts about the PR."
+}

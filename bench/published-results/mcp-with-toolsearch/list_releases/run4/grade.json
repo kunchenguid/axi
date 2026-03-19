@@ -1,0 +1,4 @@
+{
+  "task_success": true,
+  "details": "The agent correctly used the GitHub releases API tool to fetch the 3 most recent releases for openclaw/openclaw, and accurately reported all three tag names: v2026.3.13-1, v2026.3.13-beta.1, and v2026.3.12, matching the known facts exactly."
+}

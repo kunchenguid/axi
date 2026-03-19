@@ -1,0 +1,4 @@
+{
+  "task_success": false,
+  "details": "The agent ran `gh label list` but only retrieved the first page of 30 results. With approximately 124 labels in the repo, the agent needed to paginate (e.g., using `--limit` flag or multiple pages) to get all labels. The agent incorrectly reported 30 labels as the complete count, giving a significantly incomplete answer."
+}

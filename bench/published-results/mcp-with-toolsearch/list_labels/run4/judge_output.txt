@@ -1,0 +1,1 @@
+{"pass": false, "reason": "The agent failed to list the labels. It searched for tools but couldn't find a list_labels tool, then gave up without attempting alternative approaches (e.g., using gh CLI, REST API calls, or other available tools). The agent produced no label count and did not complete the task."}

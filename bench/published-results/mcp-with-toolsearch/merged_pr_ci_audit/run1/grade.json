@@ -1,0 +1,4 @@
+{
+  "task_success": true,
+  "details": "The agent correctly fetched merged PRs across two pages, identified the 10 most recently merged (including #27727 as the 10th), fetched CI check runs for all 10 in parallel, correctly identified that PR #51146 had a `check` job with conclusion `failure`, and reported exactly 10 PRs with title/author/CI status plus an accurate final count of 9/10 fully green based on actual check data."
+}

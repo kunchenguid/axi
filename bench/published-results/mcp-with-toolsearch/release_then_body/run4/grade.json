@@ -1,0 +1,4 @@
+{
+  "task_success": true,
+  "details": "The agent correctly listed releases, fetched the release by tag v2026.3.13-1, and reported all three correct first items from What's Changed with matching titles and authors."
+}

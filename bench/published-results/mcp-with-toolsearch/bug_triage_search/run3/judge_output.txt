@@ -1,0 +1,1 @@
+{"pass": true, "reason": "The agent correctly searched the GitHub issues, reported the total count of 943 (which meets the 'hundreds or thousands' requirement), and provided all 5 most recent issues with all three required fields (title, state, assignee). All data came from actual tool results, not hallucinated."}

@@ -1,0 +1,23 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+
+# Benchmark results (generated, often large)
+bench/results/*
+bench/ITERATIONS.md
+!bench/results/.gitkeep
+
+# Published benchmark results (tracked)
+!bench/published-results/
+
+# Blog draft (not version-controlled)
+docs/blog.md
+
+# Desloppify
+.desloppify/
+*.png
+
+# OS
+.DS_Store

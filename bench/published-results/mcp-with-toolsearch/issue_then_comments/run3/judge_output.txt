@@ -1,0 +1,1 @@
+{"pass": true, "reason": "The agent correctly listed open bug issues ordered by creation date descending with perPage=1 to find the most recent one (#51810), then fetched its comments and correctly identified Ryce as the last commenter."}

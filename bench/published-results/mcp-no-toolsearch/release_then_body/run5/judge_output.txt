@@ -1,0 +1,1 @@
+{"pass": true, "reason": "The agent called get_release_by_tag for the correct tag v2026.3.13-1, received the full release data, and correctly identified all three first items from What's Changed matching the known facts exactly."}

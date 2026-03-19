@@ -1,0 +1,1 @@
+{"pass": true, "reason": "The agent correctly called the list_issues tool, received an error that the repository does not exist, and accurately reported the error to the user."}

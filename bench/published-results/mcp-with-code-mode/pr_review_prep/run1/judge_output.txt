@@ -1,0 +1,1 @@
+{"pass": true, "reason": "The agent executed appropriate commands to fetch PR data, checks, and comments. It correctly reported: title 'Gateway: harden OpenResponses file-context escaping', author joshavant, 27 passed/4 failed/10 skipped out of 41 total CI checks with specific failed check names, and summarized the 1 bot comment from greptile-apps[bot] with no human reviews."}

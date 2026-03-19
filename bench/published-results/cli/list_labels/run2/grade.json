@@ -1,0 +1,4 @@
+{
+  "task_success": false,
+  "details": "The agent ran `gh label list --repo openclaw/openclaw` but only retrieved 30 labels (the default page size), while the repository has approximately 124 labels. The agent failed to use `--limit` or pagination to fetch all labels, resulting in an incomplete and incorrect count of 30 instead of ~124."
+}

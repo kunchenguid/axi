@@ -1,0 +1,4 @@
+{
+  "task_success": true,
+  "details": "The agent successfully determined that issue #999999 does not exist in openclaw/openclaw. After initial MCP API failures (SSE format parsing issues), the agent fell back to the GitHub REST API directly, which returned a 404 Not Found response. The agent correctly reported the not-found error to the user."
+}

@@ -1,0 +1,1 @@
+{"pass": true, "reason": "The agent ran the appropriate command (gh issue view 999999 --repo openclaw/openclaw), correctly interpreted the error response indicating the issue does not exist, and accurately reported the not-found error to the user."}

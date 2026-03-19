@@ -1,0 +1,4 @@
+{
+  "task_success": true,
+  "details": "The agent executed a command (npx tsx list_issues.ts) that fetched real data from the openclaw/openclaw repository, retrieved 30 open issues, and correctly reported the most recent one as 'WhatsApp mention detection triggers on mentions inside quoted messages' (Issue #51804) based on the command output."
+}

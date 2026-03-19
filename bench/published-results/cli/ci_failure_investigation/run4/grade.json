@@ -1,0 +1,4 @@
+{
+  "task_success": true,
+  "details": "The agent ran appropriate commands to list 5 failed runs and then queried each run for failed job details. All 5 runs are reported with correct run IDs, workflow names, and specific failed job names matching the command outputs. The agent correctly identified install-smoke jobs for the two Install Smoke runs, and the multiple failing jobs for each CI run (including all 6 Windows shards and Linux check jobs for run 23385977677)."
+}

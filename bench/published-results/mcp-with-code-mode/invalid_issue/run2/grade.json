@@ -1,0 +1,4 @@
+{
+  "task_success": true,
+  "details": "The agent encountered an initial error with the MCP tool (SSE format vs JSON), correctly diagnosed the issue, pivoted to using the githubApi function which calls the REST API directly, received a clear 404 Not Found response, and accurately reported that issue #999999 does not exist in the openclaw/openclaw repository."
+}

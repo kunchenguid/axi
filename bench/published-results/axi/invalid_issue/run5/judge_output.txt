@@ -1,0 +1,1 @@
+{"pass": true, "reason": "The agent ran the appropriate command (gh-axi issue view 999999 --repo openclaw/openclaw), received a NOT_FOUND error, and correctly reported that issue #999999 does not exist in the repository."}

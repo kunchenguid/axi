@@ -1,0 +1,2 @@
+Error: Invalid MCP configuration:
+mcpServers.github: Does not adhere to MCP server configuration schema

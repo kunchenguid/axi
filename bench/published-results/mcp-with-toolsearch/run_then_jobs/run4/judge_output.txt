@@ -1,0 +1,1 @@
+{"pass": false, "reason": "The agent did not attempt to use the gh CLI or any other available tool to list workflow runs and jobs. It incorrectly concluded that MCP tools were required exclusively and gave up without completing the task. The agent never retrieved actual run data, job names, or statuses."}

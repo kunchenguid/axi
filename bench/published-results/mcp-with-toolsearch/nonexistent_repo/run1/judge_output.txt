@@ -1,0 +1,1 @@
+{"pass": true, "reason": "The agent called the GitHub API to list issues for openclaw/this-does-not-exist, received the expected error that the repository does not exist, and correctly reported this error to the user with a clear explanation."}

@@ -1,0 +1,4 @@
+{
+  "task_success": true,
+  "details": "The agent ran `gh issue list` to fetch open issues, correctly identified issue #51797 as the most recent by timestamp (2026-03-21T18:16:13Z), and reported its title accurately."
+}

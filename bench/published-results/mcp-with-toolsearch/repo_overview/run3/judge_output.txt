@@ -1,0 +1,1 @@
+{"pass": true, "reason": "The agent used mcp__github__search_repositories to query the repo and correctly reported all three requested fields: 328,409 stars (within range of ~326k), TypeScript as primary language, and main as default branch."}

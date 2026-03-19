@@ -1,0 +1,4 @@
+{
+  "task_success": true,
+  "details": "The agent called the appropriate tool to fetch PR #50782, received accurate data, and correctly reported the title ('Gateway: harden OpenResponses file-context escaping'), author (joshavant), and merged status (yes)."
+}

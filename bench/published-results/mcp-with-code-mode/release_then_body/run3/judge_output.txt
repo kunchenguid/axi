@@ -1,0 +1,1 @@
+{"pass": true, "reason": "The agent executed commands to list releases and retrieve the release body, correctly identified the v2026.3.13-1 release, and accurately reported all 3 required items from What's Changed matching the known facts exactly."}

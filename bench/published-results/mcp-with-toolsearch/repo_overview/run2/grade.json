@@ -1,0 +1,4 @@
+{
+  "task_success": true,
+  "details": "The agent ran mcp__github__search_repositories to retrieve repo data, then correctly reported all three requested fields: 328,408 stars, TypeScript as primary language, and main as the default branch — all consistent with known facts."
+}

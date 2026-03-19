@@ -1,0 +1,4 @@
+{
+  "task_success": true,
+  "details": "The agent correctly viewed PR #50863, ran gh pr checks to get CI status, and accurately reported 27 passed, 3 failed (check, check-docs, checks node/channels), and 8 skipped checks, matching the known facts."
+}

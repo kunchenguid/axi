@@ -1,0 +1,4 @@
+{
+  "task_success": false,
+  "details": "The agent failed to complete the task. It listed MCP resources but immediately gave up, claiming the tools don't support workflow runs/jobs. The agent did not attempt to use available tools (like making direct API calls or checking what MCP tools were actually available) and produced no actual data about workflow runs or job names/statuses. The agent should have explored available tools more thoroughly before concluding the task was impossible."
+}

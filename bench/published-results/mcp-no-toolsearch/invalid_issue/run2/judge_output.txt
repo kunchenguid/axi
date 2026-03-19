@@ -1,0 +1,1 @@
+{"pass": true, "reason": "The agent correctly called the GitHub API to look up issue #999999 in openclaw/openclaw, received a 404 Not Found error, and accurately reported that the issue does not exist along with possible reasons why."}

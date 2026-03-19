@@ -1,0 +1,1 @@
+{"pass": false, "reason": "The agent used a limit of 100 in the listLabels call and retrieved exactly 100 labels, but the known fact states openclaw/openclaw has approximately 124 labels. The agent did not attempt to paginate or increase the limit to get all labels, and reported 100 as the total without noting the truncation. The answer is incomplete and the count is incorrect."}

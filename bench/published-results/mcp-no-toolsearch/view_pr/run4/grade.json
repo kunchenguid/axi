@@ -1,0 +1,4 @@
+{
+  "task_success": true,
+  "details": "The agent called the GitHub PR API, retrieved correct data, and accurately reported all three requested facts: title ('Gateway: harden OpenResponses file-context escaping'), author (joshavant), and merged status (yes)."
+}

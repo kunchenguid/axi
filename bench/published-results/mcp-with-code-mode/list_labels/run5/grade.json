@@ -1,0 +1,4 @@
+{
+  "task_success": false,
+  "details": "The agent ran a script that only returned 30 labels (the API likely paginated and the code didn't handle pagination), while the known fact is ~124 labels. The agent reported 30 labels as the complete answer without recognizing the result was truncated/incomplete."
+}

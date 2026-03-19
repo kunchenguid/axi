@@ -1,0 +1,98 @@
+# Benchmark conditions — each defines how the agent accesses GitHub
+
+conditions:
+  cli:
+    name: "gh CLI (raw)"
+    tool: gh
+    agents_md: |
+      # Tools
+
+      You have the `gh` CLI installed. Use it for all GitHub operations.
+      Run `gh <command> --help` to discover subcommands and flags.
+
+      Examples:
+      - `gh issue list --repo owner/repo`
+      - `gh pr view 123 --repo owner/repo`
+      - `gh release list --repo owner/repo`
+
+  axi:
+    name: "gh-axi (AXI wrapper)"
+    tool: gh-axi
+    agents_md: |
+      # Tools
+
+      You have `gh-axi` installed for GitHub operations. The `gh` CLI is not
+      available — use `gh-axi` for all GitHub commands. It has the same
+      subcommands and flags as `gh` but provides structured output with
+      pre-computed summaries (counts, check results).
+
+      Examples:
+      - `gh-axi issue list --repo owner/repo`
+      - `gh-axi pr view 123 --repo owner/repo`
+      - `gh-axi release list --repo owner/repo`
+
+  mcp-with-toolsearch:
+    name: "GitHub MCP server (with ToolSearch)"
+    tool: mcp
+    agents_md: |
+      # Tools
+
+      You have a GitHub MCP server registered with tools for GitHub operations.
+      Use the available MCP tools to interact with GitHub.
+      The tools follow standard GitHub API patterns.
+
+      IMPORTANT: Do NOT use the `gh` CLI or `curl` to call the GitHub API.
+      You must use the MCP tools exclusively for all GitHub operations.
+    setup_commands:
+      - "codex mcp add github --url https://api.githubcopilot.com/mcp/ --bearer-token-env-var GH_TOKEN"
+
+  mcp-no-toolsearch:
+    name: "GitHub MCP (no ToolSearch)"
+    tool: mcp
+    agents_md: |
+      # Tools
+
+      You have a GitHub MCP server registered with tools for GitHub operations.
+      Use the available MCP tools to interact with GitHub.
+      The tools follow standard GitHub API patterns.
+
+      IMPORTANT: Do NOT use the `gh` CLI or `curl` to call the GitHub API.
+      You must use the MCP tools exclusively for all GitHub operations.
+    setup_commands:
+      - "codex mcp add github --url https://api.githubcopilot.com/mcp/ --bearer-token-env-var GH_TOKEN"
+
+  mcp-with-code-mode:
+    name: "Code execution (gh wrappers)"
+    tool: code
+    agents_md: |
+      # Tools
+
+      You have a TypeScript library at `./gh-code/` that wraps GitHub operations
+      as typed functions. Use it by writing a `.ts` script and running it with `npx tsx`.
+
+      IMPORTANT: Do NOT use the `gh` CLI or `curl` to call the GitHub API directly.
+      You must use the `./gh-code/` library exclusively for all GitHub operations.
+
+      ## Available modules
+
+      - `./gh-code/issues` — listIssues, viewIssue, listComments
+      - `./gh-code/prs` — viewPR, listChecks
+      - `./gh-code/releases` — listReleases, viewRelease
+      - `./gh-code/repo` — viewRepo
+      - `./gh-code/labels` — listLabels
+      - `./gh-code/runs` — listRuns, viewRun
+
+      ## Usage pattern
+
+      Write a TypeScript file, then run it:
+
+      ```ts
+      import { listIssues } from "./gh-code/issues";
+      const issues = listIssues("openclaw/openclaw", { state: "open", limit: 5 });
+      console.log(JSON.stringify(issues, null, 2));
+      ```
+
+      Then execute: `npx tsx script.ts`
+
+      You can compose multiple operations in a single script to minimize round trips.
+      Filter and process data in code before logging results.

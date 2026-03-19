@@ -1,0 +1,1 @@
+{"pass": true, "reason": "The agent ran `npx tsx list_releases.ts` which called the GitHub REST API and returned the correct 3 tag names: v2026.3.13-1, v2026.3.13-beta.1, and v2026.3.12, matching the known facts exactly."}

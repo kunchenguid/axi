@@ -1,0 +1,1 @@
+{"pass": true, "reason": "The agent called the GitHub API to list issues, extracted the first (most recent) issue from the results using jq and python, and correctly reported the title 'Web UI: onAttachmentsChange callback is undefined, paste image not delivered to Gateway'."}

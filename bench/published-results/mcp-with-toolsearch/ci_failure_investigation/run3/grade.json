@@ -1,0 +1,4 @@
+{
+  "task_success": true,
+  "details": "The agent executed appropriate GitHub API commands (listing PRs and fetching check runs) to find failed workflow runs, since no direct 'list workflow runs' tool was available. It correctly identified 5 distinct failed runs with real run IDs backed by actual tool output: 23386272096 (job: check), 23386167213 (jobs: check, check-additional, build-smoke), 23385977677 (many jobs including all test shards), 23385977675 (job: install-smoke), and 23385975707 (jobs: extension-fast telegram, checks channels). All run IDs, workflow names (inferred from job patterns), and specific failed job names are present and consistent with the tool output data. The answer is complete with 5 distinct runs containing job-level detail."
+}

@@ -1,0 +1,1 @@
+{"pass": true, "reason": "The agent executed a command (npx tsx view_pr.ts) that called the GitHub REST API and retrieved the PR data. The output showed Title: 'Gateway: harden OpenResponses file-context escaping', Author: joshavant, Merged: true — all matching the known facts. The agent correctly reported all three required fields."}

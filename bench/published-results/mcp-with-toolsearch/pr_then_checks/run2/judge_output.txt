@@ -1,0 +1,1 @@
+{"pass": true, "reason": "The agent correctly retrieved PR #50863 details and CI check runs across two pages, accurately counted 43 total checks with 32 passed, 3 failed (check-docs, channels, check), and 8 skipped, which matches the known facts."}

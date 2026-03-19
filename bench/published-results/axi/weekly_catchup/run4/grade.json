@@ -1,0 +1,4 @@
+{
+  "task_success": true,
+  "details": "The agent ran all three required commands, correctly extracted the total issue count (8,771 not just the page size of 30), listed all 5 merged PRs with titles and authors, and reported the latest release tag v2026.3.13-1."
+}

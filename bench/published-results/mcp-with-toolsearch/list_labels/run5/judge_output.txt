@@ -1,0 +1,1 @@
+{"pass": false, "reason": "The agent failed to list the labels. It searched for MCP tools but concluded no list_labels tool was available. The agent did not attempt alternative approaches (such as using the GitHub CLI via bash, or using the gh API command) and never actually retrieved or reported the labels or their count."}

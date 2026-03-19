@@ -1,0 +1,4 @@
+{
+  "task_success": true,
+  "details": "The agent ran appropriate gh commands to list merged PRs and check CI status for each. It correctly identified all 10 PRs with titles and authors, ran per-PR check queries, accurately identified failures (6 for #51721, 6 for #51704, 3 for #51618, 1 for #51574), and correctly reported 6 out of 10 PRs had fully green CI. The data matches the command outputs."
+}

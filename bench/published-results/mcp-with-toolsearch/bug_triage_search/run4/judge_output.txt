@@ -1,0 +1,1 @@
+{"pass": true, "reason": "The agent correctly searched for issues mentioning 'rate limit' in openclaw/openclaw, reported the total count of 943 (which is in the hundreds as expected by known facts), and provided all 5 most recent issues with all three required fields (title, state, assignee). All data came from actual tool calls, not hallucination."}

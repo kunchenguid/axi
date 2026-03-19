@@ -1,0 +1,4 @@
+{
+  "task_success": false,
+  "details": "The agent failed to actually query the GitHub API for the nonexistent repository. It encountered a protocol/transport error with the MCP server and gave up, concluding it 'never found out whether openclaw/this-does-not-exist exists or not.' The agent should have recovered by using an alternative approach (e.g., the githubApi function already in exec.ts, or the gh CLI directly) to attempt to list issues and report the expected 404/not-found error. Instead, it explained the transport mismatch and stopped without completing the task."
+}

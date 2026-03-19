@@ -1,0 +1,1 @@
+{"pass": true, "reason": "The agent called the GitHub PR API, received correct data, and accurately reported all three requested fields: title ('Gateway: harden OpenResponses file-context escaping'), author (joshavant), and merged status (yes)."}

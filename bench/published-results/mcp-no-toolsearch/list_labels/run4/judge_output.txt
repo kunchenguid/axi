@@ -1,0 +1,1 @@
+{"pass": false, "reason": "The agent failed to complete the task. It called list_issues instead of a labels endpoint, then gave up claiming no list_labels tool exists without exploring alternatives (e.g., using gh CLI, REST API calls, or other available tools). The agent never listed the labels or reported a count."}

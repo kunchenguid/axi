@@ -1,0 +1,1 @@
+{"pass": true, "reason": "The agent ran the correct commands to list workflow runs, identified the most recent completed run (Workflow Sanity, id 23386253561), fetched its jobs, and correctly reported all three job names with their statuses (no-tabs: success, actionlint: success, config-docs-drift: skipped)."}

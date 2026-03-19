@@ -1,0 +1,1 @@
+{"pass": true, "reason": "The agent correctly retrieved all three pieces of information: (1) open issue count of 8,779 (not just the page size), (2) 5 most recently merged PRs with titles and authors, and (3) latest release tag v2026.3.13-1. All data was obtained via actual tool calls and accurately reported."}

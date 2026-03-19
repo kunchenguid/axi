@@ -1,0 +1,1 @@
+{"pass": false, "reason": "The agent ran gh label list but only retrieved 30 labels (the default first page) when the repo has approximately 124 labels. The agent failed to use --limit or pagination to fetch all labels, resulting in a significantly incomplete answer."}

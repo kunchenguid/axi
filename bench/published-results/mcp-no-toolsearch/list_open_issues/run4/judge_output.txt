@@ -1,0 +1,1 @@
+{"pass": true, "reason": "The agent executed the list_issues command, received real data, and correctly identified issue #51800 as the most recent open issue with the accurate title 'Web UI: onAttachmentsChange callback is undefined, paste image not delivered to Gateway'."}

@@ -1,0 +1,4 @@
+{
+  "task_success": true,
+  "details": "The agent correctly queried the GitHub API for openclaw/openclaw and accurately reported all three requested fields: 328,406 stars (consistent with ~326k), TypeScript as the primary language, and 'main' as the default branch."
+}

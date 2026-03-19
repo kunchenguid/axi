@@ -1,0 +1,4 @@
+{
+  "task_success": true,
+  "details": "The agent ran commands to fetch open issues from openclaw/openclaw, correctly handled the wrapped response format `{ issues: [...] }`, sorted by issue number to find the most recent, and reported the correct title: 'WhatsApp mention detection triggers on mentions inside quoted messages' (#51804)."
+}

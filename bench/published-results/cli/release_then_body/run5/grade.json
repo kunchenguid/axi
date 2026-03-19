@@ -1,0 +1,4 @@
+{
+  "task_success": true,
+  "details": "The agent ran the correct gh command to fetch the release body, then correctly identified and reported all three first items from What's Changed matching the known facts exactly."
+}

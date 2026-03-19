@@ -1,0 +1,4 @@
+{
+  "task_success": true,
+  "details": "The agent correctly fetched 10 recently merged PRs using the GitHub search API, retrieved CI check runs for all 10 PRs in parallel, accurately identified that PR #51146 had a failing 'check' job (conclusion: 'failure'), and reported exactly 10 PRs with per-PR CI status including title, author, and CI result. The final count of 9/10 fully green PRs is based on actual check data from the API."
+}

@@ -1,0 +1,4 @@
+{
+  "task_success": false,
+  "details": "The agent found 5 distinct failed run IDs with specific failed job names, but failed to report workflow names for any of the runs — a required field. The agent acknowledged it could not determine workflow names from the available tool responses and instead assumed 'main CI workflow' without verification. Additionally, the search methodology (iterating through PR check runs) may not guarantee finding the 5 most recent failed runs across the entire repository."
+}

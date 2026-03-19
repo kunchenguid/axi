@@ -1,0 +1,23 @@
+{
+  "name": "axi-bench",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Benchmark harness comparing cli, axi, and GitHub MCP for agent tasks",
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest run",
+    "bench": "tsx src/cli.ts"
+  },
+  "dependencies": {
+    "yaml": "^2.7.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.7.0",
+    "vitest": "^3.0.0"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

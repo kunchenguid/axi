@@ -1,0 +1,4 @@
+{
+  "task_success": true,
+  "details": "The agent correctly fetched PR #50782 data using appropriate tool calls, accurately reported the title 'Gateway: harden OpenResponses file-context escaping', author joshavant, CI results (20 success, 4 failure, 7 skipped out of 41 total checks), and summarized the single comment from greptile-apps[bot]. All data matches the tool outputs without hallucination."
+}

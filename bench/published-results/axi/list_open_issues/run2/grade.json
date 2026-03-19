@@ -1,0 +1,4 @@
+{
+  "task_success": true,
+  "details": "The agent ran `gh-axi issue list --repo openclaw/openclaw --state open` and correctly identified the most recent open issue as #51800 'Web UI: onAttachmentsChange callback is undefined, paste image not delivered to Gateway' from the command output."
+}

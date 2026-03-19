@@ -1,0 +1,4 @@
+{
+  "task_success": true,
+  "details": "The agent correctly listed workflow runs, identified the most recent completed run (23386042806, Workflow Sanity), viewed its jobs, and reported all three job names with accurate statuses: actionlint (success), no-tabs (success), and config-docs-drift (skipped/not run, shown as '-' in the output)."
+}

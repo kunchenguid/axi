@@ -33,7 +33,7 @@ gh-axi run list -R owner/repo   # list workflow runs for a specific repo
 | `release`  | Releases — list, view, create, edit, delete               |
 | `repo`     | Repositories — list, view, create, edit, clone, fork      |
 | `label`    | Labels — list, create, edit, delete                       |
-| `search`   | Search repositories                                       |
+| `search`   | Search issues, PRs, repos, commits, code                  |
 | `api`      | Raw GitHub API access                                     |
 
 ### Global flags

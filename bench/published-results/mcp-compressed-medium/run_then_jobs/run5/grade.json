@@ -1,0 +1,4 @@
+{
+  "task_success": false,
+  "details": "The agent failed to complete the task. It attempted to find workflow run tools in the GitHub MCP server but they were unavailable. The agent correctly identified the limitation but did not attempt alternative approaches such as using the GitHub REST API directly through other available tools or web fetching. The agent never retrieved any workflow run data, never identified a specific run ID, and never reported any job names or statuses. The task required specific output (run ID, job names, job statuses) which was not produced."
+}

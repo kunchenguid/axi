@@ -1,0 +1,1 @@
+{"pass": true, "reason": "The agent correctly used the pull_request_read tool to fetch PR #50782, then accurately reported the title ('Gateway: harden OpenResponses file-context escaping'), author ('joshavant'), and merged status (yes, merged) - all matching the known facts."}

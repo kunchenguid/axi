@@ -186,6 +186,31 @@ function runAgent(
         // Disable ToolSearch so MCP tools are loaded upfront into context
         mcpArgs.push("--disallowedTools", "ToolSearch");
       }
+    } else if (condition.mcp_compressor) {
+      const ghToken = process.env.GH_TOKEN;
+      const { level, server_name } = condition.mcp_compressor;
+      const compressorArgs = [
+        "mcp-compressor",
+        "https://api.githubcopilot.com/mcp/",
+        "-H", `Authorization=Bearer ${ghToken}`,
+        "-c", level,
+      ];
+      if (server_name) {
+        compressorArgs.push("--server-name", server_name);
+      }
+      const mcpConfig = {
+        mcpServers: {
+          "compressed-github": {
+            command: "uvx",
+            args: compressorArgs,
+          },
+        },
+      };
+      const mcpConfigPath = join(artifactDir, ".mcp-config.json");
+      writeFileSync(mcpConfigPath, JSON.stringify(mcpConfig));
+      mcpArgs.push("--mcp-config", mcpConfigPath);
+      // Only 2–3 wrapper tools, no need for ToolSearch discovery
+      mcpArgs.push("--disallowedTools", "ToolSearch");
     }
 
     cmd = [

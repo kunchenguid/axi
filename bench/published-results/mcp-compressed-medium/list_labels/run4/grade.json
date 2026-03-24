@@ -1,0 +1,4 @@
+{
+  "task_success": false,
+  "details": "The agent reported 16 labels, but the known fact states openclaw/openclaw has approximately 124 labels. The agent's approach was fundamentally flawed - instead of using a dedicated 'list repository labels' API endpoint, it attempted to infer labels by sampling issues (search_issues with has:label) and manually checking for specific known label names. This approach only discovered labels that happened to appear in the small subset of issues examined, missing the vast majority of the 124 labels. The agent's final answer of 16 labels is significantly incorrect compared to the actual ~124 labels."
+}

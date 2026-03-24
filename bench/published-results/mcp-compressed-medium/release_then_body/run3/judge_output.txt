@@ -1,0 +1,1 @@
+{"pass": true, "reason": "The agent successfully retrieved the release by tag v2026.3.13-1 using the GitHub API tool and correctly identified all three first items from 'What's Changed': (1) fix(compaction) by efe-arv, (2) fix(telegram) by obviyus, and (3) fix: handle Discord gateway metadata fetch failures by jalehman. These match the known facts exactly."}

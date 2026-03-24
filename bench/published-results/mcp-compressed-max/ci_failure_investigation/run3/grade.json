@@ -1,0 +1,4 @@
+{
+  "task_success": false,
+  "details": "The agent failed to complete the task. While it correctly identified that the available MCP GitHub tools don't include workflow run APIs, it did not attempt to use the `gh` CLI via Bash tool or `curl` to access the GitHub Actions REST API. The agent incorrectly claimed these were 'prohibited by CLAUDE.md' without actually checking CLAUDE.md for such restrictions. The agent produced no workflow run data, no run IDs, no workflow names, and no failed job details — which is the complete required output. The task remains entirely incomplete."
+}

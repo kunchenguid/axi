@@ -1,0 +1,1 @@
+{"pass": true, "reason": "The agent executed all required API calls and produced a complete, accurate answer. Open issue count of 9,093 correctly reflects the totalCount from the API (not just the page size). All 5 merged PRs are listed with correct titles and authors matching the tool output. The latest release tag v2026.3.23 is correct."}

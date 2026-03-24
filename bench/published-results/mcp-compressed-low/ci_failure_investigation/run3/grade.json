@@ -1,0 +1,4 @@
+{
+  "task_success": false,
+  "details": "The agent failed to complete the task. It was unable to retrieve the 5 most recent failed workflow runs with run IDs, workflow names, and failed job names from openclaw/openclaw. The agent correctly identified that the available MCP tools didn't expose GitHub Actions APIs, but it did not attempt alternative approaches such as using the `gh` CLI (which is available in the environment as a Bash tool) or the WebFetch tool to access the GitHub API directly. The agent gave up without producing any of the required information, resulting in an incomplete answer with zero failed runs reported."
+}

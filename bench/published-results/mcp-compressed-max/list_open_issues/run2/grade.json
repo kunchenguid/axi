@@ -1,0 +1,4 @@
+{
+  "task_success": true,
+  "details": "The agent ran the list_issues command against openclaw/openclaw with appropriate parameters (state=open, ordered by CREATED_AT DESC) and correctly reported the most recent open issue title: 'Feature: Global system prompt injection for multi-agent governance (with NemoClaw analysis)' (issue #53457)."
+}

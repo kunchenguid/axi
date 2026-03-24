@@ -1,0 +1,4 @@
+{
+  "task_success": false,
+  "details": "The agent correctly retrieved the PR title, author (joshavant), body summary, and comments (Greptile bot review). However, the task explicitly required CI check pass/fail counts, and the agent acknowledged it could not access check-run data through the available tools, providing only the author's self-reported test results from the PR body instead of actual check counts. The known facts indicate CI check data should have been reported, making this a partial answer on a specifically requested data point."
+}

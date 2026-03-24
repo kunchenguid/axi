@@ -18,8 +18,7 @@ function sum(arr: number[]): number {
   return arr.reduce((a, b) => a + b, 0);
 }
 
-function loadResults(): RunResult[] {
-  const path = join(RESULTS_DIR, "results.jsonl");
+function loadResultsFromFile(path: string): RunResult[] {
   let raw: string;
   try {
     raw = readFileSync(path, "utf-8");
@@ -30,6 +29,26 @@ function loadResults(): RunResult[] {
     .split("\n")
     .filter((l) => l.trim())
     .map((l) => JSON.parse(l) as RunResult);
+}
+
+function loadResults(): RunResult[] {
+  return loadResultsFromFile(join(RESULTS_DIR, "results.jsonl"));
+}
+
+/**
+ * Load results from multiple JSONL files and merge them.
+ * When the same (condition, task, run) key appears in multiple files,
+ * the entry from the later file wins (allows overriding published results
+ * with fresh runs).
+ */
+export function loadAndMerge(paths: string[]): RunResult[] {
+  const byKey = new Map<string, RunResult>();
+  for (const p of paths) {
+    for (const r of loadResultsFromFile(p)) {
+      byKey.set(`${r.condition}::${r.task}::${r.run}`, r);
+    }
+  }
+  return [...byKey.values()];
 }
 
 function groupBy<T>(items: T[], key: (item: T) => string): Map<string, T[]> {
@@ -154,11 +173,12 @@ export function csvReport(results?: RunResult[]): string {
   return lines.join("\n") + "\n";
 }
 
-export function writeReports(): void {
-  const md = markdownReport();
-  const csv = csvReport();
-  writeFileSync(join(RESULTS_DIR, "report.md"), md);
-  writeFileSync(join(RESULTS_DIR, "report.csv"), csv);
+export function writeReports(outDir?: string, results?: RunResult[]): void {
+  const dir = outDir ?? RESULTS_DIR;
+  const md = markdownReport(results);
+  const csv = csvReport(results);
+  writeFileSync(join(dir, "report.md"), md);
+  writeFileSync(join(dir, "report.csv"), csv);
   console.log(md);
-  console.log(`Reports written to results/report.md and results/report.csv`);
+  console.log(`Reports written to ${dir}/report.md and ${dir}/report.csv`);
 }

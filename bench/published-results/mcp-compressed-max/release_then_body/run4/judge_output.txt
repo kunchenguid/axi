@@ -1,0 +1,1 @@
+{"pass": true, "reason": "The agent correctly used the GitHub API tool to fetch the release by tag v2026.3.13-1 from openclaw/openclaw, then accurately reported the first 3 items from 'What's Changed': fix(compaction) by efe-arv, fix(telegram) by obviyus, and fix: handle Discord gateway metadata fetch failures by jalehman - all matching the known facts exactly."}

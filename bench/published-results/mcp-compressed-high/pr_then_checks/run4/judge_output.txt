@@ -1,0 +1,1 @@
+{"pass": true, "reason": "The agent correctly fetched PR #50863 details and its check runs via appropriate API calls. The counts are accurate: 32 passed, 3 failed (check-docs, checks for channels, and check), and 8 skipped out of 43 total. The failed checks match the known facts (check-docs, channels, check). No hallucination — all data came from actual tool calls."}

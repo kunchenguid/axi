@@ -1,0 +1,4 @@
+{
+  "task_success": false,
+  "details": "The agent found only 15 labels by sampling ~800 issues, but the known fact is that openclaw/openclaw has approximately 124 labels. The agent's approach of extracting labels from issue search results is fundamentally incomplete - it can only discover labels that have been applied to sampled issues, missing labels applied to unsampled issues and labels that exist in the repo but haven't been applied to any issues. The agent even acknowledged this limitation. The reported count of 15 is drastically different from the actual ~124 labels, making the answer incorrect and incomplete."
+}

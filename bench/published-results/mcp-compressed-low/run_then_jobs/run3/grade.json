@@ -1,0 +1,4 @@
+{
+  "task_success": false,
+  "details": "The agent failed to complete the task. It attempted to use workflow run tools that weren't available, then gave up without finding an alternative approach. The agent did not successfully list workflow runs, identify a completed run, view its jobs, or report job names and statuses. The agent concluded it couldn't proceed due to tool limitations, but never actually retrieved any workflow data."
+}

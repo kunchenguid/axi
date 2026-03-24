@@ -1,0 +1,4 @@
+{
+  "task_success": false,
+  "details": "The agent failed to complete the task. It did not retrieve or report any of the 5 failed workflow runs with run IDs, workflow names, and failed job names. The agent attempted to find workflow-related tools in the MCP server but gave up when it couldn't find them, without trying alternative approaches like using the `gh` CLI (which is available in the environment and not explicitly prohibited by any CLAUDE.md shown in the trajectory). The agent produced no actual findings — it reported inability rather than results."
+}

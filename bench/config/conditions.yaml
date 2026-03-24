@@ -96,3 +96,103 @@ conditions:
 
       You can compose multiple operations in a single script to minimize round trips.
       Filter and process data in code before logging results.
+
+  mcp-compressed-low:
+    name: "GitHub MCP (compressed-low)"
+    tool: mcp-compressed
+    mcp_compressor:
+      level: low
+      server_name: github
+    agents_md: |
+      # Tools
+
+      You have a compressed GitHub MCP server with wrapper tools prefixed `github_`.
+      Full tool descriptions are visible — browse them and call `github_invoke_tool`
+      directly.
+
+      Available wrapper tools:
+      - `github_list_tools` — list all available GitHub tools
+      - `github_get_tool_schema` — get full JSON schema for a specific tool
+      - `github_invoke_tool` — call a GitHub tool by name with arguments
+
+      At low compression, descriptions are fully visible so you can often call
+      `github_invoke_tool` directly without first calling `github_get_tool_schema`.
+
+      IMPORTANT: Do NOT use the `gh` CLI or `curl` to call the GitHub API.
+      You must use the wrapper tools exclusively for all GitHub operations.
+
+  mcp-compressed-medium:
+    name: "GitHub MCP (compressed-medium)"
+    tool: mcp-compressed
+    mcp_compressor:
+      level: medium
+      server_name: github
+    agents_md: |
+      # Tools
+
+      You have a compressed GitHub MCP server with wrapper tools prefixed `github_`.
+      Only the first sentence of each tool description is visible.
+
+      Available wrapper tools:
+      - `github_list_tools` — list all available GitHub tools
+      - `github_get_tool_schema` — get full JSON schema for a specific tool
+      - `github_invoke_tool` — call a GitHub tool by name with arguments
+
+      Workflow: browse tool names, call `github_get_tool_schema` for any tool you
+      want to use to see its full schema and parameters, then call
+      `github_invoke_tool` with the tool name and arguments.
+
+      IMPORTANT: Do NOT use the `gh` CLI or `curl` to call the GitHub API.
+      You must use the wrapper tools exclusively for all GitHub operations.
+
+  mcp-compressed-high:
+    name: "GitHub MCP (compressed-high)"
+    tool: mcp-compressed
+    mcp_compressor:
+      level: high
+      server_name: github
+    agents_md: |
+      # Tools
+
+      You have a compressed GitHub MCP server with wrapper tools prefixed `github_`.
+      Only tool and parameter names are visible (no descriptions).
+
+      Available wrapper tools:
+      - `github_list_tools` — list all available GitHub tools
+      - `github_get_tool_schema` — get full JSON schema for a specific tool
+      - `github_invoke_tool` — call a GitHub tool by name with arguments
+
+      Workflow: you MUST call `github_get_tool_schema` before invoking any tool,
+      because descriptions are stripped. Then call `github_invoke_tool` with the
+      tool name and arguments.
+
+      IMPORTANT: Do NOT use the `gh` CLI or `curl` to call the GitHub API.
+      You must use the wrapper tools exclusively for all GitHub operations.
+
+  mcp-compressed-max:
+    name: "GitHub MCP (compressed-max)"
+    tool: mcp-compressed
+    mcp_compressor:
+      level: max
+      server_name: github
+    agents_md: |
+      # Tools
+
+      You have a compressed GitHub MCP server with wrapper tools prefixed `github_`.
+      Nothing is loaded upfront — you must discover tools at runtime.
+
+      Available wrapper tools:
+      - `github_list_tools` — list all available GitHub tools
+      - `github_get_tool_schema` — get full JSON schema for a specific tool
+      - `github_invoke_tool` — call a GitHub tool by name with arguments
+
+      Workflow:
+      1. Call `github_list_tools()` to discover available tools
+      2. Call `github_get_tool_schema(tool_name)` to get the full schema
+      3. Call `github_invoke_tool(tool_name, arguments)` to execute
+
+      You MUST follow this sequence — no tool information is available without
+      calling `github_list_tools` first.
+
+      IMPORTANT: Do NOT use the `gh` CLI or `curl` to call the GitHub API.
+      You must use the wrapper tools exclusively for all GitHub operations.

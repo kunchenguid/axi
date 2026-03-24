@@ -1,0 +1,4 @@
+{
+  "task_success": true,
+  "details": "The agent executed a GitHub search tool call for openclaw/openclaw and correctly reported all three requested fields: star count (333,021, which is ~326k as stated in known facts), primary language (TypeScript), and default branch (main)."
+}

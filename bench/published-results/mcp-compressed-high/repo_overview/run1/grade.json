@@ -1,0 +1,4 @@
+{
+  "task_success": true,
+  "details": "The agent executed GitHub API search commands and correctly reported all three requested fields: 333,028 stars (within range of ~326k known facts), TypeScript as primary language, and 'main' as default branch. All values match the known facts."
+}

@@ -1,0 +1,4 @@
+{
+  "task_success": false,
+  "details": "The agent gathered data on 10 merged PRs and their comments, but never produced a final answer. The trajectory ends mid-task without reporting titles, authors, and CI status for each PR, and without providing the count of fully-green PRs. Additionally, the agent used `get_commit` (which doesn't return check run status) and fell back to inferring CI from comments rather than actual check data."
+}

@@ -1,0 +1,4 @@
+{
+  "task_success": false,
+  "details": "The agent never completed the task. It used an indirect approach of searching through issues to discover labels, finding only about 19 labels (bug, bug:behavior, enhancement, regression, bug:crash, question, help wanted, cannot-reproduce, good first issue, duplicate, close:duplicate, dedupe:child, dedupe:parent, invalid, close:invalid, maintainer, security, stale, r: testflight) out of approximately 124. The agent never produced a final answer listing all labels or reporting a total count. The trajectory ends mid-search without any summary or conclusion."
+}

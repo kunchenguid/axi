@@ -1,0 +1,4 @@
+{
+  "task_success": false,
+  "details": "The agent failed to complete the task. All attempts to use the mcp__compressed-github tools returned internal server errors, and the agent did not attempt alternative approaches (such as using the gh CLI tool via Bash, or the WebFetch/WebSearch tools to access GitHub's API or web interface). The agent gave up without finding the required information about the most recent open bug-labeled issue in openclaw/openclaw and who commented last on it."
+}

@@ -1,0 +1,1 @@
+{"pass": true, "reason": "The agent correctly called list_issues on openclaw/openclaw with state=open, processed the results, and accurately reported issue #53457 'Feature: Global system prompt injection for multi-agent governance (with NemoClaw analysis)' as the most recent open issue. The agent ran actual commands rather than hallucinating data."}

@@ -1,0 +1,1 @@
+{"pass": true, "reason": "The agent correctly queried the GitHub API for issue #999999 in openclaw/openclaw, received a 404 Not Found response, and accurately reported that the issue does not exist. This matches the known fact that issue #999999 does not exist."}

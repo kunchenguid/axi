@@ -9,8 +9,11 @@ bench/results/*
 bench/ITERATIONS.md
 !bench/results/.gitkeep
 
-# Published benchmark results (tracked)
+# Published benchmark results (tracked, but not workspace clones or MCP configs with tokens)
 !bench/published-results/
+bench/published-results/**/workspace/
+bench/published-results/**/.mcp-config.json
+bench/results/**/workspace/
 
 # Blog draft (not version-controlled)
 docs/blog.md

@@ -8,16 +8,17 @@
  *   report    — Generate summary from results.jsonl
  */
 
-import { readFileSync, writeFileSync, existsSync } from "node:fs";
+import { readFileSync, writeFileSync, existsSync, mkdirSync, copyFileSync } from "node:fs";
 import { execSync } from "node:child_process";
 import { resolve, join } from "node:path";
 import { parse as parseYaml } from "yaml";
 import type { AgentBackend, ConditionDef, ConditionId, TaskDef } from "./types.js";
 import { runOne } from "./runner.js";
-import { writeReports } from "./reporter.js";
+import { writeReports, loadAndMerge } from "./reporter.js";
 
 const BENCH_ROOT = resolve(import.meta.dirname, "..");
 const CONFIG_DIR = join(BENCH_ROOT, "config");
+const PUBLISHED_DIR = join(BENCH_ROOT, "published-results");
 
 function loadConditions(): Map<string, ConditionDef> {
   const raw = readFileSync(join(CONFIG_DIR, "conditions.yaml"), "utf-8");
@@ -101,6 +102,10 @@ async function cmdRun(argv: string[]): Promise<void> {
     console.error("Condition mcp-with-toolsearch is not supported with Codex (ToolSearch is Claude-specific). Use mcp-no-toolsearch instead.");
     process.exit(1);
   }
+  if (agent === "codex" && conditionId?.startsWith("mcp-compressed-")) {
+    console.error(`Condition ${conditionId} is not supported with Codex (requires stdio MCP via mcp-compressor). Use --agent claude instead.`);
+    process.exit(1);
+  }
 
   const task = tasks.get(taskId);
   if (!task) {
@@ -138,9 +143,9 @@ async function cmdMatrix(argv: string[]): Promise<void> {
     ? conditionFilter.split(",")
     : [...conditions.keys()];
 
-  // ToolSearch is Claude-specific; skip the condition for Codex
+  // ToolSearch and mcp-compressor conditions are Claude-specific; skip for Codex
   if (agent === "codex") {
-    conditionIds = conditionIds.filter((id) => id !== "mcp-with-toolsearch");
+    conditionIds = conditionIds.filter((id) => id !== "mcp-with-toolsearch" && !id.startsWith("mcp-compressed-"));
   }
 
   let taskIds = taskFilter
@@ -228,6 +233,64 @@ async function cmdMatrix(argv: string[]): Promise<void> {
   writeReports();
 }
 
+function cmdReport(argv: string[]): void {
+  const args = parseArgs(argv);
+  const mergePaths = args.merge?.split(",") ?? [];
+
+  // Always include working results if they exist
+  const sources: string[] = [];
+  const workingResults = join(BENCH_ROOT, "results", "results.jsonl");
+  if (existsSync(workingResults)) sources.push(workingResults);
+
+  // --merge: add extra JSONL files (e.g., published-results/results.jsonl)
+  sources.push(...mergePaths);
+
+  if (sources.length <= 1 && mergePaths.length === 0) {
+    // Simple case: just the working results
+    writeReports();
+  } else {
+    const merged = loadAndMerge(sources);
+    writeReports(undefined, merged);
+  }
+}
+
+function cmdPublish(argv: string[]): void {
+  const args = parseArgs(argv);
+  const workingResults = join(BENCH_ROOT, "results", "results.jsonl");
+  const publishedResults = join(PUBLISHED_DIR, "results.jsonl");
+
+  // Collect sources: published first (lower priority), then working (overrides)
+  const sources: string[] = [];
+  if (existsSync(publishedResults)) sources.push(publishedResults);
+  if (existsSync(workingResults)) sources.push(workingResults);
+
+  if (sources.length === 0) {
+    console.error("No results to publish. Run benchmarks first.");
+    process.exit(1);
+  }
+
+  const merged = loadAndMerge(sources);
+  console.log(`Merging ${merged.length} results into published-results/`);
+
+  mkdirSync(PUBLISHED_DIR, { recursive: true });
+  writeFileSync(publishedResults, merged.map((r) => JSON.stringify(r)).join("\n") + "\n");
+  writeReports(PUBLISHED_DIR, merged);
+
+  // Copy per-condition artifact directories from working results if they exist
+  // Excludes workspace/ dirs (large repo clones that are reproducible)
+  const conditions = loadConditions();
+  for (const condId of conditions.keys()) {
+    const src = join(BENCH_ROOT, "results", condId);
+    const dst = join(PUBLISHED_DIR, condId);
+    if (existsSync(src) && !existsSync(dst)) {
+      execSync(`rsync -a --exclude=workspace --exclude=.mcp-config.json ${JSON.stringify(src + "/")} ${JSON.stringify(dst + "/")}`, { stdio: "pipe" });
+      console.log(`  Copied artifacts: ${condId}/`);
+    }
+  }
+
+  console.log(`\nPublished ${merged.length} results to published-results/`);
+}
+
 async function main(): Promise<void> {
   const [command, ...rest] = process.argv.slice(2);
 
@@ -237,8 +300,9 @@ async function main(): Promise<void> {
     case "matrix":
       return cmdMatrix(rest);
     case "report":
-      writeReports();
-      return;
+      return cmdReport(rest);
+    case "publish":
+      return cmdPublish(rest);
     default:
       console.log(`axi-bench — benchmark harness for cli vs axi vs GitHub MCP
 
@@ -260,6 +324,11 @@ Commands:
               --parallel          Run conditions in parallel
 
   report    Generate summary from results.jsonl
+              --merge <path,path,...>  Merge additional JSONL files into report
+
+  publish   Merge working results into published-results/
+              Combines results/results.jsonl with published-results/results.jsonl,
+              regenerates reports, and copies artifact directories.
 `);
   }
 }

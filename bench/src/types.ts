@@ -1,6 +1,6 @@
 /** Shared interfaces for the benchmark harness. */
 
-export type ConditionId = "cli" | "axi" | "mcp-with-toolsearch" | "mcp-no-toolsearch" | "mcp-with-code-mode";
+export type ConditionId = "cli" | "axi" | "mcp-with-toolsearch" | "mcp-no-toolsearch" | "mcp-with-code-mode" | "mcp-compressed-low" | "mcp-compressed-medium" | "mcp-compressed-high" | "mcp-compressed-max";
 export type TaskCategory = "single_step" | "multi_step" | "error_recovery";
 export type AgentBackend = "codex" | "claude";
 
@@ -22,6 +22,7 @@ export interface ConditionDef {
   tool: string;
   agents_md: string;
   setup_commands?: string[];
+  mcp_compressor?: { level: "low" | "medium" | "high" | "max"; server_name?: string };
 }
 
 export interface RunSpec {

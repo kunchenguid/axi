@@ -1,0 +1,4 @@
+{
+  "task_success": false,
+  "details": "The agent failed to complete the task. While it correctly attempted to use workflow run tools and discovered they weren't available in the compressed GitHub MCP server, it did not try alternative approaches such as using the Bash tool with `gh` CLI commands (e.g., `gh run list --repo openclaw/openclaw` and `gh run view <run_id> --repo openclaw/openclaw`) which would have been available in the environment. The agent gave up too quickly without exploring all available tooling options, resulting in no workflow run data, no job names, and no job statuses being reported."
+}

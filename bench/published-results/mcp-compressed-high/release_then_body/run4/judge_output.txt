@@ -1,0 +1,1 @@
+{"pass": true, "reason": "The agent correctly listed releases for openclaw/openclaw, fetched the release tagged v2026.3.13-1 using get_release_by_tag, and accurately reported all 3 first items from What's Changed: fix(compaction) by efe-arv, fix(telegram) by obviyus, and fix: handle Discord gateway metadata fetch failures by jalehman - matching the known facts exactly."}

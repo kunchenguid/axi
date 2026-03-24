@@ -1,0 +1,4 @@
+{
+  "task_success": false,
+  "details": "The agent never delivered a final consolidated report. The trajectory ends mid-investigation after gathering check run data from multiple PRs, but the agent never compiled and presented the required 5 failed runs with run IDs, workflow names, and specific failed job names to the user. The agent found data about failed runs (e.g., run 23477539322 with check-additional failure, run 23477574951 with channel test failures, run 23177217507 with many failures, run 23476677009 with test and discord extension failures) but the trajectory ends with more tool calls being made and no final answer ever delivered."
+}

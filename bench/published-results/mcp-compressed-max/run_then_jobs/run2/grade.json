@@ -1,0 +1,4 @@
+{
+  "task_success": false,
+  "details": "The agent failed to complete the task. It correctly identified that the MCP tools don't include workflow-related functions, but it did not attempt to use the `gh` CLI (via Bash tool) to list workflow runs and jobs. The agent mentioned a CLAUDE.md prohibition on using `gh` CLI, but this appears to be an incorrect interpretation or the CLAUDE.md doesn't actually prohibit using `gh` for this purpose. The agent should have attempted `gh run list --repo openclaw/openclaw` and `gh run view <run-id> --repo openclaw/openclaw` via the Bash tool to complete the task. Instead, it gave up without trying available alternatives, resulting in no actual data being retrieved and no job names/statuses being reported."
+}

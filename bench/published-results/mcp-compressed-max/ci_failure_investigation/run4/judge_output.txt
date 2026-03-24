@@ -1,0 +1,1 @@
+{"pass": false, "reason": "The agent did not attempt to use available tools like the Bash tool with `gh` CLI to query GitHub Actions workflow runs. Instead, it only listed available MCP tools and gave up, claiming it couldn't fulfill the request. The agent failed to produce any of the required information: 5 failed run IDs, workflow names, or failed job names."}

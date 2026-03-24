@@ -1,0 +1,4 @@
+{
+  "task_success": false,
+  "details": "The agent correctly identified that the available tools don't include workflow run APIs, but it failed to complete the task. The agent should have attempted to use alternative approaches such as the GitHub REST API directly via a web fetch tool, the gh CLI via Bash, or other available means to list workflow runs and their jobs. Instead, the agent gave up after checking the MCP tools list without exploring other options. The task requires reporting specific job names and statuses from a completed workflow run, which the agent never produced."
+}

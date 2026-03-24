@@ -1,0 +1,4 @@
+{
+  "task_success": false,
+  "details": "The agent never produced a final report. It found only ~3 failed runs before the trajectory ended mid-search, and never delivered a consolidated answer with 5 distinct failed runs including run IDs, workflow names, and specific failed job names as required."
+}

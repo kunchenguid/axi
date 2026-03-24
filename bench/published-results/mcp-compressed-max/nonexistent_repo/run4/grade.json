@@ -1,0 +1,4 @@
+{
+  "task_success": true,
+  "details": "The agent correctly called the list_issues tool for openclaw/this-does-not-exist, received the error 'Could not resolve to a Repository with the name openclaw/this-does-not-exist', and accurately reported the error to the user with appropriate context about possible causes."
+}

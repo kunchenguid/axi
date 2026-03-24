@@ -1,0 +1,1 @@
+{"pass": false, "reason": "The agent ran appropriate commands but reported incorrect results. The agent reported v2026.3.23, v2026.3.22, and v2026.3.22-beta.1, but the known correct answers are v2026.3.13-1, v2026.3.13-beta.1, and v2026.3.12. The agent misread or got incorrect data from the tool output."}

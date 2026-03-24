@@ -1,0 +1,4 @@
+{
+  "task_success": false,
+  "details": "The agent never produced a final answer. It was still searching through PRs when the trajectory ended, having found only one failed workflow run (PR #44602, run ID 23177217507). The task required reporting 5 distinct failed workflow runs with run IDs, workflow names, and specific failed job names. The agent did not report any findings to the user — it only accumulated data internally through tool calls but never synthesized and presented the required information. The known facts explicitly state that reporting fewer than 5 runs is incomplete."
+}

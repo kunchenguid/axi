@@ -1,0 +1,20 @@
+Looking at this trajectory, I need to evaluate whether the agent successfully reported 5 distinct failed workflow runs with run IDs, workflow names, and specific failed job names.
+
+**What the agent did:**
+- Correctly used the available wrapper tools (not gh CLI, as instructed)
+- Searched through PRs and checked their check runs for failures
+- Found failures in several runs:
+  1. Run `23477539322` (PR #53496) — `check-additional` failed
+  2. Run `23477574951` (PR #52293) — `checks (node, channels, 2/3)`, `checks (node, channels, 3/3)`, and `check-additional` failed
+  3. Run `23177217507` (PR #44602) — many jobs failed (secrets, check, contracts, channels, test shards, etc.)
+
+**What the agent did NOT do:**
+- The agent found only ~3 distinct failed runs, then continued searching for more
+- The trajectory ends mid-search with the agent still looking for more failures
+- No final consolidated report was ever produced with 5 distinct failed runs
+- Workflow names were never explicitly stated (the runs were only identified by run ID, not the workflow name like "CI" or "ci.yml")
+- The agent's last text output was "Three failed runs found so far. Let me check PR #48563 and get more PRs." — clearly incomplete
+
+The task required 5 distinct failed runs with run IDs, workflow names, AND specific job names. The agent's trajectory ended without producing any final answer.
+
+{"pass": false, "reason": "The agent never produced a final report. It found only ~3 failed runs before the trajectory ended mid-search, and never delivered a consolidated answer with 5 distinct failed runs including run IDs, workflow names, and specific failed job names as required."}

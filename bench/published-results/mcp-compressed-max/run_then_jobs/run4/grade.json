@@ -1,0 +1,4 @@
+{
+  "task_success": false,
+  "details": "The agent did not complete the task. It only listed available tools from the MCP server and determined that workflow/Actions tools were not available, but it did not attempt to use alternative methods (like the gh CLI via Bash tool) to list workflow runs and their jobs. The agent failed to retrieve any workflow run data, select a completed run, or report job names and statuses. The task required specific job-level information which was never obtained."
+}

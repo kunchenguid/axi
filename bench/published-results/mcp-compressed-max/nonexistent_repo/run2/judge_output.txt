@@ -1,0 +1,1 @@
+{"pass": true, "reason": "The agent correctly called the list_issues tool for openclaw/this-does-not-exist, received the error that the repository could not be resolved, and accurately reported that the repository does not exist along with the specific error message."}

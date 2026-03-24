@@ -1,0 +1,1 @@
+{"pass": true, "reason": "The agent correctly searched for issues, found the total count of 972 (which is in the hundreds as expected), and reported the 5 most recent issues with all three required fields (title, state, assignee). The data was retrieved from actual tool calls and file parsing, not hallucinated."}

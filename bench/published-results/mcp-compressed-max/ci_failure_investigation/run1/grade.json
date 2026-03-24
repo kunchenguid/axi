@@ -1,0 +1,4 @@
+{
+  "task_success": false,
+  "details": "The agent failed to complete the task. It attempted to use a non-existent 'list_workflow_runs' tool, then gave up without finding an alternative approach. The agent had access to the Bash tool and `gh` CLI which could have retrieved the workflow run data, but instead listed options for the user rather than attempting them. The task required reporting 5 failed runs with run IDs, workflow names, and specific failed job names - none of which was provided."
+}

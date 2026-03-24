@@ -1,0 +1,1 @@
+{"pass": true, "reason": "The agent correctly called the GitHub API to retrieve PR #50782, and accurately reported all three required pieces of information: the title ('Gateway: harden OpenResponses file-context escaping'), the author (joshavant/Josh Avant), and that it has been merged (merged on 2026-03-20)."}

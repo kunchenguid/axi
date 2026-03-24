@@ -1,0 +1,4 @@
+{
+  "task_success": false,
+  "details": "The agent correctly identified that the available GitHub MCP tools don't include workflow/Actions-related functionality, but it failed to complete the task. The agent did not attempt alternative approaches such as using the gh CLI (which may or may not be prohibited - the agent claimed CLAUDE.md prohibits it but we can't verify this), the GitHub REST API through other means, or web search. The agent gave up without producing the required output: a specific run ID, individual job names, and their statuses. The task explicitly requires reporting job names and statuses, which the agent completely failed to provide."
+}

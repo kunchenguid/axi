@@ -1,0 +1,4 @@
+{
+  "task_success": true,
+  "details": "The agent correctly called the GitHub API to retrieve the release tagged v2026.3.13-1 for openclaw/openclaw, then accurately extracted and reported the first 3 items from 'What's Changed': (1) fix(compaction) by efe-arv, (2) fix(telegram) by obviyus, and (3) fix: handle Discord gateway metadata fetch failures by jalehman - all matching the known facts exactly."
+}

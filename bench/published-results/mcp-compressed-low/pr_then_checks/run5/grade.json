@@ -1,0 +1,4 @@
+{
+  "task_success": true,
+  "details": "The agent correctly retrieved PR #50863 details and its CI check runs across two pages (43 total checks). The agent accurately counted 32 passed, 3 failed, and 8 skipped checks, and correctly identified the three failing checks as check-docs, channels (pnpm test:channels), and check — which matches the known facts."
+}

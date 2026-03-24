@@ -1,0 +1,4 @@
+{
+  "task_success": false,
+  "details": "The agent ran commands and retrieved data, but the results returned (v2026.3.23, v2026.3.22, v2026.3.22-beta.1) do not match the known correct answers (v2026.3.13-1, v2026.3.13-beta.1, v2026.3.12). The agent used perPage:3 which only returned the first 3 releases by the API's default ordering, but those releases appear to be different from the known facts. The agent reported incorrect tag names."
+}

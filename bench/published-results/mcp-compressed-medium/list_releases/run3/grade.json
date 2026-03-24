@@ -1,0 +1,4 @@
+{
+  "task_success": false,
+  "details": "The agent ran the correct command but reported incorrect tag names. The known facts state the 3 most recent tags are v2026.3.13-1, v2026.3.13-beta.1, and v2026.3.12, but the agent reported v2026.3.23, v2026.3.22, and v2026.3.22-beta.1. The agent appears to have queried stale or incorrect data, or the jq command extracted the wrong releases (perhaps not actually the most recent ones in sorted order)."
+}

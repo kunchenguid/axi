@@ -98,16 +98,21 @@ function extractQuery(args: string[]): string {
   return positionals.join(' ');
 }
 
+const COMMON_FILTER_FLAGS = ['--repo', '--owner', '--state', '--label', '--assignee', '--author'];
+
+function hasSearchFilters(args: string[], extraFlags: string[] = []): boolean {
+  return [...COMMON_FILTER_FLAGS, ...extraFlags].some(f => hasFlag(args, f));
+}
+
 async function searchIssues(args: string[], ctx?: RepoContext): Promise<string> {
   const query = extractQuery(args);
-  if (!query) throw new AxiError('Search query is required: gh-axi search issues <query>', 'VALIDATION_ERROR');
+  if (!query && !hasSearchFilters(args))
+    throw new AxiError('Search query or filters required: gh-axi search issues <query> [--assignee x] [--state open] ...', 'VALIDATION_ERROR');
 
   const limit = getFlag(args, '--limit') ?? DEFAULT_SEARCH_LIMIT;
-  const ghArgs = [
-    'search', 'issues', query,
-    '--json', 'number,title,repository,state,author,labels,createdAt',
-    '--limit', limit,
-  ];
+  const ghArgs = ['search', 'issues'];
+  if (query) ghArgs.push(query);
+  ghArgs.push('--json', 'number,title,repository,state,author,labels,createdAt', '--limit', limit);
   const repo = getFlag(args, '--repo') ?? ctx?.nwo;
   if (repo) ghArgs.push('--repo', repo);
   const owner = getFlag(args, '--owner');
@@ -141,14 +146,13 @@ async function searchIssues(args: string[], ctx?: RepoContext): Promise<string> 
 
 async function searchPrs(args: string[], ctx?: RepoContext): Promise<string> {
   const query = extractQuery(args);
-  if (!query) throw new AxiError('Search query is required: gh-axi search prs <query>', 'VALIDATION_ERROR');
+  if (!query && !hasSearchFilters(args, ['--draft', '--review']))
+    throw new AxiError('Search query or filters required: gh-axi search prs <query> [--assignee x] [--state open] ...', 'VALIDATION_ERROR');
 
   const limit = getFlag(args, '--limit') ?? DEFAULT_SEARCH_LIMIT;
-  const ghArgs = [
-    'search', 'prs', query,
-    '--json', 'number,title,repository,state,author,createdAt',
-    '--limit', limit,
-  ];
+  const ghArgs = ['search', 'prs'];
+  if (query) ghArgs.push(query);
+  ghArgs.push('--json', 'number,title,repository,state,author,createdAt', '--limit', limit);
   const repo = getFlag(args, '--repo') ?? ctx?.nwo;
   if (repo) ghArgs.push('--repo', repo);
   const owner = getFlag(args, '--owner');
@@ -185,14 +189,13 @@ async function searchPrs(args: string[], ctx?: RepoContext): Promise<string> {
 
 async function searchRepos(args: string[], ctx?: RepoContext): Promise<string> {
   const query = extractQuery(args);
-  if (!query) throw new AxiError('Search query is required: gh-axi search repos <query>', 'VALIDATION_ERROR');
+  if (!query && !hasSearchFilters(args, ['--language', '--stars']))
+    throw new AxiError('Search query or filters required: gh-axi search repos <query> [--owner x] [--language y] ...', 'VALIDATION_ERROR');
 
   const limit = getFlag(args, '--limit') ?? DEFAULT_SEARCH_LIMIT;
-  const ghArgs = [
-    'search', 'repos', query,
-    '--json', 'fullName,description,stargazersCount,forksCount,language,updatedAt',
-    '--limit', limit,
-  ];
+  const ghArgs = ['search', 'repos'];
+  if (query) ghArgs.push(query);
+  ghArgs.push('--json', 'fullName,description,stargazersCount,forksCount,language,updatedAt', '--limit', limit);
   const owner = getFlag(args, '--owner');
   if (owner) ghArgs.push('--owner', owner);
   const language = getFlag(args, '--language');
@@ -212,14 +215,13 @@ async function searchRepos(args: string[], ctx?: RepoContext): Promise<string> {
 
 async function searchCommits(args: string[], ctx?: RepoContext): Promise<string> {
   const query = extractQuery(args);
-  if (!query) throw new AxiError('Search query is required: gh-axi search commits <query>', 'VALIDATION_ERROR');
+  if (!query && !hasSearchFilters(args))
+    throw new AxiError('Search query or filters required: gh-axi search commits <query> [--repo x] [--author y] ...', 'VALIDATION_ERROR');
 
   const limit = getFlag(args, '--limit') ?? DEFAULT_SEARCH_LIMIT;
-  const ghArgs = [
-    'search', 'commits', query,
-    '--json', 'sha,commit,repository,author',
-    '--limit', limit,
-  ];
+  const ghArgs = ['search', 'commits'];
+  if (query) ghArgs.push(query);
+  ghArgs.push('--json', 'sha,commit,repository,author', '--limit', limit);
   const repo = getFlag(args, '--repo');
   if (repo) ghArgs.push('--repo', repo);
   const owner = getFlag(args, '--owner');
@@ -249,14 +251,13 @@ const codeSchema: FieldDef[] = [
 
 async function searchCode(args: string[], ctx?: RepoContext): Promise<string> {
   const query = extractQuery(args);
-  if (!query) throw new AxiError('Search query is required: gh-axi search code <query>', 'VALIDATION_ERROR');
+  if (!query && !hasSearchFilters(args, ['--language']))
+    throw new AxiError('Search query or filters required: gh-axi search code <query> [--repo x] [--language y] ...', 'VALIDATION_ERROR');
 
   const limit = getFlag(args, '--limit') ?? DEFAULT_SEARCH_LIMIT;
-  const ghArgs = [
-    'search', 'code', query,
-    '--json', 'path,repository,textMatches',
-    '--limit', limit,
-  ];
+  const ghArgs = ['search', 'code'];
+  if (query) ghArgs.push(query);
+  ghArgs.push('--json', 'path,repository,textMatches', '--limit', limit);
   const repo = getFlag(args, '--repo');
   if (repo) ghArgs.push('--repo', repo);
   const owner = getFlag(args, '--owner');

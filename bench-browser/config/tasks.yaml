@@ -1,0 +1,158 @@
+# Benchmark tasks — browser automation across stable public websites
+#
+# Grading:
+#   Uses LLM-as-judge (claude-sonnet-4-6) to evaluate the agent's trajectory.
+#   grading_hint — optional context to help the judge verify correctness.
+
+tasks:
+  # ── Category A: Single-step (navigate + read one page) ──────────
+
+  read_static_page:
+    category: single_step
+    prompt: >
+      Navigate to https://example.com and report the main heading of the page.
+    grading:
+      grading_hint: "The main heading on example.com is 'Example Domain'."
+
+  wikipedia_fact_lookup:
+    category: single_step
+    prompt: >
+      Navigate to the Wikipedia article for the Moon
+      (https://en.wikipedia.org/wiki/Moon) and report the Moon's average
+      orbital speed from the infobox.
+    grading:
+      grading_hint: "The Moon's average orbital speed is 1.022 km/s (approximately 1.022 km/s or 2,286 mph). The agent must have navigated to the page and extracted data from the infobox, not hallucinated."
+
+  github_repo_stars:
+    category: single_step
+    prompt: >
+      Navigate to https://github.com/torvalds/linux and report the
+      approximate star count and the primary programming language.
+    grading:
+      grading_hint: "torvalds/linux has 190k+ stars and the primary language is C. The star count changes over time but should be in the hundreds of thousands."
+
+  httpbin_page_read:
+    category: single_step
+    prompt: >
+      Navigate to https://httpbin.org/html and report the first sentence
+      of the text content on the page.
+    grading:
+      grading_hint: "The page contains Herman Melville's Moby Dick excerpt. The first sentence begins with 'Avast!' or refers to the Herman Melville passage. The key text is from Moby Dick by Herman Melville."
+
+  wikipedia_table_read:
+    category: single_step
+    prompt: >
+      Navigate to the Wikipedia article 'List of countries and dependencies
+      by population' (https://en.wikipedia.org/wiki/List_of_countries_and_dependencies_by_population)
+      and report the top 3 countries by population.
+    grading:
+      grading_hint: "The top 3 countries by population are India, China, and the United States (order may vary slightly depending on data updates, but India and China are always #1 and #2)."
+
+  # ── Category B: Multi-step (navigate + interact + follow links) ─
+
+  wikipedia_link_follow:
+    category: multi_step
+    prompt: >
+      Navigate to the Wikipedia article for Ada Lovelace
+      (https://en.wikipedia.org/wiki/Ada_Lovelace), then click the link
+      to Charles Babbage, and report his birth date from that article.
+    grading:
+      grading_hint: "Charles Babbage was born on 26 December 1791. The agent must have navigated to Ada Lovelace's page first, then followed the link to Charles Babbage's page."
+
+  github_navigate_to_file:
+    category: multi_step
+    prompt: >
+      Navigate to https://github.com/torvalds/linux, then browse to the
+      MAINTAINERS file and report the name of the first maintainer listed.
+    grading:
+      grading_hint: "The MAINTAINERS file in the Linux kernel lists Linus Torvalds as the overall maintainer at the top. The agent must have navigated through the repository to find and read the file."
+
+  wikipedia_infobox_hop:
+    category: multi_step
+    prompt: >
+      Navigate to the Wikipedia article for Python (programming language)
+      (https://en.wikipedia.org/wiki/Python_(programming_language)), find
+      the stable release version in the infobox, then click the link to
+      the article about the developer (Python Software Foundation) and
+      report when the foundation was formed.
+    grading:
+      grading_hint: "The Python Software Foundation was formed on March 6, 2001. The agent must have started on the Python article, identified the developer in the infobox, then navigated to the PSF article to find the formation date."
+
+  multi_page_comparison:
+    category: multi_step
+    prompt: >
+      Navigate to the Wikipedia article for Python (programming language)
+      and note who designed it. Then navigate to the Wikipedia article for
+      JavaScript and note who designed it. Report both designers.
+    grading:
+      grading_hint: "Python was designed by Guido van Rossum. JavaScript was designed by Brendan Eich. The agent must have visited both pages."
+
+  wikipedia_search_click:
+    category: multi_step
+    prompt: >
+      Navigate to https://en.wikipedia.org/wiki/Main_Page, search for
+      'Turing Award' using the search box, and report the first recipient
+      of the Turing Award from the article.
+    grading:
+      grading_hint: "The first Turing Award recipient was Alan Perlis in 1966. The agent must have used the Wikipedia search functionality to find the article."
+
+  # ── Category C: Investigation (complex multi-page extraction) ───
+
+  wikipedia_deep_extraction:
+    category: investigation
+    prompt: >
+      Navigate to the Wikipedia article 'List of Nobel laureates in Physics'
+      (https://en.wikipedia.org/wiki/List_of_Nobel_laureates_in_Physics)
+      and report the winners for the 3 most recent years listed.
+    grading:
+      grading_hint: "The agent must report specific laureate names for 3 recent years. The data changes as new prizes are awarded, but the agent must have extracted names from the table, not hallucinated them."
+
+  github_issue_investigation:
+    category: investigation
+    prompt: >
+      Navigate to the issues page for facebook/react on GitHub
+      (https://github.com/facebook/react/issues) and report the titles
+      of the 5 most recent issues and the total number of open issues.
+    grading:
+      grading_hint: "The agent must report 5 specific issue titles from the react repo and an approximate count of total open issues (typically in the hundreds). The titles must match actual issues visible on the page."
+
+  multi_site_research:
+    category: investigation
+    prompt: >
+      Research the Rust programming language across three sites:
+      1. Wikipedia (https://en.wikipedia.org/wiki/Rust_(programming_language)) — report who designed it
+      2. GitHub (https://github.com/rust-lang/rust) — report the star count
+      3. rust-lang.org (https://www.rust-lang.org/) — report the tagline or main description
+    grading:
+      grading_hint: "Rust was originally designed by Graydon Hoare. The GitHub repo has 100k+ stars. The rust-lang.org tagline is about reliability and performance (e.g. 'A language empowering everyone to build reliable and efficient software'). The agent must have visited all three sites."
+
+  tabular_data_analysis:
+    category: investigation
+    prompt: >
+      Navigate to the Wikipedia article 'World population'
+      (https://en.wikipedia.org/wiki/World_population) and find the table
+      showing when world population reached each billion milestone. Report
+      the year for each billion from 1 billion to 8 billion.
+    grading:
+      grading_hint: "Approximate milestones: 1B around 1804, 2B around 1927, 3B around 1960, 4B around 1974, 5B around 1987, 6B around 1999, 7B around 2011, 8B around 2022. The agent must have extracted these from the article's table."
+
+  # ── Category D: Error recovery ──────────────────────────────────
+
+  navigate_404:
+    category: error_recovery
+    prompt: >
+      Navigate to https://httpbin.org/status/404 and report what error
+      you encounter. Then navigate to https://httpbin.org/html to confirm
+      you can still browse normally and report the page content.
+    grading:
+      grading_hint: "The first URL returns a 404 error. The agent should report the error, then successfully navigate to httpbin.org/html which contains the Moby Dick excerpt. Both steps must be completed."
+
+  broken_element_interaction:
+    category: error_recovery
+    prompt: >
+      Navigate to https://example.com and try to fill in a search box
+      (which does not exist on this page). Report what happens when you
+      try to interact with a nonexistent element, then report the actual
+      content of the page.
+    grading:
+      grading_hint: "example.com has no search box or form fields. The agent should gracefully report that the element was not found or does not exist, then correctly report the page content (heading 'Example Domain' and a paragraph about IANA)."

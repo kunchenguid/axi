@@ -1,0 +1,4 @@
+{
+  "task_success": true,
+  "details": "The agent navigated to https://github.com/torvalds/linux, took a snapshot of the page, and correctly reported ~225k stars and C as the primary language (98.0%), both of which match the known facts (190k+ stars, primary language C)."
+}

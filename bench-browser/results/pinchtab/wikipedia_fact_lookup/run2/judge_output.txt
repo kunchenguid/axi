@@ -1,0 +1,1 @@
+{"pass": true, "reason": "The agent navigated to the correct Wikipedia Moon page, extracted the 'Average orbital speed' value directly from the infobox using accessibility tree data showing '1.022 km/s', and correctly reported it. No hallucination occurred."}

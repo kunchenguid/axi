@@ -1,0 +1,1 @@
+{"pass": true, "reason": "The agent navigated to the correct Wikipedia Moon page, extracted the orbital speed from the infobox using JavaScript, and correctly reported 1.022 km/s, which matches the known fact."}

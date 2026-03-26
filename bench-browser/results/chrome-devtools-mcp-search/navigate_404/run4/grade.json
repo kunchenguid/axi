@@ -1,0 +1,4 @@
+{
+  "task_success": false,
+  "details": "Could not parse judge verdict from output: Error: Reached max turns (1)"
+}

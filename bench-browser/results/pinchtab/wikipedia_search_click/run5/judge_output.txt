@@ -1,0 +1,1 @@
+{"pass": true, "reason": "The agent navigated to Wikipedia's Main Page, attempted to use the search box directly (which failed due to a DOM error), then recovered by navigating via the Wikipedia search URL, landed on the Turing Award article, and correctly identified Alan Perlis as the first recipient in 1966, quoting the article directly."}

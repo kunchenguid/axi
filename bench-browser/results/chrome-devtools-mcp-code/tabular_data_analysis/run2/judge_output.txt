@@ -1,0 +1,1 @@
+{"pass": true, "reason": "The agent successfully navigated to the Wikipedia 'World population' article, extracted the billion milestone table using JavaScript evaluation, and reported all 8 milestone years correctly: 1B→1804, 2B→1927, 3B→1960, 4B→1974, 5B→1987, 6B→1999, 7B→2011, 8B→2022, all matching the known facts."}

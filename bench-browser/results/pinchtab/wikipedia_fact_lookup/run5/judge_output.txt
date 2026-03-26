@@ -1,0 +1,1 @@
+{"pass": true, "reason": "The agent navigated to https://en.wikipedia.org/wiki/Moon, used pinchtab snap to extract the page structure, and correctly identified the Moon's average orbital speed as 1.022 km/s from the infobox cell adjacent to the 'Average orbital speed' row header. The data was extracted from the actual page content, not hallucinated."}

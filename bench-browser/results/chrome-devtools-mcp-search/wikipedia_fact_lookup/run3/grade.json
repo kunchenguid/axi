@@ -1,0 +1,4 @@
+{
+  "task_success": true,
+  "details": "The agent navigated to the correct Wikipedia Moon article, used JavaScript to extract the orbital speed from the infobox, and correctly reported 1.022 km/s, which matches the known fact."
+}

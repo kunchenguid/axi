@@ -92,10 +92,10 @@ Requires Node.js >= 20 and the [GitHub CLI](https://cli.github.com/) (`gh`) inst
 
 ### Running the Benchmark
 
-The benchmark harness lives in `bench/`. It runs agent tasks across different interface conditions and grades results with an LLM judge.
+The GitHub benchmark harness lives in `bench-github/`. It runs agent tasks across different interface conditions and grades results with an LLM judge.
 
 ```sh
-cd bench
+cd bench-github
 npm install
 
 # Run a single condition × task
@@ -110,10 +110,30 @@ npm run bench -- report
 
 **Conditions:** `axi`, `cli`, `mcp-no-toolsearch`, `mcp-with-toolsearch`, `mcp-with-code-mode`
 
-Results are written to `bench/results/`. Published results from the study (425 runs) are in [`bench/published-results/`](bench/published-results/STUDY.md).
+Results are written to `bench-github/results/`. Published results from the study (425 runs) are in [`bench-github/published-results/`](bench-github/published-results/STUDY.md).
+
+### Running the Browser Benchmark
+
+The browser benchmark harness lives in `bench-browser/`. It compares browser automation tools across 16 browsing tasks.
+
+```sh
+cd bench-browser
+npm install
+
+# Run a single condition × task
+npm run bench -- run --condition agent-browser --task read_static_page
+
+# Run the full matrix (all conditions × all tasks)
+npm run bench -- matrix --repeat 5
+
+# Generate summary report from results
+npm run bench -- report
+```
+
+**Conditions:** `agent-browser`, `pinchtab`, `chrome-devtools-mcp`
 
 ## Links
 
 - [Website](https://axi.md)
 - [AXI Skill definition](.agents/skills/axi/SKILL.md)
-- [Benchmark study](bench/published-results/STUDY.md)
+- [GitHub benchmark study](bench-github/published-results/STUDY.md)

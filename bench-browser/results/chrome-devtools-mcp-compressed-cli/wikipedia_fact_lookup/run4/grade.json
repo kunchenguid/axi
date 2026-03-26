@@ -1,0 +1,4 @@
+{
+  "task_success": true,
+  "details": "The agent navigated to the correct Wikipedia Moon article, extracted the orbital speed from the infobox using a snapshot (finding '1.022 km/s'), and correctly reported it."
+}

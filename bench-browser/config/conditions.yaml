@@ -1,0 +1,207 @@
+# Benchmark conditions — each defines how the agent automates a browser
+
+conditions:
+  agent-browser:
+    name: "Vercel Agent Browser (Rust CLI)"
+    tool: agent-browser
+    agents_md: |
+      # Tools
+
+      You have the `agent-browser` CLI installed for browser automation.
+      Use it for all browsing tasks. Do NOT use curl, wget, or WebFetch.
+
+      ## Commands
+
+      - `agent-browser navigate <url>` — Navigate to a URL
+      - `agent-browser snapshot` — Take an accessibility snapshot of the current page
+      - `agent-browser click @<ref>` — Click an element by its accessibility reference
+      - `agent-browser fill @<ref> <text>` — Fill a form field
+      - `agent-browser type <text>` — Type text into the focused element
+      - `agent-browser press <key>` — Press a keyboard key (e.g. Enter, Tab)
+      - `agent-browser scroll <direction>` — Scroll the page (up or down)
+      - `agent-browser back` — Go back in browser history
+      - `agent-browser wait <ms>` — Wait for a specified duration
+
+      ## Workflow
+
+      1. Navigate to a URL
+      2. Take a snapshot to see the page content and element references
+      3. Interact with elements using their @ref identifiers
+      4. Take another snapshot to verify the result
+    daemon: auto
+    install_command: "agent-browser install"
+
+  pinchtab:
+    name: "PinchTab (Go CLI)"
+    tool: pinchtab
+    agents_md: |
+      # Tools
+
+      You have the `pinchtab` CLI installed for browser automation.
+      Use it for all browsing tasks. Do NOT use curl, wget, or WebFetch.
+
+      ## Commands
+
+      - `pinchtab nav <url>` — Navigate to a URL
+      - `pinchtab snap` — Take an accessibility snapshot of the current page
+      - `pinchtab click @<ref>` — Click an element by its accessibility reference
+      - `pinchtab fill @<ref> <text>` — Fill a form field
+      - `pinchtab type <text>` — Type text into the focused element
+      - `pinchtab press <key>` — Press a keyboard key (e.g. Enter, Tab)
+      - `pinchtab scroll <direction>` — Scroll the page (up or down)
+      - `pinchtab back` — Go back in browser history
+
+      ## Workflow
+
+      1. Navigate to a URL
+      2. Take a snapshot to see the page content and element references
+      3. Interact with elements using their @ref identifiers
+      4. Take another snapshot to verify the result
+    daemon: explicit
+    daemon_start: "pinchtab daemon start"
+    daemon_stop: "pinchtab daemon stop"
+
+  # ── Chrome DevTools MCP variants ────────────────────────────────
+
+  chrome-devtools-mcp:
+    name: "Chrome DevTools MCP (no ToolSearch)"
+    tool: mcp
+    agents_md: |
+      # Tools
+
+      You have a Chrome DevTools MCP server with tools for browser automation.
+      Use the available MCP tools to interact with web pages.
+      Do NOT use curl, wget, or WebFetch.
+
+      ## Available MCP Tools
+
+      - `navigate_page` — Navigate to a URL (params: url)
+      - `take_snapshot` — Take an accessibility snapshot of the current page
+      - `click` — Click an element (params: selector or ref)
+      - `fill` — Fill a form field (params: selector, value)
+      - `type_text` — Type text (params: text)
+      - `press_key` — Press a keyboard key (params: key)
+      - `take_screenshot` — Take a visual screenshot
+      - `evaluate_script` — Run JavaScript on the page
+
+      ## Workflow
+
+      1. Navigate to a URL with `navigate_page`
+      2. Use `take_snapshot` to see the page content
+      3. Interact using `click`, `fill`, `type_text`, `press_key`
+      4. Use `take_snapshot` again to verify the result
+    daemon: none
+    mcp_config:
+      mcpServers:
+        chrome-devtools:
+          command: "npx"
+          args: ["-y", "chrome-devtools-mcp@latest", "--headless", "--isolated"]
+
+  chrome-devtools-mcp-search:
+    name: "Chrome DevTools MCP (with ToolSearch)"
+    tool: mcp
+    agents_md: |
+      # Tools
+
+      You have a Chrome DevTools MCP server registered with tools for browser
+      automation. Use the available MCP tools to interact with web pages.
+      Do NOT use curl, wget, or WebFetch.
+
+      The tools follow standard browser automation patterns. Use ToolSearch
+      to discover available tools and their parameters.
+    daemon: none
+    mcp_config:
+      mcpServers:
+        chrome-devtools:
+          command: "npx"
+          args: ["-y", "chrome-devtools-mcp@latest", "--headless", "--isolated"]
+
+  chrome-devtools-mcp-code:
+    name: "Chrome DevTools (code execution)"
+    tool: code
+    agents_md: |
+      # Tools
+
+      You have a TypeScript library at `./browser-code/` that provides
+      `callTool(name, args)` and `listTools()` to call chrome-devtools-mcp
+      tools. Use it by writing a `.ts` script and running it with `npx tsx`.
+
+      IMPORTANT: Do NOT use `curl`, `wget`, or WebFetch.
+      You must use the `./browser-code/` library exclusively.
+
+      ## Available functions
+
+      - `listTools()` — List all available MCP tool names and descriptions
+      - `callTool(name, args)` — Call an MCP tool by name, returns text result
+
+      ## MCP tool names (same as chrome-devtools-mcp)
+
+      - `navigate_page` (params: url) — Navigate to a URL
+      - `take_snapshot` — Accessibility snapshot of the page
+      - `click` (params: element) — Click an element (ref from snapshot)
+      - `fill` (params: element, value) — Fill a form field
+      - `type_text` (params: text) — Type text into focused element
+      - `press_key` (params: key) — Press a keyboard key
+      - `evaluate_script` (params: expression) — Run JavaScript in the page
+      - `new_page` (params: url) — Open a new tab
+      - `list_pages` — List open pages
+      - `select_page` (params: pageId) — Switch to a page
+
+      ## Usage pattern
+
+      Write a TypeScript file, then run it:
+
+      ```ts
+      import { callTool } from "./browser-code";
+
+      await callTool("navigate_page", { url: "https://example.com" });
+      const snapshot = await callTool("take_snapshot");
+      console.log(snapshot);
+      ```
+
+      Then execute: `npx tsx script.ts`
+
+      Browser state persists across scripts — you can navigate in one script
+      and snapshot in the next. Compose multiple operations in a single script
+      to minimize round trips.
+    daemon: none
+
+  chrome-devtools-mcp-compressed-cli:
+    name: "MCP Compressor CLI (chrome-devtools)"
+    tool: mcp-compressor-cli
+    agents_md: |
+      # Tools
+
+      You have a `chrome-devtools` CLI tool for browser automation. Use it via bash.
+      Do NOT use curl, wget, WebFetch, or interact with Chrome DevTools Protocol directly.
+      Only use the `chrome-devtools` CLI commands listed below.
+
+      ## Key Commands
+
+      - `chrome-devtools new-page --url <url>` — Open a new tab and navigate to URL
+      - `chrome-devtools navigate-page --url <url>` — Navigate current page to URL
+      - `chrome-devtools take-snapshot` — Take an accessibility snapshot of the current page
+      - `chrome-devtools click --element "<ref>"` — Click an element (use ref from snapshot)
+      - `chrome-devtools fill --element "<ref>" --value "text"` — Fill a form field
+      - `chrome-devtools type-text --text "hello"` — Type text into focused element
+      - `chrome-devtools press-key --key Enter` — Press a keyboard key
+      - `chrome-devtools list-pages` — List open pages
+      - `chrome-devtools select-page --pageId <id>` — Switch to a specific page
+
+      Run `chrome-devtools <subcommand> --help` for parameter details.
+
+      ## Workflow
+
+      1. Open a page: `chrome-devtools new-page --url https://example.com`
+      2. Take a snapshot: `chrome-devtools take-snapshot`
+      3. Interact with elements using refs from the snapshot
+      4. Take another snapshot to verify the result
+
+      IMPORTANT: Always start with `new-page` to open a tab. Use `navigate-page`
+      only to navigate an already-open page to a different URL.
+    daemon: none
+    mcp_compressor:
+      level: medium
+      server_name: chrome-devtools
+      cli_mode: true
+      backend_command: ["npx", "-y", "chrome-devtools-mcp@latest", "--headless", "--isolated"]

@@ -1,0 +1,4 @@
+{
+  "task_success": true,
+  "details": "The agent navigated to the correct Wikipedia Moon article, took a snapshot, searched the output for 'orbital speed', found the infobox cell showing '1.022km/s', and correctly reported 1.022 km/s as the Moon's average orbital speed."
+}

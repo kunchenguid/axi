@@ -1,0 +1,1 @@
+{"pass": true, "reason": "The agent successfully navigated to https://github.com/torvalds/linux, extracted the star count (~225k, which is consistent with 190k+ stars) and correctly identified the primary programming language as C (98.0%). The data was retrieved by actually browsing to the page, not hallucinated."}

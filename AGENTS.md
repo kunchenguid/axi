@@ -7,7 +7,8 @@ This file provides guidance to AI agents when working with code in this reposito
 AXI (Agent eXperience Interface) defines 10 ergonomic principles for building CLI tools that AI agents use via shell execution. This repo contains:
 
 - **`gh-axi/`** — Reference AXI implementation: a `gh` CLI wrapper with TOON output, pre-computed fields, contextual suggestions, and structured errors. Published to npm as `gh-axi`.
-- **`bench/`** — Benchmark harness that compares gh-axi vs gh CLI vs GitHub MCP across 17 agent tasks, graded by an LLM judge.
+- **`bench-github/`** — Benchmark harness that compares gh-axi vs gh CLI vs GitHub MCP across 17 agent tasks, graded by an LLM judge.
+- **`bench-browser/`** — Benchmark harness that compares browser automation tools (agent-browser, pinchtab, chrome-devtools-mcp) across 16 browsing tasks.
 - **`.agents/skills/axi/SKILL.md`** — The AXI skill definition (installable via `npx skills add kunchenguid/axi`).
 - **`docs/`** — Static website (axi.md).
 
@@ -24,13 +25,24 @@ npm test           # Run all tests (vitest)
 npx vitest run src/toon.test.ts   # Run a single test file (from gh-axi/)
 ```
 
-### Benchmark harness
+### Benchmark harness (GitHub)
 
 ```sh
-cd bench
+cd bench-github
 npm install
 npm run bench -- run --condition axi --task merged_pr_ci_audit --repeat 5 --agent claude
 npm run bench -- matrix --repeat 5 --agent claude
+npm run bench -- report
+npm test           # Run bench tests (vitest)
+```
+
+### Benchmark harness (Browser)
+
+```sh
+cd bench-browser
+npm install
+npm run bench -- run --condition agent-browser --task read_static_page
+npm run bench -- matrix --repeat 5
 npm run bench -- report
 npm test           # Run bench tests (vitest)
 ```
@@ -57,7 +69,11 @@ TOON encoding uses the `@toon-format/toon` library. Field extraction (`toon.ts:e
 
 ### Benchmark
 
-`bench/src/runner.ts` orchestrates runs: clones a test repo, writes condition-specific AGENTS.md, invokes the agent (codex or claude), parses JSONL usage, and runs the LLM grader. Conditions are defined in `bench/config/conditions.yaml`, tasks in `bench/config/tasks.yaml`. Results go to `bench/results/`, published results in `bench/published-results/`.
+`bench-github/src/runner.ts` orchestrates runs: clones a test repo, writes condition-specific AGENTS.md, invokes the agent (codex or claude), parses JSONL usage, and runs the LLM grader. Conditions are defined in `bench-github/config/conditions.yaml`, tasks in `bench-github/config/tasks.yaml`. Results go to `bench-github/results/`, published results in `bench-github/published-results/`.
+
+### Benchmark (Browser)
+
+`bench-browser/src/runner.ts` orchestrates browser benchmark runs: creates a workspace with condition-specific CLAUDE.md, manages browser daemon lifecycle, invokes Claude with `--bare` isolation, parses JSONL usage, and grades results. Conditions are defined in `bench-browser/config/conditions.yaml`, tasks in `bench-browser/config/tasks.yaml`.
 
 ## Conventions
 

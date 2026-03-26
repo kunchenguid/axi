@@ -1,0 +1,1 @@
+{"pass": true, "reason": "The agent successfully visited all three required sites: rust-lang.org (found tagline 'A language empowering everyone to build reliable and efficient software.'), Wikipedia (found Graydon Hoare as designer), and GitHub (found 111k stars). All three facts are correct and match the known facts."}

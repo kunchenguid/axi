@@ -7,20 +7,21 @@ This study compares how AI agents perform browser automation tasks across differ
 **Agent**: Claude Sonnet 4.6 (`claude-sonnet-4-6`)
 **Judge**: Claude Sonnet 4.6
 **Repeats**: 5 per condition × task
-**Total runs**: 480 (6 conditions × 16 tasks × 5 repeats)
-**Total cost**: ~$84
+**Total runs**: 560 (7 conditions × 16 tasks × 5 repeats)
+**Total cost**: ~$91
 **Date**: 2026-03-25
 
 ## Conditions
 
-| Condition                            | Interface             | Description                                                                                                                  |
-| ------------------------------------ | --------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
-| `agent-browser`                      | Bash CLI (Rust)       | Vercel's Agent Browser. Agent runs `agent-browser navigate`, `agent-browser snapshot`, etc.                                  |
-| `pinchtab`                           | Bash CLI (Go)         | PinchTab CLI. Agent runs `pinchtab nav`, `pinchtab snap`, etc.                                                               |
-| `chrome-devtools-mcp`                | MCP (no ToolSearch)   | Chrome DevTools MCP server. All ~30 tool schemas loaded upfront. Agent calls tools directly.                                 |
-| `chrome-devtools-mcp-search`         | MCP (with ToolSearch) | Same server, but tools discovered on-demand via ToolSearch.                                                                  |
-| `chrome-devtools-mcp-code`           | TypeScript scripts    | Agent writes `.ts` scripts calling `callTool(name, args)` which forwards to chrome-devtools-mcp via a persistent MCP bridge. |
-| `chrome-devtools-mcp-compressed-cli` | MCP Compressor (CLI)  | mcp-compressor CLI mode generates a `chrome-devtools` shell command wrapping the MCP server. Agent uses Bash.                |
+| Condition                            | Interface             | Description                                                                                                                   |
+| ------------------------------------ | --------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| `agent-browser`                      | Bash CLI (Rust)       | Vercel's Agent Browser. Agent runs `agent-browser navigate`, `agent-browser snapshot`, etc.                                   |
+| `agent-browser-axi`                  | Bash CLI (AXI)        | AXI wrapper around agent-browser. Combined operations (action + snapshot in one call), TOON metadata, contextual suggestions. |
+| `pinchtab`                           | Bash CLI (Go)         | PinchTab CLI. Agent runs `pinchtab nav`, `pinchtab snap`, etc.                                                                |
+| `chrome-devtools-mcp`                | MCP (no ToolSearch)   | Chrome DevTools MCP server. All ~30 tool schemas loaded upfront. Agent calls tools directly.                                  |
+| `chrome-devtools-mcp-search`         | MCP (with ToolSearch) | Same server, but tools discovered on-demand via ToolSearch.                                                                   |
+| `chrome-devtools-mcp-code`           | TypeScript scripts    | Agent writes `.ts` scripts calling `callTool(name, args)` which forwards to chrome-devtools-mcp via a persistent MCP bridge.  |
+| `chrome-devtools-mcp-compressed-cli` | MCP Compressor (CLI)  | mcp-compressor CLI mode generates a `chrome-devtools` shell command wrapping the MCP server. Agent uses Bash.                 |
 
 All MCP-based conditions use the same backend: `chrome-devtools-mcp@latest --headless --isolated`.
 
@@ -28,7 +29,8 @@ All MCP-based conditions use the same backend: `chrome-devtools-mcp@latest --hea
 
 | Condition                          | Success% | Avg Cost   | Total Cost | Avg Duration | Avg Turns |
 | ---------------------------------- | -------- | ---------- | ---------- | ------------ | --------- |
-| **agent-browser**                  | **96%**  | **$0.164** | $13.15     | **30.3s**    | 6.3       |
+| agent-browser                      | 96%      | $0.164     | $13.15     | 30.3s        | 6.3       |
+| **agent-browser-axi**              | **95%**  | **$0.085** | **$6.76**  | **19.2s**    | **5.0**   |
 | pinchtab                           | 94%      | $0.178     | $14.23     | 36.5s        | 7.2       |
 | chrome-devtools-mcp-compressed-cli | 94%      | $0.167     | $13.37     | 31.2s        | 6.2       |
 | chrome-devtools-mcp                | 93%      | $0.176     | $14.06     | 31.3s        | 6.0       |
@@ -37,11 +39,27 @@ All MCP-based conditions use the same backend: `chrome-devtools-mcp@latest --hea
 
 ## Findings
 
-### 1. CLI tools outperform MCP for browser automation
+### 1. AXI wrapper halves cost while matching success rate
 
-The two CLI conditions (agent-browser, pinchtab) achieve the highest success rates (96%, 94%) at the lowest costs ($0.164, $0.178). CLI tools benefit from simple, predictable interfaces — the agent learns the command set from the system prompt and executes directly without schema discovery overhead.
+The AXI wrapper (`agent-browser-axi`) achieves 95% success at $0.085/task — 48% cheaper than raw `agent-browser` (96%, $0.164) with 37% less wall-clock time (19.2s vs 30.3s). The primary mechanism is **combined operations**: every action command (click, fill, scroll, etc.) automatically returns a page snapshot, eliminating the separate `snapshot` call the agent would otherwise need. This halves the number of Bash tool calls, which compounds across multi-step tasks.
 
-### 2. ToolSearch severely hurts browser automation
+| Metric           | agent-browser | agent-browser-axi | Delta |
+| ---------------- | ------------- | ----------------- | ----- |
+| Success          | 96%           | 95%               | −1pp  |
+| Avg cost         | $0.164        | $0.085            | −48%  |
+| Avg turns        | 6.3           | 5.0               | −21%  |
+| Avg duration     | 30.3s         | 19.2s             | −37%  |
+| Avg input tokens | 205K          | 100K              | −51%  |
+
+The 1pp success gap comes entirely from `github_navigate_to_file`, which is hard for all conditions. On the other 15 tasks, agent-browser-axi matches agent-browser at 100%.
+
+This mirrors the GitHub benchmark finding where AXI achieved 100% success at 7% lower cost vs raw `gh` CLI. The browser benchmark shows a much larger cost reduction because browser automation involves more round trips — each eliminated snapshot call saves an entire LLM turn.
+
+### 2. CLI tools outperform MCP for browser automation
+
+The three CLI conditions (agent-browser-axi, agent-browser, pinchtab) achieve the highest success rates (95–96%) at the lowest costs. CLI tools benefit from simple, predictable interfaces — the agent learns the command set from the system prompt and executes directly without schema discovery overhead.
+
+### 3. ToolSearch severely hurts browser automation
 
 ToolSearch (71%) drops 22 percentage points vs eager-loading (93%). Chrome DevTools MCP exposes ~30 tools, and ToolSearch forces the agent to discover them on-demand. Key failures:
 
@@ -57,21 +75,22 @@ The agent wastes turns searching for tools (e.g., querying for "navigate" when t
 
 This mirrors the GitHub benchmark finding: ToolSearch is a net negative when the agent needs most of the tools. The upfront context cost of loading all schemas (~30 tools) is far cheaper than the cumulative cost of discovery turns.
 
-### 3. MCP Compressor CLI mode matches dedicated CLI tools
+### 4. MCP Compressor CLI mode matches dedicated CLI tools
 
 MCP Compressor's CLI mode (94%, $0.167, 31.2s) performs on par with dedicated CLI tools (agent-browser: 96%, $0.164, 30.3s) despite wrapping the same chrome-devtools-mcp backend. The auto-generated `chrome-devtools` CLI command gives the agent a familiar Bash interface without requiring a purpose-built tool.
 
-### 4. Code mode is competitive but adds latency
+### 5. Code mode is competitive but adds latency
 
 Code execution (91%) is close to MCP (93%) in success but 45% slower (45.5s vs 31.3s). The agent spends time writing scripts, and each `npx tsx` invocation has startup overhead. However, code mode's `callTool(name, args)` interface is nearly identical to raw MCP — the comparison isolates the "write and execute code" paradigm from the tool interface itself.
 
-### 5. `github_navigate_to_file` is universally hard
+### 6. `github_navigate_to_file` is universally hard
 
 This task (navigate to torvalds/linux → find MAINTAINERS file → report first maintainer) has the lowest success rate across all conditions:
 
 | Condition                          | Success |
 | ---------------------------------- | ------- |
 | agent-browser                      | 2/5     |
+| agent-browser-axi                  | 1/5     |
 | pinchtab                           | 1/5     |
 | chrome-devtools-mcp                | 0/5     |
 | chrome-devtools-mcp-search         | 1/5     |
@@ -80,7 +99,7 @@ This task (navigate to torvalds/linux → find MAINTAINERS file → report first
 
 The GitHub file browser is complex — deeply nested DOM, dynamic loading, and the MAINTAINERS file is large. All tools struggle with multi-step repository navigation. This suggests a task design issue rather than a tool limitation; the task may be too dependent on GitHub's UI implementation.
 
-### 6. Simple tasks are solved by all conditions
+### 7. Simple tasks are solved by all conditions
 
 Single-step tasks (`read_static_page`, `wikipedia_fact_lookup`, `wikipedia_table_read`) achieve near-100% success across all conditions except ToolSearch. The browser automation tools are all capable — the differences emerge on complex multi-step workflows.
 

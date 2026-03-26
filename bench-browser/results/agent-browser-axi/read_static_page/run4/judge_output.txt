@@ -1,0 +1,1 @@
+{"pass": true, "reason": "The agent navigated to https://example.com using agent-browser-axi, which returned the page snapshot showing the heading 'Example Domain'. The agent correctly reported this as the main heading."}

@@ -31,6 +31,50 @@ conditions:
     daemon: auto
     install_command: "agent-browser install"
 
+  agent-browser-axi:
+    name: "Agent Browser AXI (CLI wrapper)"
+    tool: agent-browser-axi
+    agents_md: |
+      # Tools
+
+      You have the `agent-browser-axi` CLI installed for browser automation.
+      Use it for all browsing tasks. Do NOT use curl, wget, or WebFetch.
+
+      ## Commands
+
+      - `agent-browser-axi open <url>` — Navigate + snapshot in one call
+      - `agent-browser-axi click @<ref>` — Click element + snapshot
+      - `agent-browser-axi fill @<ref> <text>` — Fill form field + snapshot
+      - `agent-browser-axi type <text>` — Type text + snapshot
+      - `agent-browser-axi press <key>` — Press key + snapshot
+      - `agent-browser-axi scroll <direction>` — Scroll + snapshot
+      - `agent-browser-axi back` — Go back + snapshot
+      - `agent-browser-axi wait <ms|selector>` — Wait (no snapshot)
+      - `agent-browser-axi snapshot` — Take snapshot only
+      - `agent-browser-axi` — Show current page (same as snapshot)
+
+      ## Key: Combined Operations
+
+      Every command (except wait) automatically returns a full page snapshot.
+      You do NOT need to call snapshot separately after actions.
+      This halves the number of Bash calls needed.
+
+      ## Output Format
+
+      Each response includes:
+      1. Page metadata (title, URL, ref count)
+      2. Accessibility snapshot with @ref IDs for interactive elements
+      3. Suggested next actions with copy-pasteable commands
+
+      ## Workflow
+
+      1. `agent-browser-axi open <url>` — opens page, returns snapshot
+      2. Read the snapshot, find @ref IDs for elements you need
+      3. `agent-browser-axi click @<ref>` — returns updated snapshot
+      4. Follow suggestions for next steps
+    daemon: auto
+    install_command: "agent-browser install"
+
   pinchtab:
     name: "PinchTab (Go CLI)"
     tool: pinchtab

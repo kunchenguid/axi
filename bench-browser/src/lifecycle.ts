@@ -169,6 +169,7 @@ function waitForHealth(condition: ConditionDef): void {
 function getHealthCommand(condition: ConditionDef): string | null {
   switch (condition.id) {
     case "agent-browser":
+    case "agent-browser-axi":
       return "agent-browser navigate about:blank";
     case "pinchtab":
       return "pinchtab nav about:blank";

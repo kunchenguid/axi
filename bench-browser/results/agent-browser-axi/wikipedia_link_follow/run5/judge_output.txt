@@ -1,0 +1,1 @@
+{"pass": true, "reason": "The agent correctly navigated to Ada Lovelace's Wikipedia page, found the Charles Babbage link, clicked it to navigate to his page, and correctly reported his birth date as 26 December 1791."}

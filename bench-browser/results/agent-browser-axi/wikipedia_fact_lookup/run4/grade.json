@@ -1,0 +1,4 @@
+{
+  "task_success": true,
+  "details": "The agent navigated to https://en.wikipedia.org/wiki/Moon, extracted the infobox data from the page snapshot, and correctly reported the Moon's average orbital speed as 1.022 km/s, which matches the known fact. The data was confirmed from the actual page content (cell ref=e1144 showing '1.022km/s'), not hallucinated."
+}

@@ -1,6 +1,6 @@
 /** Shared interfaces for the browser benchmark harness. */
 
-export type ConditionId = "agent-browser" | "pinchtab" | "chrome-devtools-mcp" | "chrome-devtools-mcp-search" | "chrome-devtools-mcp-code" | "chrome-devtools-mcp-compressed-cli";
+export type ConditionId = "agent-browser" | "agent-browser-axi" | "pinchtab" | "chrome-devtools-mcp" | "chrome-devtools-mcp-search" | "chrome-devtools-mcp-code" | "chrome-devtools-mcp-compressed-cli";
 export type TaskCategory = "single_step" | "multi_step" | "investigation" | "error_recovery";
 
 export interface GradingSpec {

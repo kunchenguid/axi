@@ -4,6 +4,26 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>AXI: Agent eXperience Interface</title>
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="AXI: Agent eXperience Interface" />
+    <meta
+      property="og:description"
+      content="10 design principles for agent-ergonomic CLI. 100% task success at the lowest cost — beating both MCP and raw CLI across two benchmarks and 985 runs."
+    />
+    <meta property="og:image" content="https://axi.md/axi-splash.png" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://kunchenguid.github.io/axi/" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="AXI: Agent eXperience Interface" />
+    <meta
+      name="twitter:description"
+      content="10 design principles for agent-ergonomic CLI. 100% task success at the lowest cost — beating both MCP and raw CLI across two benchmarks and 985 runs."
+    />
+    <meta name="twitter:image" content="https://axi.md/axi-splash.png" />
+
     <link
       rel="stylesheet"
       href="https://kunchenguid.github.io/kunchenguid-design-system/css/design-system.css"
@@ -32,7 +52,7 @@
       }
       .chart-label {
         flex-shrink: 0;
-        width: 7rem;
+        width: 16rem;
         text-align: right;
         font-family: var(--font-mono);
         font-size: var(--text-xs);
@@ -63,6 +83,10 @@
       }
       .copyable {
         position: relative;
+        padding: 0.5rem 0.75rem;
+      }
+      .copyable code {
+        font-size: var(--text-xs);
       }
       .btn-copy {
         position: absolute;
@@ -90,11 +114,11 @@
       <!-- Header -->
       <header class="section" style="border-top: none">
         <p class="section-label">AXI &mdash; Agent eXperience Interface</p>
-        <h1 data-annotate>Let's build apps that [agents] love.</h1>
+        <h1 data-annotate>Let&apos;s build apps that [agents] love.</h1>
         <p class="text-lg">
           10 design principles for agent-ergonomic CLI. 100% task success at the
-          lowest cost &mdash; beating both MCP and raw CLI across 425 benchmark
-          runs.
+          lowest cost &mdash; beating both MCP and raw CLI across two benchmarks
+          and 985 runs.
         </p>
 
         <div class="grid grid--2 mt-xl">
@@ -102,35 +126,52 @@
             <p class="section-label">Success Rate</p>
             <div class="chart-rows">
               <div class="chart-row">
-                <span class="chart-label">gh-cli</span>
+                <span class="chart-label">chrome-devtools-mcp</span>
                 <div class="chart-bar-track">
-                  <div class="chart-bar" style="width: 86%"></div>
+                  <div class="chart-bar" style="width: 100%"></div>
                 </div>
-                <span class="chart-value">86%</span>
+                <span class="chart-value">100%</span>
               </div>
               <div class="chart-row">
-                <span class="chart-label">gh-mcp</span>
+                <span class="chart-label">chrome-devtools-mcp-search</span>
                 <div class="chart-bar-track">
-                  <div class="chart-bar" style="width: 87%"></div>
+                  <div class="chart-bar" style="width: 85%"></div>
                 </div>
-                <span class="chart-value">87%</span>
+                <span class="chart-value">85%</span>
               </div>
               <div class="chart-row">
-                <span class="chart-label">gh-mcp-search</span>
+                <span class="chart-label">chrome-devtools-mcp-code</span>
                 <div class="chart-bar-track">
-                  <div class="chart-bar" style="width: 82%"></div>
+                  <div class="chart-bar" style="width: 99%"></div>
                 </div>
-                <span class="chart-value">82%</span>
+                <span class="chart-value">99%</span>
               </div>
               <div class="chart-row">
-                <span class="chart-label">gh-mcp-code</span>
+                <span class="chart-label">chrome-devtools-mcp-compressed</span>
                 <div class="chart-bar-track">
-                  <div class="chart-bar" style="width: 84%"></div>
+                  <div class="chart-bar" style="width: 100%"></div>
                 </div>
-                <span class="chart-value">84%</span>
+                <span class="chart-value">100%</span>
               </div>
               <div class="chart-row">
-                <span class="chart-label">gh-axi</span>
+                <span class="chart-label">chrome-devtools-axi</span>
+                <div class="chart-bar-track">
+                  <div
+                    class="chart-bar bar-highlight"
+                    style="width: 100%"
+                  ></div>
+                </div>
+                <span class="chart-value value-highlight">100%</span>
+              </div>
+              <div class="chart-row">
+                <span class="chart-label">agent-browser</span>
+                <div class="chart-bar-track">
+                  <div class="chart-bar" style="width: 100%"></div>
+                </div>
+                <span class="chart-value">100%</span>
+              </div>
+              <div class="chart-row">
+                <span class="chart-label">agent-browser-axi</span>
                 <div class="chart-bar-track">
                   <div
                     class="chart-bar bar-highlight"
@@ -145,39 +186,53 @@
             <p class="section-label">Avg Cost per Task</p>
             <div class="chart-rows">
               <div class="chart-row">
-                <span class="chart-label">gh-cli</span>
+                <span class="chart-label">chrome-devtools-mcp</span>
                 <div class="chart-bar-track">
-                  <div class="chart-bar" style="width: 36%"></div>
+                  <div class="chart-bar" style="width: 95%"></div>
                 </div>
-                <span class="chart-value">$0.054</span>
+                <span class="chart-value">$0.168</span>
               </div>
               <div class="chart-row">
-                <span class="chart-label">gh-mcp</span>
+                <span class="chart-label">chrome-devtools-mcp-search</span>
+                <div class="chart-bar-track">
+                  <div class="chart-bar" style="width: 94%"></div>
+                </div>
+                <span class="chart-value">$0.167</span>
+              </div>
+              <div class="chart-row">
+                <span class="chart-label">chrome-devtools-mcp-code</span>
                 <div class="chart-bar-track">
                   <div class="chart-bar" style="width: 100%"></div>
                 </div>
-                <span class="chart-value">$0.148</span>
+                <span class="chart-value">$0.177</span>
               </div>
               <div class="chart-row">
-                <span class="chart-label">gh-mcp-search</span>
+                <span class="chart-label">chrome-devtools-mcp-compressed</span>
                 <div class="chart-bar-track">
-                  <div class="chart-bar" style="width: 99%"></div>
+                  <div class="chart-bar" style="width: 85%"></div>
                 </div>
-                <span class="chart-value">$0.147</span>
+                <span class="chart-value">$0.150</span>
               </div>
               <div class="chart-row">
-                <span class="chart-label">gh-mcp-code</span>
+                <span class="chart-label">chrome-devtools-axi</span>
                 <div class="chart-bar-track">
-                  <div class="chart-bar" style="width: 68%"></div>
+                  <div class="chart-bar bar-highlight" style="width: 75%"></div>
                 </div>
-                <span class="chart-value">$0.101</span>
+                <span class="chart-value value-highlight">$0.133</span>
               </div>
               <div class="chart-row">
-                <span class="chart-label">gh-axi</span>
+                <span class="chart-label">agent-browser</span>
                 <div class="chart-bar-track">
-                  <div class="chart-bar bar-highlight" style="width: 34%"></div>
+                  <div class="chart-bar" style="width: 90%"></div>
                 </div>
-                <span class="chart-value value-highlight">$0.050</span>
+                <span class="chart-value">$0.160</span>
+              </div>
+              <div class="chart-row">
+                <span class="chart-label">agent-browser-axi</span>
+                <div class="chart-bar-track">
+                  <div class="chart-bar bar-highlight" style="width: 77%"></div>
+                </div>
+                <span class="chart-value value-highlight">$0.137</span>
               </div>
             </div>
           </div>
@@ -187,18 +242,23 @@
           <div class="card">
             <p class="section-label">Try it now</p>
             <p class="text-sm text-muted">
-              <code>gh-axi</code> is a wrapper around the <code>gh</code> CLI,
-              optimized for agent ergonomics.
+              <code>gh-axi</code> &mdash; GitHub operations
             </p>
             <pre
               class="copyable"
             ><code>npm install -g gh-axi</code><button class="btn-copy" onclick="copyBlock(this)" aria-label="Copy to clipboard"><svg class="icon-copy" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><svg class="icon-check" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="display:none"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg></button></pre>
+            <p class="text-sm text-muted">
+              <code>chrome-devtools-axi</code> &mdash; Browser automation
+            </p>
+            <pre
+              class="copyable"
+            ><code>npm install -g chrome-devtools-axi</code><button class="btn-copy" onclick="copyBlock(this)" aria-label="Copy to clipboard"><svg class="icon-copy" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><svg class="icon-check" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="display:none"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg></button></pre>
             <p class="text-sm text-muted mb-0">
               Add to your <code>CLAUDE.md</code> or <code>AGENTS.md</code>:
             </p>
             <pre
               class="copyable"
-            ><code>Use `gh-axi` (replacement for `gh` CLI) for all GitHub operations.</code><button class="btn-copy" onclick="copyBlock(this)" aria-label="Copy to clipboard"><svg class="icon-copy" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><svg class="icon-check" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="display:none"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg></button></pre>
+            ><code>Use `gh-axi` for GitHub and `chrome-devtools-axi` for browser automation.</code><button class="btn-copy" onclick="copyBlock(this)" aria-label="Copy to clipboard"><svg class="icon-copy" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><svg class="icon-check" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="display:none"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg></button></pre>
           </div>
           <div class="card">
             <p class="section-label">Build your own AXI</p>
@@ -227,33 +287,35 @@
         <p>
           AI agents interact with external services through two dominant
           paradigms. The first is <strong>shell-based CLI execution</strong>:
-          the agent runs commands like <code>gh issue list</code> and parses the
-          text output. The second is
-          <strong>structured tool protocols</strong> like MCP (Model Context
-          Protocol), where the agent invokes typed tool functions through the
-          hosting framework&rsquo;s native tool-calling interface.
+          the agent runs commands like <code>gh issue list</code> or
+          <code>agent-browser navigate</code> and parses the text output. The
+          second is <strong>structured tool protocols</strong> like MCP (Model
+          Context Protocol), where the agent invokes typed tool functions
+          through the hosting framework&rsquo;s native tool-calling interface.
         </p>
         <p>Both approaches have significant problems for agents:</p>
         <ul>
           <li>
-            <strong>CLI: verbose, metadata-sparse output.</strong>
-            Human-oriented CLIs produce tab-separated tables, ANSI formatting,
-            and per-item descriptions that waste token budget. Worse, they omit
-            critical metadata &mdash; a label list returns 30 items with no
-            total count, and the agent reports 30 when the actual answer is 126.
+            <strong>CLI: action and observation are separated.</strong>
+            Browser CLIs return minimal confirmations &mdash;
+            <code>navigate</code> returns only a page title,
+            <code>click</code> returns &ldquo;Done&rdquo; &mdash; forcing the
+            agent to call <code>snapshot</code> after every action. This doubles
+            tool calls and wastes token budget.
           </li>
           <li>
-            <strong>MCP: massive schema overhead.</strong> MCP tool definitions
-            consume 137K&ndash;176K input tokens per task in our benchmark,
-            compared to 46&ndash;47K for CLI conditions. This 3&ndash;4&times;
-            context inflation translates directly to 2&ndash;3&times; higher
-            cost per task ($0.10&ndash;0.15 vs. $0.05).
+            <strong>MCP: schema overhead scales with tool count.</strong> A
+            browser MCP server exposes ~30 tools. Their schemas inflate input
+            tokens &mdash; MCP conditions average 251K tokens per task vs. 142K
+            for AXI &mdash; and the overhead compounds across every turn.
           </li>
           <li>
             <strong>Both: poor discoverability.</strong> CLI agents must guess
             subcommands or read <code>--help</code>. MCP agents with lazy
-            loading waste turns on tool discovery. Neither provides in-context
-            guidance on what to do next.
+            loading guess wrong tool names &mdash; selecting
+            <code>take_screenshot</code> (1MB base64 PNG) instead of
+            <code>take_snapshot</code> (80KB text) &mdash; and crash the
+            session. Neither provides in-context guidance on what to do next.
           </li>
         </ul>
         <p>
@@ -280,12 +342,28 @@
             four categories.
           </li>
           <li>
-            A reference implementation (<code>gh-axi</code>) demonstrating the
-            principles on the GitHub platform.
+            Reference implementations (<a
+              href="https://github.com/kunchenguid/gh-axi"
+              target="_blank"
+              ><code>gh-axi</code></a
+            >
+            for GitHub,
+            <a
+              href="https://github.com/kunchenguid/chrome-devtools-axi"
+              target="_blank"
+              ><code>chrome-devtools-axi</code></a
+            >
+            for browser automation) demonstrating the principles across two
+            domains.
           </li>
           <li>
-            A 425-run benchmark comparing five agent-tool interface conditions,
-            with trajectory-level analysis showing where and why each interface
+            Two benchmarks &mdash; 560 browser automation runs and
+            <a
+              href="https://github.com/kunchenguid/axi/blob/main/bench-github/published-results/STUDY.md"
+              >425 GitHub API runs</a
+            >
+            &mdash; comparing seven interface conditions each, with
+            trajectory-level analysis showing where and why each interface
             fails.
           </li>
         </ol>
@@ -303,9 +381,9 @@
           models to external tools through structured, typed tool definitions.
           While MCP offers type-safe schemas and discoverable tool catalogs, the
           schema overhead is substantial. The evaluation below quantifies this
-          cost: MCP tool definitions consume 3&ndash;4&times; more context
-          tokens than equivalent CLI conditions, translating to 2&ndash;3&times;
-          higher cost.
+          cost: MCP tool schemas inflate input tokens by up to 77% over
+          equivalent AXI conditions, and the overhead compounds across
+          multi-step tasks.
         </p>
 
         <h4>MCP vs. CLI benchmarks</h4>
@@ -333,12 +411,16 @@
           <a href="#ref-cloudflare-code">[4]</a> independently arrived at the
           same insight, coining the term &ldquo;Code Mode&rdquo; and reporting
           that LLMs handle complex, multi-step tool interactions better when
-          writing TypeScript than when making direct tool calls. The
-          <code>mcp-with-code-mode</code> condition in this benchmark evaluates
-          this approach: it is the cheapest MCP condition ($0.101/task vs.
-          $0.147&ndash;0.148), confirming that code execution reduces MCP
-          overhead, but it remains 2&times; more expensive than AXI and
-          introduces new failure modes from runtime errors in generated code.
+          writing TypeScript than when making direct tool calls. The code-mode
+          condition in our browser benchmark evaluates this approach. Code
+          execution enables multi-operation scripts, but TypeScript compilation
+          overhead makes it the slowest condition (42.9s avg) and, at
+          $0.177/task, 33% more expensive than AXI. In a
+          <a
+            href="https://github.com/kunchenguid/axi/blob/main/bench-github/published-results/STUDY.md"
+            >separate GitHub benchmark</a
+          >, code mode was the cheapest MCP condition ($0.101/task) by batching
+          API calls &mdash; suggesting the trade-off is domain-dependent.
         </p>
       </section>
 
@@ -556,7 +638,10 @@ pull_request:
         <h2>Experimental Setup</h2>
 
         <h4>Conditions</h4>
-        <p>The benchmark evaluates five agent-tool interface conditions:</p>
+        <p>
+          The benchmark evaluates seven agent-tool interface conditions for
+          browser automation:
+        </p>
 
         <div class="card">
           <div class="table-wrap">
@@ -570,29 +655,57 @@ pull_request:
               </thead>
               <tbody>
                 <tr>
-                  <td><strong>axi</strong></td>
-                  <td><code>gh-axi</code></td>
-                  <td>AXI-compliant wrapper over gh CLI</td>
+                  <td><strong>chrome-devtools-axi</strong></td>
+                  <td>Bash CLI (AXI)</td>
+                  <td>
+                    AXI wrapper around chrome-devtools-mcp. Combined operations,
+                    TOON metadata, contextual suggestions.
+                  </td>
                 </tr>
                 <tr>
-                  <td><strong>cli</strong></td>
-                  <td><code>gh</code> CLI</td>
-                  <td>Raw GitHub CLI baseline</td>
+                  <td><strong>agent-browser-axi</strong></td>
+                  <td>Bash CLI (AXI)</td>
+                  <td>
+                    AXI wrapper around agent-browser. Combined operations, TOON
+                    metadata, contextual suggestions.
+                  </td>
                 </tr>
                 <tr>
-                  <td><strong>mcp-no-toolsearch</strong></td>
-                  <td>GitHub MCP</td>
-                  <td>All tool schemas loaded upfront</td>
+                  <td><strong>agent-browser</strong></td>
+                  <td>Bash CLI (Rust)</td>
+                  <td>
+                    Vercel&rsquo;s Agent Browser &mdash; the raw CLI baseline.
+                  </td>
                 </tr>
                 <tr>
-                  <td><strong>mcp-with-toolsearch</strong></td>
-                  <td>GitHub MCP + ToolSearch</td>
-                  <td>Tools discovered on demand via ToolSearch</td>
+                  <td><strong>chrome-devtools-mcp</strong></td>
+                  <td>MCP (no ToolSearch)</td>
+                  <td>
+                    Chrome DevTools MCP server. All ~30 tool schemas loaded
+                    upfront.
+                  </td>
                 </tr>
                 <tr>
-                  <td><strong>mcp-with-code-mode</strong></td>
-                  <td>TypeScript wrappers over GitHub MCP</td>
-                  <td>Agent writes <code>.ts</code> scripts to call tools</td>
+                  <td><strong>chrome-devtools-mcp-search</strong></td>
+                  <td>MCP + ToolSearch</td>
+                  <td>Same MCP server, tools discovered on-demand.</td>
+                </tr>
+                <tr>
+                  <td><strong>chrome-devtools-mcp-code</strong></td>
+                  <td>TypeScript scripts</td>
+                  <td>
+                    Agent writes <code>.ts</code> scripts calling
+                    <code>callTool()</code> which forwards to
+                    chrome-devtools-mcp via a persistent MCP bridge.
+                  </td>
+                </tr>
+                <tr>
+                  <td><strong>chrome-devtools-mcp-compressed</strong></td>
+                  <td>MCP Compressor CLI</td>
+                  <td>
+                    mcp-compressor generates a shell command wrapping the MCP
+                    server. Agent uses Bash.
+                  </td>
                 </tr>
               </tbody>
             </table>
@@ -600,40 +713,56 @@ pull_request:
         </div>
 
         <h4>Task design</h4>
-        <p>The benchmark includes 17 tasks across four categories:</p>
+        <p>The benchmark includes 16 tasks across four categories:</p>
         <ul>
           <li>
-            <strong>Simple lookups (4 tasks):</strong>
-            <code>list_open_issues</code>, <code>view_pr</code>,
-            <code>list_releases</code>, <code>repo_overview</code> &mdash;
-            single-command tasks.
+            <strong>Single-step (5 tasks):</strong>
+            <code>read_static_page</code>, <code>wikipedia_fact_lookup</code>,
+            <code>github_repo_stars</code>, <code>httpbin_page_read</code>,
+            <code>wikipedia_table_read</code> &mdash; navigate to one page and
+            extract information.
           </li>
           <li>
-            <strong>Multi-step investigations (7 tasks):</strong>
-            <code>issue_then_comments</code>, <code>pr_then_checks</code>,
-            <code>release_then_body</code>, <code>run_then_jobs</code>,
-            <code>ci_failure_investigation</code>, <code>pr_review_prep</code>,
-            <code>merged_pr_ci_audit</code> &mdash; tasks requiring 2&ndash;5
-            sequential commands.
+            <strong>Multi-step (5 tasks):</strong>
+            <code>wikipedia_link_follow</code>,
+            <code>github_navigate_to_file</code>,
+            <code>wikipedia_infobox_hop</code>,
+            <code>multi_page_comparison</code>,
+            <code>wikipedia_search_click</code> &mdash; navigate, interact, and
+            follow links across pages.
           </li>
           <li>
-            <strong>Aggregate/count tasks (4 tasks):</strong>
-            <code>list_labels</code>, <code>bug_triage_search</code>,
-            <code>weekly_catchup</code>, <code>find_fix_for_bug</code> &mdash;
-            tasks requiring counts or aggregations.
+            <strong>Investigation (4 tasks):</strong>
+            <code>wikipedia_deep_extraction</code>,
+            <code>github_issue_investigation</code>,
+            <code>multi_site_research</code>,
+            <code>tabular_data_analysis</code> &mdash; complex multi-page
+            extraction requiring context across navigations.
           </li>
           <li>
-            <strong>Error handling (2 tasks):</strong>
-            <code>invalid_issue</code>, <code>nonexistent_repo</code> &mdash;
-            tasks where the target does not exist.
+            <strong>Error recovery (2 tasks):</strong>
+            <code>navigate_404</code>,
+            <code>broken_element_interaction</code> &mdash; handle failures
+            gracefully.
           </li>
         </ul>
 
         <h4>Infrastructure</h4>
         <p>
-          Each run uses a fresh shallow clone of <code>openclaw/openclaw</code>.
-          Agent: Claude Sonnet 4.6. Judge: Claude Sonnet 4.6. Five repeats per
-          condition&ndash;task pair: 17 &times; 5 &times; 5 = 425 total runs.
+          Each run creates a fresh workspace with condition-specific
+          <code>CLAUDE.md</code>. All MCP-based conditions use the same backend:
+          <code>chrome-devtools-mcp@latest --headless --isolated</code>. Agent:
+          Claude Sonnet 4.6. Judge: Claude Sonnet 4.6. Five repeats per
+          condition&ndash;task pair: 16 &times; 7 &times; 5 = 560 total runs.
+        </p>
+        <p>
+          A
+          <a
+            href="https://github.com/kunchenguid/axi/blob/main/bench-github/published-results/STUDY.md"
+            >separate benchmark targeting GitHub API tasks</a
+          >
+          (425 runs, 5 conditions, 17 tasks) validates the same findings in a
+          different domain.
         </p>
 
         <h4>Metrics</h4>
@@ -662,7 +791,7 @@ pull_request:
         <p class="section-label">Proof</p>
         <h2>Results</h2>
         <p class="text-muted">
-          425 runs, 17 tasks &times; 5 repetitions per condition
+          560 runs, 16 tasks &times; 5 repetitions &times; 7 conditions
         </p>
 
         <div class="card mt-xl">
@@ -680,39 +809,53 @@ pull_request:
               </thead>
               <tbody>
                 <tr>
-                  <td>gh-cli</td>
-                  <td>86%</td>
-                  <td>$0.054</td>
-                  <td>17.4s</td>
-                  <td>3</td>
-                </tr>
-                <tr>
-                  <td>gh-mcp</td>
-                  <td>87%</td>
-                  <td>$0.148</td>
-                  <td>34.2s</td>
-                  <td>6</td>
-                </tr>
-                <tr>
-                  <td>gh-mcp-search</td>
-                  <td>82%</td>
-                  <td>$0.147</td>
-                  <td>41.1s</td>
-                  <td>8</td>
-                </tr>
-                <tr>
-                  <td>gh-mcp-code</td>
-                  <td>84%</td>
-                  <td>$0.101</td>
-                  <td>43.4s</td>
-                  <td>7</td>
-                </tr>
-                <tr>
-                  <td><strong>gh-axi</strong></td>
+                  <td><strong>chrome-devtools-axi</strong></td>
                   <td><strong class="text-accent">100%</strong></td>
-                  <td><strong class="text-accent">$0.050</strong></td>
-                  <td><strong class="text-accent">15.7s</strong></td>
-                  <td><strong class="text-accent">3</strong></td>
+                  <td><strong class="text-accent">$0.133</strong></td>
+                  <td><strong class="text-accent">24.1s</strong></td>
+                  <td><strong class="text-accent">4.6</strong></td>
+                </tr>
+                <tr>
+                  <td>agent-browser-axi</td>
+                  <td>100%</td>
+                  <td>$0.137</td>
+                  <td>26.9s</td>
+                  <td>5.0</td>
+                </tr>
+                <tr>
+                  <td>chrome-devtools-mcp-compressed</td>
+                  <td>100%</td>
+                  <td>$0.150</td>
+                  <td>32.6s</td>
+                  <td>5.9</td>
+                </tr>
+                <tr>
+                  <td>agent-browser</td>
+                  <td>100%</td>
+                  <td>$0.160</td>
+                  <td>33.9s</td>
+                  <td>7.2</td>
+                </tr>
+                <tr>
+                  <td>chrome-devtools-mcp</td>
+                  <td>100%</td>
+                  <td>$0.168</td>
+                  <td>27.2s</td>
+                  <td>5.4</td>
+                </tr>
+                <tr>
+                  <td>chrome-devtools-mcp-code</td>
+                  <td>99%</td>
+                  <td>$0.177</td>
+                  <td>42.9s</td>
+                  <td>6.6</td>
+                </tr>
+                <tr>
+                  <td>chrome-devtools-mcp-search</td>
+                  <td class="cell-fail">85%</td>
+                  <td>$0.167</td>
+                  <td>39.1s</td>
+                  <td>7.1</td>
                 </tr>
               </tbody>
             </table>
@@ -720,388 +863,96 @@ pull_request:
         </div>
 
         <p class="mt-md">
-          AXI achieves 100% task success at the lowest average cost
-          ($0.050/task) and shortest average duration (15.7s). The raw CLI
-          baseline achieves 86% success at comparable cost. All three MCP
-          conditions achieve 82&ndash;87% success at 2&ndash;3&times; the cost
-          and 2&ndash;3&times; the duration.
+          AXI (<code>chrome-devtools-axi</code>) achieves 100% task success at
+          the lowest average cost ($0.133/task), shortest duration (24.1s), and
+          fewest turns (4.6). Five of the seven conditions achieve 100% success
+          &mdash; the differentiator is efficiency. The two AXI wrappers (<code
+            >chrome-devtools-axi</code
+          >
+          and <code>agent-browser-axi</code>) claim the top two spots across
+          every metric.
         </p>
 
         <hr class="divider" />
 
-        <h3>Per-task breakdown</h3>
+        <h3>AXI efficiency breakdown</h3>
         <p class="text-sm text-muted">
-          Success rate (out of 5 runs), average cost, and average duration per
-          condition&ndash;task pair.
+          Comparing the raw CLI baseline against its AXI wrappers across all 80
+          runs per condition.
         </p>
 
         <div class="card mt-md">
           <div class="table-wrap">
-            <table class="table" style="font-size: 0.8rem">
+            <table class="table" style="font-size: 0.875rem">
               <thead>
                 <tr>
-                  <th
-                    rowspan="2"
-                    style="min-width: 10rem; vertical-align: bottom"
-                  >
-                    Task
+                  <th>Metric</th>
+                  <th>agent-browser</th>
+                  <th>agent-browser-axi</th>
+                  <th style="color: var(--color-accent)">
+                    chrome-devtools-axi
                   </th>
-                  <th
-                    colspan="3"
-                    style="text-align: center; color: var(--color-accent)"
-                  >
-                    axi
-                  </th>
-                  <th colspan="3" style="text-align: center">cli</th>
-                  <th colspan="3" style="text-align: center">mcp</th>
-                  <th colspan="3" style="text-align: center">mcp-search</th>
-                  <th colspan="3" style="text-align: center">mcp-code</th>
-                </tr>
-                <tr>
-                  <th>&#10003;</th>
-                  <th>$</th>
-                  <th>&#9201;</th>
-                  <th>&#10003;</th>
-                  <th>$</th>
-                  <th>&#9201;</th>
-                  <th>&#10003;</th>
-                  <th>$</th>
-                  <th>&#9201;</th>
-                  <th>&#10003;</th>
-                  <th>$</th>
-                  <th>&#9201;</th>
-                  <th>&#10003;</th>
-                  <th>$</th>
-                  <th>&#9201;</th>
                 </tr>
               </thead>
               <tbody>
-                <tr class="row-category">
-                  <td colspan="16"><em>Simple lookups</em></td>
+                <tr>
+                  <td>Success</td>
+                  <td>100%</td>
+                  <td>100%</td>
+                  <td><strong class="text-accent">100%</strong></td>
                 </tr>
                 <tr>
-                  <td>list_open_issues</td>
-                  <td>5/5</td>
-                  <td>.028</td>
-                  <td>10</td>
-                  <td>5/5</td>
-                  <td>.024</td>
-                  <td>8</td>
-                  <td>5/5</td>
-                  <td>.100</td>
-                  <td>25</td>
-                  <td>5/5</td>
-                  <td>.046</td>
-                  <td>18</td>
-                  <td>5/5</td>
-                  <td>.086</td>
-                  <td>37</td>
+                  <td>Avg cost</td>
+                  <td>$0.160</td>
+                  <td>$0.137</td>
+                  <td><strong class="text-accent">$0.133</strong></td>
                 </tr>
                 <tr>
-                  <td>view_pr</td>
-                  <td>5/5</td>
-                  <td>.039</td>
-                  <td>8</td>
-                  <td>5/5</td>
-                  <td>.038</td>
-                  <td>9</td>
-                  <td>5/5</td>
-                  <td>.045</td>
-                  <td>9</td>
-                  <td>5/5</td>
-                  <td>.031</td>
-                  <td>12</td>
-                  <td>5/5</td>
-                  <td>.072</td>
-                  <td>28</td>
+                  <td>Avg turns</td>
+                  <td>7.2</td>
+                  <td>5.0</td>
+                  <td><strong class="text-accent">4.6</strong></td>
                 </tr>
                 <tr>
-                  <td>list_releases</td>
-                  <td>5/5</td>
-                  <td>.039</td>
-                  <td>11</td>
-                  <td>5/5</td>
-                  <td>.038</td>
-                  <td>9</td>
-                  <td>5/5</td>
-                  <td>.096</td>
-                  <td>8</td>
-                  <td>5/5</td>
-                  <td>.055</td>
-                  <td>11</td>
-                  <td>5/5</td>
-                  <td>.035</td>
-                  <td>18</td>
+                  <td>Avg commands</td>
+                  <td>6.0</td>
+                  <td>3.9</td>
+                  <td><strong class="text-accent">3.3</strong></td>
                 </tr>
                 <tr>
-                  <td>repo_overview</td>
-                  <td>5/5</td>
-                  <td>.038</td>
-                  <td>9</td>
-                  <td>5/5</td>
-                  <td>.038</td>
-                  <td>10</td>
-                  <td>5/5</td>
-                  <td>.056</td>
-                  <td>9</td>
-                  <td>5/5</td>
-                  <td>.042</td>
-                  <td>14</td>
-                  <td>5/5</td>
-                  <td>.033</td>
-                  <td>16</td>
-                </tr>
-                <tr class="row-category">
-                  <td colspan="16"><em>Multi-step investigations</em></td>
+                  <td>Avg duration</td>
+                  <td>33.9s</td>
+                  <td>26.9s</td>
+                  <td><strong class="text-accent">24.1s</strong></td>
                 </tr>
                 <tr>
-                  <td>issue_then_comments</td>
-                  <td>5/5</td>
-                  <td>.049</td>
-                  <td>13</td>
-                  <td>5/5</td>
-                  <td>.046</td>
-                  <td>11</td>
-                  <td>5/5</td>
-                  <td>.065</td>
-                  <td>14</td>
-                  <td>5/5</td>
-                  <td>.050</td>
-                  <td>20</td>
-                  <td>5/5</td>
-                  <td>.090</td>
-                  <td>39</td>
-                </tr>
-                <tr>
-                  <td>pr_then_checks</td>
-                  <td>5/5</td>
-                  <td>.050</td>
-                  <td>14</td>
-                  <td>5/5</td>
-                  <td>.055</td>
-                  <td>15</td>
-                  <td>5/5</td>
-                  <td>.112</td>
-                  <td>32</td>
-                  <td>5/5</td>
-                  <td>.077</td>
-                  <td>35</td>
-                  <td>5/5</td>
-                  <td>.087</td>
-                  <td>46</td>
-                </tr>
-                <tr>
-                  <td>release_then_body</td>
-                  <td>5/5</td>
-                  <td>.053</td>
-                  <td>14</td>
-                  <td>5/5</td>
-                  <td>.052</td>
-                  <td>12</td>
-                  <td>5/5</td>
-                  <td>.060</td>
-                  <td>11</td>
-                  <td>5/5</td>
-                  <td>.041</td>
-                  <td>16</td>
-                  <td>5/5</td>
-                  <td>.103</td>
-                  <td>43</td>
-                </tr>
-                <tr>
-                  <td>run_then_jobs</td>
-                  <td>5/5</td>
-                  <td>.048</td>
-                  <td>13</td>
-                  <td>5/5</td>
-                  <td>.050</td>
-                  <td>14</td>
-                  <td>4/5</td>
-                  <td>.063</td>
-                  <td>24</td>
-                  <td class="cell-fail">0/5</td>
-                  <td>.061</td>
-                  <td>24</td>
-                  <td>5/5</td>
-                  <td>.047</td>
-                  <td>20</td>
-                </tr>
-                <tr>
-                  <td>ci_failure_investigation</td>
-                  <td>5/5</td>
-                  <td>.065</td>
-                  <td>21</td>
-                  <td>5/5</td>
-                  <td>.061</td>
-                  <td>22</td>
-                  <td class="cell-fail">2/5</td>
-                  <td>.758</td>
-                  <td>177</td>
-                  <td class="cell-fail">2/5</td>
-                  <td>.568</td>
-                  <td>151</td>
-                  <td>5/5</td>
-                  <td>.194</td>
-                  <td>94</td>
-                </tr>
-                <tr>
-                  <td>pr_review_prep</td>
-                  <td>5/5</td>
-                  <td>.055</td>
-                  <td>19</td>
-                  <td>5/5</td>
-                  <td>.070</td>
-                  <td>25</td>
-                  <td>5/5</td>
-                  <td>.100</td>
-                  <td>32</td>
-                  <td>5/5</td>
-                  <td>.087</td>
-                  <td>31</td>
-                  <td>5/5</td>
-                  <td>.091</td>
-                  <td>35</td>
-                </tr>
-                <tr>
-                  <td>merged_pr_ci_audit</td>
-                  <td>5/5</td>
-                  <td>.064</td>
-                  <td>26</td>
-                  <td>5/5</td>
-                  <td>.076</td>
-                  <td>42</td>
-                  <td>3/5</td>
-                  <td>.340</td>
-                  <td>63</td>
-                  <td>3/5</td>
-                  <td>.614</td>
-                  <td>136</td>
-                  <td>5/5</td>
-                  <td>.205</td>
-                  <td>104</td>
-                </tr>
-                <tr class="row-category">
-                  <td colspan="16"><em>Aggregate/count tasks</em></td>
-                </tr>
-                <tr>
-                  <td>list_labels</td>
-                  <td>5/5</td>
-                  <td>.044</td>
-                  <td>11</td>
-                  <td class="cell-fail">0/5</td>
-                  <td>.041</td>
-                  <td>10</td>
-                  <td class="cell-fail">0/5</td>
-                  <td>.319</td>
-                  <td>108</td>
-                  <td class="cell-fail">0/5</td>
-                  <td>.353</td>
-                  <td>125</td>
-                  <td class="cell-fail">0/5</td>
-                  <td>.041</td>
-                  <td>18</td>
-                </tr>
-                <tr>
-                  <td>bug_triage_search</td>
-                  <td>5/5</td>
-                  <td>.088</td>
-                  <td>47</td>
-                  <td>3/5</td>
-                  <td>.114</td>
-                  <td>52</td>
-                  <td>5/5</td>
-                  <td>.092</td>
-                  <td>21</td>
-                  <td>5/5</td>
-                  <td>.088</td>
-                  <td>19</td>
-                  <td>5/5</td>
-                  <td>.132</td>
-                  <td>53</td>
-                </tr>
-                <tr>
-                  <td>weekly_catchup</td>
-                  <td>5/5</td>
-                  <td>.050</td>
-                  <td>15</td>
-                  <td class="cell-fail">0/5</td>
-                  <td>.046</td>
-                  <td>14</td>
-                  <td>5/5</td>
-                  <td>.123</td>
-                  <td>17</td>
-                  <td>5/5</td>
-                  <td>.185</td>
-                  <td>37</td>
-                  <td class="cell-fail">0/5</td>
-                  <td>.132</td>
-                  <td>53</td>
-                </tr>
-                <tr>
-                  <td>find_fix_for_bug</td>
-                  <td>5/5</td>
-                  <td>.067</td>
-                  <td>21</td>
-                  <td>5/5</td>
-                  <td>.091</td>
-                  <td>26</td>
-                  <td>5/5</td>
-                  <td>.084</td>
-                  <td>15</td>
-                  <td>5/5</td>
-                  <td>.093</td>
-                  <td>29</td>
-                  <td>5/5</td>
-                  <td>.124</td>
-                  <td>43</td>
-                </tr>
-                <tr class="row-category">
-                  <td colspan="16"><em>Error handling</em></td>
-                </tr>
-                <tr>
-                  <td>invalid_issue</td>
-                  <td>5/5</td>
-                  <td>.038</td>
-                  <td>8</td>
-                  <td>5/5</td>
-                  <td>.038</td>
-                  <td>8</td>
-                  <td>5/5</td>
-                  <td>.053</td>
-                  <td>8</td>
-                  <td>5/5</td>
-                  <td>.051</td>
-                  <td>10</td>
-                  <td>5/5</td>
-                  <td>.167</td>
-                  <td>69</td>
-                </tr>
-                <tr>
-                  <td>nonexistent_repo</td>
-                  <td>5/5</td>
-                  <td>.039</td>
-                  <td>8</td>
-                  <td>5/5</td>
-                  <td>.039</td>
-                  <td>10</td>
-                  <td>5/5</td>
-                  <td>.052</td>
-                  <td>8</td>
-                  <td>5/5</td>
-                  <td>.050</td>
-                  <td>10</td>
-                  <td class="cell-fail">1/5</td>
-                  <td>.069</td>
-                  <td>21</td>
+                  <td>Avg input tokens</td>
+                  <td>232K</td>
+                  <td>159K</td>
+                  <td><strong class="text-accent">142K</strong></td>
                 </tr>
               </tbody>
             </table>
           </div>
-          <p class="text-sm text-muted mt-sm">
-            &#10003; = successes/5 runs. $ = avg cost (USD). &#9201; = avg
-            duration (seconds).
-          </p>
         </div>
+
+        <hr class="divider" />
+
+        <h3>Corroborating evidence: GitHub benchmark</h3>
+        <p>
+          A
+          <a
+            href="https://github.com/kunchenguid/axi/blob/main/bench-github/published-results/STUDY.md"
+            >separate 425-run benchmark</a
+          >
+          comparing <code>gh-axi</code> against raw <code>gh</code> CLI and
+          GitHub MCP across 17 tasks arrives at the same conclusions:
+          <strong>AXI achieves 100% success at $0.050/task</strong>, vs. 86% at
+          $0.054 for CLI and 82&ndash;87% at $0.101&ndash;$0.148 for MCP. The
+          cost gap widens dramatically on complex tasks:
+          <code>ci_failure_investigation</code> costs $0.065 for AXI vs. $0.758
+          for MCP (12&times;).
+        </p>
       </section>
 
       <!-- 6. Analysis -->
@@ -1111,205 +962,207 @@ pull_request:
 
         <div class="card mt-xl">
           <p class="section-label">Finding 1</p>
-          <h4>AXI achieves 100% reliability at lowest cost.</h4>
-          <p class="mb-0">
-            AXI is the only condition that passes all 85 runs (100% success) at
-            an average cost of $0.050/task &mdash; 7% less than CLI&rsquo;s
-            $0.054 and 66% less than the cheapest MCP condition ($0.101 for
-            <code>mcp-with-code-mode</code>). AXI also has the fastest average
-            duration (15.7s vs. 17.4s for CLI, 34&ndash;43s for MCP). The
-            reliability advantage is most pronounced on aggregate tasks (where
-            pre-computed <code>totalCount</code> fields eliminate pagination
-            errors) and complex investigations (where contextual suggestions
-            prevent wrong turns).
+          <h4>AXI wrappers lead across every metric.</h4>
+          <p>
+            The two AXI conditions (<code>chrome-devtools-axi</code> and
+            <code>agent-browser-axi</code>) take the top two spots in success,
+            cost, turns, and duration. <code>chrome-devtools-axi</code> achieves
+            100% success at the lowest cost ($0.133/task), fewest turns (4.6),
+            and fastest execution (24.1s). Compared to the raw CLI baseline
+            (<code>agent-browser</code>), AXI reduces turns by 36% (7.2 &rarr;
+            4.6), input tokens by 39% (232K &rarr; 142K), and cost by 17%
+            ($0.160 &rarr; $0.133).
           </p>
+          <p>
+            Trajectory analysis across all 160 AXI runs decomposes the
+            efficiency gains into three mechanisms:
+          </p>
+          <ul>
+            <li>
+              <strong>Combined operations.</strong>
+              Every <code>navigate</code> + <code>snapshot</code> pair in the
+              baseline becomes a single <code>open</code> call. For
+              <code>agent-browser-axi</code>, this accounts for 143 of 168
+              eliminated commands across 80 runs. For
+              <code>chrome-devtools-axi</code> vs.
+              <code>chrome-devtools-mcp</code>, what required
+              <code>navigate_page</code> then <code>take_snapshot</code> (two
+              tool calls) becomes one <code>open</code> call.
+            </li>
+            <li>
+              <strong>TOON structured output.</strong> Page metadata (title,
+              URL, ref count) returned with every response helps the agent
+              orient without extra probing calls. In
+              <code>agent-browser</code> baseline runs, the agent sometimes
+              spirals into repeated
+              <code>snapshot 2&gt;&amp;1 | grep &quot;heading&quot;</code>
+              sequences just to figure out what page it&rsquo;s on.
+            </li>
+            <li>
+              <strong>Contextual suggestions.</strong>
+              The <code>help[N]:</code> block provides copy-pasteable next-step
+              commands. The agent consistently follows these, maintaining a
+              clean one-action-per-turn cadence.
+            </li>
+          </ul>
         </div>
 
         <div class="card mt-md">
           <p class="section-label">Finding 2</p>
-          <h4>MCP conditions are 2&ndash;3&times; more expensive.</h4>
+          <h4>ToolSearch drops success by 15 percentage points.</h4>
           <p>
-            The MCP cost premium is not uniform &mdash; it concentrates on
-            complex tasks where schema overhead compounds across many turns. On
-            <code>ci_failure_investigation</code>,
-            <code>mcp-no-toolsearch</code> averages $0.758/task across 15 turns
-            and 177 seconds, vs. AXI&rsquo;s $0.065 across 3 turns and 21
-            seconds &mdash; a <strong>12&times; cost difference</strong>. The
-            agent re-sends the full tool schema catalog (176K tokens) on every
-            turn; by turn 15, schema tokens dominate the context.
-          </p>
-          <p class="mb-0">
-            On simple tasks where agents need few turns, MCP&rsquo;s overhead is
-            more modest: <code>view_pr</code> costs $0.045 for MCP vs. $0.039
-            for AXI (1.2&times;).
-          </p>
-        </div>
-
-        <div class="card mt-md">
-          <p class="section-label">Finding 3</p>
-          <h4>
-            ToolSearch saves upfront tokens but spends them on extra turns.
-          </h4>
-          <p>
-            ToolSearch starts with a smaller context but needs extra turns for
-            tool discovery. Whether that trade-off pays depends on task
-            complexity:
+            ToolSearch (85%) drops 15 points vs. eager-loading (100%). Chrome
+            DevTools MCP exposes ~30 tools, and ToolSearch forces the agent to
+            discover them on-demand.
           </p>
           <div class="table-wrap">
             <table class="table" style="font-size: 0.875rem">
               <thead>
                 <tr>
-                  <th></th>
-                  <th colspan="4" style="text-align: center">mcp-search</th>
-                  <th colspan="4" style="text-align: center">mcp (raw)</th>
-                </tr>
-                <tr>
                   <th>Task</th>
-                  <th>1st turn</th>
-                  <th>last turn</th>
-                  <th>turns</th>
-                  <th>cost</th>
-                  <th>1st turn</th>
-                  <th>last turn</th>
-                  <th>turns</th>
-                  <th>cost</th>
+                  <th>No ToolSearch</th>
+                  <th>With ToolSearch</th>
                 </tr>
               </thead>
               <tbody>
                 <tr>
-                  <td><code>view_pr</code></td>
-                  <td>16K</td>
-                  <td>18K</td>
-                  <td>3</td>
-                  <td>$0.031</td>
-                  <td>41K</td>
-                  <td>42K</td>
-                  <td>2</td>
-                  <td>$0.045</td>
+                  <td><code>github_repo_stars</code></td>
+                  <td>5/5</td>
+                  <td class="cell-fail">0/5</td>
                 </tr>
                 <tr>
-                  <td><code>find_fix_for_bug</code></td>
-                  <td>16K</td>
-                  <td>22K</td>
-                  <td>6</td>
-                  <td>$0.093</td>
-                  <td>42K</td>
-                  <td>45K</td>
-                  <td>3</td>
-                  <td>$0.084</td>
+                  <td><code>navigate_404</code></td>
+                  <td>5/5</td>
+                  <td class="cell-fail">2/5</td>
                 </tr>
                 <tr>
-                  <td><code>weekly_catchup</code></td>
-                  <td>16K</td>
-                  <td>43K</td>
-                  <td>6</td>
-                  <td>$0.185</td>
-                  <td>42K</td>
-                  <td>59K</td>
-                  <td>4</td>
-                  <td>$0.123</td>
+                  <td><code>wikipedia_search_click</code></td>
+                  <td>5/5</td>
+                  <td class="cell-fail">3/5</td>
                 </tr>
                 <tr>
-                  <td><code>merged_pr_ci_audit</code></td>
-                  <td>16K</td>
-                  <td>84K</td>
-                  <td>24</td>
-                  <td>$0.614</td>
-                  <td>42K</td>
-                  <td>85K</td>
-                  <td>18</td>
-                  <td>$0.340</td>
+                  <td><code>wikipedia_table_read</code></td>
+                  <td>5/5</td>
+                  <td class="cell-fail">4/5</td>
+                </tr>
+                <tr>
+                  <td><code>github_issue_investigation</code></td>
+                  <td>5/5</td>
+                  <td class="cell-fail">4/5</td>
                 </tr>
               </tbody>
             </table>
           </div>
           <p>
-            Both conditions start at a fixed context size &mdash; 16K for
-            ToolSearch (no schemas), 42K for raw MCP (all schemas loaded)
-            &mdash; and grow as conversation history accumulates. On a simple
-            <code>view_pr</code>, ToolSearch finishes at 18K (still well under
-            raw&rsquo;s 42K), so the upfront savings carry through to a lower
-            cost despite one extra turn.
-          </p>
-          <p>
-            But as tasks grow, the contexts converge. By
-            <code>weekly_catchup</code>, ToolSearch&rsquo;s last turn has
-            reached 43K &mdash; matching raw&rsquo;s <em>starting</em> context
-            &mdash; yet it still needs 2 extra turns, costing 1.5&times; more.
-            On <code>merged_pr_ci_audit</code>, both end at ~85K tokens, but
-            ToolSearch takes 24 turns to get there vs. 18 &mdash; the upfront
-            savings are completely gone, and the extra turns make it 1.8&times;
-            more expensive.
-          </p>
-          <p>
-            ToolSearch also introduces a new failure mode: on
-            <code>run_then_jobs</code>, the agent cannot find the right tool via
-            search (0/5 success), while raw loading succeeds 4/5.
+            <strong
+              >Root cause: <code>take_screenshot</code> vs.
+              <code>take_snapshot</code>.</strong
+            >
+            The MCP server exposes both <code>take_snapshot</code> (compact
+            accessibility tree, ~80KB) and <code>take_screenshot</code> (base64
+            PNG, ~1MB). With eager-loading, the agent&rsquo;s
+            <code>CLAUDE.md</code> lists <code>take_snapshot</code> explicitly.
+            Under ToolSearch, the agent consistently guesses
+            <code>take_screenshot</code>. The 1MB payload exhausts the context
+            window and triggers a timeout before the agent can produce an
+            answer.
           </p>
           <p class="mb-0">
-            The takeaway: lazy tool loading helps on simple tasks where one
-            discovery turn unlocks big token savings. But on complex tasks where
-            the agent needs many tools across many turns, the discovery overhead
-            compounds and overwhelms the savings. Since real-world agent
-            workloads skew complex, raw loading is the safer default.
+            This mirrors our
+            <a
+              href="https://github.com/kunchenguid/axi/blob/main/bench-github/published-results/STUDY.md"
+              >GitHub benchmark finding</a
+            >: ToolSearch is a net negative when the agent needs most of the
+            tools. The upfront cost of loading all schemas is far cheaper than
+            the cumulative cost of discovery mistakes.
+          </p>
+        </div>
+
+        <div class="card mt-md">
+          <p class="section-label">Finding 3</p>
+          <h4>Code mode is competitive but 58% slower.</h4>
+          <p>
+            Code execution (99% success) nearly matches raw MCP (100%) but at
+            42.9s avg &mdash; 58% slower than MCP&rsquo;s 27.2s. The agent
+            spends time writing TypeScript scripts, and each
+            <code>npx tsx</code> invocation has startup overhead. At
+            $0.177/task, it is the most expensive MCP condition.
+          </p>
+          <p class="mb-0">
+            Its single failure was on <code>read_static_page</code> (4/5)
+            &mdash; the simplest task &mdash; suggesting occasional brittleness
+            in the script execution path rather than a systematic limitation.
           </p>
         </div>
 
         <div class="card mt-md">
           <p class="section-label">Finding 4</p>
-          <h4>Code-mode is cheapest MCP but still 2&times; AXI.</h4>
+          <h4>MCP Compressor is the strongest non-AXI interface.</h4>
           <p>
-            The <code>mcp-with-code-mode</code> condition, where the agent
-            writes TypeScript scripts calling typed wrapper functions, achieves
-            the lowest cost among MCP conditions ($0.101/task). Writing code
-            amortizes schema costs by batching multiple API calls per script.
-            But the code-generation overhead makes it the
-            <em>slowest</em> condition (43.4s avg, the longest of all five).
+            <a href="https://github.com/atlassian-labs/mcp-compressor/"
+              >MCP Compressor</a
+            >
+            open sourced by Atlassian (100% success, $0.150/task, 5.9 turns)
+            wraps any MCP server into a single CLI tool, converting each MCP
+            tool into a Bash subcommand. The agent calls
+            <code>chrome-devtools take-snapshot</code> instead of
+            <code>mcp__chrome-devtools__take_snapshot</code> &mdash; same
+            backend, but invoked through Bash rather than the tool-calling
+            protocol.
+          </p>
+          <p>
+            This single change &mdash; CLI over MCP &mdash; unlocks two
+            advantages that explain the gap over raw MCP. First,
+            <strong>no schema overhead</strong>: instead of loading ~30 tool
+            schemas into context on every turn, the agent gets a concise list of
+            subcommands in its <code>CLAUDE.md</code>. Second,
+            <strong>shell composability</strong>: the agent can pipe snapshot
+            output through <code>grep</code> and <code>head</code>, extracting
+            data without a separate turn. In the
+            <code>multi_page_comparison</code> trajectories, the compressed-CLI
+            agent runs
+            <code
+              >chrome-devtools take-snapshot 2&gt;&amp;1 | grep -i
+              &quot;designed by&quot;</code
+            >
+            to navigate-and-extract in one call, while the raw MCP agent spirals
+            through 7 <code>evaluate_script</code> calls trying to query the DOM
+            (13 tool calls vs. 7).
           </p>
           <p class="mb-0">
-            On <code>ci_failure_investigation</code>,
-            <code>mcp-with-code-mode</code> costs $0.194/task &mdash; 3&times;
-            AXI&rsquo;s $0.065 &mdash; but achieves 5/5 success, outperforming
-            both direct MCP conditions (2/5 each). Code-mode also introduces a
-            unique failure mode: unhandled runtime errors cause 4/5 failures on
-            <code>nonexistent_repo</code>, where the agent writes scripts that
-            throw instead of gracefully reporting the error.
+            The remaining gap to AXI ($0.150 vs. $0.133, 5.9 vs. 4.6 turns)
+            comes from the lack of combined operations: MCP Compressor still
+            requires separate <code>navigate-page</code> +
+            <code>take-snapshot</code> calls where AXI&rsquo;s
+            <code>open</code> returns both in one. It also lacks TOON metadata
+            (page title, URL, ref counts) and contextual
+            <code>help[]</code> suggestions. MCP Compressor gets you halfway to
+            AXI by fixing the transport; AXI goes the rest of the way by fixing
+            the output.
           </p>
         </div>
 
         <div class="card mt-md">
           <p class="section-label">Finding 5</p>
-          <h4>AXI&rsquo;s advantages by task type.</h4>
+          <h4>Shell pipes give AXI an advantage MCP cannot match.</h4>
           <p>
-            <strong>Simple lookups.</strong> All conditions achieve 100%
-            success. AXI and CLI cost $0.024&ndash;0.039/task; MCP costs
-            $0.031&ndash;0.100/task. The 1.5&ndash;3&times; MCP premium is pure
-            schema overhead.
-          </p>
-          <p>
-            <strong>Multi-step investigations.</strong> AXI and CLI both achieve
-            100% success on most tasks. The cost difference emerges on the
-            hardest tasks: <code>ci_failure_investigation</code> costs $0.065
-            for AXI vs. $0.061 for CLI (both 5/5), but $0.194&ndash;0.758 for
-            MCP conditions (2&ndash;5/5). AXI&rsquo;s pre-computed job status
-            fields (<code>checks: &quot;27 passed, 0 failed&quot;</code>)
-            eliminate the need for separate job-listing API calls that MCP
-            agents must make turn by turn.
-          </p>
-          <p>
-            <strong>Aggregate tasks.</strong> This is where AXI separates from
-            all conditions. <code>list_labels</code>: AXI 5/5 at $0.044; every
-            other condition 0/5. <code>weekly_catchup</code>: AXI 5/5 at $0.050;
-            CLI 0/5; <code>mcp-with-code-mode</code> 0/5. The pre-computed
-            <code>totalCount</code> field is the difference &mdash; without it,
-            agents report the default page size (30) as the total.
+            Because AXI output is plain text on stdout, agents can compose
+            commands with unix pipes:
+            <code
+              >chrome-devtools-axi open &lt;url&gt; 2&gt;&amp;1 | grep -i
+              &quot;designer&quot;</code
+            >
+            navigates <em>and</em> extracts in a single shell pipeline. MCP tool
+            calls have no equivalent &mdash; each call goes through the model,
+            and the agent must request a snapshot, receive it, then grep in a
+            separate turn.
           </p>
           <p class="mb-0">
-            <strong>Error handling.</strong> All CLI-based conditions handle
-            errors well. <code>mcp-with-code-mode</code> scores only 1/5 on
-            <code>nonexistent_repo</code> ($0.069/task) because generated
-            scripts throw unhandled exceptions rather than reporting structured
-            errors.
+            When MCP snapshots overflow (400K+ characters on large Wikipedia
+            pages), the agent resorts to <code>evaluate_script</code>
+            workarounds &mdash; writing JavaScript to query the DOM directly.
+            AXI&rsquo;s text-oriented output avoids this entirely by presenting
+            snapshots in a greppable format.
           </p>
         </div>
       </section>
@@ -1319,154 +1172,199 @@ pull_request:
         <p class="section-label">Case Studies</p>
         <h2>Trajectory analysis.</h2>
 
-        <h3>Case A: ci_failure_investigation</h3>
+        <h3>Case A: navigate_404</h3>
         <p class="text-muted">
-          Identify the 5 most recent failed CI runs and report which jobs failed
-          in each.
+          Navigate to httpbin.org/status/404 and report the error, then navigate
+          to httpbin.org/html to confirm normal browsing.
         </p>
 
         <div class="grid grid--2 mt-md">
           <div class="card">
             <p class="section-label">
-              gh-axi &mdash; 3 turns &middot; $0.065 &middot; 21s &middot; 5/5
+              chrome-devtools-axi &mdash; 2 calls &middot; 3 turns &middot;
+              $0.104
             </p>
-            <pre><code><span class="annotation">Turn 1 (agent &rarr; tool):</span>
-$ gh-axi run list --status failure --limit 5
+            <pre><code><span class="annotation">Call 1:</span>
+$ chrome-devtools-axi open httpbin.org/status/404
 
-<span class="annotation">Turn 1 (tool &rarr; agent):</span>
-runs[5]{id,title,status,conclusion,workflow,branch}:
-  23386042824,"fix(daemon): repair stale...",completed,failure,Install Smoke,...
-  23385977677,"feat(auth): add models auth...",completed,failure,CI,...
-  ... (3 more)
-help[1]:
-  Run `gh-axi run view &lt;id&gt;` to view details
+<span class="annotation">&rarr; Page metadata + snapshot returned together:
+   title, URL, "HTTP ERROR 404", and
+   contextual suggestions.</span>
 
-<span class="annotation">Turn 2: Agent views all 5 runs in parallel</span>
+<span class="annotation">Call 2:</span>
+$ chrome-devtools-axi open httpbin.org/html
 
-<span class="annotation">Turn 2 (tool &rarr; agent, for each run):</span>
-run:
-  id: 23385977677
-  conclusion: failure
-  workflow: CI
-jobs[29]{name,status,conclusion}:
-  check,completed,failure
-  check-additional,completed,failure
-  build-smoke,completed,failure
-  ... (26 more with pass/skip/fail)
-help[2]:
-  Run `gh-axi run view 23385977677 --log-failed`
+<span class="annotation">&rarr; Page metadata + Moby-Dick excerpt
+   returned together.</span>
 
-<span class="annotation">Turn 3: Agent summarizes patterns.</span></code></pre>
+<span class="annotation">Turn 3: Agent delivers final answer.</span></code></pre>
           </div>
           <div class="card">
             <p class="section-label">
-              gh mcp (raw) &mdash; 15 turns &middot; $0.758 &middot; 177s
-              &middot; 2/5
+              chrome-devtools-mcp &mdash; 4 calls &middot; 5 turns &middot;
+              $0.154
             </p>
-            <pre><code><span class="annotation">Turn 1: list_workflow_runs(status:"failure",per_page:5)
-  &rarr; 5 run objects (~2KB JSON each)</span>
+            <pre><code><span class="annotation">Call 1: navigate_page(url)
+  &rarr; "Successfully navigated."
+  No page content.</span>
 
-<span class="annotation">Turn 2: list_workflow_run_jobs(run_id:...)
-  &rarr; 29 job objects (~1.5KB JSON each)
-  (context now: 176K schema + growing conversation)</span>
+<span class="annotation">Call 2: take_snapshot()
+  &rarr; Error page snapshot with 404 heading.</span>
 
-<span class="annotation">Turn 3: list_workflow_run_jobs(run_id:...)
-  &rarr; 2 job objects</span>
+<span class="annotation">Call 3: navigate_page(url)
+  &rarr; "Successfully navigated."
+  No page content.</span>
 
-<span class="annotation">Turn 4&ndash;6: ... (remaining runs)
-  (context exceeding 400K tokens by turn 6)</span>
+<span class="annotation">Call 4: take_snapshot()
+  &rarr; Moby-Dick excerpt.</span>
 
-<span class="annotation">Turn 7&ndash;15: Agent re-reads earlier results,
-  attempts to correlate, loses track of which
-  jobs belong to which run.</span>
-
-<span class="annotation">Result: 2/5 runs produce correct answer.
-3/5 runs misattribute job failures or omit runs.</span></code></pre>
+<span class="annotation">Turn 5: Agent delivers final answer.</span></code></pre>
           </div>
         </div>
         <p class="mt-md">
-          AXI completes in 3 turns. The key advantage: each
-          <code>run view</code> response includes the full job-level breakdown
-          (<code>jobs[29]{name,status,conclusion}</code>) as structured data,
-          plus a suggestion to view failure logs. The agent can immediately
-          identify which jobs failed without additional API calls. MCP requires
-          separate API calls for run listing and job listing (no inline job
-          status). Each call re-sends the full schema catalog. By turn 6, the
-          context exceeds 400K tokens, and the agent begins confusing job data
-          across runs.
+          Each <code>open</code> combines navigate + snapshot into one call. The
+          MCP agent needs two calls per page (<code>navigate_page</code> returns
+          only a confirmation string, so <code>take_snapshot</code> must
+          follow). On a 2-page task the savings are exactly 2 tool calls &mdash;
+          one per navigation.
         </p>
 
         <hr class="divider" />
 
-        <h3>Case B: merged_pr_ci_audit</h3>
+        <h3>Case B: wikipedia_link_follow</h3>
         <p class="text-muted">
-          List the 10 most recently merged PRs and report the CI status of each.
+          Navigate to the Ada Lovelace Wikipedia article, click the link to
+          Charles Babbage, and report his birth date.
         </p>
 
-        <div class="card mt-md">
-          <p class="section-label">
-            gh-axi &mdash; 5 turns &middot; $0.064 &middot; 26s &middot; 5/5
-          </p>
-          <pre><code><span class="annotation">Turn 1:</span>
-$ gh-axi pr list --state merged --limit 10
-count: 10 of 3549
-pull_requests[10]{number,title,state,...}:
-  51772,"refactor(plugins): route Telegram...",merged
-  ...
-help: Run `gh-axi pr view &lt;number&gt;`
+        <div class="grid grid--2 mt-md">
+          <div class="card">
+            <p class="section-label">
+              chrome-devtools-axi &mdash; 5 calls &middot; 6 turns &middot;
+              $0.15
+            </p>
+            <pre><code><span class="annotation">Call 1:</span>
+$ chrome-devtools-axi open &lt;url&gt;
+<span class="annotation">&rarr; Page metadata + full accessibility
+   snapshot in one call.</span>
 
-<span class="annotation">Turns 2&ndash;5: views each PR (some in parallel)</span>
-pr:
-  number: 51772
-  state: merged
-  checks: "27 passed, 0 failed, 10 skipped"
-  <span class="annotation">         ^ pre-computed &mdash; no extra API call</span>
+<span class="annotation">Call 2:</span>
+$ grep -i "babbage" &lt;snapshot&gt;
+<span class="annotation">&rarr; Found uid=26_181 link "Charles Babbage"</span>
 
-<span class="annotation">Agent summarizes: &ldquo;6 out of 10 fully green CI.&rdquo;</span></code></pre>
+<span class="annotation">Call 3:</span>
+$ chrome-devtools-axi click @26_181
+<span class="annotation">&rarr; Clicked link + new page snapshot
+   returned automatically.</span>
+
+<span class="annotation">Calls 4&ndash;5:</span>
+$ grep -i "born\|birth" &lt;snapshot&gt;
+<span class="annotation">&rarr; Extracted "26 December 1791".</span></code></pre>
+          </div>
+          <div class="card">
+            <p class="section-label">
+              agent-browser &mdash; 10 calls &middot; 11 turns &middot; $0.21
+            </p>
+            <pre><code><span class="annotation">Call 1: agent-browser navigate &lt;url&gt;
+  &rarr; Title only, no page content.</span>
+<span class="annotation">Call 2: agent-browser snapshot
+  &rarr; Full accessibility tree (187KB).</span>
+<span class="annotation">Call 3: grep -i "charles babbage"
+  &rarr; Found link [ref=e43].</span>
+<span class="annotation">Call 4: agent-browser click @e43
+  &rarr; "Done" &mdash; no page content.</span>
+<span class="annotation">Call 5: agent-browser snapshot
+  &rarr; Still Ada Lovelace's page!
+  (click didn't navigate)</span>
+<span class="annotation">Calls 6&ndash;7: grep attempts, confirms
+  still on wrong page.</span>
+<span class="annotation">Call 8: agent-browser navigate &lt;url&gt;
+  &rarr; Direct URL to Babbage page.</span>
+<span class="annotation">Call 9: agent-browser snapshot</span>
+<span class="annotation">Call 10: grep "born"
+  &rarr; "26 December 1791".</span></code></pre>
+          </div>
         </div>
-
-        <div class="card mt-md">
-          <p class="section-label">
-            gh CLI &mdash; 4 turns &middot; $0.076 &middot; 42s &middot; 5/5
-          </p>
-          <pre><code><span class="annotation">Turn 1:</span>
-$ gh pr list --state merged --limit 10 \
-    --json number,title,author,mergedAt,statusCheckRollup
-  &rarr; 10 PR objects with nested check arrays (~2KB JSON each)
-
-<span class="annotation">Turns 2&ndash;3: parse JSON, count pass/fail per PR</span>
-  Some runs call `gh pr checks` again to double-check
-
-<span class="annotation">Turn 4: Agent summarizes results.</span>
-  <span class="annotation">19% more expensive, 62% slower &mdash; but succeeds.</span></code></pre>
-        </div>
-
-        <div class="card mt-md">
-          <p class="section-label">
-            gh mcp (with ToolSearch) &mdash; 24 turns &middot; $0.614 &middot;
-            136s &middot; 3/5
-          </p>
-          <pre><code><span class="annotation">Turns 1&ndash;3: ToolSearch for PR listing tool</span>
-<span class="annotation">Turns 4&ndash;6: list merged PRs, paginate</span>
-<span class="annotation">Turns 7&ndash;24: for each PR, search for check/status
-  tool, invoke it, parse response.
-  Context grows to &gt;300K tokens.
-  Agent loses track of PR-to-check mapping.</span>
-
-<span class="annotation">Result: 3/5 runs succeed. 2/5 misreport CI status.
-9.6&times; more expensive than AXI.</span></code></pre>
-        </div>
-
         <p class="mt-md">
-          AXI&rsquo;s pre-computed <code>checks</code> field provides a one-line
-          CI summary inline in each PR view. The agent never needs to call a
-          separate checks or workflow API. CLI also succeeds (5/5) by using the
-          <code>--json</code> flag to get structured output in a single call,
-          but costs 19% more ($0.076 vs. $0.064) and takes 62% longer (42s vs.
-          26s). The CLI agent must know to use <code>--json</code> with
-          <code>statusCheckRollup</code> &mdash; a non-obvious field name that
-          requires prior knowledge of the <code>gh</code> CLI&rsquo;s JSON
-          schema.
+          The raw CLI separates every action from its observation:
+          <code>navigate</code> returns a title, <code>click</code> returns
+          &ldquo;Done&rdquo;, and the agent must always follow up with
+          <code>snapshot</code>. AXI&rsquo;s <code>open</code> and
+          <code>click</code> both return the full snapshot automatically. The
+          agent-browser trajectory also shows a recovery cost &mdash; the click
+          didn&rsquo;t navigate, and the agent spent 3 extra steps discovering
+          it was still on the wrong page. With AXI, <code>click</code> returned
+          the new page content immediately. Across 5 runs, this task averages
+          9.8 turns for agent-browser vs. 5.6 for chrome-devtools-axi (43%
+          reduction).
+        </p>
+
+        <hr class="divider" />
+
+        <h3>Case C: multi_page_comparison</h3>
+        <p class="text-muted">
+          Navigate to the Python Wikipedia page and note the designer. Then
+          navigate to JavaScript&rsquo;s page and note the designer. Report
+          both.
+        </p>
+
+        <div class="grid grid--2 mt-md">
+          <div class="card">
+            <p class="section-label">
+              chrome-devtools-axi &mdash; 3 calls &middot; 5 turns &middot;
+              $0.134
+            </p>
+            <pre><code><span class="annotation">Call 1:</span>
+$ chrome-devtools-axi open &lt;python-url&gt; \
+    2>&amp;1 | head -100
+<span class="annotation">&rarr; Page metadata + snapshot (7.1KB).</span>
+
+<span class="annotation">Call 2:</span>
+$ chrome-devtools-axi open &lt;python-url&gt; \
+    2>&amp;1 | grep -i "design"
+<span class="annotation">&rarr; "Designed by" + "Guido van Rossum".</span>
+
+<span class="annotation">Call 3:</span>
+$ chrome-devtools-axi open &lt;js-url&gt; \
+    2>&amp;1 | grep -i "designed\|Brendan"
+<span class="annotation">&rarr; Navigated + grepped in one pipeline.
+   Found "Brendan Eich".</span></code></pre>
+          </div>
+          <div class="card">
+            <p class="section-label">
+              chrome-devtools-mcp &mdash; 5 calls &middot; 8 turns &middot;
+              $0.205
+            </p>
+            <pre><code><span class="annotation">Call 1: navigate_page(url)
+  &rarr; Confirmation only.</span>
+
+<span class="annotation">Call 2: take_snapshot()
+  &rarr; 554K chars &mdash; overflows,
+  saved to file.</span>
+
+<span class="annotation">Call 3: Grep("Designed", file)
+  &rarr; No matches. Snapshot is
+  JSON-encoded, not plain text.</span>
+
+<span class="annotation">Call 4: evaluate_script
+  &rarr; JS to query .infobox tr.
+  Got "Guido van Rossum".</span>
+
+<span class="annotation">Call 5: navigate_page(url)
+  &rarr; Confirmation only.</span>
+
+<span class="annotation">Call 6: evaluate_script
+  &rarr; Same JS pattern.
+  Got "Brendan Eich".</span></code></pre>
+          </div>
+        </div>
+        <p class="mt-md">
+          The AXI agent piped CLI output directly through <code>grep</code> in
+          the shell &mdash; a pattern impossible with MCP tool calls. When the
+          MCP snapshot overflowed and <code>Grep</code> failed on the JSON
+          encoding, the agent had to write JavaScript to extract data from the
+          DOM. AXI&rsquo;s text-oriented output kept the entire workflow in
+          standard unix idioms.
         </p>
       </section>
 
@@ -1476,9 +1374,9 @@ $ gh pr list --state merged --limit 10 \
         <h2>Caveats.</h2>
         <ul>
           <li>
-            <strong>Single target repository.</strong> All tasks target
-            <code>openclaw/openclaw</code>. Results may vary on repositories
-            with different sizes or structures.
+            <strong>Public websites only.</strong> All tasks target public sites
+            (Wikipedia, GitHub, httpbin.org, example.com). Results may vary on
+            authenticated or dynamic web applications.
           </li>
           <li>
             <strong>Single agent model.</strong> Only Claude Sonnet 4.6 is
@@ -1487,29 +1385,22 @@ $ gh pr list --state merged --limit 10 \
           </li>
           <li>
             <strong>Read-only tasks.</strong> The benchmark includes only read
-            operations. Mutations introduce additional challenges around
-            idempotency.
+            and navigation operations. Form submissions and complex interactions
+            introduce additional challenges.
           </li>
           <li>
             <strong>LLM judge.</strong> Task success is determined by an LLM
             judge, which may introduce scoring biases.
           </li>
           <li>
-            <strong>GitHub-specific implementation.</strong> While the AXI
-            principles are domain-general, this evaluation is specific to
-            GitHub.
-          </li>
-          <li>
-            <strong>LLM training data bias.</strong> GitHub CLI is widely
-            visible in LLM training data, allowing it to be more efficient than
-            a brand new CLI. If there&rsquo;s enough interest, I can run another
-            benchmark removing this variable.
-          </li>
-          <li>
-            <strong>Sub-optimal MCP baseline.</strong> The MCP conditions use
-            the official GitHub MCP server, not a hand-optimized one. A
-            carefully designed MCP server with fewer, better-composed tools
-            could narrow the gap.
+            <strong>Domain-specific implementation.</strong> While the AXI
+            principles are domain-general, this evaluation focuses on browser
+            automation. The
+            <a
+              href="https://github.com/kunchenguid/axi/blob/main/bench-github/published-results/STUDY.md"
+              >GitHub benchmark</a
+            >
+            provides cross-domain validation.
           </li>
         </ul>
       </section>
@@ -1528,17 +1419,19 @@ $ gh pr list --state merged --limit 10 \
           cost, duration, and turns.
         </p>
         <p>
-          AXI achieves 100% reliability at $0.050/task, compared to 86% at
-          $0.054 for raw CLI and 82&ndash;87% at $0.101&ndash;0.148 for MCP. The
-          cost gap widens dramatically on complex tasks:
-          <code>ci_failure_investigation</code> costs $0.065 for AXI vs. $0.758
-          for MCP (12&times;), with AXI achieving 100% success vs. MCP&rsquo;s
-          40%.
+          In browser automation, AXI achieves 100% reliability at $0.133/task
+          and 4.6 turns, compared to $0.160 and 7.2 turns for raw CLI and $0.168
+          and 5.4 turns for MCP. The primary mechanism is simple: combined
+          operations that return both action confirmation and page state in a
+          single call, eliminating the separate snapshot calls that double tool
+          invocations across every other condition.
         </p>
         <p>
-          The 10 AXI principles provide a concrete, testable framework for
-          designing agent-ergonomic interfaces that are both reliable and
-          cost-efficient.
+          A separate GitHub benchmark validates the same pattern: AXI at 100%
+          success and $0.050/task vs. 86% and $0.054 for CLI, and 82&ndash;87%
+          and $0.101&ndash;$0.148 for MCP. The 10 AXI principles provide a
+          concrete, testable framework for designing agent-ergonomic interfaces
+          that are both reliable and cost-efficient.
         </p>
       </section>
 
@@ -1577,6 +1470,14 @@ $ gh pr list --state merged --limit 10 \
               MCP.&rdquo;</a
             >
             Cloudflare Blog, September 2025.
+          </li>
+          <li id="ref-github-bench">
+            <a
+              href="https://github.com/kunchenguid/axi/blob/main/bench-github/published-results/STUDY.md"
+              >K. Chen. &ldquo;AXI Benchmark Study: Agent Interface Comparison
+              (GitHub).&rdquo;</a
+            >
+            425-run benchmark comparing gh-axi, gh CLI, and GitHub MCP, 2026.
           </li>
         </ol>
         <p class="text-sm text-muted mt-xl">

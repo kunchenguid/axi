@@ -1,9 +1,9 @@
 # AXI: Agent eXperience Interface
 
-<h3 align="center">A new standard for agent ergonomics which beats both MCP and regular CLI in success rate and efficiency.</h3>
+<h3 align="center">Design principles for agent ergonomics. Higher accuracy with lower token cost than both MCP and regular CLI.</h3>
 
 <p align="center">
-  <img src="docs/axi-splash.png" alt="AXI — Let's build apps agents love." width="600">
+  <img src="docs/axi-splash.png" alt="AXI — Let's build apps agents love." width="800">
 </p>
 
 AI agents interact with external services through two dominant paradigms today: **CLIs** which were originally built for humans, and structured tool protocols like **MCP**. Both impose significant overhead — CLIs produce verbose, metadata-sparse output that wastes token budgets, while MCP tool schemas consume a lot of context tokens upfront.

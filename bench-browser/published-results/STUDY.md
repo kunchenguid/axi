@@ -8,8 +8,8 @@ This study compares how AI agents perform browser automation tasks across differ
 **Judge**: Claude Sonnet 4.6
 **Repeats**: 5 per condition x task
 **Total runs**: 560 (7 conditions x 16 tasks x 5 repeats)
-**Total cost**: ~$97
-**Date**: 2026-03-26
+**Total cost**: ~$87
+**Date**: 2026-03-27
 
 ## Conditions
 
@@ -17,7 +17,7 @@ This study compares how AI agents perform browser automation tasks across differ
 | ------------------------------------ | --------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
 | `agent-browser`                      | Bash CLI (Rust)       | Vercel's Agent Browser. Agent runs `agent-browser navigate`, `agent-browser snapshot`, etc.                                   |
 | `agent-browser-axi`                  | Bash CLI (AXI)        | AXI wrapper around agent-browser. Combined operations (action + snapshot in one call), TOON metadata, contextual suggestions. |
-| `pinchtab`                           | Bash CLI (Go)         | PinchTab CLI. Agent runs `pinchtab nav`, `pinchtab snap`, etc.                                                                |
+| `chrome-devtools-axi`                | Bash CLI (AXI)        | AXI wrapper around chrome-devtools-mcp. Combined operations, TOON metadata, contextual suggestions.                           |
 | `chrome-devtools-mcp`                | MCP (no ToolSearch)   | Chrome DevTools MCP server. All ~30 tool schemas loaded upfront. Agent calls tools directly.                                  |
 | `chrome-devtools-mcp-search`         | MCP (with ToolSearch) | Same server, but tools discovered on-demand via ToolSearch.                                                                   |
 | `chrome-devtools-mcp-code`           | TypeScript scripts    | Agent writes `.ts` scripts calling `callTool(name, args)` which forwards to chrome-devtools-mcp via a persistent MCP bridge.  |
@@ -29,111 +29,202 @@ All MCP-based conditions use the same backend: `chrome-devtools-mcp@latest --hea
 
 | Condition                          | Success% | Avg Cost   | Total Cost | Avg Duration | Avg Turns |
 | ---------------------------------- | -------- | ---------- | ---------- | ------------ | --------- |
-| **agent-browser-axi**              | **100%** | **$0.148** | **$11.83** | **24.5s**    | **4.6**   |
-| agent-browser                      | 100%     | $0.162     | $12.95     | 24.6s        | 6.3       |
-| chrome-devtools-mcp-compressed-cli | 100%     | $0.171     | $13.64     | 28.1s        | 6.2       |
-| chrome-devtools-mcp                | 99%      | $0.172     | $13.75     | 26.1s        | 5.3       |
-| chrome-devtools-mcp-code           | 99%      | $0.218     | $17.46     | 42.4s        | 8.1       |
-| chrome-devtools-mcp-search         | 88%      | $0.185     | $14.81     | 33.3s        | 7.3       |
-| pinchtab                           | 86%      | $0.159     | $12.72     | 50.1s        | 5.9       |
+| **chrome-devtools-axi**            | **100%** | **$0.133** | **$10.66** | **24.1s**    | **4.6**   |
+| agent-browser-axi                  | 100%     | $0.137     | $11.00     | 26.9s        | 5.0       |
+| chrome-devtools-mcp-compressed-cli | 100%     | $0.150     | $11.99     | 32.6s        | 5.9       |
+| agent-browser                      | 100%     | $0.160     | $12.81     | 33.9s        | 7.2       |
+| chrome-devtools-mcp                | 100%     | $0.168     | $13.44     | 27.2s        | 5.4       |
+| chrome-devtools-mcp-code           | 99%      | $0.177     | $14.18     | 42.9s        | 6.6       |
+| chrome-devtools-mcp-search         | 85%      | $0.167     | $13.39     | 39.1s        | 7.1       |
 
 ## Findings
 
-### 1. AXI wrapper matches 100% success at lowest cost and fewest turns
+### 1. AXI wrappers lead across every metric
 
-The AXI wrapper (`agent-browser-axi`) achieves 100% success at $0.148/task — 9% cheaper than raw `agent-browser` (100%, $0.162) with 27% fewer turns (4.6 vs 6.3). Both conditions now hit perfect success across all 16 tasks, so the story is no longer about a success gap but about efficiency. The primary mechanism is **combined operations**: every action command (click, fill, scroll, etc.) automatically returns a page snapshot, eliminating the separate `snapshot` call the agent would otherwise need. This reduces the number of Bash tool calls, which compounds across multi-step tasks.
+The two AXI conditions (`chrome-devtools-axi` and `agent-browser-axi`) take the top two spots. `chrome-devtools-axi` achieves 100% success at the lowest cost ($0.133/task), fewest turns (4.6), and fastest execution (24.1s). The primary mechanism is **combined operations**: every action command automatically returns a page snapshot, eliminating separate snapshot calls.
 
-| Metric           | agent-browser | agent-browser-axi | Delta |
-| ---------------- | ------------- | ----------------- | ----- |
-| Success          | 100%          | 100%              | 0pp   |
-| Avg cost         | $0.162        | $0.148            | -9%   |
-| Avg turns        | 6.3           | 4.6               | -27%  |
-| Avg duration     | 24.6s         | 24.5s             | ~0%   |
-| Avg input tokens | 211K          | 155K              | -26%  |
+| Metric           | agent-browser | agent-browser-axi | chrome-devtools-axi |
+| ---------------- | ------------- | ----------------- | ------------------- |
+| Success          | 100%          | 100%              | 100%                |
+| Avg cost         | $0.160        | $0.137            | $0.133              |
+| Avg turns        | 7.2           | 5.0               | 4.6                 |
+| Avg commands     | 6.0           | 3.9               | 3.3                 |
+| Avg duration     | 33.9s         | 26.9s             | 24.1s               |
+| Avg input tokens | 232K          | 159K              | 142K                |
 
-The cost advantage is smaller than the previous run (9% vs 48%) because the agent model's cache hit rate now dominates costs — both conditions benefit heavily from prompt caching (86% vs 79%), narrowing the absolute cost difference even as AXI uses 26% fewer input tokens. The turn reduction remains substantial and would amplify cost savings on models with lower cache rates.
+**Where the savings come from.** Trajectory analysis across all 160 AXI runs decomposes the efficiency gains into three AXI design principles:
 
-This mirrors the GitHub benchmark finding where AXI achieved 100% success at 7% lower cost vs raw `gh` CLI. The browser benchmark confirms that combined operations consistently reduce turns without sacrificing success.
+- **Combined operations (~85% of command reduction).** Every `navigate` + `snapshot` pair in the baseline becomes a single `open` call in AXI. For `agent-browser-axi`, this accounts for 143 of 168 eliminated commands across 80 runs. For `chrome-devtools-axi` vs `chrome-devtools-mcp`, every task shows the same pattern: what required `navigate_page` then `take_snapshot` (two tool calls) becomes one `open` call.
+- **TOON structured output (~10-15%).** Page metadata (title, URL, ref count) returned with every response helps the agent orient without extra probing calls. In `agent-browser` baseline runs, the agent sometimes spirals into repeated `snapshot 2>&1 | grep "heading" | head -5` sequences just to figure out what page it's on — e.g., `wikipedia_infobox_hop` run 5 ballooned to 51 commands. AXI runs avoid this entirely. A secondary factor: `chrome-devtools-mcp`'s raw accessibility snapshots sometimes exceed 400K characters on large Wikipedia pages, forcing the agent into expensive `evaluate_script` workarounds — the `wikipedia_link_follow` trajectory shows 9 MCP tool calls vs 5 AXI commands for the same task. AXI's TOON output avoids this by presenting the same snapshot in a greppable format.
+- **Contextual suggestions (minor but consistent).** The `help[N]:` block provides copy-pasteable next-step commands (e.g., `Run 'chrome-devtools-axi click @1_3' to click "Learn more"`). The agent consistently follows these, maintaining a clean one-action-per-turn cadence.
 
-### 2. CLI tools and MCP Compressor outperform raw MCP
+**Why chrome-devtools-axi edges out agent-browser-axi.** The gap between the two AXI conditions (4.6 vs 5.0 turns, 24.1s vs 26.9s) comes from two factors:
 
-Three conditions achieve perfect 100% success: `agent-browser-axi`, `agent-browser`, and `chrome-devtools-mcp-compressed-cli`. The MCP Compressor CLI mode matches dedicated CLI tools by giving the agent a familiar Bash interface over the chrome-devtools-mcp backend. Raw MCP (`chrome-devtools-mcp`) is close at 99%, with its only failure on `httpbin_page_read` (4/5).
+1. **Ref stability (~60% of the turn gap).** Agent-browser refs can become stale between snapshot and click, causing "Unknown ref" errors that require recovery turns. Across 80 runs, `agent-browser-axi` encountered 14 ref failures vs zero for `chrome-devtools-axi`. The worst-affected task is `wikipedia_infobox_hop`, where ref failures in 3/5 runs inflated the average by ~4 turns. Chrome-devtools-mcp refs are stable because the click and snapshot happen in a single atomic MCP call via `includeSnapshot`.
+2. **Latency (~40% of the wall-clock gap).** Chrome-devtools-axi performs action + snapshot as one MCP call internally, while agent-browser-axi shells out to two separate `agent-browser` subprocesses. Both present a single CLI call to the agent (so turn count is similar), but the two-subprocess path adds latency. This explains most of the 2.8s wall-clock difference.
+
+Note that chrome-devtools-axi doesn't win every task — it actually loses on `github_issue_investigation` (6.4 vs 3.6 turns) and `github_repo_stars` (4.8 vs 2.8 turns) because chrome-devtools-mcp produces larger snapshots that sometimes require extra Read/Grep steps. The aggregate advantage comes from ref stability on interaction-heavy tasks outweighing snapshot verbosity on read-heavy ones.
+
+The turn reduction from raw baseline to AXI is consistent: 36% for `agent-browser` → `chrome-devtools-axi` (7.2 → 4.6) and 31% for `agent-browser` → `agent-browser-axi` (7.2 → 5.0). This confirms the GitHub benchmark finding: AXI's combined operations consistently reduce turns without sacrificing success.
+
+### 2. Five conditions achieve perfect 100% success
+
+`chrome-devtools-axi`, `agent-browser-axi`, `chrome-devtools-mcp-compressed-cli`, `agent-browser`, and `chrome-devtools-mcp` all achieve 100% success across 80 runs each. The MCP Compressor CLI mode matches dedicated CLI tools by giving the agent a familiar Bash interface over the chrome-devtools-mcp backend.
 
 ### 3. ToolSearch hurts browser automation
 
-ToolSearch (88%) drops 11 percentage points vs eager-loading (99%). Chrome DevTools MCP exposes ~30 tools, and ToolSearch forces the agent to discover them on-demand. Key failures:
+ToolSearch (85%) drops 15 percentage points vs eager-loading (100%). Chrome DevTools MCP exposes ~30 tools, and ToolSearch forces the agent to discover them on-demand. Key failures:
 
-| Task                     | No ToolSearch | With ToolSearch |
-| ------------------------ | ------------- | --------------- |
-| `github_repo_stars`      | 5/5           | 0/5             |
-| `navigate_404`           | 5/5           | 2/5             |
-| `httpbin_page_read`      | 4/5           | 4/5             |
-| `wikipedia_search_click` | 5/5           | 4/5             |
+| Task                         | No ToolSearch | With ToolSearch |
+| ---------------------------- | ------------- | --------------- |
+| `github_repo_stars`          | 5/5           | 0/5             |
+| `navigate_404`               | 5/5           | 2/5             |
+| `wikipedia_search_click`     | 5/5           | 3/5             |
+| `wikipedia_table_read`       | 5/5           | 4/5             |
+| `github_issue_investigation` | 5/5           | 4/5             |
 
-The agent wastes turns searching for tools (e.g., querying for "navigate" when the tool is `navigate_page`), and the discovery overhead compounds on multi-step tasks where each step requires finding a new tool. The `github_repo_stars` task is a total failure under ToolSearch — the agent never finds the right tools to get started.
+**Root cause: `take_screenshot` vs `take_snapshot`.** Chrome-devtools-mcp exposes two similarly-named tools: `take_snapshot` (returns a compact accessibility tree) and `take_screenshot` (returns a massive base64-encoded PNG). With eager-loading, the agent's CLAUDE.md explicitly lists `take_snapshot` in its workflow, so it always picks the right tool. Under ToolSearch, the agent must guess tool names for its `select:` query — and it consistently guesses `take_screenshot` instead:
 
-This mirrors the GitHub benchmark finding: ToolSearch is a net negative when the agent needs most of the tools. The upfront context cost of loading all schemas (~30 tools) is far cheaper than the cumulative cost of discovery turns.
+```
+query: "select:mcp__chrome-devtools__navigate_page,mcp__chrome-devtools__take_screenshot"
+```
 
-### 4. PinchTab struggles with specific task patterns
+The screenshot payload (~1MB base64) exhausts the context window and triggers the 5-minute timeout before the agent can produce an answer. Every failed run across all 5 tasks shows `take_screenshot` with zero `take_snapshot` calls; every successful run found the correct tool. The `github_repo_stars` 0/5 result is especially telling — it's a simple single-step task that fails 100% of the time purely from this tool selection error.
 
-PinchTab (86%) has the lowest success rate in this run, driven by failures on several tasks:
+This mirrors the GitHub benchmark finding: ToolSearch is a net negative when the agent needs most of the tools. The upfront context cost of loading all schemas (~30 tools) is far cheaper than the cumulative cost of discovery mistakes.
 
-| Task                     | PinchTab |
-| ------------------------ | -------- |
-| `wikipedia_search_click` | 0/5      |
-| `wikipedia_infobox_hop`  | 3/5      |
-| `multi_site_research`    | 3/5      |
-| `navigate_404`           | 4/5      |
-| `wikipedia_link_follow`  | 4/5      |
+### 4. Code mode is competitive but adds latency
 
-The `wikipedia_search_click` task is a complete failure — PinchTab's timeouts during Wikipedia search interactions cause the agent to give up. The multi-step Wikipedia tasks (`infobox_hop`, `link_follow`) also show brittleness, suggesting PinchTab's interaction model struggles with dynamic page content.
+Code execution (99%) nearly matches raw MCP (100%) in success but is 58% slower (42.9s vs 27.2s). The agent spends time writing scripts, and each `npx tsx` invocation has startup overhead. Its single failure was on `read_static_page` (4/5) — the simplest task — suggesting occasional brittleness in the script execution path rather than a systematic limitation.
 
-### 5. Code mode is competitive but adds latency
-
-Code execution (99%) nearly matches raw MCP (99%) in success but is 63% slower (42.4s vs 26.1s). The agent spends time writing scripts, and each `npx tsx` invocation has startup overhead. However, code mode's `callTool(name, args)` interface is nearly identical to raw MCP — the comparison isolates the "write and execute code" paradigm from the tool interface itself.
-
-### 6. `github_navigate_to_file` task redesigned — now universally solved
-
-The previous version of this task asked the agent to navigate to `torvalds/linux` and read the 3.4MB MAINTAINERS file. GitHub cannot fully render files that large, making the task dependent on GitHub's UI implementation rather than the agent's browsing ability. All conditions scored poorly (0-2 out of 5).
-
-The task was redesigned to navigate to `torvalds/linux` and read the Makefile (extracting VERSION and PATCHLEVEL values). All 7 conditions now score 5/5, confirming the previous failures were a task design issue, not a tool limitation.
-
-### 7. Simple tasks are solved by all conditions
+### 5. Simple tasks are solved by all conditions
 
 Single-step tasks (`read_static_page`, `wikipedia_fact_lookup`, `wikipedia_table_read`) achieve near-100% success across all conditions including ToolSearch. The browser automation tools are all capable — the differences emerge on complex multi-step workflows and edge cases.
+
+## Case Studies
+
+### A. Error recovery in 2 calls vs 4: `navigate_404`
+
+> _Navigate to httpbin.org/status/404 and report the error, then navigate to httpbin.org/html to confirm normal browsing._
+
+| Step | chrome-devtools-axi                                                                                                                   | chrome-devtools-mcp                                               |
+| ---- | ------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------- |
+| 1    | `open httpbin.org/status/404` — page metadata + snapshot returned together: title, URL, "HTTP ERROR 404", and contextual suggestions. | `navigate_page(url)` — "Successfully navigated." No page content. |
+| 2    | `open httpbin.org/html` — page metadata + Moby-Dick excerpt returned together.                                                        | `take_snapshot()` — error page snapshot with 404 heading.         |
+| 3    | Agent delivers final answer.                                                                                                          | `navigate_page(url)` — "Successfully navigated." No page content. |
+| 4    |                                                                                                                                       | `take_snapshot()` — Moby-Dick excerpt.                            |
+| 5    |                                                                                                                                       | Agent delivers final answer.                                      |
+
+| Metric     | chrome-devtools-axi | chrome-devtools-mcp |
+| ---------- | :-----------------: | :-----------------: |
+| Tool calls |          2          |          4          |
+| Turns      |          3          |          5          |
+| Cost       |       $0.104        |       $0.154        |
+
+Each `open` combines navigate + snapshot into one call. The MCP agent needs two calls per page (`navigate_page` returns only a confirmation string, so `take_snapshot` must follow). On a 2-page task the savings are exactly 2 tool calls — one per navigation.
+
+### B. Combined operations compound on multi-step tasks: `wikipedia_link_follow`
+
+> _Navigate to the Ada Lovelace Wikipedia article, click the link to Charles Babbage, and report his birth date._
+
+**chrome-devtools-axi** (5 tool calls, 6 turns, $0.15):
+
+| Step | Call                                | Result                                                   |
+| ---- | ----------------------------------- | -------------------------------------------------------- |
+| 1    | `chrome-devtools-axi open <url>`    | Page metadata + full accessibility snapshot in one call. |
+| 2    | `grep -i "babbage" <snapshot>`      | Found `uid=26_181 link "Charles Babbage"`.               |
+| 3    | `chrome-devtools-axi click @26_181` | Clicked link + new page snapshot returned automatically. |
+| 4    | `grep -i "born\|birth" <snapshot>`  | Found `uid=27_123 StaticText "Born"`.                    |
+| 5    | `grep -A2 "uid=27_123" <snapshot>`  | Extracted `"26 December 1791"`.                          |
+
+**agent-browser** (10 tool calls, 11 turns, $0.21):
+
+| Step | Call                                   | Result                                                                  |
+| ---- | -------------------------------------- | ----------------------------------------------------------------------- |
+| 1    | `agent-browser navigate <url>`         | `"Ada Lovelace - Wikipedia"` — title only, no page content.             |
+| 2    | `agent-browser snapshot`               | Full accessibility tree (187KB, saved to file).                         |
+| 3    | `grep -i "charles babbage" <file>`     | Found `link "Charles Babbage" [ref=e43]`.                               |
+| 4    | `agent-browser click @e43`             | `"Done"` — no page content.                                             |
+| 5    | `agent-browser snapshot`               | Accessibility tree — still Ada Lovelace's page (click didn't navigate). |
+| 6    | `grep -i "born\|birth" <file>`         | Found `rowheader "Born"` but no date value.                             |
+| 7    | `grep -i "charles babbage" <file>`     | Confirmed still on wrong page.                                          |
+| 8    | `agent-browser navigate <babbage-url>` | `"Charles Babbage - Wikipedia"` — title only.                           |
+| 9    | `agent-browser snapshot`               | Full accessibility tree (230KB, saved to file).                         |
+| 10   | `grep -i "born\|birth" <file>`         | `cell "26 December 1791 London, England"`.                              |
+
+The raw CLI separates every action from its observation: `navigate` returns a title, `click` returns `"Done"`, and the agent must always follow up with `snapshot` to see the page. The AXI wrapper combines each action with its observation — `open` and `click` both return the full snapshot automatically.
+
+The agent-browser trajectory also shows a recovery cost. The `click @e43` in step 4 returned `"Done"` but didn't actually navigate. The agent spent 3 extra steps (snapshot, grep, grep) discovering it was still on the wrong page, then had to manually navigate + snapshot. With AXI, `click @26_181` returned the new page content immediately — the agent could see at a glance that navigation succeeded.
+
+Across 5 runs, this task averages 9.8 turns for agent-browser vs 5.6 for chrome-devtools-axi (43% reduction), with cost dropping from $0.19 to $0.14.
+
+### C. Shell pipes turn navigate + extract into one call: `multi_page_comparison`
+
+> _Navigate to the Python Wikipedia page and note the designer. Then navigate to JavaScript's page and note the designer. Report both._
+
+**chrome-devtools-axi** (3 productive calls, 5 turns, $0.134):
+
+| Step | Call                                                | Result                                                             |
+| ---- | --------------------------------------------------- | ------------------------------------------------------------------ |
+| 1    | `open <python-url> 2>&1 \| head -100`               | Page metadata + snapshot (7.1KB preview).                          |
+| 2    | `open <python-url> 2>&1 \| grep -i "design"`        | Found `"Designed by"` and `"Guido van Rossum"`.                    |
+| 3    | `open <js-url> 2>&1 \| grep -i "designed\|Brendan"` | Navigated + grepped in one shell pipeline. Found `"Brendan Eich"`. |
+
+**chrome-devtools-mcp** (5 productive calls, 8 turns, $0.205):
+
+| Step | Call                     | Result                                                              |
+| ---- | ------------------------ | ------------------------------------------------------------------- |
+| 1    | `navigate_page(url)`     | Confirmation only.                                                  |
+| 2    | `take_snapshot()`        | 554K chars — overflows, saved to file.                              |
+| 3    | `Grep("Designed", file)` | No matches — snapshot is JSON-encoded, not plain text.              |
+| 4    | `evaluate_script`        | JS to query `.infobox tr` for "Designed". Got `"Guido van Rossum"`. |
+| 5    | `navigate_page(url)`     | Confirmation only.                                                  |
+| 6    | `evaluate_script`        | Same JS pattern. Got `"Brendan Eich"`.                              |
+
+The AXI agent piped CLI output directly through `grep` in the shell — a pattern impossible with MCP tool calls. When the MCP snapshot overflowed and `Grep` failed on the JSON encoding, the agent had to write JavaScript to extract data from the DOM. The AXI agent's text-oriented output kept the entire workflow in standard unix idioms.
+
+### D. ToolSearch picks the wrong tool: `github_repo_stars`
+
+> _Navigate to github.com/torvalds/linux and report the star count and primary language._
+
+This is a simple single-step task. chrome-devtools-axi completes it in 4 calls (open, grep for stars, grep for languages, answer). But under ToolSearch, it fails **5 out of 5 runs** with an identical failure mode:
+
+The agent's ToolSearch query:
+
+```
+select:mcp__chrome-devtools__navigate_page,mcp__chrome-devtools__take_screenshot
+```
+
+The server exposes both `take_screenshot` (base64 PNG, ~1.1MB) and `take_snapshot` (text accessibility tree, ~80KB). The agent guessed `take_screenshot`. After navigating successfully, the screenshot response (1,106,093 characters of base64) blew the output buffer, truncating the session mid-stream. The agent never produced an answer.
+
+This happened identically in all 5 runs — the agent always guessed the wrong tool name and the session always died on the screenshot payload. With eager-loading (`chrome-devtools-mcp`), the CLAUDE.md explicitly references `take_snapshot` in its workflow, so the agent never encounters this trap.
 
 ## Task Categories
 
 ### Single-step (5 tasks): Navigate + read one page
 
-All conditions score 90%+ except PinchTab on some edge cases. Tasks use stable targets (example.com, Wikipedia, httpbin.org).
+All conditions score 95%+ except ToolSearch on `wikipedia_table_read` (4/5). Tasks use stable targets (example.com, Wikipedia, httpbin.org).
 
 ### Multi-step (5 tasks): Navigate + interact + follow links
 
-Conditions with 100% success (agent-browser, agent-browser-axi, chrome-devtools-mcp-compressed-cli) handle these cleanly. PinchTab and ToolSearch show the most failures here.
+Conditions with 100% success handle these cleanly. ToolSearch shows failures on `wikipedia_search_click` (3/5) and `github_repo_stars` (0/5).
 
 ### Investigation (4 tasks): Complex multi-page extraction
 
-Success ranges from 88% (ToolSearch) to 100% (agent-browser, agent-browser-axi). These tasks require maintaining context across many page navigations.
+Success ranges from 85% (ToolSearch) to 100% (all CLI conditions). These tasks require maintaining context across many page navigations.
 
 ### Error recovery (2 tasks): Handle failures gracefully
 
-Most conditions handle 404s and missing elements well (90%+). ToolSearch struggles with 404 detection (2/5), and PinchTab has occasional failures (4/5 on navigate_404).
+Most conditions handle 404s and missing elements well (100%). ToolSearch struggles with 404 detection (2/5 on `navigate_404`).
 
 ## Methodology
 
 - Each run creates a fresh workspace with condition-specific `CLAUDE.md`
-- Agent isolation via `--strict-mcp-config` (prevents local MCP server leakage)
+- Agent isolation via `--setting-sources ""` (prevents user settings/hooks/plugins leakage) + `--strict-mcp-config` (prevents local MCP server leakage) + `--disable-slash-commands`
 - All MCP conditions use `--headless --isolated` Chrome (no UI popups, clean profile per run)
-- Code-mode uses a persistent MCP bridge (supergateway -> chrome-devtools-mcp) for cross-script state
+- Code-mode uses a persistent MCP bridge (chrome-devtools-mcp via HTTP) for cross-script browser state
 - Agent output captured as stream-json and parsed for usage metrics (tokens, cost, duration, turns)
 - A separate judge LLM evaluates the trajectory against task-specific grading hints
-
-### Changes from previous run
-
-- **`github_navigate_to_file` task redesigned**: Changed from reading the 3.4MB MAINTAINERS file (which GitHub cannot fully render) to reading VERSION/PATCHLEVEL from the Makefile
-- **Parallel mode bug fix**: Fixed `killOrphanedBrowsers` in `lifecycle.ts` that was killing sibling conditions' browser daemons during parallel matrix runs. Added `BENCH_PARALLEL_CHILD` env var to prevent orphan cleanup in child processes
-- **Cleanup improvement**: Added proper cleanup after `Promise.all` in parallel matrix execution
 
 ## Files
 

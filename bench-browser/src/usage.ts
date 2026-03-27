@@ -70,7 +70,7 @@ export function parseClaudeJsonl(
       continue;
     }
 
-    // Tool use events: count Bash commands
+    // Tool use events: count Bash commands (top-level or nested in assistant messages)
     if (entry.type === "tool_use") {
       const toolName = entry.tool ?? entry.name ?? "";
       if (toolName === "Bash") {
@@ -81,11 +81,37 @@ export function parseClaudeJsonl(
         }
       }
     }
+    if (entry.type === "assistant") {
+      const msg = (entry.message ?? {}) as Record<string, unknown>;
+      if (Array.isArray(msg.content)) {
+        for (const block of msg.content) {
+          const b = block as Record<string, unknown>;
+          if (b.type === "tool_use" && b.name === "Bash") {
+            commandCount++;
+            const input = (b.input ?? {}) as Record<string, unknown>;
+            if (typeof input.command === "string") {
+              commandLog.push(input.command);
+            }
+          }
+        }
+      }
+    }
 
     // Tool result events: check for errors
     if (entry.type === "tool_result") {
       if (entry.is_error === true) {
         errorCount++;
+      }
+    }
+    if (entry.type === "user") {
+      const msg = (entry.message ?? {}) as Record<string, unknown>;
+      if (Array.isArray(msg.content)) {
+        for (const block of msg.content) {
+          const b = block as Record<string, unknown>;
+          if (b.type === "tool_result" && b.is_error === true) {
+            errorCount++;
+          }
+        }
       }
     }
 

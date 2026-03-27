@@ -1,4 +1,0 @@
-{
-  "task_success": true,
-  "details": "The agent navigated to https://example.com using agent-browser-axi, the snapshot confirms the page loaded correctly showing the 'Example Domain' heading, and the agent correctly reported the main heading as 'Example Domain'."
-}

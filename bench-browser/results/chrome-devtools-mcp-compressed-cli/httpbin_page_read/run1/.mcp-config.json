@@ -1,1 +1,0 @@
-{"mcpServers":{"compressed-browser":{"command":"uvx","args":["mcp-compressor","-c","medium","--server-name","chrome-devtools","--cli-mode","--","npx","-y","chrome-devtools-mcp@latest","--headless","--isolated"]}}}

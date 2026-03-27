@@ -190,7 +190,8 @@ describe("grade", () => {
     );
 
     const lastCallArgs = mockedExecFileSync.mock.calls.at(-1)![1] as string[];
-    const promptArg = lastCallArgs[1]; // -p is args[0], prompt is args[1]
+    const pIdx = lastCallArgs.indexOf("-p");
+    const promptArg = lastCallArgs[pIdx + 1]; // prompt follows -p
     expect(promptArg).toContain("Report the heading");
     expect(promptArg).toContain("The heading is 'Example Domain'.");
   });

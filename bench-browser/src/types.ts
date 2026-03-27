@@ -1,6 +1,6 @@
 /** Shared interfaces for the browser benchmark harness. */
 
-export type ConditionId = "agent-browser" | "agent-browser-axi" | "pinchtab" | "chrome-devtools-mcp" | "chrome-devtools-mcp-search" | "chrome-devtools-mcp-code" | "chrome-devtools-mcp-compressed-cli";
+export type ConditionId = "agent-browser" | "agent-browser-axi" | "chrome-devtools-axi" | "chrome-devtools-mcp" | "chrome-devtools-mcp-search" | "chrome-devtools-mcp-code" | "chrome-devtools-mcp-compressed-cli";
 export type TaskCategory = "single_step" | "multi_step" | "investigation" | "error_recovery";
 
 export interface GradingSpec {
@@ -24,9 +24,9 @@ export interface ConditionDef {
   daemon: "auto" | "explicit" | "none";
   /** One-time install command (agent-browser). */
   install_command?: string;
-  /** Explicit daemon start command (pinchtab). */
+  /** Explicit daemon start command. */
   daemon_start?: string;
-  /** Explicit daemon stop command (pinchtab). */
+  /** Explicit daemon stop command. */
   daemon_stop?: string;
   /** MCP server config for MCP conditions. */
   mcp_config?: { mcpServers: Record<string, unknown> };

@@ -21,6 +21,7 @@ import { grade } from "./grader.js";
 const BENCH_ROOT = resolve(import.meta.dirname, "..");
 const RESULTS_DIR = join(BENCH_ROOT, "results");
 
+
 export function runOne(
   spec: RunSpec,
   condition: ConditionDef,
@@ -138,6 +139,7 @@ function runAgent(
   // Build Claude CLI args array (using execFileSync to avoid shell interpretation
   // of backticks and angle brackets in the system prompt)
   const args: string[] = [
+    "--setting-sources", "",
     "-p", task.prompt,
     "--model", spec.model,
     "--output-format", "stream-json",

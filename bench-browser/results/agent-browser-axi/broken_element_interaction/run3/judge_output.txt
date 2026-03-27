@@ -1,1 +1,0 @@
-{"pass": true, "reason": "The agent navigated to example.com, correctly attempted to fill a nonexistent element (@e99), received a clear error (exit code 1, 'Unknown ref: e99'), and accurately reported the page content including the 'Example Domain' heading and the IANA-related paragraph."}

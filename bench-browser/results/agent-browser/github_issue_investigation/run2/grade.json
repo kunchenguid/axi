@@ -1,4 +1,0 @@
-{
-  "task_success": true,
-  "details": "The agent navigated to the correct URL, read the page snapshot, and reported 5 accurate issue titles with matching issue numbers and authors, plus the correct total open issue count of 812."
-}

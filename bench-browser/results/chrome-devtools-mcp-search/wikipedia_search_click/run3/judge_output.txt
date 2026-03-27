@@ -1,1 +1,0 @@
-{"pass": true, "reason": "The agent navigated to Wikipedia's main page, used the search box to search for 'Turing Award', found the article, and correctly identified Alan Perlis as the first recipient in 1966, which matches the known facts."}

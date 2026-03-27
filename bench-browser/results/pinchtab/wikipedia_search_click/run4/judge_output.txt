@@ -1,1 +1,0 @@
-{"pass": false, "reason": "The agent repeatedly failed to navigate to Wikipedia due to 'context deadline exceeded' errors from the pinchtab browser tool. All navigation attempts returned Error 500, and the agent never successfully loaded any page, performed a search, or reported any answer about the first Turing Award recipient."}

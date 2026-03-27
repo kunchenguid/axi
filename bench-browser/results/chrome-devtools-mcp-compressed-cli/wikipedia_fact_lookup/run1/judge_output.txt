@@ -1,1 +1,0 @@
-{"pass": true, "reason": "The agent navigated to the correct Wikipedia Moon article, extracted the orbital speed value of 1.022 km/s from the infobox using a snapshot, and reported the correct answer matching the known fact."}

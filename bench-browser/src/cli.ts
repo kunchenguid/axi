@@ -253,7 +253,7 @@ async function main(): Promise<void> {
 
 Commands:
   run       Run a single benchmark
-              --condition <agent-browser|pinchtab|chrome-devtools-mcp|chrome-devtools-mcp-search|chrome-devtools-mcp-code|chrome-devtools-mcp-compressed>
+              --condition <agent-browser|chrome-devtools-axi|chrome-devtools-mcp|...>
               --task <task_id>
               --repeat <N>  (default: 1)
               --model <M>   (default: claude-sonnet-4-6)

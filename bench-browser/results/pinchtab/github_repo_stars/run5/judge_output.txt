@@ -1,1 +1,0 @@
-{"pass": true, "reason": "The agent navigated to https://github.com/torvalds/linux, retrieved the page snapshot, extracted the star count (225k) and primary language (C at 98.0%) from actual page content, and reported both correctly. The star count is consistent with the known 190k+ figure."}

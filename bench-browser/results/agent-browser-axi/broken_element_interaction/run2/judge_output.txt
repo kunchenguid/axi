@@ -1,1 +1,0 @@
-{"pass": true, "reason": "The agent navigated to example.com, correctly attempted to fill a nonexistent search box, received and reported a clean structured error (UNKNOWN ref), and accurately described the page content including the 'Example Domain' heading and IANA paragraph."}

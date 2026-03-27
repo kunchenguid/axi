@@ -1,1 +1,0 @@
-{"pass": true, "reason": "The agent navigated to https://github.com/torvalds/linux, extracted the star count (~225k, consistent with 190k+ expectation) and primary language (C at 98.0%) via JavaScript evaluation, and reported both correctly."}

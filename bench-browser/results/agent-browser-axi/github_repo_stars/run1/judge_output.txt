@@ -1,1 +1,0 @@
-{"pass": true, "reason": "The agent navigated to https://github.com/torvalds/linux, retrieved the page snapshot showing 225k stars and confirmed C as the primary language at 98.0% from the languages section. Both answers are correct and complete."}

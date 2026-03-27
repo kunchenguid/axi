@@ -3,7 +3,7 @@
  *
  * Each condition has different daemon requirements:
  * - agent-browser: auto-launches daemon on first command; install once via `agent-browser install`
- * - pinchtab: explicit `pinchtab daemon start` / `pinchtab daemon stop`
+ * - chrome-devtools-axi: explicit `chrome-devtools-axi start` / `chrome-devtools-axi stop`
  * - chrome-devtools-mcp / -search / -compressed: no daemon — MCP server managed by Claude process
  * - chrome-devtools-mcp-code: supergateway daemon bridging chrome-devtools-mcp stdio→HTTP
  */
@@ -102,7 +102,7 @@ export function stopDaemon(condition: ConditionDef): void {
 
     case "auto":
     case "none":
-      // auto: daemon will self-stop or persist; none: nothing to stop
+      // none: nothing to stop (except code-mode bridge)
       stopBridge();
       break;
   }
@@ -171,8 +171,8 @@ function getHealthCommand(condition: ConditionDef): string | null {
     case "agent-browser":
     case "agent-browser-axi":
       return "agent-browser navigate about:blank";
-    case "pinchtab":
-      return "pinchtab nav about:blank";
+    case "chrome-devtools-axi":
+      return "curl -sf http://127.0.0.1:9224/health";
     default:
       return null;
   }

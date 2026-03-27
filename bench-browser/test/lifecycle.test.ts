@@ -52,16 +52,16 @@ describe("startDaemon", () => {
     mockedExecSync.mockReturnValue("");
 
     const condition = makeCondition({
-      id: "pinchtab",
+      id: "chrome-devtools-axi",
       daemon: "explicit",
-      daemon_start: "pinchtab daemon start",
-      daemon_stop: "pinchtab daemon stop",
+      daemon_start: "chrome-devtools-axi start",
+      daemon_stop: "chrome-devtools-axi stop",
     });
 
     startDaemon(condition);
 
     expect(mockedExecSync).toHaveBeenCalledWith(
-      "pinchtab daemon start",
+      "chrome-devtools-axi start",
       expect.objectContaining({ timeout: 15_000 }),
     );
   });
@@ -97,15 +97,15 @@ describe("stopDaemon", () => {
     mockedExecSync.mockReturnValue("");
 
     const condition = makeCondition({
-      id: "pinchtab",
+      id: "chrome-devtools-axi",
       daemon: "explicit",
-      daemon_stop: "pinchtab daemon stop",
+      daemon_stop: "chrome-devtools-axi stop",
     });
 
     stopDaemon(condition);
 
     expect(mockedExecSync).toHaveBeenCalledWith(
-      "pinchtab daemon stop",
+      "chrome-devtools-axi stop",
       expect.objectContaining({ timeout: 10_000 }),
     );
   });
@@ -130,16 +130,16 @@ describe("stopDaemon", () => {
 
   it("handles daemon_stop failure gracefully", () => {
     mockedExecSync.mockImplementation((cmd: string) => {
-      if (typeof cmd === "string" && cmd.includes("daemon stop")) {
+      if (typeof cmd === "string" && cmd.includes("axi stop")) {
         throw new Error("not running");
       }
       return "";
     });
 
     const condition = makeCondition({
-      id: "pinchtab",
+      id: "chrome-devtools-axi",
       daemon: "explicit",
-      daemon_stop: "pinchtab daemon stop",
+      daemon_stop: "chrome-devtools-axi stop",
     });
 
     expect(() => stopDaemon(condition)).not.toThrow();

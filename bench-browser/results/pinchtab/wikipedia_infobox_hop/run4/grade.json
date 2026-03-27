@@ -1,4 +1,0 @@
-{
-  "task_success": false,
-  "details": "The agent navigated to the Python (programming language) Wikipedia page and found the stable release version (3.14.3) in the infobox. However, the trajectory ends there — there is no evidence the agent clicked the Python Software Foundation link, navigated to the PSF article, or reported the formation date of March 6, 2001. The task required completing all steps including the PSF navigation and formation date reporting, which the agent did not do."
-}

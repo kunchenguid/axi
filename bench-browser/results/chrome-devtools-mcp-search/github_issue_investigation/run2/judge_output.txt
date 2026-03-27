@@ -1,1 +1,0 @@
-{"pass": true, "reason": "The agent correctly navigated to https://github.com/facebook/react/issues, took a snapshot of the page, and accurately reported the 5 most recent issues with their exact titles matching the page content, plus the correct total of 812 open issues."}

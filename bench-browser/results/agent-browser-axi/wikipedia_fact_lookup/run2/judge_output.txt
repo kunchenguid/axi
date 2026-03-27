@@ -1,1 +1,0 @@
-{"pass": true, "reason": "The agent navigated to the Wikipedia Moon article, extracted the orbital speed from the infobox (confirmed via grep on the actual page snapshot showing '1.022km/s'), and correctly reported 1.022 km/s as the average orbital speed."}

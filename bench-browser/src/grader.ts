@@ -13,6 +13,7 @@ import type { GradingSpec, GradeResult } from "./types.js";
 
 const CLAUDE_JUDGE_MODEL = "claude-sonnet-4-6";
 
+
 /**
  * Format raw JSONL from the agent run into a readable trajectory transcript.
  *
@@ -128,7 +129,7 @@ export function grade(
   try {
     judgeOutput = execFileSync(
       "claude",
-      ["-p", prompt, "--model", CLAUDE_JUDGE_MODEL, "--output-format", "text", "--max-turns", "1", "--dangerously-skip-permissions", "--no-session-persistence"],
+      ["--setting-sources", "", "-p", prompt, "--model", CLAUDE_JUDGE_MODEL, "--output-format", "text", "--max-turns", "1", "--dangerously-skip-permissions", "--no-session-persistence"],
       {
         encoding: "utf-8",
         timeout: 60 * 1000,

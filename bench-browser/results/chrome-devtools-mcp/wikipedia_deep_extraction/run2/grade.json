@@ -1,4 +1,0 @@
-{
-  "task_success": true,
-  "details": "The agent navigated to the correct Wikipedia page, extracted data from the table using JavaScript, and reported the 3 most recent years (2025, 2024, 2023) with correct laureate names and citation reasons for each year."
-}

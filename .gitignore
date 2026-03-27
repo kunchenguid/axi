@@ -8,6 +8,8 @@ dist/
 bench/results/*
 bench/ITERATIONS.md
 !bench/results/.gitkeep
+bench-github/results/
+bench-browser/results/
 
 # Published benchmark results (tracked)
 !bench/published-results/

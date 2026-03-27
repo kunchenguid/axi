@@ -13,6 +13,7 @@ import type { AgentBackend, GradingSpec, GradeResult } from "./types.js";
 const CODEX_JUDGE_MODEL = "gpt-5.4-mini";
 const CLAUDE_JUDGE_MODEL = "claude-sonnet-4-6";
 
+
 /**
  * Format raw JSONL from the agent run into a readable trajectory transcript.
  *
@@ -159,7 +160,7 @@ export function grade(
   let judgeOutput: string;
   try {
     const { cmd, args } = judgeBackend === "claude"
-      ? { cmd: "claude", args: ["-p", prompt, "--model", CLAUDE_JUDGE_MODEL, "--output-format", "text", "--max-turns", "1", "--dangerously-skip-permissions", "--no-session-persistence"] }
+      ? { cmd: "claude", args: ["--setting-sources", "", "-p", prompt, "--model", CLAUDE_JUDGE_MODEL, "--output-format", "text", "--max-turns", "1", "--dangerously-skip-permissions", "--no-session-persistence"] }
       : { cmd: "codex", args: ["exec", "--json", "--model", CODEX_JUDGE_MODEL, "--ephemeral", prompt] };
     judgeOutput = execFileSync(
       cmd,

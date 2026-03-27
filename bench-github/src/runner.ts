@@ -18,6 +18,7 @@ import type { RunSpec, RunResult, ConditionDef, TaskDef, AgentBackend } from "./
 import { parseCodexJsonl, parseClaudeJsonl } from "./usage.js";
 import { grade } from "./grader.js";
 
+
 const BENCH_ROOT = resolve(import.meta.dirname, "..");
 const RESULTS_DIR = join(BENCH_ROOT, "results");
 const REPO_URL = "https://github.com/openclaw/openclaw.git";
@@ -199,12 +200,14 @@ function runAgent(
     }
 
     cmd = [
-      "claude", "-p", JSON.stringify(task.prompt),
+      "claude", "--setting-sources", "",
+      "-p", JSON.stringify(task.prompt),
       "--model", spec.model,
       "--output-format", "stream-json",
       "--verbose",
       "--dangerously-skip-permissions",
       "--no-session-persistence",
+      "--disable-slash-commands",
       "--allowedTools", "Bash", "Read", "Edit", "Glob", "Grep", "Agent", "WebFetch", "WebSearch",
       ...mcpArgs,
     ];

@@ -1,1 +1,0 @@
-{"pass": true, "reason": "The agent navigated to https://github.com/torvalds/linux, captured the page snapshot showing 225k stars and C as the primary language (98.0%), and reported both facts correctly and completely."}

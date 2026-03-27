@@ -1,1 +1,0 @@
-{"pass": true, "reason": "The agent navigated to https://example.com, retrieved the page snapshot showing the h1 heading 'Example Domain', and correctly reported it as the main heading."}

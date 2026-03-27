@@ -1,1 +1,0 @@
-{"pass": true, "reason": "The agent navigated to the correct Wikipedia Moon page, extracted the 'Average orbital speed' cell from the infobox (1.022 km/s), and reported the correct value."}

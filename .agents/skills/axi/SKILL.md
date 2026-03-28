@@ -148,7 +148,9 @@ help[2]:
 **Rules:**
 
 - **Self-installing**: register hooks at global/user level on first run — no manual setup required
-- **Idempotent**: repeated installs are silent no-ops
+- **Absolute paths**: hook commands must use the full absolute path of the current executable (via `os.Executable()` or equivalent), not a bare command name. This ensures hooks work regardless of the agent's `$PATH` at runtime
+- **Path repair**: on every invocation, check existing hooks and update the executable path if it has changed (e.g., after reinstall or relocation). This turns self-install into self-heal
+- **Idempotent**: repeated installs with the same path are silent no-ops
 - **Directory-scoped**: show only state relevant to the current working directory
 - **Token-budget-aware**: this context loads on _every_ session — ruthlessly minimize it. Include just enough for the agent to orient and act; deep data belongs in explicit invocations
 - **Lifecycle capture**: use session-end hooks to capture what happened (transcripts, files touched, specs referenced) so future session-start context gets richer over time

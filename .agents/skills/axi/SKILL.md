@@ -9,6 +9,10 @@ description: >
 
 AXI defines ergonomic standards for building CLI tools that autonomous agents interact with through shell execution.
 
+## Before you start
+
+Read the [TOON specification](https://toonformat.dev/reference/spec.html) before building any AXI output.
+
 ## 1. Token-efficient output
 
 Use [TOON](https://toonformat.dev/) (Token-Oriented Object Notation) as the output format on stdout.
@@ -182,6 +186,7 @@ Rules:
 - **Actionable**: every suggestion is a complete, copy-pasteable command carrying forward any disambiguating flags from the current invocation (e.g., `--repo`, `--source`)
 - **Omit when self-contained**: when the output fully answers the query (a detail view, a count, a confirmation), suggestions are noise — leave them out. Include them on list and mutation responses where the next step isn't obvious.
 - **Guide discovery, not workflows**: suggest a variety of possible next actions, don't prescribe a fixed sequence. An agent that already knows what it wants should never be nudged into an extra step.
+- **Reveal truncated lists**: when a list shows only the most recent N items out of a larger total, add a help hint telling the agent how to see all of them (e.g., `Run 'mytool list' for all 47 items`). Don't encode pagination into TOON array headers — use help hints instead.
 - **Resolve errors**: on errors, suggest the specific command that fixes the problem, not "see `--help`"
 
 ## 10. Consistent way to get help

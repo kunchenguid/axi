@@ -1,18 +1,34 @@
 # AXI: Agent eXperience Interface
 
-<h3 align="center">Design principles for agent ergonomics. Higher accuracy with lower token cost than both MCP and regular CLI.</h3>
+<h3 align="center">10 design principles for building agent-ergonomic apps.</h3>
 
 <p align="center">
   <img src="docs/axi-splash.png" alt="AXI — Let's build apps agents love." width="800">
 </p>
 
-AI agents interact with external services through two dominant paradigms today: **CLIs** which were originally built for humans, and structured tool protocols like **MCP**. Both impose significant overhead — CLIs produce verbose, metadata-sparse output that wastes token budgets, while MCP tool schemas consume a lot of context tokens upfront.
+AI agents interact with external services through two dominant paradigms today: **CLIs** which were originally built for humans, and structured tool protocols like **MCP**. Both impose significant overhead.
 
-AXI is a **new paradigm** — agent-native CLI tools built from **10 design principles** that treat token budget as a first-class constraint. An AXI provides token-optimized output formatting, pre-computed aggregate fields, contextual next-step suggestions, and structured error handling. **[`gh-axi`](https://github.com/kunchenguid/gh-axi)** is the first AXI — a `gh` wrapper you can install today and point your agent at via `CLAUDE.md` or `AGENTS.md`.
+AXI is a **new paradigm** — agent-native CLI tools built from **10 design principles** that treat token budget as a first-class constraint.
 
 ## Results
 
-Evaluated across 425 benchmark runs (17 tasks × 5 conditions × 5 repeats) using Claude Sonnet 4.6:
+### Browser Benchmark
+
+Evaluated across 560 runs (16 tasks × 7 conditions × 5 repeats) using Claude Sonnet 4.6:
+
+| Condition                      | Success  | Avg Cost   | Avg Duration | Avg Turns |
+| ------------------------------ | -------- | ---------- | ------------ | --------- |
+| **chrome-devtools-axi**        | **100%** | **$0.133** | **24.1s**    | **4.6**   |
+| **agent-browser-axi**          | **100%** | **$0.137** | **26.9s**    | **5.0**   |
+| chrome-devtools-mcp-compressed | 100%     | $0.150     | 32.6s        | 5.9       |
+| agent-browser                  | 100%     | $0.160     | 33.9s        | 7.2       |
+| chrome-devtools-mcp            | 100%     | $0.168     | 27.2s        | 5.4       |
+| chrome-devtools-mcp-code       | 99%      | $0.177     | 42.9s        | 6.6       |
+| chrome-devtools-mcp-search     | 85%      | $0.167     | 39.1s        | 7.1       |
+
+### GitHub Benchmark
+
+Evaluated across 425 runs (17 tasks × 5 conditions × 5 repeats) using Claude Sonnet 4.6:
 
 | Condition               | Success  | Avg Cost   | Avg Duration | Avg Turns |
 | ----------------------- | -------- | ---------- | ------------ | --------- |
@@ -24,19 +40,21 @@ Evaluated across 425 benchmark runs (17 tasks × 5 conditions × 5 repeats) usin
 
 ## Quick Start
 
-[`gh-axi`](https://github.com/kunchenguid/gh-axi) is the reference AXI implementation — an ergonomic wrapper around the `gh` CLI.
+Reference AXI implementations:
+
+- [`gh-axi`](https://github.com/kunchenguid/gh-axi) — GitHub operations
+- [`chrome-devtools-axi`](https://github.com/kunchenguid/chrome-devtools-axi) — Browser automation
 
 ```sh
 $ npm install -g gh-axi
+$ npm install -g chrome-devtools-axi
 ```
 
 Add to your `CLAUDE.md` or `AGENTS.md`:
 
 ```
-Use `gh-axi` (replacement for `gh` CLI) for all GitHub operations.
+Use `gh-axi` for GitHub and `chrome-devtools-axi` for browser automation.
 ```
-
-That's it. Your agent now gets structured, token-efficient GitHub output.
 
 ## The 10 Principles
 
@@ -65,24 +83,29 @@ $ npx skills add kunchenguid/axi
 
 This installs the [AXI skill](.agents/skills/axi/SKILL.md) — a detailed guide with examples for each principle that your coding agent can reference while building.
 
-## gh-axi
-
-`gh-axi` wraps the `gh` CLI with token-efficient TOON output, pre-computed fields, contextual suggestions, and structured errors. See the [gh-axi repo](https://github.com/kunchenguid/gh-axi) for full usage and command reference.
-
-```sh
-$ gh-axi pr list --state merged --limit 3
-count: 3 of 3549
-pull_requests[3]{number,title,state,author}:
-  51772,"refactor(plugins): route Telegram...",merged,dependabot
-  51770,"fix(core): handle nil pointer in...",merged,alice
-  51769,"feat(auth): add OAuth2 PKCE flow",merged,bob
-help[1]:
-  Run `gh-axi pr view <number>` to see full details
-```
-
 ## Development
 
-### Running the Benchmark
+### Browser Benchmark
+
+The browser benchmark harness lives in `bench-browser/`. It compares browser automation tools across 16 browsing tasks.
+
+```sh
+cd bench-browser
+npm install
+
+# Run a single condition × task
+npm run bench -- run --condition chrome-devtools-axi --task read_static_page
+
+# Run the full matrix
+npm run bench -- matrix --repeat 5
+
+# Generate summary report
+npm run bench -- report
+```
+
+Published results (560 runs): [`bench-browser/published-results/STUDY.md`](bench-browser/published-results/STUDY.md)
+
+### GitHub Benchmark
 
 The GitHub benchmark harness lives in `bench-github/`. It runs agent tasks across different interface conditions and grades results with an LLM judge.
 
@@ -93,39 +116,18 @@ npm install
 # Run a single condition × task
 npm run bench -- run --condition axi --task merged_pr_ci_audit --repeat 5 --agent claude
 
-# Run the full matrix (all conditions × all tasks)
+# Run the full matrix
 npm run bench -- matrix --repeat 5 --agent claude
 
-# Generate summary report from results
+# Generate summary report
 npm run bench -- report
 ```
 
-**Conditions:** `axi`, `cli`, `mcp-no-toolsearch`, `mcp-with-toolsearch`, `mcp-with-code-mode`
-
-Results are written to `bench-github/results/`. Published results from the study (425 runs) are in [`bench-github/published-results/`](bench-github/published-results/STUDY.md).
-
-### Running the Browser Benchmark
-
-The browser benchmark harness lives in `bench-browser/`. It compares browser automation tools across 16 browsing tasks.
-
-```sh
-cd bench-browser
-npm install
-
-# Run a single condition × task
-npm run bench -- run --condition agent-browser --task read_static_page
-
-# Run the full matrix (all conditions × all tasks)
-npm run bench -- matrix --repeat 5
-
-# Generate summary report from results
-npm run bench -- report
-```
-
-**Conditions:** `agent-browser`, `pinchtab`, `chrome-devtools-mcp`
+Published results (425 runs): [`bench-github/published-results/STUDY.md`](bench-github/published-results/STUDY.md)
 
 ## Links
 
 - [Website](https://axi.md)
 - [AXI Skill definition](.agents/skills/axi/SKILL.md)
+- [Browser benchmark study](bench-browser/published-results/STUDY.md)
 - [GitHub benchmark study](bench-github/published-results/STUDY.md)

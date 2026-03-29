@@ -190,7 +190,8 @@ The agent discovers your CLI's surface area organically by using it, not by read
 Rules:
 
 - **Relevant**: after an open item → suggest closing; after an empty list → suggest creating; after a list → suggest viewing
-- **Actionable**: every suggestion is a complete, copy-pasteable command carrying forward any disambiguating flags from the current invocation (e.g., `--repo`, `--source`)
+- **Actionable**: every suggestion is a complete command (or template) carrying forward any disambiguating flags from the current invocation (e.g., `--repo`, `--source`)
+- **Parameterize dynamic values**: when a suggested command needs a runtime value such as an ID, title, branch, URL, or path, use placeholders like `<id>` or `"<title>"` instead of guessing a concrete value that may mislead the agent
 - **Omit when self-contained**: when the output fully answers the query (a detail view, a count, a confirmation), suggestions are noise — leave them out. Include them on list and mutation responses where the next step isn't obvious.
 - **Guide discovery, not workflows**: suggest a variety of possible next actions, don't prescribe a fixed sequence. An agent that already knows what it wants should never be nudged into an extra step.
 - **Reveal truncated lists**: when a list shows only the most recent N items out of a larger total, add a help hint telling the agent how to see all of them (e.g., `Run 'mytool list' for all 47 items`). Don't encode pagination into TOON array headers — use help hints instead.

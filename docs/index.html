@@ -634,8 +634,11 @@ help[2]:
         <h4><span class="text-accent">9.</span> Contextual disclosure</h4>
         <p>
           Append <code>help[]</code> lines after output, suggesting logical next
-          steps as complete, copy-pasteable commands. This eliminates
-          tool-discovery turns and guides agents through multi-step workflows.
+          steps as concrete command templates. Carry forward fixed
+          disambiguating flags, but leave runtime values parameterized as
+          placeholders like <code>&lt;id&gt;</code> instead of guessing them.
+          This eliminates tool-discovery turns and guides agents through
+          multi-step workflows.
         </p>
 
         <h4><span class="text-accent">10.</span> Consistent way to get help</h4>

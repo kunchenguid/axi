@@ -52,8 +52,8 @@ Reference AXI implementations:
 - [`chrome-devtools-axi`](https://github.com/kunchenguid/chrome-devtools-axi) — Browser automation
 
 ```sh
-$ npm install -g gh-axi
-$ npm install -g chrome-devtools-axi
+npm install -g gh-axi
+npm install -g chrome-devtools-axi
 ```
 
 Add to your `CLAUDE.md` or `AGENTS.md`:
@@ -84,7 +84,7 @@ These principles define what makes a CLI tool "an AXI":
 Install the AXI skill to get the design guidelines and scaffolding for building an AXI-compliant CLI:
 
 ```sh
-$ npx skills add kunchenguid/axi
+npx skills add kunchenguid/axi
 ```
 
 This installs the [AXI skill](.agents/skills/axi/SKILL.md) — a detailed guide with examples for each principle that your coding agent can reference while building.

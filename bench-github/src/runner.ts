@@ -200,7 +200,7 @@ function runAgent(
     }
 
     cmd = [
-      "claude", "--setting-sources", "",
+      "claude", "--setting-sources", "''",
       "-p", JSON.stringify(task.prompt),
       "--model", spec.model,
       "--output-format", "stream-json",

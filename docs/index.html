@@ -599,7 +599,9 @@ pull_request:
         <h4><span class="text-accent">8.</span> Content first</h4>
         <p>
           Running a command with no arguments should display live, actionable
-          data rather than help text.
+          data rather than help text. The home view should also include the
+          current executable path, with the home-directory prefix rendered as
+          <code>~</code>, and a one-sentence description of what the AXI does.
         </p>
 
         <div class="grid grid--2">
@@ -617,6 +619,8 @@ AVAILABLE COMMANDS
           <div class="card">
             <p class="section-label">AXI: no-args shows live state</p>
             <pre><code>$ gh-axi issue
+bin: ~/.local/bin/gh-axi
+description: Browse and manage GitHub issues for the current repository
 count: 14 of 8771 total
 issues[14]{number,title,state}:
   51815,"[Bug]: Telegram plugin...",open

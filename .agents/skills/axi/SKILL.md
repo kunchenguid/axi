@@ -198,4 +198,16 @@ Rules:
 
 ## 10. Consistent way to get help
 
+The top-level home view should also identify the tool itself before the live data:
+
+- Include the absolute path of the current executable, with the user's home directory collapsed to `~`
+- Include a one-sentence description of what this AXI does
+
+```
+$ tasks
+bin: ~/.local/bin/tasks
+description: Manage project tasks in the current workspace
+...
+```
+
 Every subcommand should support `--help` with a concise, complete reference: available flags with defaults, required arguments, and 2-3 usage examples. Keep it focused on the requested subcommand — don't dump the entire CLI's manual.

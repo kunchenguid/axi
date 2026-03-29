@@ -8,7 +8,7 @@
  *   report    — Generate summary from results.jsonl
  */
 
-import { readFileSync, writeFileSync, existsSync } from "node:fs";
+import { readFileSync, writeFileSync, existsSync, mkdirSync } from "node:fs";
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
 import { resolve, join } from "node:path";
@@ -46,8 +46,10 @@ function loadTasks(): Map<string, TaskDef> {
 
 /** Clear previous results for the given conditions, keeping results from other conditions. */
 function clearResults(conditionIds: string[]): void {
-  const resultsPath = join(BENCH_ROOT, "results", "results.jsonl");
+  const resultsDir = join(BENCH_ROOT, "results");
+  const resultsPath = join(resultsDir, "results.jsonl");
   if (!existsSync(resultsPath)) {
+    mkdirSync(resultsDir, { recursive: true });
     writeFileSync(resultsPath, "");
     return;
   }

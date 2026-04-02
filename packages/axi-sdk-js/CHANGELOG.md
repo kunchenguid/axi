@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.2](https://github.com/kunchenguid/axi/compare/axi-sdk-js-v0.1.1...axi-sdk-js-v0.1.2) (2026-04-02)
+
+
+### Features
+
+* better encapsulation of args handling in sdk ([#21](https://github.com/kunchenguid/axi/issues/21)) ([c7414b5](https://github.com/kunchenguid/axi/commit/c7414b50f20b1dd6c28b0f10007f3f8fd761e116))
+
 ## [0.1.1](https://github.com/kunchenguid/axi/compare/axi-sdk-js-v0.1.0...axi-sdk-js-v0.1.1) (2026-04-02)
 
 

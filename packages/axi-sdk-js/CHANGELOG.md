@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.3](https://github.com/kunchenguid/axi/compare/axi-sdk-js-v0.1.2...axi-sdk-js-v0.1.3) (2026-04-02)
+
+
+### Features
+
+* **cli:** add version flag support ([#23](https://github.com/kunchenguid/axi/issues/23)) ([e05e312](https://github.com/kunchenguid/axi/commit/e05e312c5341175c1babe1a0c067a60a773f75f9))
+
 ## [0.1.2](https://github.com/kunchenguid/axi/compare/axi-sdk-js-v0.1.1...axi-sdk-js-v0.1.2) (2026-04-02)
 
 

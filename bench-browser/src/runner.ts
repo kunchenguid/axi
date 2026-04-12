@@ -11,10 +11,13 @@
  */
 
 import { execFileSync, execSync } from "node:child_process";
+import { createHash } from "node:crypto";
 import { existsSync, mkdirSync, readFileSync, writeFileSync, appendFileSync, rmSync } from "node:fs";
 import { join, resolve } from "node:path";
 
 import type { RunSpec, RunResult, ConditionDef, TaskDef } from "./types.js";
+import { isActionbookConditionId, prewarmActionbookDaemon } from "./actionbook.js";
+import { resolveClaudeAuth } from "./claude-auth.js";
 import { parseClaudeJsonl } from "./usage.js";
 import { grade } from "./grader.js";
 import { validateCommandPolicy } from "./validation.js";
@@ -38,6 +41,43 @@ export function renderAgentsMd(
     .replaceAll("__AXI_BENCH_DEV_BROWSER_CMD__", devBrowserCommand);
 }
 
+export function buildConditionEnv(
+  condition: Pick<ConditionDef, "id">,
+  artifactDir: string,
+): Record<string, string> {
+  if (!isActionbookConditionId(condition.id)) {
+    return {};
+  }
+
+  const shortId = createHash("sha1").update(artifactDir).digest("hex").slice(0, 12);
+
+  return {
+    ACTIONBOOK_HOME: join("/tmp", `axi-ab-${shortId}`),
+    ACTIONBOOK_BROWSER_MODE: "local",
+    ACTIONBOOK_BROWSER_HEADLESS: "true",
+  };
+}
+
+function cleanupActionbookHome(actionbookHome: string): void {
+  const pidPath = join(actionbookHome, "daemon.pid");
+  if (existsSync(pidPath)) {
+    try {
+      const pid = parseInt(readFileSync(pidPath, "utf-8").trim(), 10);
+      if (Number.isFinite(pid) && pid > 0) {
+        process.kill(pid, "SIGTERM");
+      }
+    } catch {
+      // Best-effort cleanup only.
+    }
+  }
+
+  try {
+    rmSync(actionbookHome, { recursive: true, force: true });
+  } catch {
+    // Best-effort cleanup only.
+  }
+}
+
 export function runOne(
   spec: RunSpec,
   condition: ConditionDef,
@@ -46,6 +86,11 @@ export function runOne(
   // 1. Create artifact dir
   const artifactDir = join(RESULTS_DIR, spec.condition, spec.task, `run${spec.run}`);
   mkdirSync(artifactDir, { recursive: true });
+  const conditionEnv = buildConditionEnv(condition, artifactDir);
+  if (conditionEnv.ACTIONBOOK_HOME) {
+    mkdirSync(conditionEnv.ACTIONBOOK_HOME, { recursive: true });
+    prewarmActionbookDaemon({ ...process.env, ...conditionEnv });
+  }
 
   // 2. Set up workspace: just a directory with CLAUDE.md (no repo clone needed)
   const workspaceDir = join(artifactDir, "workspace");
@@ -86,7 +131,7 @@ export function runOne(
     }
 
     // 3. Run agent
-    const { agentOutput, wallClockSeconds } = runAgent(spec, condition, task, artifactDir, workspaceDir, agentsMd);
+    const { agentOutput, wallClockSeconds } = runAgent(spec, condition, task, artifactDir, workspaceDir, agentsMd, conditionEnv);
 
     // Save raw output
     writeFileSync(join(artifactDir, "agent_output.txt"), agentOutput);
@@ -105,7 +150,13 @@ export function runOne(
           details: usageValidationError,
           failure_reason: "policy_violation" as const,
         }
-      : grade(task.grading, task.prompt, agentOutput, artifactDir);
+      : grade(
+          task.grading,
+          task.prompt,
+          agentOutput,
+          artifactDir,
+          spec.claude_auth_mode ?? "auto",
+        );
     writeFileSync(join(artifactDir, "grade.json"), JSON.stringify(gradeResult, null, 2));
 
     // 6. Build result
@@ -141,6 +192,9 @@ export function runOne(
     // Always remove workspace to avoid leaving browser data on disk
     if (existsSync(workspaceDir)) {
       rmSync(workspaceDir, { recursive: true, force: true });
+    }
+    if (conditionEnv.ACTIONBOOK_HOME) {
+      cleanupActionbookHome(conditionEnv.ACTIONBOOK_HOME);
     }
   }
 }
@@ -182,7 +236,12 @@ function runAgent(
   artifactDir: string,
   workspaceDir: string,
   agentsMd: string,
+  conditionEnv: Record<string, string>,
 ): { agentOutput: string; wallClockSeconds: number } {
+  const auth = resolveClaudeAuth(
+    spec.claude_auth_mode ?? "auto",
+    { ...process.env, ...conditionEnv },
+  );
   // Build Claude CLI args array (using execFileSync to avoid shell interpretation
   // of backticks and angle brackets in the system prompt)
   const args: string[] = [
@@ -285,7 +344,7 @@ function runAgent(
       timeout: 5 * 60 * 1000,
       maxBuffer: 50 * 1024 * 1024, // 50MB — screenshots produce large base64 output
       stdio: ["pipe", "pipe", "pipe"],
-      env: { ...process.env },
+      env: auth.env,
       cwd: workspaceDir,
     });
   } catch (err: unknown) {

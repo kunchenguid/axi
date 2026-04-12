@@ -13,6 +13,7 @@ import { execSync } from "node:child_process";
 import { resolve, join } from "node:path";
 import { parse as parseYaml } from "yaml";
 import type { AgentBackend, ConditionDef, ConditionId, TaskDef } from "./types.js";
+import type { ClaudeAuthMode } from "./claude-auth.js";
 import { runOne } from "./runner.js";
 import { writeReports } from "./reporter.js";
 
@@ -76,6 +77,17 @@ function parseArgs(argv: string[]): Record<string, string> {
   return args;
 }
 
+function parseClaudeAuthMode(value: string | undefined): ClaudeAuthMode {
+  const mode = value ?? "auto";
+  if (mode === "auto" || mode === "env" || mode === "subscription") {
+    return mode;
+  }
+  console.error(
+    `Unknown --claude-auth mode: ${mode}. Expected one of: auto, env, subscription.`,
+  );
+  process.exit(1);
+}
+
 async function cmdRun(argv: string[]): Promise<void> {
   const args = parseArgs(argv);
   const conditionId = args.condition;
@@ -84,9 +96,10 @@ async function cmdRun(argv: string[]): Promise<void> {
   const agent = (args.agent ?? "codex") as AgentBackend;
   const defaultModel = agent === "claude" ? "claude-sonnet-4-6" : "gpt-5.4";
   const model = args.model ?? defaultModel;
+  const claudeAuthMode = parseClaudeAuthMode(args["claude-auth"]);
 
   if (!conditionId || !taskId) {
-    console.error("Usage: bench run --condition <id> --task <id> [--repeat N] [--model M] [--agent codex|claude]");
+    console.error("Usage: bench run --condition <id> --task <id> [--repeat N] [--model M] [--agent codex|claude] [--claude-auth auto|env|subscription]");
     process.exit(1);
   }
 
@@ -114,7 +127,14 @@ async function cmdRun(argv: string[]): Promise<void> {
 
   for (let r = 1; r <= repeat; r++) {
     console.log(`\n=== Run ${r}/${repeat}: ${conditionId} × ${taskId} ===\n`);
-    const result = runOne({ condition: conditionId as ConditionId, task: taskId, run: r, model, agent }, condition, task);
+    const result = runOne({
+      condition: conditionId as ConditionId,
+      task: taskId,
+      run: r,
+      model,
+      agent,
+      claude_auth_mode: claudeAuthMode,
+    }, condition, task);
     console.log(`  Success: ${result.grade.task_success}`);
     console.log(`  Turns: ${result.usage.turn_count}, Commands: ${result.usage.command_count}`);
     console.log(`  Input tokens: ${result.usage.input_tokens} (cached: ${result.usage.input_tokens_cached})`);
@@ -129,6 +149,7 @@ async function cmdMatrix(argv: string[]): Promise<void> {
   const agent = (args.agent ?? "codex") as AgentBackend;
   const defaultModel = agent === "claude" ? "claude-sonnet-4-6" : "gpt-5.4";
   const model = args.model ?? defaultModel;
+  const claudeAuthMode = parseClaudeAuthMode(args["claude-auth"]);
   const conditionFilter = args.condition;
   const taskFilter = args.task;
   const categoryFilter = args.category;
@@ -182,7 +203,14 @@ async function cmdMatrix(argv: string[]): Promise<void> {
         condDone++;
         console.log(`\n[${condId} ${condDone}/${condTotal}] ${taskId} (run ${r})`);
         const result = runOne(
-          { condition: condId as ConditionId, task: taskId, run: r, model, agent },
+          {
+            condition: condId as ConditionId,
+            task: taskId,
+            run: r,
+            model,
+            agent,
+            claude_auth_mode: claudeAuthMode,
+          },
           condition,
           task,
         );
@@ -199,6 +227,7 @@ async function cmdMatrix(argv: string[]): Promise<void> {
     const execFileAsync = promisify(execFile);
     const childArgs = [
       "--agent", agent,
+      "--claude-auth", claudeAuthMode,
       "--repeat", String(repeat),
       "--model", model,
       ...(taskFilter ? ["--task", taskFilter] : []),
@@ -251,11 +280,13 @@ Commands:
               --repeat <N>  (default: 1)
               --model <M>   (default: gpt-5.4 for codex, claude-sonnet-4-6 for claude)
               --agent <codex|claude>  (default: codex)
+              --claude-auth <auto|env|subscription>  (default: auto)
 
   matrix    Run all condition × task combinations
               --repeat <N>  (default: 1)
               --model <M>   (default: gpt-5.4 for codex, claude-sonnet-4-6 for claude)
               --agent <codex|claude>  (default: codex)
+              --claude-auth <auto|env|subscription>  (default: auto)
               --condition <id,id,...>  (filter conditions)
               --task <id,id,...>       (filter tasks)
               --category <single_step|multi_step|error_recovery>

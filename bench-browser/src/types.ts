@@ -1,6 +1,8 @@
 /** Shared interfaces for the browser benchmark harness. */
 
-export type ConditionId = "agent-browser" | "chrome-devtools-axi" | "chrome-devtools-mcp" | "chrome-devtools-mcp-search" | "chrome-devtools-mcp-code" | "chrome-devtools-mcp-compressed-cli" | "dev-browser";
+import type { ClaudeAuthMode } from "./claude-auth.js";
+
+export type ConditionId = "agent-browser" | "actionbook" | "actionbook-parallel" | "chrome-devtools-axi" | "chrome-devtools-mcp" | "chrome-devtools-mcp-search" | "chrome-devtools-mcp-code" | "chrome-devtools-mcp-compressed-cli" | "dev-browser";
 export type TaskCategory = "single_step" | "multi_step" | "investigation" | "error_recovery";
 
 export interface GradingSpec {
@@ -52,6 +54,7 @@ export interface RunSpec {
   task: string;
   run: number;
   model: string;
+  claude_auth_mode?: ClaudeAuthMode;
 }
 
 export interface UsageMetrics {

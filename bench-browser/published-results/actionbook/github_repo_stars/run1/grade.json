@@ -1,0 +1,5 @@
+{
+  "task_success": true,
+  "details": "The agent navigated to https://github.com/torvalds/linux, extracted the star count (~228k, which is consistent with 190k+ expectation) and the primary programming language (C at 98.0%) via browser evaluation commands, and reported a correct, complete answer.",
+  "judge_model": "claude-sonnet-4-6"
+}

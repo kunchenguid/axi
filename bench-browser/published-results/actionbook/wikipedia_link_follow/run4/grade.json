@@ -1,0 +1,5 @@
+{
+  "task_success": true,
+  "details": "The agent correctly navigated to the Ada Lovelace Wikipedia page first, then clicked the Charles Babbage link (ref e61) which redirected to the Charles Babbage Wikipedia page, and correctly reported his birth date as 26 December 1791, matching the known facts.",
+  "judge_model": "claude-sonnet-4-6"
+}

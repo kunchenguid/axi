@@ -8,6 +8,7 @@
 
 import { execFileSync } from "node:child_process";
 import { writeFileSync } from "node:fs";
+import { resolveClaudeAuth, type ClaudeAuthMode } from "./claude-auth.js";
 import type { AgentBackend, GradingSpec, GradeResult } from "./types.js";
 
 const CODEX_JUDGE_MODEL = "gpt-5.4-mini";
@@ -153,6 +154,7 @@ export function grade(
   rawJsonl: string,
   judgeBackend: AgentBackend = "codex",
   artifactDir?: string,
+  claudeAuthMode: ClaudeAuthMode = "env",
 ): GradeResult {
   const trajectory = formatTrajectory(rawJsonl);
   const prompt = buildGradingPrompt(taskPrompt, trajectory, spec.grading_hint);
@@ -162,6 +164,9 @@ export function grade(
     const { cmd, args } = judgeBackend === "claude"
       ? { cmd: "claude", args: ["--setting-sources", "", "-p", prompt, "--model", CLAUDE_JUDGE_MODEL, "--output-format", "text", "--max-turns", "1", "--dangerously-skip-permissions", "--no-session-persistence"] }
       : { cmd: "codex", args: ["exec", "--json", "--model", CODEX_JUDGE_MODEL, "--ephemeral", prompt] };
+    const judgeEnv = judgeBackend === "claude"
+      ? resolveClaudeAuth(claudeAuthMode, process.env).env
+      : { ...process.env };
     judgeOutput = execFileSync(
       cmd,
       args,
@@ -169,6 +174,7 @@ export function grade(
         encoding: "utf-8",
         timeout: 60 * 1000,
         stdio: ["pipe", "pipe", "pipe"],
+        env: judgeEnv,
       },
     );
   } catch (err: unknown) {

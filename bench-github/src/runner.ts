@@ -10,11 +10,12 @@
  * 6. Append to results.jsonl
  */
 
-import { execSync, type ExecSyncOptionsWithStringEncoding } from "node:child_process";
+import { execFileSync, execSync, type ExecSyncOptionsWithStringEncoding } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync, writeFileSync, appendFileSync, rmSync } from "node:fs";
 import { join, resolve } from "node:path";
 
 import type { RunSpec, RunResult, ConditionDef, TaskDef, AgentBackend } from "./types.js";
+import { resolveClaudeAuth } from "./claude-auth.js";
 import { parseCodexJsonl, parseClaudeJsonl } from "./usage.js";
 import { grade } from "./grader.js";
 
@@ -73,7 +74,14 @@ export function runOne(
       : extractFinalOutput(agentOutput);
 
     // 5. Grade — pass raw JSONL so the judge sees the full trajectory
-    const gradeResult = grade(task.grading, task.prompt, agentOutput, agent, artifactDir);
+    const gradeResult = grade(
+      task.grading,
+      task.prompt,
+      agentOutput,
+      agent,
+      artifactDir,
+      spec.claude_auth_mode ?? "auto",
+    );
     writeFileSync(join(artifactDir, "grade.json"), JSON.stringify(gradeResult, null, 2));
 
     // 6. Build result
@@ -168,8 +176,9 @@ function runAgent(
   workspaceDir: string,
 ): { agentOutput: string; wallClockSeconds: number } {
   const agent = spec.agent ?? "codex";
-
-  let cmd: string[];
+  let claudeArgs: string[] | undefined;
+  let codexCmd: string[] | undefined;
+  let claudeEnv: NodeJS.ProcessEnv | undefined;
 
   if (agent === "claude") {
     // Ensure GH_TOKEN is set for conditions that need it (MCP, code-mode)
@@ -199,8 +208,8 @@ function runAgent(
       }
     }
 
-    cmd = [
-      "claude", "--setting-sources", "''",
+    claudeArgs = [
+      "--setting-sources", "",
       "-p", JSON.stringify(task.prompt),
       "--model", spec.model,
       "--output-format", "stream-json",
@@ -211,6 +220,7 @@ function runAgent(
       "--allowedTools", "Bash", "Read", "Edit", "Glob", "Grep", "Agent", "WebFetch", "WebSearch",
       ...mcpArgs,
     ];
+    claudeEnv = resolveClaudeAuth(spec.claude_auth_mode ?? "auto", process.env).env;
   } else {
     // Codex: register MCP server if needed
     if (condition.setup_commands) {
@@ -223,7 +233,7 @@ function runAgent(
       }
     }
 
-    cmd = [
+    codexCmd = [
       "codex", "exec", "--json",
       "--model", spec.model,
       "--skip-git-repo-check",
@@ -237,13 +247,23 @@ function runAgent(
   const startTime = Date.now();
   let agentOutput = "";
   try {
-    agentOutput = execSync(cmd.join(" "), {
-      encoding: "utf-8",
-      timeout: 5 * 60 * 1000,
-      stdio: ["pipe", "pipe", "pipe"],
-      env: { ...process.env },
-      cwd: workspaceDir,
-    } as ExecSyncOptionsWithStringEncoding);
+    if (agent === "claude") {
+      agentOutput = execFileSync("claude", claudeArgs!, {
+        encoding: "utf-8",
+        timeout: 5 * 60 * 1000,
+        stdio: ["pipe", "pipe", "pipe"],
+        env: claudeEnv,
+        cwd: workspaceDir,
+      });
+    } else {
+      agentOutput = execSync(codexCmd!.join(" "), {
+        encoding: "utf-8",
+        timeout: 5 * 60 * 1000,
+        stdio: ["pipe", "pipe", "pipe"],
+        env: { ...process.env },
+        cwd: workspaceDir,
+      } as ExecSyncOptionsWithStringEncoding);
+    }
   } catch (err: unknown) {
     const execErr = err as { stdout?: string; stderr?: string };
     agentOutput = execErr.stdout ?? "";

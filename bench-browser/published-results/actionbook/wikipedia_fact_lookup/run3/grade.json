@@ -1,0 +1,5 @@
+{
+  "task_success": true,
+  "details": "The agent navigated to the correct Wikipedia page for the Moon, extracted the orbital speed directly from the infobox using browser text commands, and correctly reported 1.022 km/s.",
+  "judge_model": "claude-sonnet-4-6"
+}

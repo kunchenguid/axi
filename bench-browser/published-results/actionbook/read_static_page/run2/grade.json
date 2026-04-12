@@ -1,0 +1,5 @@
+{
+  "task_success": true,
+  "details": "The agent navigated to https://example.com using browser automation, retrieved the page content, and correctly identified the main heading as 'Example Domain'.",
+  "judge_model": "claude-sonnet-4-6"
+}

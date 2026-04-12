@@ -20,6 +20,160 @@ conditions:
         - "chrome-devtools"
         - "dev-browser"
 
+  actionbook:
+    name: "Actionbook CLI"
+    tool: actionbook
+    agents_md: |
+      # Tools
+
+      You have the `actionbook` CLI installed for browser automation.
+      Use it for all browsing tasks. Do NOT use curl, wget, or WebFetch.
+
+      The harness already sets these environment variables for every Bash call:
+      - `ACTIONBOOK_HOME`
+      - `ACTIONBOOK_BROWSER_MODE=local`
+      - `ACTIONBOOK_BROWSER_HEADLESS=true`
+
+      Do not inspect AXI source code, Homebrew paths, or config directories to
+      rediscover setup. Reuse the harness-provided environment.
+
+      IMPORTANT: prefer one Bash invocation per task. Start Actionbook with a
+      backgrounded `browser start`, wait briefly, then reuse the same session
+      and tab for the rest of the script.
+
+      For `browser text` and `browser eval`, prefer plain output when you only
+      need the extracted value. Use `--json` when you need metadata or want the
+      full envelope. If you do use `--json`, the extracted payload lives under
+      `data.value`, not a top-level `text` field.
+      For `snapshot --json`, the interactive elements live under `data.nodes`.
+      It is fine to filter a saved snapshot locally with `grep` or a short
+      script instead of re-reading the page.
+
+      For `click --json`, inspect `data.changed.url_changed` and `data.post_url`.
+      If `url_changed` is true or `post_url` already changed to the target page,
+      the navigation already happened. Do not immediately follow that with
+      `browser wait navigation`, because it will often just burn 30 seconds on
+      an already-completed page transition.
+      There is no `actionbook browser key` subcommand. To submit a search or
+      form, click the relevant suggestion, link, or submit button instead of
+      trying to press Enter.
+
+      Recommended per-task pattern:
+
+          actionbook browser start --headless --set-session-id s1 --json >"$ACTIONBOOK_HOME/start.json" 2>&1 &
+          sleep 3
+          actionbook browser list-sessions --json
+          actionbook browser goto <url> --session s1 --tab t1 --json
+          actionbook browser snapshot --session s1 --tab t1 --json
+          actionbook browser click @eN --session s1 --tab t1 --json
+          actionbook browser fill @eN "text" --session s1 --tab t1 --json
+          actionbook browser text --session s1 --tab t1
+          actionbook browser wait navigation --session s1 --tab t1 --json
+
+      Use refs from `snapshot` output (`@eN`) when interacting with the page.
+      Keep the same session (`s1`) and tab (`t1`) throughout the script unless
+      you intentionally open a new tab.
+      Keep shell URLs quoted, especially URLs containing `(` or `)`.
+      Run `actionbook browser --help` or `actionbook browser <subcommand> --help`
+      only when you need command details.
+    daemon: none
+    command_policy:
+      require_any_prefix: ["actionbook"]
+      forbid_any_prefix:
+        - "agent-browser"
+        - "chrome-devtools-axi"
+        - "chrome-devtools"
+        - "dev-browser"
+
+  actionbook-parallel:
+    name: "Actionbook CLI (parallel sessions)"
+    tool: actionbook
+    agents_md: |
+      # Tools
+
+      You have the `actionbook` CLI installed for browser automation.
+      Use it for all browsing tasks. Do NOT use curl, wget, or WebFetch.
+
+      The harness already sets these environment variables for every Bash call:
+      - `ACTIONBOOK_HOME`
+      - `ACTIONBOOK_BROWSER_MODE=local`
+      - `ACTIONBOOK_BROWSER_HEADLESS=true`
+
+      Do not inspect AXI source code, Homebrew paths, or config directories to
+      rediscover setup. Reuse the harness-provided environment.
+
+      IMPORTANT: prefer one Bash invocation per task.
+      When the task spans multiple independent pages or sites, run multiple
+      Actionbook sessions in parallel inside the same shell script and `wait`
+      for them before extracting results. When the task is sequential, use one
+      session only.
+
+      `actionbook` is stateless: every command addresses an explicit
+      `--session` and `--tab`, so independent sessions can be run in parallel.
+      `actionbook browser start --help` also supports `--open-url`, which is
+      the fastest way to start a session directly on its target page.
+      IMPORTANT: concurrent sessions must use different `--profile` values.
+      The default `actionbook` profile can only back one live session at a time.
+
+      Recommended parallel pattern for independent pages:
+
+          actionbook browser start --headless --profile wiki-p --set-session-id wiki --open-url "https://en.wikipedia.org/wiki/Rust_(programming_language)" --json >"$ACTIONBOOK_HOME/wiki-start.json" 2>&1 &
+          actionbook browser start --headless --profile gh-p --set-session-id gh --open-url "https://github.com/rust-lang/rust" --json >"$ACTIONBOOK_HOME/gh-start.json" 2>&1 &
+          actionbook browser start --headless --profile home-p --set-session-id home --open-url "https://www.rust-lang.org/" --json >"$ACTIONBOOK_HOME/home-start.json" 2>&1 &
+          sleep 4
+          actionbook browser text "#mw-content-text" --session wiki --tab t1 >"$ACTIONBOOK_HOME/wiki-text.txt" 2>&1 &
+          actionbook browser eval "document.querySelector('#repo-stars-counter-star')?.textContent?.trim()" --session gh --tab t1 >"$ACTIONBOOK_HOME/gh-stars.txt" 2>&1 &
+          actionbook browser text "main" --session home --tab t1 >"$ACTIONBOOK_HOME/home-text.txt" 2>&1 &
+          wait
+
+      For final extraction, prefer plain output and save each result to a file
+      once. Then inspect the saved files locally instead of issuing more browser
+      reads on the same page.
+
+      If you do need JSON, remember that the extracted payload is usually under
+      `data.value`.
+      For `snapshot --json`, refs live under `data.nodes`.
+      For `click --json`, inspect `data.changed.url_changed` and `data.post_url`.
+      If the click result already shows the new page, do not follow it with
+      `browser wait navigation`.
+      There is no `actionbook browser key` subcommand. Submit searches and
+      forms by clicking the matching suggestion, link, or submit button.
+
+      Targeted reads for this pattern:
+
+          actionbook browser text "#mw-content-text" --session wiki --tab t1
+          actionbook browser eval "document.querySelector('#repo-stars-counter-star')?.textContent?.trim()" --session gh --tab t1
+          actionbook browser text "main" --session home --tab t1
+
+      Site-specific guidance:
+
+      - Wikipedia designer / creator questions: prefer `#mw-content-text` or
+        article paragraphs, not just the infobox. The infobox often lists the
+        current developer (`The Rust Team`) instead of the original creator.
+      - GitHub star count questions: prefer the exact star counter selector via
+        `eval` or the exact `#repo-stars-counter-star` selector. Do not fall
+        back to generic GitHub selectors like `.Counter`, `[aria-label*='star']`,
+        watch counts, or fork counts unless the exact star selector failed and
+        you explicitly verified the fallback is really the star counter.
+      - Once you already have a successful exact GitHub star read, stop. Do not
+        keep probing other GitHub counters.
+
+      For same-session fanout, `actionbook browser new-tab` can open multiple
+      quoted URLs at once, but for independent-site research prefer one session
+      per site.
+      Use refs from `snapshot` output (`@eN`) when clicking or filling.
+      Keep shell URLs quoted, especially URLs containing `(` or `)`.
+      Run `actionbook browser --help` or `actionbook browser <subcommand> --help`
+      only when you need command details.
+    daemon: none
+    command_policy:
+      require_any_prefix: ["actionbook"]
+      forbid_any_prefix:
+        - "agent-browser"
+        - "chrome-devtools-axi"
+        - "chrome-devtools"
+        - "dev-browser"
+
   chrome-devtools-axi:
     name: "Chrome DevTools AXI (CLI wrapper)"
     tool: chrome-devtools-axi

@@ -12,6 +12,7 @@ import { readFileSync } from "node:fs";
 import { resolve, join } from "node:path";
 import { parse as parseYaml } from "yaml";
 import type { ConditionDef, ConditionId, TaskDef } from "./types.js";
+import type { ClaudeAuthMode } from "./claude-auth.js";
 import { runOne } from "./runner.js";
 import { writeReports } from "./reporter.js";
 import { startDaemon, stopDaemon } from "./lifecycle.js";
@@ -56,6 +57,17 @@ function parseArgs(argv: string[]): Record<string, string> {
   return args;
 }
 
+function parseClaudeAuthMode(value: string | undefined): ClaudeAuthMode {
+  const mode = value ?? "auto";
+  if (mode === "auto" || mode === "env" || mode === "subscription") {
+    return mode;
+  }
+  console.error(
+    `Unknown --claude-auth mode: ${mode}. Expected one of: auto, env, subscription.`,
+  );
+  process.exit(1);
+}
+
 function shuffleArray<T>(arr: T[]): T[] {
   const a = [...arr];
   for (let i = a.length - 1; i > 0; i--) {
@@ -71,6 +83,7 @@ async function cmdRun(argv: string[]): Promise<void> {
   const taskId = args.task;
   const repeat = parseInt(args.repeat ?? "1", 10);
   const model = args.model ?? DEFAULT_MODEL;
+  const claudeAuthMode = parseClaudeAuthMode(args["claude-auth"]);
 
   if (!conditionId || !taskId) {
     console.error(
@@ -105,7 +118,13 @@ async function cmdRun(argv: string[]): Promise<void> {
     for (let r = 1; r <= repeat; r++) {
       console.log(`\n=== Run ${r}/${repeat}: ${conditionId} x ${taskId} ===\n`);
       const result = runOne(
-        { condition: conditionId as ConditionId, task: taskId, run: r, model },
+        {
+          condition: conditionId as ConditionId,
+          task: taskId,
+          run: r,
+          model,
+          claude_auth_mode: claudeAuthMode,
+        },
         condition,
         task,
       );
@@ -132,6 +151,7 @@ async function cmdMatrix(argv: string[]): Promise<void> {
   const taskFilter = args.task;
   const categoryFilter = args.category;
   const freshBrowser = args["fresh-browser"] !== "false"; // default: true
+  const claudeAuthMode = parseClaudeAuthMode(args["claude-auth"]);
 
   const conditions = loadConditions();
   const tasks = loadTasks();
@@ -192,7 +212,13 @@ async function cmdMatrix(argv: string[]): Promise<void> {
           }
 
           const result = runOne(
-            { condition: condId as ConditionId, task: taskId, run: r, model },
+            {
+              condition: condId as ConditionId,
+              task: taskId,
+              run: r,
+              model,
+              claude_auth_mode: claudeAuthMode,
+            },
             condition,
             task,
           );
@@ -213,6 +239,7 @@ async function cmdMatrix(argv: string[]): Promise<void> {
 
 async function main(): Promise<void> {
   const [command, ...rest] = process.argv.slice(2);
+  const args = parseArgs(rest);
 
   switch (command) {
     case "run":
@@ -220,27 +247,34 @@ async function main(): Promise<void> {
     case "matrix":
       return cmdMatrix(rest);
     case "report":
-      writeReports();
+      writeReports({
+        inputDir: args["source-dir"],
+        outputDir: args["output-dir"],
+      });
       return;
     default:
       console.log(`axi-bench-browser — benchmark harness for browser automation tools
 
 Commands:
   run       Run a single benchmark
-              --condition <agent-browser|chrome-devtools-axi|chrome-devtools-mcp|...>
+              --condition <agent-browser|actionbook|actionbook-parallel|chrome-devtools-axi|chrome-devtools-mcp|...>
               --task <task_id>
               --repeat <N>  (default: 1)
               --model <M>   (default: ${DEFAULT_MODEL})
+              --claude-auth <auto|env|subscription>  (default: auto)
 
   matrix    Run all condition x task combinations (sequential, randomized order)
               --repeat <N>            (default: 1)
               --model <M>             (default: ${DEFAULT_MODEL})
+              --claude-auth <auto|env|subscription>  (default: auto)
               --condition <id,id,...>  (filter conditions)
               --task <id,id,...>       (filter tasks)
               --category <single_step|multi_step|investigation|error_recovery>
               --fresh-browser <true|false>  (restart browser between runs, default: true)
 
   report    Generate summary from results.jsonl
+              --source-dir <dir>  (default: bench-browser/results)
+              --output-dir <dir>  (default: same as --source-dir)
 `);
   }
 }

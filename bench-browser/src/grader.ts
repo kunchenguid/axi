@@ -9,6 +9,7 @@
 
 import { execFileSync, execSync } from "node:child_process";
 import { writeFileSync } from "node:fs";
+import { resolveClaudeAuth, type ClaudeAuthMode } from "./claude-auth.js";
 import type { GradingSpec, GradeResult } from "./types.js";
 
 const CLAUDE_JUDGE_MODEL = "claude-sonnet-4-6";
@@ -133,9 +134,11 @@ export function grade(
   taskPrompt: string,
   rawJsonl: string,
   artifactDir?: string,
+  claudeAuthMode: ClaudeAuthMode = "env",
 ): GradeResult {
   const trajectory = formatTrajectory(rawJsonl);
   const prompt = buildGradingPrompt(taskPrompt, trajectory, spec.grading_hint);
+  const judgeEnv = resolveClaudeAuth(claudeAuthMode, process.env).env;
 
   let judgeOutput: string = "";
   let lastError: string = "";
@@ -156,6 +159,7 @@ export function grade(
           timeout: 120 * 1000,
           maxBuffer: 50 * 1024 * 1024,
           stdio: ["pipe", "pipe", "pipe"],
+          env: judgeEnv,
         },
       );
       break; // Success

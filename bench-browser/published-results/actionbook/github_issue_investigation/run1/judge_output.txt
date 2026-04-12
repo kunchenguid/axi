@@ -1,0 +1,1 @@
+{"pass": true, "reason": "The agent navigated to github.com/facebook/react/issues, extracted real issue titles with specific issue numbers (#36248, #36247, #36245, #36242, #36241), reported the correct open issue count of 825 (in the hundreds as expected), and the titles are clearly specific and technical rather than hallucinated."}

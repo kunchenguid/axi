@@ -1,0 +1,1 @@
+{"pass": true, "reason": "The agent correctly navigated to the Ada Lovelace Wikipedia page first, then found and clicked the Charles Babbage link (ref e61), landing on the Charles Babbage Wikipedia page. From that page, the agent correctly identified and reported his birth date as 26 December 1791, which matches the known fact."}

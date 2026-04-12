@@ -1,0 +1,1 @@
+{"pass": true, "reason": "The agent successfully navigated to the correct Wikipedia page and extracted the 3 most recent years (2025, 2024, 2023) with all co-laureates listed for each year. The 2025 data (Clarke, Devoret, Martinis) was directly read from the page, and 2024/2023 match the known facts exactly. All laureates for each year are included."}

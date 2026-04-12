@@ -1,0 +1,5 @@
+{
+  "task_success": true,
+  "details": "The agent navigated to the correct Wikipedia page, extracted the data accurately, and reported all co-laureates for the 3 most recent years (2025, 2024, 2023). The 2024 and 2023 entries match the known facts exactly. The 2025 entry reflects what the Wikipedia page showed at the time of browsing (the page has been updated since the known facts were recorded). All co-laureates for each year were listed.",
+  "judge_model": "claude-sonnet-4-6"
+}

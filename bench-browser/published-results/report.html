@@ -1,0 +1,633 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AXI Browser Benchmark Report</title>
+  <style>
+    :root{color-scheme:light;background:#f6f7fb;color:#111827;font-family:ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+    *{box-sizing:border-box}body{margin:0;background:linear-gradient(180deg,#f8fafc 0%,#eef2ff 100%);color:#111827}
+    a{color:#0f766e;text-decoration:none}a:hover{text-decoration:underline}
+    code,pre{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace}
+    .container{max-width:1180px;margin:0 auto;padding:40px 24px 64px}
+    .hero{display:grid;gap:16px;margin-bottom:28px}
+    .eyebrow{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#475569;font-weight:700}
+    h1{margin:0;font-size:40px;line-height:1.05;letter-spacing:-.04em}
+    .lede{max-width:780px;font-size:18px;line-height:1.6;color:#334155}
+    .meta{display:flex;flex-wrap:wrap;gap:10px 16px;color:#475569;font-size:14px}
+    .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin:28px 0}
+    .card{background:rgba(255,255,255,.82);backdrop-filter:blur(10px);border:1px solid rgba(148,163,184,.25);border-radius:18px;box-shadow:0 12px 32px rgba(15,23,42,.08)}
+    .stat{padding:18px 18px 16px}.stat-label{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:#64748b;font-weight:700}.stat-value{margin-top:8px;font-size:32px;line-height:1;font-weight:700}.stat-sub{margin-top:6px;color:#475569;font-size:13px}
+    .grid-2{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:16px;margin-bottom:16px}
+    .panel{padding:20px}.panel h2{margin:0 0 14px;font-size:18px}
+    .chart-rows{display:flex;flex-direction:column;gap:10px}.chart-row{display:flex;align-items:center;gap:10px}.chart-label{width:13rem;flex-shrink:0;text-align:right;font-size:12px;color:#64748b}.chart-bar-track{flex:1;height:18px;background:#e2e8f0;border-radius:999px;overflow:hidden}.chart-bar{height:100%;background:#94a3b8}.chart-bar.bar-highlight{background:linear-gradient(90deg,#0f766e,#14b8a6)}.chart-value{width:4.25rem;flex-shrink:0;font-size:12px;color:#475569}.chart-value.value-highlight{color:#0f766e;font-weight:700}
+    .section{margin-top:18px}.section h2{margin:0 0 14px;font-size:22px}.section-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
+    .pill{display:inline-flex;align-items:center;border-radius:999px;padding:4px 10px;background:#e2e8f0;color:#334155;font-size:12px;font-weight:600}
+    .table-wrap{overflow:auto}.table-wrap table{width:100%;border-collapse:collapse}.table-wrap th,.table-wrap td{padding:10px 12px;border-bottom:1px solid #e2e8f0;text-align:left;font-size:14px;vertical-align:top}.table-wrap th{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:#64748b}
+    .task-list{display:grid;gap:16px}.task-card{padding:18px}.task-card summary{cursor:pointer;color:#0f766e;font-weight:600}.task-card pre{white-space:pre-wrap;background:#0f172a;color:#e2e8f0;padding:14px;border-radius:12px;overflow:auto;font-size:12px;line-height:1.5}
+    .status-pass{color:#047857;font-weight:700}.status-fail{color:#b91c1c;font-weight:700}
+    .footer-note{margin-top:18px;color:#64748b;font-size:13px}
+    @media (max-width: 760px){h1{font-size:32px}.chart-label{width:8rem;text-align:left}}
+  </style>
+</head>
+<body>
+  <main class="container">
+    <section class="hero">
+      <div class="eyebrow">AXI Browser Benchmark</div>
+      <h1>Browser Benchmark Results</h1>
+      <p class="lede">A benchmark dashboard for the current report directory. It summarizes cost, duration, turn count, and per-task outcomes, with direct links to each run's grade and trace files.</p>
+      <div class="meta"><span>Generated from 560 runs</span><span>8 conditions</span><span>14 tasks</span><span>Latest timestamp 2026-04-11T11:51:08.338Z</span></div>
+    </section>
+    <section class="stats">
+      <article class="card stat"><div class="stat-label">Success Rate</div><div class="stat-value">99%</div><div class="stat-sub">555/560 successful runs</div></article>
+      <article class="card stat"><div class="stat-label">Avg Cost</div><div class="stat-value">$0.0891</div><div class="stat-sub">Total cost $49.8839</div></article>
+      <article class="card stat"><div class="stat-label">Avg Duration</div><div class="stat-value">27.5s</div><div class="stat-sub">Average end-to-end wall clock</div></article>
+      <article class="card stat"><div class="stat-label">Avg Turns</div><div class="stat-value">5.9</div><div class="stat-sub">Agent turns per run</div></article>
+    </section>
+    <section class="grid-2">
+      <article class="card panel">
+        <h2>Avg Cost per Task</h2>
+        <div class="chart-rows"><div class="chart-row">
+  <span class="chart-label">chrome-devtools-mcp-code</span>
+  <div class="chart-bar-track">
+    <div class="chart-bar" style="width: 11.964952714285713%"></div>
+  </div>
+  <span class="chart-value">$0.1196</span>
+</div>
+<div class="chart-row">
+  <span class="chart-label">chrome-devtools-mcp</span>
+  <div class="chart-bar-track">
+    <div class="chart-bar" style="width: 10.045391785714289%"></div>
+  </div>
+  <span class="chart-value">$0.1005</span>
+</div>
+<div class="chart-row">
+  <span class="chart-label">chrome-devtools-mcp-search</span>
+  <div class="chart-bar-track">
+    <div class="chart-bar" style="width: 9.55143021428571%"></div>
+  </div>
+  <span class="chart-value">$0.0955</span>
+</div>
+<div class="chart-row">
+  <span class="chart-label">chrome-devtools-mcp-compressed-cli</span>
+  <div class="chart-bar-track">
+    <div class="chart-bar" style="width: 9.113340857142857%"></div>
+  </div>
+  <span class="chart-value">$0.0911</span>
+</div>
+<div class="chart-row">
+  <span class="chart-label">agent-browser</span>
+  <div class="chart-bar-track">
+    <div class="chart-bar" style="width: 8.79170592857143%"></div>
+  </div>
+  <span class="chart-value">$0.0879</span>
+</div>
+<div class="chart-row">
+  <span class="chart-label">dev-browser</span>
+  <div class="chart-bar-track">
+    <div class="chart-bar" style="width: 7.794213428571428%"></div>
+  </div>
+  <span class="chart-value">$0.0779</span>
+</div>
+<div class="chart-row">
+  <span class="chart-label">chrome-devtools-axi</span>
+  <div class="chart-bar-track">
+    <div class="chart-bar" style="width: 7.436691642857145%"></div>
+  </div>
+  <span class="chart-value">$0.0744</span>
+</div>
+<div class="chart-row">
+  <span class="chart-label">actionbook</span>
+  <div class="chart-bar-track">
+    <div class="chart-bar bar-highlight" style="width: 6.564988071428571%"></div>
+  </div>
+  <span class="chart-value value-highlight">$0.0656</span>
+</div></div>
+      </article>
+      <article class="card panel">
+        <h2>Avg Duration per Task</h2>
+        <div class="chart-rows"><div class="chart-row">
+  <span class="chart-label">chrome-devtools-mcp-code</span>
+  <div class="chart-bar-track">
+    <div class="chart-bar" style="width: 100%"></div>
+  </div>
+  <span class="chart-value">36.2s</span>
+</div>
+<div class="chart-row">
+  <span class="chart-label">chrome-devtools-mcp-compressed-cli</span>
+  <div class="chart-bar-track">
+    <div class="chart-bar" style="width: 82.02348280580934%"></div>
+  </div>
+  <span class="chart-value">29.7s</span>
+</div>
+<div class="chart-row">
+  <span class="chart-label">chrome-devtools-mcp-search</span>
+  <div class="chart-bar-track">
+    <div class="chart-bar" style="width: 81.14302543477808%"></div>
+  </div>
+  <span class="chart-value">29.4s</span>
+</div>
+<div class="chart-row">
+  <span class="chart-label">dev-browser</span>
+  <div class="chart-bar-track">
+    <div class="chart-bar" style="width: 78.94227626538151%"></div>
+  </div>
+  <span class="chart-value">28.6s</span>
+</div>
+<div class="chart-row">
+  <span class="chart-label">chrome-devtools-mcp</span>
+  <div class="chart-bar-track">
+    <div class="chart-bar" style="width: 71.78968376157%"></div>
+  </div>
+  <span class="chart-value">26.0s</span>
+</div>
+<div class="chart-row">
+  <span class="chart-label">agent-browser</span>
+  <div class="chart-bar-track">
+    <div class="chart-bar" style="width: 67.81674406611869%"></div>
+  </div>
+  <span class="chart-value">24.6s</span>
+</div>
+<div class="chart-row">
+  <span class="chart-label">actionbook</span>
+  <div class="chart-bar-track">
+    <div class="chart-bar" style="width: 66.59761891713836%"></div>
+  </div>
+  <span class="chart-value">24.1s</span>
+</div>
+<div class="chart-row">
+  <span class="chart-label">chrome-devtools-axi</span>
+  <div class="chart-bar-track">
+    <div class="chart-bar bar-highlight" style="width: 59.41135676462274%"></div>
+  </div>
+  <span class="chart-value value-highlight">21.5s</span>
+</div></div>
+      </article>
+    </section>
+    <section class="section">
+      <h2>Summary</h2>
+      <div class="card panel table-wrap">
+        <table>
+          <thead><tr><th>Condition</th><th>Runs</th><th>Avg Input</th><th>Cache%</th><th>Avg Output</th><th>Avg Cost</th><th>Total Cost</th><th>Avg Duration</th><th>Avg Turns</th><th>Success</th></tr></thead>
+          <tbody><tr><td><code>actionbook</code></td><td>70</td><td>95061</td><td>89%</td><td>695</td><td>$0.0656</td><td>$4.5955</td><td>24.1s</td><td>5.3</td><td>99%</td></tr>
+<tr><td><code>agent-browser</code></td><td>70</td><td>93074</td><td>83%</td><td>558</td><td>$0.0879</td><td>$6.1542</td><td>24.6s</td><td>4.8</td><td>99%</td></tr>
+<tr><td><code>chrome-devtools-axi</code></td><td>70</td><td>79141</td><td>82%</td><td>573</td><td>$0.0744</td><td>$5.2057</td><td>21.5s</td><td>4.5</td><td>100%</td></tr>
+<tr><td><code>chrome-devtools-mcp-code</code></td><td>70</td><td>129606</td><td>85%</td><td>1480</td><td>$0.1196</td><td>$8.3755</td><td>36.2s</td><td>6.4</td><td>100%</td></tr>
+<tr><td><code>chrome-devtools-mcp-compressed-cli</code></td><td>70</td><td>130779</td><td>91%</td><td>888</td><td>$0.0911</td><td>$6.3793</td><td>29.7s</td><td>7.6</td><td>100%</td></tr>
+<tr><td><code>chrome-devtools-mcp-search</code></td><td>70</td><td>133712</td><td>90%</td><td>1014</td><td>$0.0955</td><td>$6.6860</td><td>29.4s</td><td>7.5</td><td>99%</td></tr>
+<tr><td><code>chrome-devtools-mcp</code></td><td>70</td><td>184711</td><td>94%</td><td>825</td><td>$0.1005</td><td>$7.0318</td><td>26.0s</td><td>6.2</td><td>99%</td></tr>
+<tr><td><code>dev-browser</code></td><td>70</td><td>82532</td><td>85%</td><td>1292</td><td>$0.0779</td><td>$5.4559</td><td>28.6s</td><td>4.9</td><td>99%</td></tr></tbody>
+        </table>
+      </div>
+    </section>
+    <section class="section">
+      <h2>Task Breakdown</h2>
+      <div class="task-list"><section class="card task-card">
+  <div class="section-head"><h3>wikipedia_link_follow</h3><span class="pill">40 runs</span></div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Condition</th><th>Avg Input</th><th>Cache%</th><th>Avg Output</th><th>Avg Cost</th><th>Avg Duration</th><th>Avg Turns</th><th>Success</th></tr></thead>
+      <tbody><tr><td><code>actionbook</code></td><td>114911</td><td>92%</td><td>855</td><td>$0.0773</td><td>25.9s</td><td>6.4</td><td>5/5</td></tr>
+<tr><td><code>agent-browser</code></td><td>71558</td><td>80%</td><td>316</td><td>$0.0632</td><td>75.7s</td><td>3.6</td><td>4/5</td></tr>
+<tr><td><code>chrome-devtools-axi</code></td><td>96502</td><td>86%</td><td>506</td><td>$0.0838</td><td>18.7s</td><td>5.2</td><td>5/5</td></tr>
+<tr><td><code>chrome-devtools-mcp-code</code></td><td>255557</td><td>93%</td><td>2849</td><td>$0.1725</td><td>51.5s</td><td>12.8</td><td>5/5</td></tr>
+<tr><td><code>chrome-devtools-mcp-compressed-cli</code></td><td>125474</td><td>91%</td><td>547</td><td>$0.0852</td><td>27.9s</td><td>7.2</td><td>5/5</td></tr>
+<tr><td><code>chrome-devtools-mcp-search</code></td><td>183741</td><td>93%</td><td>1373</td><td>$0.1171</td><td>35.9s</td><td>10.0</td><td>5/5</td></tr>
+<tr><td><code>chrome-devtools-mcp</code></td><td>235669</td><td>96%</td><td>819</td><td>$0.1144</td><td>29.3s</td><td>7.6</td><td>5/5</td></tr>
+<tr><td><code>dev-browser</code></td><td>98829</td><td>88%</td><td>1372</td><td>$0.0892</td><td>32.2s</td><td>5.6</td><td>5/5</td></tr></tbody>
+    </table>
+  </div>
+  <details><summary>Latest agent output</summary><pre>Charles Babbage&#39;s birth date is **26 December 1791**, born in London, England.</pre></details>
+</section>
+<section class="card task-card">
+  <div class="section-head"><h3>multi_site_research</h3><span class="pill">40 runs</span></div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Condition</th><th>Avg Input</th><th>Cache%</th><th>Avg Output</th><th>Avg Cost</th><th>Avg Duration</th><th>Avg Turns</th><th>Success</th></tr></thead>
+      <tbody><tr><td><code>actionbook</code></td><td>270128</td><td>96%</td><td>1860</td><td>$0.1423</td><td>51.9s</td><td>14.4</td><td>5/5</td></tr>
+<tr><td><code>agent-browser</code></td><td>82235</td><td>85%</td><td>875</td><td>$0.1394</td><td>29.2s</td><td>6.6</td><td>5/5</td></tr>
+<tr><td><code>chrome-devtools-axi</code></td><td>57051</td><td>78%</td><td>506</td><td>$0.0904</td><td>26.3s</td><td>4.8</td><td>5/5</td></tr>
+<tr><td><code>chrome-devtools-mcp-code</code></td><td>109533</td><td>82%</td><td>1599</td><td>$0.1995</td><td>75.7s</td><td>5.6</td><td>5/5</td></tr>
+<tr><td><code>chrome-devtools-mcp-compressed-cli</code></td><td>252341</td><td>94%</td><td>2076</td><td>$0.1541</td><td>55.4s</td><td>17.2</td><td>5/5</td></tr>
+<tr><td><code>chrome-devtools-mcp-search</code></td><td>275202</td><td>95%</td><td>2370</td><td>$0.1675</td><td>59.9s</td><td>16.6</td><td>5/5</td></tr>
+<tr><td><code>chrome-devtools-mcp</code></td><td>426808</td><td>97%</td><td>2304</td><td>$0.2103</td><td>59.4s</td><td>17.4</td><td>5/5</td></tr>
+<tr><td><code>dev-browser</code></td><td>70167</td><td>84%</td><td>1876</td><td>$0.0842</td><td>29.7s</td><td>6.4</td><td>5/5</td></tr></tbody>
+    </table>
+  </div>
+  <details><summary>Latest agent output</summary><pre>Here are the results from all three sites:
+
+**1. Wikipedia — Designed by:**
+Graydon Hoare, who created Rust in 2006 as a personal project while working at Mozilla. Mozilla officially sponsored it in 2009.
+
+**2. GitHub (rust-lang/rust) — Star count:**
+**112k** stars
+
+**3. rust-lang.org — Main description/tagline:**
+&gt; *&quot;Rust is blazingly fast and memory-efficient: with no runtime or garbage collector, it can power performance-critical services, run on embedded devices, and easily integrate with other languages.&quot;*</pre></details>
+</section>
+<section class="card task-card">
+  <div class="section-head"><h3>wikipedia_search_click</h3><span class="pill">40 runs</span></div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Condition</th><th>Avg Input</th><th>Cache%</th><th>Avg Output</th><th>Avg Cost</th><th>Avg Duration</th><th>Avg Turns</th><th>Success</th></tr></thead>
+      <tbody><tr><td><code>actionbook</code></td><td>173503</td><td>95%</td><td>1251</td><td>$0.1019</td><td>37.9s</td><td>9.6</td><td>5/5</td></tr>
+<tr><td><code>agent-browser</code></td><td>139018</td><td>88%</td><td>507</td><td>$0.1087</td><td>24.1s</td><td>6.2</td><td>5/5</td></tr>
+<tr><td><code>chrome-devtools-axi</code></td><td>91577</td><td>83%</td><td>478</td><td>$0.0872</td><td>19.2s</td><td>5.0</td><td>5/5</td></tr>
+<tr><td><code>chrome-devtools-mcp-code</code></td><td>263777</td><td>91%</td><td>2655</td><td>$0.1905</td><td>60.6s</td><td>11.8</td><td>5/5</td></tr>
+<tr><td><code>chrome-devtools-mcp-compressed-cli</code></td><td>180686</td><td>93%</td><td>817</td><td>$0.1068</td><td>35.4s</td><td>10.0</td><td>5/5</td></tr>
+<tr><td><code>chrome-devtools-mcp-search</code></td><td>181431</td><td>93%</td><td>961</td><td>$0.1119</td><td>36.7s</td><td>9.8</td><td>5/5</td></tr>
+<tr><td><code>chrome-devtools-mcp</code></td><td>257230</td><td>96%</td><td>736</td><td>$0.1227</td><td>29.3s</td><td>8.2</td><td>5/5</td></tr>
+<tr><td><code>dev-browser</code></td><td>97228</td><td>85%</td><td>1232</td><td>$0.0863</td><td>39.9s</td><td>5.4</td><td>5/5</td></tr></tbody>
+    </table>
+  </div>
+  <details><summary>Latest agent output</summary><pre>The first recipient of the Turing Award was **Alan Perlis**, in **1966**, recognized *&quot;for his influence in the area of advanced computer programming techniques and compiler construction&quot;* — awarded while he was at Carnegie Mellon University.</pre></details>
+</section>
+<section class="card task-card">
+  <div class="section-head"><h3>read_static_page</h3><span class="pill">40 runs</span></div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Condition</th><th>Avg Input</th><th>Cache%</th><th>Avg Output</th><th>Avg Cost</th><th>Avg Duration</th><th>Avg Turns</th><th>Success</th></tr></thead>
+      <tbody><tr><td><code>actionbook</code></td><td>33821</td><td>82%</td><td>176</td><td>$0.0335</td><td>12.3s</td><td>2.0</td><td>5/5</td></tr>
+<tr><td><code>agent-browser</code></td><td>58436</td><td>81%</td><td>247</td><td>$0.0598</td><td>11.4s</td><td>3.2</td><td>5/5</td></tr>
+<tr><td><code>chrome-devtools-axi</code></td><td>77299</td><td>88%</td><td>417</td><td>$0.0608</td><td>14.5s</td><td>4.6</td><td>5/5</td></tr>
+<tr><td><code>chrome-devtools-mcp-code</code></td><td>32117</td><td>76%</td><td>245</td><td>$0.0401</td><td>7.9s</td><td>2.0</td><td>5/5</td></tr>
+<tr><td><code>chrome-devtools-mcp-compressed-cli</code></td><td>72082</td><td>88%</td><td>322</td><td>$0.0550</td><td>17.5s</td><td>4.4</td><td>5/5</td></tr>
+<tr><td><code>chrome-devtools-mcp-search</code></td><td>75736</td><td>86%</td><td>347</td><td>$0.0631</td><td>14.8s</td><td>4.4</td><td>5/5</td></tr>
+<tr><td><code>chrome-devtools-mcp</code></td><td>90664</td><td>92%</td><td>156</td><td>$0.0552</td><td>10.4s</td><td>3.0</td><td>5/5</td></tr>
+<tr><td><code>dev-browser</code></td><td>48270</td><td>84%</td><td>341</td><td>$0.0460</td><td>11.1s</td><td>3.0</td><td>5/5</td></tr></tbody>
+    </table>
+  </div>
+  <details><summary>Latest agent output</summary><pre>The main heading of the page is **&quot;Example Domain&quot;**.</pre></details>
+</section>
+<section class="card task-card">
+  <div class="section-head"><h3>wikipedia_infobox_hop</h3><span class="pill">40 runs</span></div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Condition</th><th>Avg Input</th><th>Cache%</th><th>Avg Output</th><th>Avg Cost</th><th>Avg Duration</th><th>Avg Turns</th><th>Success</th></tr></thead>
+      <tbody><tr><td><code>actionbook</code></td><td>141272</td><td>94%</td><td>1041</td><td>$0.0865</td><td>32.6s</td><td>7.8</td><td>5/5</td></tr>
+<tr><td><code>agent-browser</code></td><td>208551</td><td>87%</td><td>798</td><td>$0.1637</td><td>34.8s</td><td>8.0</td><td>5/5</td></tr>
+<tr><td><code>chrome-devtools-axi</code></td><td>91981</td><td>86%</td><td>642</td><td>$0.0819</td><td>19.0s</td><td>5.0</td><td>5/5</td></tr>
+<tr><td><code>chrome-devtools-mcp-code</code></td><td>220663</td><td>90%</td><td>1411</td><td>$0.1581</td><td>37.9s</td><td>10.2</td><td>5/5</td></tr>
+<tr><td><code>chrome-devtools-mcp-compressed-cli</code></td><td>193884</td><td>92%</td><td>1176</td><td>$0.1263</td><td>37.2s</td><td>10.0</td><td>5/5</td></tr>
+<tr><td><code>chrome-devtools-mcp-search</code></td><td>229856</td><td>92%</td><td>1780</td><td>$0.1564</td><td>46.7s</td><td>11.8</td><td>5/5</td></tr>
+<tr><td><code>chrome-devtools-mcp</code></td><td>243281</td><td>96%</td><td>1101</td><td>$0.1225</td><td>31.9s</td><td>7.8</td><td>5/5</td></tr>
+<tr><td><code>dev-browser</code></td><td>107423</td><td>87%</td><td>1528</td><td>$0.0897</td><td>34.7s</td><td>6.0</td><td>5/5</td></tr></tbody>
+    </table>
+  </div>
+  <details><summary>Latest agent output</summary><pre>Here are the findings:
+
+- **Stable release version**: Python **3.14.4** (released April 7, 2026)
+- **Developer**: [Python Software Foundation](https://en.wikipedia.org/wiki/Python_Software_Foundation)
+- **Formation date**: **March 6, 2001**</pre></details>
+</section>
+<section class="card task-card">
+  <div class="section-head"><h3>github_navigate_to_file</h3><span class="pill">40 runs</span></div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Condition</th><th>Avg Input</th><th>Cache%</th><th>Avg Output</th><th>Avg Cost</th><th>Avg Duration</th><th>Avg Turns</th><th>Success</th></tr></thead>
+      <tbody><tr><td><code>actionbook</code></td><td>79972</td><td>91%</td><td>618</td><td>$0.0573</td><td>22.8s</td><td>4.6</td><td>5/5</td></tr>
+<tr><td><code>agent-browser</code></td><td>112770</td><td>89%</td><td>593</td><td>$0.0863</td><td>23.1s</td><td>5.8</td><td>5/5</td></tr>
+<tr><td><code>chrome-devtools-axi</code></td><td>86482</td><td>88%</td><td>494</td><td>$0.0705</td><td>16.0s</td><td>5.0</td><td>5/5</td></tr>
+<tr><td><code>chrome-devtools-mcp-code</code></td><td>71883</td><td>83%</td><td>976</td><td>$0.0730</td><td>28.6s</td><td>4.0</td><td>5/5</td></tr>
+<tr><td><code>chrome-devtools-mcp-compressed-cli</code></td><td>106146</td><td>90%</td><td>569</td><td>$0.0762</td><td>26.4s</td><td>6.2</td><td>5/5</td></tr>
+<tr><td><code>chrome-devtools-mcp-search</code></td><td>89728</td><td>89%</td><td>662</td><td>$0.0703</td><td>20.8s</td><td>5.2</td><td>5/5</td></tr>
+<tr><td><code>chrome-devtools-mcp</code></td><td>109610</td><td>93%</td><td>408</td><td>$0.0662</td><td>18.3s</td><td>3.6</td><td>5/5</td></tr>
+<tr><td><code>dev-browser</code></td><td>59887</td><td>85%</td><td>822</td><td>$0.0605</td><td>33.3s</td><td>3.6</td><td>5/5</td></tr></tbody>
+    </table>
+  </div>
+  <details><summary>Latest agent output</summary><pre>The Makefile at the root of `torvalds/linux` defines:
+
+- **VERSION = 7**
+- **PATCHLEVEL = 0**
+
+(The full version is `7.0-rc7`, as also shown in the latest commit message &quot;Linux 7.0-rc7&quot;.)</pre></details>
+</section>
+<section class="card task-card">
+  <div class="section-head"><h3>wikipedia_fact_lookup</h3><span class="pill">40 runs</span></div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Condition</th><th>Avg Input</th><th>Cache%</th><th>Avg Output</th><th>Avg Cost</th><th>Avg Duration</th><th>Avg Turns</th><th>Success</th></tr></thead>
+      <tbody><tr><td><code>actionbook</code></td><td>51525</td><td>87%</td><td>297</td><td>$0.0429</td><td>15.2s</td><td>3.0</td><td>5/5</td></tr>
+<tr><td><code>agent-browser</code></td><td>72286</td><td>82%</td><td>324</td><td>$0.0687</td><td>12.9s</td><td>3.8</td><td>5/5</td></tr>
+<tr><td><code>chrome-devtools-axi</code></td><td>33933</td><td>73%</td><td>172</td><td>$0.0438</td><td>7.9s</td><td>2.0</td><td>5/5</td></tr>
+<tr><td><code>chrome-devtools-mcp-code</code></td><td>58428</td><td>80%</td><td>511</td><td>$0.0613</td><td>16.0s</td><td>3.2</td><td>5/5</td></tr>
+<tr><td><code>chrome-devtools-mcp-compressed-cli</code></td><td>83507</td><td>89%</td><td>455</td><td>$0.0624</td><td>18.8s</td><td>5.0</td><td>5/5</td></tr>
+<tr><td><code>chrome-devtools-mcp-search</code></td><td>85937</td><td>89%</td><td>502</td><td>$0.0664</td><td>17.3s</td><td>5.0</td><td>5/5</td></tr>
+<tr><td><code>chrome-devtools-mcp</code></td><td>90815</td><td>92%</td><td>299</td><td>$0.0576</td><td>15.1s</td><td>3.0</td><td>5/5</td></tr>
+<tr><td><code>dev-browser</code></td><td>109363</td><td>90%</td><td>1336</td><td>$0.0862</td><td>25.3s</td><td>6.4</td><td>5/5</td></tr></tbody>
+    </table>
+  </div>
+  <details><summary>Latest agent output</summary><pre>The Moon&#39;s average orbital speed from the infobox is **1.022 km/s**.</pre></details>
+</section>
+<section class="card task-card">
+  <div class="section-head"><h3>wikipedia_table_read</h3><span class="pill">40 runs</span></div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Condition</th><th>Avg Input</th><th>Cache%</th><th>Avg Output</th><th>Avg Cost</th><th>Avg Duration</th><th>Avg Turns</th><th>Success</th></tr></thead>
+      <tbody><tr><td><code>actionbook</code></td><td>52708</td><td>85%</td><td>404</td><td>$0.0486</td><td>17.2s</td><td>3.0</td><td>5/5</td></tr>
+<tr><td><code>agent-browser</code></td><td>95886</td><td>88%</td><td>673</td><td>$0.0797</td><td>20.3s</td><td>5.0</td><td>5/5</td></tr>
+<tr><td><code>chrome-devtools-axi</code></td><td>34478</td><td>72%</td><td>273</td><td>$0.0473</td><td>10.4s</td><td>2.0</td><td>5/5</td></tr>
+<tr><td><code>chrome-devtools-mcp-code</code></td><td>121966</td><td>86%</td><td>1544</td><td>$0.1074</td><td>31.3s</td><td>6.0</td><td>5/5</td></tr>
+<tr><td><code>chrome-devtools-mcp-compressed-cli</code></td><td>83951</td><td>89%</td><td>825</td><td>$0.0694</td><td>22.6s</td><td>5.0</td><td>5/5</td></tr>
+<tr><td><code>chrome-devtools-mcp-search</code></td><td>116290</td><td>91%</td><td>1175</td><td>$0.0889</td><td>26.8s</td><td>6.6</td><td>5/5</td></tr>
+<tr><td><code>chrome-devtools-mcp</code></td><td>147073</td><td>94%</td><td>804</td><td>$0.0850</td><td>22.8s</td><td>4.8</td><td>5/5</td></tr>
+<tr><td><code>dev-browser</code></td><td>134419</td><td>92%</td><td>1708</td><td>$0.1004</td><td>32.5s</td><td>7.8</td><td>5/5</td></tr></tbody>
+    </table>
+  </div>
+  <details><summary>Latest agent output</summary><pre>The top 3 countries by population according to the Wikipedia article are:
+
+| Rank | Country | Population |
+|------|---------|------------|
+| 1 | **India** | 1,417,492,000 (17.2% of world) |
+| 2 | **China** | 1,404,890,000 (17.0% of world) |
+| 3 | **United States** | 341,784,857 (4.1% of world) |</pre></details>
+</section>
+<section class="card task-card">
+  <div class="section-head"><h3>wikipedia_deep_extraction</h3><span class="pill">40 runs</span></div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Condition</th><th>Avg Input</th><th>Cache%</th><th>Avg Output</th><th>Avg Cost</th><th>Avg Duration</th><th>Avg Turns</th><th>Success</th></tr></thead>
+      <tbody><tr><td><code>actionbook</code></td><td>52173</td><td>86%</td><td>507</td><td>$0.0482</td><td>17.4s</td><td>3.0</td><td>4/5</td></tr>
+<tr><td><code>agent-browser</code></td><td>110138</td><td>88%</td><td>1367</td><td>$0.0968</td><td>31.8s</td><td>5.8</td><td>5/5</td></tr>
+<tr><td><code>chrome-devtools-axi</code></td><td>34093</td><td>73%</td><td>337</td><td>$0.0468</td><td>9.2s</td><td>2.0</td><td>5/5</td></tr>
+<tr><td><code>chrome-devtools-mcp-code</code></td><td>167583</td><td>88%</td><td>2318</td><td>$0.1473</td><td>40.8s</td><td>7.6</td><td>5/5</td></tr>
+<tr><td><code>chrome-devtools-mcp-compressed-cli</code></td><td>124909</td><td>92%</td><td>1551</td><td>$0.0969</td><td>34.1s</td><td>7.2</td><td>5/5</td></tr>
+<tr><td><code>chrome-devtools-mcp-search</code></td><td>135962</td><td>91%</td><td>1671</td><td>$0.1060</td><td>34.7s</td><td>7.6</td><td>5/5</td></tr>
+<tr><td><code>chrome-devtools-mcp</code></td><td>117196</td><td>92%</td><td>960</td><td>$0.0795</td><td>21.8s</td><td>3.8</td><td>5/5</td></tr>
+<tr><td><code>dev-browser</code></td><td>73537</td><td>84%</td><td>1387</td><td>$0.0804</td><td>27.4s</td><td>4.2</td><td>5/5</td></tr></tbody>
+    </table>
+  </div>
+  <details><summary>Latest agent output</summary><pre>Here are the winners for the 3 most recent years listed:
+
+**2025**
+- **John Clarke** (United States) — &quot;For the discovery of macroscopic quantum mechanical tunnelling and energy quantisation in an electric circuit.&quot;
+
+**2024**
+- **John J. Hopfield** (United States) — &quot;For foundational discoveries and inventions that enable machine learning with artificial neural networks.&quot;
+
+**2023**
+- **Pierre Agostini** (United States) — &quot;For experimental methods that generate attosecond pulses of light for the study of electron dynamics in matter.&quot;
+
+&gt; Note: Each year typically has multiple laureates — these are the first listed per year. The 2024 prize was shared with Geoffrey Hinton, and the 2023 prize was shared with Ferenc Krausz and Anne L&#39;Huillier. Let me grab the full entries if you&#39;d like all co-laureates.</pre></details>
+</section>
+<section class="card task-card">
+  <div class="section-head"><h3>github_repo_stars</h3><span class="pill">40 runs</span></div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Condition</th><th>Avg Input</th><th>Cache%</th><th>Avg Output</th><th>Avg Cost</th><th>Avg Duration</th><th>Avg Turns</th><th>Success</th></tr></thead>
+      <tbody><tr><td><code>actionbook</code></td><td>90130</td><td>92%</td><td>595</td><td>$0.0595</td><td>21.8s</td><td>5.2</td><td>5/5</td></tr>
+<tr><td><code>agent-browser</code></td><td>80519</td><td>84%</td><td>387</td><td>$0.0697</td><td>13.3s</td><td>4.4</td><td>5/5</td></tr>
+<tr><td><code>chrome-devtools-axi</code></td><td>86010</td><td>87%</td><td>479</td><td>$0.0705</td><td>17.7s</td><td>5.0</td><td>5/5</td></tr>
+<tr><td><code>chrome-devtools-mcp-code</code></td><td>109788</td><td>85%</td><td>1080</td><td>$0.1049</td><td>28.6s</td><td>5.8</td><td>5/5</td></tr>
+<tr><td><code>chrome-devtools-mcp-compressed-cli</code></td><td>120096</td><td>89%</td><td>724</td><td>$0.0900</td><td>27.7s</td><td>6.8</td><td>5/5</td></tr>
+<tr><td><code>chrome-devtools-mcp-search</code></td><td>69483</td><td>85%</td><td>328</td><td>$0.0614</td><td>19.1s</td><td>4.0</td><td>5/5</td></tr>
+<tr><td><code>chrome-devtools-mcp</code></td><td>166780</td><td>91%</td><td>752</td><td>$0.1092</td><td>26.9s</td><td>5.4</td><td>5/5</td></tr>
+<tr><td><code>dev-browser</code></td><td>70268</td><td>85%</td><td>1020</td><td>$0.0661</td><td>26.4s</td><td>4.2</td><td>5/5</td></tr></tbody>
+    </table>
+  </div>
+  <details><summary>Latest agent output</summary><pre>Here are the details for [torvalds/linux](https://github.com/torvalds/linux):
+
+- **Stars:** ~228k
+- **Primary language:** C (98.0%)</pre></details>
+</section>
+<section class="card task-card">
+  <div class="section-head"><h3>navigate_404</h3><span class="pill">40 runs</span></div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Condition</th><th>Avg Input</th><th>Cache%</th><th>Avg Output</th><th>Avg Cost</th><th>Avg Duration</th><th>Avg Turns</th><th>Success</th></tr></thead>
+      <tbody><tr><td><code>actionbook</code></td><td>58942</td><td>87%</td><td>436</td><td>$0.0494</td><td>20.9s</td><td>3.4</td><td>5/5</td></tr>
+<tr><td><code>agent-browser</code></td><td>77400</td><td>84%</td><td>450</td><td>$0.0727</td><td>15.9s</td><td>4.2</td><td>5/5</td></tr>
+<tr><td><code>chrome-devtools-axi</code></td><td>85673</td><td>88%</td><td>596</td><td>$0.0694</td><td>17.4s</td><td>5.0</td><td>5/5</td></tr>
+<tr><td><code>chrome-devtools-mcp-code</code></td><td>63178</td><td>84%</td><td>769</td><td>$0.0636</td><td>18.0s</td><td>3.8</td><td>5/5</td></tr>
+<tr><td><code>chrome-devtools-mcp-compressed-cli</code></td><td>144313</td><td>92%</td><td>1029</td><td>$0.0979</td><td>33.8s</td><td>8.2</td><td>5/5</td></tr>
+<tr><td><code>chrome-devtools-mcp-search</code></td><td>108812</td><td>88%</td><td>644</td><td>$0.0864</td><td>24.7s</td><td>6.0</td><td>5/5</td></tr>
+<tr><td><code>chrome-devtools-mcp</code></td><td>152985</td><td>94%</td><td>450</td><td>$0.0833</td><td>19.0s</td><td>5.0</td><td>5/5</td></tr>
+<tr><td><code>dev-browser</code></td><td>58314</td><td>80%</td><td>876</td><td>$0.0626</td><td>21.0s</td><td>3.4</td><td>5/5</td></tr></tbody>
+    </table>
+  </div>
+  <details><summary>Latest agent output</summary><pre>Here&#39;s the report:
+
+---
+
+**https://httpbin.org/status/404**
+
+Error encountered: `NAVIGATION_FAILED` — `net::ERR_HTTP_RESPONSE_CODE_FAILURE`
+
+The browser refused to load the page because the server returned an HTTP 404 status code. Chromium treats 4xx/5xx responses as navigation failures when there&#39;s no renderable body.
+
+---
+
+**https://httpbin.org/html**
+
+Navigation succeeded normally. The page contains an excerpt from **Herman Melville&#39;s *Moby-Dick***, specifically a passage about Perth the blacksmith — a lengthy prose segment describing his life, hardships, and work aboard the ship. The page loaded without any issues, confirming browsing is otherwise functional.</pre></details>
+</section>
+<section class="card task-card">
+  <div class="section-head"><h3>tabular_data_analysis</h3><span class="pill">40 runs</span></div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Condition</th><th>Avg Input</th><th>Cache%</th><th>Avg Output</th><th>Avg Cost</th><th>Avg Duration</th><th>Avg Turns</th><th>Success</th></tr></thead>
+      <tbody><tr><td><code>actionbook</code></td><td>69291</td><td>85%</td><td>640</td><td>$0.0633</td><td>21.3s</td><td>3.8</td><td>5/5</td></tr>
+<tr><td><code>agent-browser</code></td><td>55691</td><td>79%</td><td>491</td><td>$0.0641</td><td>17.0s</td><td>3.0</td><td>5/5</td></tr>
+<tr><td><code>chrome-devtools-axi</code></td><td>35228</td><td>71%</td><td>312</td><td>$0.0507</td><td>10.7s</td><td>2.0</td><td>5/5</td></tr>
+<tr><td><code>chrome-devtools-mcp-code</code></td><td>104590</td><td>81%</td><td>1071</td><td>$0.1017</td><td>24.5s</td><td>4.8</td><td>5/5</td></tr>
+<tr><td><code>chrome-devtools-mcp-compressed-cli</code></td><td>76968</td><td>88%</td><td>648</td><td>$0.0639</td><td>22.0s</td><td>4.6</td><td>5/5</td></tr>
+<tr><td><code>chrome-devtools-mcp-search</code></td><td>112237</td><td>90%</td><td>904</td><td>$0.0847</td><td>25.5s</td><td>6.4</td><td>5/5</td></tr>
+<tr><td><code>chrome-devtools-mcp</code></td><td>97494</td><td>92%</td><td>516</td><td>$0.0648</td><td>17.1s</td><td>3.2</td><td>5/5</td></tr>
+<tr><td><code>dev-browser</code></td><td>36863</td><td>75%</td><td>566</td><td>$0.0509</td><td>13.0s</td><td>2.2</td><td>5/5</td></tr></tbody>
+    </table>
+  </div>
+  <details><summary>Latest agent output</summary><pre>Here are the years when world population reached each billion milestone, from the table on the Wikipedia article:
+
+| Population | Year Reached | Years Elapsed |
+|---|---|---|
+| 1 billion | **1804** | — |
+| 2 billion | **1927** | 123 years |
+| 3 billion | **1960** | 33 years |
+| 4 billion | **1974** | 14 years |
+| 5 billion | **1987** | 13 years |
+| 6 billion | **1999** | 12 years |
+| 7 billion | **2011** | 12 years |
+| 8 billion | **2022** | 11 years |
+
+Source: &quot;World population milestones in billions&quot; table (Worldometers estimates). Notable takeaway: it took ~300,000 years to reach 1 billion, then just 218 more years to reach 8 billion — with each successive billion arriving faster than the last until recently.</pre></details>
+</section>
+<section class="card task-card">
+  <div class="section-head"><h3>multi_page_comparison</h3><span class="pill">40 runs</span></div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Condition</th><th>Avg Input</th><th>Cache%</th><th>Avg Output</th><th>Avg Cost</th><th>Avg Duration</th><th>Avg Turns</th><th>Success</th></tr></thead>
+      <tbody><tr><td><code>actionbook</code></td><td>90738</td><td>92%</td><td>542</td><td>$0.0615</td><td>22.2s</td><td>5.2</td><td>5/5</td></tr>
+<tr><td><code>agent-browser</code></td><td>76231</td><td>84%</td><td>327</td><td>$0.0693</td><td>16.5s</td><td>4.0</td><td>5/5</td></tr>
+<tr><td><code>chrome-devtools-axi</code></td><td>89219</td><td>86%</td><td>397</td><td>$0.0744</td><td>22.1s</td><td>5.0</td><td>5/5</td></tr>
+<tr><td><code>chrome-devtools-mcp-code</code></td><td>71564</td><td>84%</td><td>1069</td><td>$0.0743</td><td>24.2s</td><td>4.0</td><td>5/5</td></tr>
+<tr><td><code>chrome-devtools-mcp-compressed-cli</code></td><td>166693</td><td>93%</td><td>897</td><td>$0.1046</td><td>30.7s</td><td>9.4</td><td>5/5</td></tr>
+<tr><td><code>chrome-devtools-mcp-search</code></td><td>137752</td><td>92%</td><td>933</td><td>$0.0911</td><td>27.2s</td><td>7.8</td><td>5/5</td></tr>
+<tr><td><code>chrome-devtools-mcp</code></td><td>215693</td><td>96%</td><td>758</td><td>$0.1063</td><td>23.7s</td><td>7.0</td><td>5/5</td></tr>
+<tr><td><code>dev-browser</code></td><td>71037</td><td>86%</td><td>1158</td><td>$0.0699</td><td>20.4s</td><td>4.4</td><td>5/5</td></tr></tbody>
+    </table>
+  </div>
+  <details><summary>Latest agent output</summary><pre>Here are the designers from both Wikipedia articles:
+
+- **Python**: Designed by **Guido van Rossum**
+- **JavaScript**: Designed by **Brendan Eich** (of Netscape; others later contributed to the ECMAScript standard)</pre></details>
+</section>
+<section class="card task-card">
+  <div class="section-head"><h3>github_issue_investigation</h3><span class="pill">40 runs</span></div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Condition</th><th>Avg Input</th><th>Cache%</th><th>Avg Output</th><th>Avg Cost</th><th>Avg Duration</th><th>Avg Turns</th><th>Success</th></tr></thead>
+      <tbody><tr><td><code>actionbook</code></td><td>51735</td><td>87%</td><td>503</td><td>$0.0469</td><td>18.4s</td><td>3.0</td><td>5/5</td></tr>
+<tr><td><code>agent-browser</code></td><td>62322</td><td>71%</td><td>459</td><td>$0.0886</td><td>17.9s</td><td>3.0</td><td>5/5</td></tr>
+<tr><td><code>chrome-devtools-axi</code></td><td>208453</td><td>89%</td><td>2416</td><td>$0.1635</td><td>92.3s</td><td>10.0</td><td>5/5</td></tr>
+<tr><td><code>chrome-devtools-mcp-code</code></td><td>163860</td><td>81%</td><td>2620</td><td>$0.1808</td><td>61.7s</td><td>8.4</td><td>5/5</td></tr>
+<tr><td><code>chrome-devtools-mcp-compressed-cli</code></td><td>99862</td><td>87%</td><td>797</td><td>$0.0871</td><td>26.6s</td><td>5.6</td><td>5/5</td></tr>
+<tr><td><code>chrome-devtools-mcp-search</code></td><td>69799</td><td>85%</td><td>539</td><td>$0.0659</td><td>21.5s</td><td>4.0</td><td>4/5</td></tr>
+<tr><td><code>chrome-devtools-mcp</code></td><td>234649</td><td>95%</td><td>1491</td><td>$0.1292</td><td>39.3s</td><td>7.4</td><td>4/5</td></tr>
+<tr><td><code>dev-browser</code></td><td>119844</td><td>89%</td><td>2864</td><td>$0.1189</td><td>53.6s</td><td>6.6</td><td>4/5</td></tr></tbody>
+    </table>
+  </div>
+  <details><summary>Latest agent output</summary><pre>Here&#39;s the information from the facebook/react issues page:
+
+**Total open issues: 825**
+
+**5 most recent open issues:**
+
+1. **Bug: Improvements to the memorize rules are needed.** (#36248)
+2. **Bug: eslint-plugin-react-hooks package.json says 7.0.0, but 7.0.1 is released on npmjs.** (#36247)
+3. **[React Compiler Bug] &amp;&amp; conditional renders 0 as text node when first operand is falsy** (#36245)
+4. **Docs Improvement: Add Practical Guide for Debugging Hydration Mismatches** (#36242)
+5. **Bug: Improve Developer Experience for Hydration Mismatch Errors (Better Debugging &amp; Diagnostics)** (#36241)</pre></details>
+</section></div>
+    </section>
+    <section class="section">
+      <h2>Recent Runs</h2>
+      <div class="card panel table-wrap">
+        <table>
+          <thead><tr><th>Condition</th><th>Task</th><th>Run</th><th>Status</th><th>Cost</th><th>Duration</th><th>Turns</th><th>Artifacts</th></tr></thead>
+          <tbody><tr>
+  <td><code>actionbook</code></td>
+  <td><code>github_issue_investigation</code></td>
+  <td>run5</td>
+  <td><span class="status-pass">PASS</span></td>
+  <td>$0.0477</td>
+  <td>16.8s</td>
+  <td>3</td>
+  <td><a href="./actionbook/github_issue_investigation/run5/grade.json">grade</a> · <a href="./actionbook/github_issue_investigation/run5/agent_output.txt">trace</a></td>
+</tr>
+<tr>
+  <td><code>actionbook</code></td>
+  <td><code>github_issue_investigation</code></td>
+  <td>run4</td>
+  <td><span class="status-pass">PASS</span></td>
+  <td>$0.0466</td>
+  <td>21.0s</td>
+  <td>3</td>
+  <td><a href="./actionbook/github_issue_investigation/run4/grade.json">grade</a> · <a href="./actionbook/github_issue_investigation/run4/agent_output.txt">trace</a></td>
+</tr>
+<tr>
+  <td><code>actionbook</code></td>
+  <td><code>github_issue_investigation</code></td>
+  <td>run3</td>
+  <td><span class="status-pass">PASS</span></td>
+  <td>$0.0464</td>
+  <td>17.0s</td>
+  <td>3</td>
+  <td><a href="./actionbook/github_issue_investigation/run3/grade.json">grade</a> · <a href="./actionbook/github_issue_investigation/run3/agent_output.txt">trace</a></td>
+</tr>
+<tr>
+  <td><code>actionbook</code></td>
+  <td><code>github_issue_investigation</code></td>
+  <td>run2</td>
+  <td><span class="status-pass">PASS</span></td>
+  <td>$0.0479</td>
+  <td>16.7s</td>
+  <td>3</td>
+  <td><a href="./actionbook/github_issue_investigation/run2/grade.json">grade</a> · <a href="./actionbook/github_issue_investigation/run2/agent_output.txt">trace</a></td>
+</tr>
+<tr>
+  <td><code>actionbook</code></td>
+  <td><code>github_issue_investigation</code></td>
+  <td>run1</td>
+  <td><span class="status-pass">PASS</span></td>
+  <td>$0.0459</td>
+  <td>20.6s</td>
+  <td>3</td>
+  <td><a href="./actionbook/github_issue_investigation/run1/grade.json">grade</a> · <a href="./actionbook/github_issue_investigation/run1/agent_output.txt">trace</a></td>
+</tr>
+<tr>
+  <td><code>actionbook</code></td>
+  <td><code>multi_page_comparison</code></td>
+  <td>run5</td>
+  <td><span class="status-pass">PASS</span></td>
+  <td>$0.0648</td>
+  <td>20.7s</td>
+  <td>5</td>
+  <td><a href="./actionbook/multi_page_comparison/run5/grade.json">grade</a> · <a href="./actionbook/multi_page_comparison/run5/agent_output.txt">trace</a></td>
+</tr>
+<tr>
+  <td><code>actionbook</code></td>
+  <td><code>multi_page_comparison</code></td>
+  <td>run4</td>
+  <td><span class="status-pass">PASS</span></td>
+  <td>$0.0623</td>
+  <td>20.2s</td>
+  <td>5</td>
+  <td><a href="./actionbook/multi_page_comparison/run4/grade.json">grade</a> · <a href="./actionbook/multi_page_comparison/run4/agent_output.txt">trace</a></td>
+</tr>
+<tr>
+  <td><code>actionbook</code></td>
+  <td><code>multi_page_comparison</code></td>
+  <td>run3</td>
+  <td><span class="status-pass">PASS</span></td>
+  <td>$0.0569</td>
+  <td>21.3s</td>
+  <td>5</td>
+  <td><a href="./actionbook/multi_page_comparison/run3/grade.json">grade</a> · <a href="./actionbook/multi_page_comparison/run3/agent_output.txt">trace</a></td>
+</tr>
+<tr>
+  <td><code>actionbook</code></td>
+  <td><code>multi_page_comparison</code></td>
+  <td>run2</td>
+  <td><span class="status-pass">PASS</span></td>
+  <td>$0.0598</td>
+  <td>26.4s</td>
+  <td>5</td>
+  <td><a href="./actionbook/multi_page_comparison/run2/grade.json">grade</a> · <a href="./actionbook/multi_page_comparison/run2/agent_output.txt">trace</a></td>
+</tr>
+<tr>
+  <td><code>actionbook</code></td>
+  <td><code>multi_page_comparison</code></td>
+  <td>run1</td>
+  <td><span class="status-pass">PASS</span></td>
+  <td>$0.0637</td>
+  <td>22.5s</td>
+  <td>6</td>
+  <td><a href="./actionbook/multi_page_comparison/run1/grade.json">grade</a> · <a href="./actionbook/multi_page_comparison/run1/agent_output.txt">trace</a></td>
+</tr>
+<tr>
+  <td><code>actionbook</code></td>
+  <td><code>tabular_data_analysis</code></td>
+  <td>run5</td>
+  <td><span class="status-pass">PASS</span></td>
+  <td>$0.0622</td>
+  <td>22.4s</td>
+  <td>5</td>
+  <td><a href="./actionbook/tabular_data_analysis/run5/grade.json">grade</a> · <a href="./actionbook/tabular_data_analysis/run5/agent_output.txt">trace</a></td>
+</tr>
+<tr>
+  <td><code>actionbook</code></td>
+  <td><code>tabular_data_analysis</code></td>
+  <td>run4</td>
+  <td><span class="status-pass">PASS</span></td>
+  <td>$0.0712</td>
+  <td>24.8s</td>
+  <td>4</td>
+  <td><a href="./actionbook/tabular_data_analysis/run4/grade.json">grade</a> · <a href="./actionbook/tabular_data_analysis/run4/agent_output.txt">trace</a></td>
+</tr></tbody>
+        </table>
+      </div>
+      <p class="footer-note">Artifact links are relative to the directory containing this report, so they work when you open the file locally.</p>
+    </section>
+  </main>
+</body>
+</html>

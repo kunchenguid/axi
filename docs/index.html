@@ -9,7 +9,7 @@
     <meta property="og:title" content="AXI: Agent eXperience Interface" />
     <meta
       property="og:description"
-      content="10 design principles for agent-ergonomic CLI. 100% task success at the lowest cost — validated across two benchmarks and 915 runs."
+      content="10 design principles for agent-ergonomic CLI, validated across two benchmarks and 985 runs."
     />
     <meta property="og:image" content="https://axi.md/axi-splash.png" />
     <meta property="og:type" content="website" />
@@ -20,7 +20,7 @@
     <meta name="twitter:title" content="AXI: Agent eXperience Interface" />
     <meta
       name="twitter:description"
-      content="10 design principles for agent-ergonomic CLI. 100% task success at the lowest cost — validated across two benchmarks and 915 runs."
+      content="10 design principles for agent-ergonomic CLI, validated across two benchmarks and 985 runs."
     />
     <meta name="twitter:image" content="https://axi.md/axi-splash.png" />
 
@@ -121,8 +121,8 @@
         <p class="section-label">AXI &mdash; Agent eXperience Interface</p>
         <h1 data-annotate>Let&apos;s build apps that [agents] love.</h1>
         <p class="text-lg">
-          10 design principles for agent-ergonomic CLI. 100% task success at the
-          lowest cost &mdash; validated across two benchmarks and 915 runs.
+          10 design principles for agent-ergonomic CLI, validated across two
+          benchmarks and 985 runs.
         </p>
 
         <div class="grid grid--2 mt-xl">
@@ -174,12 +174,19 @@
               <div class="chart-row">
                 <span class="chart-label">chrome-devtools-axi</span>
                 <div class="chart-bar-track">
+                  <div class="chart-bar" style="width: 62.2%"></div>
+                </div>
+                <span class="chart-value">$0.074</span>
+              </div>
+              <div class="chart-row">
+                <span class="chart-label">actionbook</span>
+                <div class="chart-bar-track">
                   <div
                     class="chart-bar bar-highlight"
-                    style="width: 62.2%"
+                    style="width: 54.8%"
                   ></div>
                 </div>
-                <span class="chart-value value-highlight">$0.074</span>
+                <span class="chart-value value-highlight">$0.066</span>
               </div>
             </div>
           </div>
@@ -227,6 +234,13 @@
                   <div class="chart-bar" style="width: 68%"></div>
                 </div>
                 <span class="chart-value">24.6s</span>
+              </div>
+              <div class="chart-row">
+                <span class="chart-label">actionbook</span>
+                <div class="chart-bar-track">
+                  <div class="chart-bar" style="width: 66.6%"></div>
+                </div>
+                <span class="chart-value">24.1s</span>
               </div>
               <div class="chart-row">
                 <span class="chart-label">chrome-devtools-axi</span>
@@ -641,7 +655,7 @@ help[2]:
 
         <h4>Conditions</h4>
         <p>
-          The benchmark evaluates seven agent-tool interface conditions for
+          The benchmark evaluates eight agent-tool interface conditions for
           browser automation:
         </p>
 
@@ -678,6 +692,14 @@ help[2]:
                   <td>Bash CLI (Rust)</td>
                   <td>
                     Vercel&rsquo;s Agent Browser &mdash; the raw CLI baseline.
+                  </td>
+                </tr>
+                <tr>
+                  <td><strong>actionbook</strong></td>
+                  <td>Bash CLI</td>
+                  <td>
+                    Actionbook&rsquo;s default browser CLI workflow using
+                    explicit sessions, tabs, and targeted text / eval reads.
                   </td>
                 </tr>
                 <tr>
@@ -754,7 +776,7 @@ help[2]:
           <code>CLAUDE.md</code>. All MCP-based conditions use the same backend:
           <code>chrome-devtools-mcp@latest --headless --isolated</code>. Agent:
           Claude Sonnet 4.6. Judge: Claude Sonnet 4.6. Five repeats per
-          condition&ndash;task pair: 14 &times; 7 &times; 5 = 490 total runs.
+          condition&ndash;task pair: 14 &times; 8 &times; 5 = 560 total runs.
         </p>
         <p>
           A
@@ -792,7 +814,7 @@ help[2]:
         <p class="section-label">Proof</p>
         <h2>Results</h2>
         <p class="text-muted">
-          490 runs, 14 tasks &times; 5 repetitions &times; 7 conditions
+          560 runs, 14 tasks &times; 5 repetitions &times; 8 conditions
         </p>
 
         <div class="card mt-xl">
@@ -812,9 +834,30 @@ help[2]:
                 <tr>
                   <td><strong>chrome-devtools-axi</strong></td>
                   <td><strong class="text-accent">100%</strong></td>
-                  <td><strong class="text-accent">$0.074</strong></td>
+                  <td>$0.074</td>
                   <td><strong class="text-accent">21.5s</strong></td>
                   <td><strong class="text-accent">4.5</strong></td>
+                </tr>
+                <tr>
+                  <td>actionbook</td>
+                  <td>99%</td>
+                  <td><strong class="text-accent">$0.066</strong></td>
+                  <td>24.1s</td>
+                  <td>5.3</td>
+                </tr>
+                <tr>
+                  <td>chrome-devtools-mcp-compressed</td>
+                  <td>100%</td>
+                  <td>$0.091</td>
+                  <td>29.7s</td>
+                  <td>7.6</td>
+                </tr>
+                <tr>
+                  <td>chrome-devtools-mcp-code</td>
+                  <td>100%</td>
+                  <td>$0.120</td>
+                  <td>36.2s</td>
+                  <td>6.4</td>
                 </tr>
                 <tr>
                   <td>dev-browser</td>
@@ -831,13 +874,6 @@ help[2]:
                   <td>4.8</td>
                 </tr>
                 <tr>
-                  <td>chrome-devtools-mcp-compressed</td>
-                  <td>100%</td>
-                  <td>$0.091</td>
-                  <td>29.7s</td>
-                  <td>7.6</td>
-                </tr>
-                <tr>
                   <td>chrome-devtools-mcp-search</td>
                   <td>99%</td>
                   <td>$0.096</td>
@@ -851,25 +887,19 @@ help[2]:
                   <td>26.0s</td>
                   <td>6.2</td>
                 </tr>
-                <tr>
-                  <td>chrome-devtools-mcp-code</td>
-                  <td>100%</td>
-                  <td>$0.120</td>
-                  <td>36.2s</td>
-                  <td>6.4</td>
-                </tr>
               </tbody>
             </table>
           </div>
         </div>
 
         <p class="mt-md">
-          AXI (<code>chrome-devtools-axi</code>) achieves 100% task success at
-          the lowest average cost ($0.074/task), shortest duration (21.5s), and
-          fewest turns (4.5). It is the only condition that leads simultaneously
-          on all four metrics. The field is competitive &mdash; dev-browser is
-          within 5% on cost &mdash; but AXI&rsquo;s consistency across the full
-          task suite gives it the edge.
+          <code>actionbook</code> is the new cost leader at $0.066/task, but it
+          misses one deep-extraction run and lands at 99% success. AXI
+          (<code>chrome-devtools-axi</code>) remains the fastest condition at
+          21.5s, the fewest-turn condition at 4.5 turns, and the cheapest among
+          the 100%-success conditions. The updated benchmark sharpens the
+          trade-off: targeted text-first CLI output drives cost down, while
+          combined browser operations still matter for reliability and latency.
         </p>
 
         <hr class="divider" />
@@ -898,15 +928,17 @@ help[2]:
 
         <div class="card mt-xl">
           <p class="section-label">Finding 1</p>
-          <h4>AXI leads on every metric.</h4>
+          <h4>Actionbook sets the cost floor; AXI wins the 100%-success tier.</h4>
           <p>
-            <code>chrome-devtools-axi</code> achieves 100% success at the lowest
-            cost ($0.074/task), fewest turns (4.5), and fastest execution
-            (21.5s). It is the only condition that leads simultaneously on all
-            four metrics. The field is competitive &mdash;
-            <code>dev-browser</code> is within 5% on cost ($0.078) &mdash; but
-            AXI&rsquo;s consistency across the full task suite gives it the
-            edge.
+            <code>actionbook</code> achieves the lowest average browser cost
+            ($0.066/task) with 99% task success. Its single miss is on
+            <code>wikipedia_deep_extraction</code>, where a flattened table read
+            omitted co-laureates in one run. <code>chrome-devtools-axi</code>
+            remains the fastest condition (21.5s), the fewest-turn condition
+            (4.5), and the cheapest among the 100%-success group ($0.074/task).
+            That boundary is useful: compact plain-text extraction can push cost
+            lower, but specialized combined browser operations still buy
+            consistency.
           </p>
           <p>
             Trajectory analysis across all 70 AXI runs reveals multiple
@@ -965,23 +997,25 @@ help[2]:
 
         <div class="card mt-md">
           <p class="section-label">Finding 3</p>
-          <h4>MCP Compressor validates CLI-over-MCP.</h4>
+          <h4>CLI-over-MCP still holds, but interface design decides the ceiling.</h4>
           <p>
+            <code>actionbook</code> (99%, $0.066/task) and
             <a href="https://github.com/atlassian-labs/mcp-compressor/"
               >MCP Compressor</a
             >
             open sourced by Atlassian (100% success, $0.091/task, 7.6 turns)
-            wraps any MCP server into a single CLI tool, converting each MCP
-            tool into a Bash subcommand. This single change &mdash; CLI over MCP
-            &mdash; eliminates schema overhead and enables shell composability
-            (<code>| grep</code>, <code>| head</code>).
+            both show the same structural win: once browser automation is
+            exposed as Bash-friendly CLI output instead of a bundle of MCP tool
+            schemas, agents get shell composability and shed a large chunk of
+            token overhead.
           </p>
           <p class="mb-0">
-            The remaining 23% gap to AXI ($0.091 vs. $0.074) comes from two
-            sources: MCP Compressor still requires separate
-            <code>navigate-page</code> + <code>take-snapshot</code> calls where
-            AXI&rsquo;s <code>open</code> returns both in one due to its
-            ergonomic interface design.
+            The remaining gap to AXI comes from interface shape, not just
+            protocol. MCP Compressor still requires separate
+            <code>navigate-page</code> + <code>take-snapshot</code> calls, and
+            Actionbook still pays extra turns on some navigation-heavy tasks.
+            AXI&rsquo;s combined <code>open</code>, query filtering, and
+            action-returned snapshots keep the 100%-success path shorter.
           </p>
         </div>
       </section>

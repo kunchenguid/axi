@@ -1,5 +1,7 @@
 /** Shared interfaces for the benchmark harness. */
 
+import type { ClaudeAuthMode } from "./claude-auth.js";
+
 export type ConditionId = "cli" | "axi" | "mcp-with-toolsearch" | "mcp-no-toolsearch" | "mcp-with-code-mode";
 export type TaskCategory = "single_step" | "multi_step" | "error_recovery";
 export type AgentBackend = "codex" | "claude";
@@ -30,6 +32,7 @@ export interface RunSpec {
   run: number;
   model: string;
   agent: AgentBackend;
+  claude_auth_mode?: ClaudeAuthMode;
 }
 
 export interface UsageMetrics {

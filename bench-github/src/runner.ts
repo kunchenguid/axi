@@ -210,7 +210,7 @@ function runAgent(
 
     claudeArgs = [
       "--setting-sources", "",
-      "-p", JSON.stringify(task.prompt),
+      "-p", task.prompt,
       "--model", spec.model,
       "--output-format", "stream-json",
       "--verbose",

@@ -1,11 +1,11 @@
-import { mkdtempSync, writeFileSync } from "node:fs";
+import { existsSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
 import { describe, expect, it } from "vitest";
 
 import type { RunResult } from "../src/types.js";
-import { htmlReport, markdownReport, summarize } from "../src/reporter.js";
+import { htmlReport, markdownReport, summarize, writeReports } from "../src/reporter.js";
 
 const sampleResults: RunResult[] = [
   {
@@ -106,5 +106,21 @@ describe("markdownReport", () => {
 
     expect(md).toContain("| actionbook |");
     expect(md).not.toContain("| actionbook-parallel |");
+  });
+
+  it("creates a fresh output directory before writing reports", () => {
+    const resultsDir = mkdtempSync(join(tmpdir(), "axi-bench-report-"));
+    const outputDir = join(resultsDir, "nested", "reports");
+    writeFileSync(
+      join(resultsDir, "actionbook.jsonl"),
+      `${JSON.stringify(sampleResults[0])}\n`,
+    );
+
+    writeReports({ inputDir: resultsDir, outputDir });
+
+    expect(existsSync(join(outputDir, "report.md"))).toBe(true);
+    expect(existsSync(join(outputDir, "report.html"))).toBe(true);
+    expect(existsSync(join(outputDir, "report.csv"))).toBe(true);
+    expect(readFileSync(join(outputDir, "report.md"), "utf-8")).toContain("| actionbook |");
   });
 });

@@ -4,7 +4,7 @@
  * Adapted from bench-github/src/reporter.ts — domain-agnostic logic.
  */
 
-import { readFileSync, readdirSync, writeFileSync } from "node:fs";
+import { mkdirSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import type { RunResult, ConditionId, ConditionSummary } from "./types.js";
 
@@ -417,6 +417,7 @@ export function writeReports(paths?: ReportPaths): void {
   const md = markdownReport(undefined, { inputDir });
   const html = htmlReport(undefined, { inputDir });
   const csv = csvReport(undefined, { inputDir });
+  mkdirSync(outputDir, { recursive: true });
   writeFileSync(join(outputDir, "report.md"), md);
   writeFileSync(join(outputDir, "report.html"), html);
   writeFileSync(join(outputDir, "report.csv"), csv);

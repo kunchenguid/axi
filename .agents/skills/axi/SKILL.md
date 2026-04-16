@@ -211,3 +211,98 @@ description: Manage project tasks in the current workspace
 ```
 
 Every subcommand should support `--help` with a concise, complete reference: available flags with defaults, required arguments, and 2-3 usage examples. Keep it focused on the requested subcommand — don't dump the entire CLI's manual.
+
+## 11. Usage-driven improvement
+
+AXI defaults are guesses until agents use them. Instrument every AXI tool to log how it is actually used, then build a summary command that turns those logs into actionable tuning decisions.
+
+### What to log
+
+Append one JSONL record per invocation to a local cache file (e.g. `~/.cache/mytool/usage.jsonl`). Logging must never break the CLI — silently drop on I/O errors. Each record should capture these AXI-relevant signals:
+
+| Signal | What to record | Which AXI principle it tunes |
+|--------|---------------|------------------------------|
+| **Command** | Command name, timestamp | Overall usage patterns |
+| **Schema** | Default fields and any `--fields` override | §2 Minimal default schemas |
+| **List length** | Default limit, requested limit, rows returned, total available | §2 Default limits |
+| **Parameterized defaults** | Default vs actual value for any flag with a meaningful default (limits, ranges, scopes) | §2 Default limits |
+| **Content truncation** | Whether `--full` was passed, count of truncated fields | §3 Content truncation |
+| **Aggregates** | Which aggregate keys appeared in the output | §4 Pre-computed aggregates |
+| **Empty results** | Whether the command returned 0 results on a successful call | §5 Definitive empty states |
+| **Errors** | Error message, whether contextual hints were shown, exit code | §6 Structured errors, §9 Contextual disclosure |
+| **Parse errors** | The raw argv when the CLI framework rejects input | §9 Contextual disclosure (missing flags) |
+| **Hints shown** | Which help hints appeared in the output | §9 Contextual disclosure (are hints guiding agents to what they actually do next?) |
+| **Latency** | Duration in milliseconds from entry to response | §4 Aggregates (high latency makes follow-up prevention more valuable) |
+
+**Key design rules:**
+
+- **Record defaults alongside overrides.** Logging that rows were overridden to 15 is useless without knowing the default was 10. Future analysis needs both to judge whether the default should change.
+- **Only log non-default values.** If the agent didn't override a parameter, omit the override key entirely — don't write `null`. This keeps records compact and makes "count of overrides" a simple key-existence check.
+- **Log on both success and error paths.** Error records need the same command-specific context as success records, plus the error message and exit code.
+- **Capture full argv on parse errors.** When the CLI framework rejects input, save the raw arguments so the summary can identify flags agents expect but don't exist.
+
+### What to detect
+
+The usage summary should surface three agent failure modes that benchmarking shows are the primary drivers of wasted cost and turns:
+
+**Discovery friction** — The agent tries a flag or command that doesn't exist, gets an error, then falls back to `--help` before finding the right invocation. Detect by looking for parse errors ("No such option", "Unknown command") optionally followed by a `--help` call. Each instance is a wasted turn pair. The fix is either to add the expected flag, alias the expected command name, or improve contextual disclosure so the agent finds the right command on the first try.
+
+**Retry cascades** — The agent re-runs the same command within seconds, often with escalating parameters (wider limits, broader filters). Detect by looking for the same command invoked twice within 30 seconds. Each cascade means the first response didn't give the agent what it needed — typically an empty result with no guidance, or an error without a recovery hint. The fix is better defaults, better empty-state messages, or better error hints.
+
+**Verification follow-ups** — The agent makes an extra call to confirm something that a pre-computed aggregate should have told it. Detect by looking for a detail/view command immediately after a list command for the same entity. If the detail call only reads a field that could have been in the list output, that field is a candidate for the default schema or for an aggregate. The fix is to promote the field or add a derived summary.
+
+**Unhinted transitions** — The agent follows command A with command B, but A's output didn't include a hint suggesting B. Detect by extracting command-pair sequences from timestamped logs (A→B within the same session or within a short time window) and comparing against the hints A actually emitted. Frequent A→B transitions where B isn't hinted reveal missing contextual disclosure (§9). The fix is to add a hint to A's output suggesting B, carrying forward any relevant context (identifiers, CRS codes, IDs) so the agent doesn't have to re-derive them. Conversely, if A hints at C but agents never actually run C, that hint is noise — consider removing it.
+
+### What to summarize
+
+Build a `mytool usage` subcommand that reads the JSONL log and reports insights. The output itself should be TOON. Organize the analysis around the four outcome metrics that AXI benchmarking tracks — **success rate, cost, duration, turns** — since every insight should connect to at least one:
+
+**Schema analysis** (reduces turns) — Count how often each extra field is requested via `--fields`. Fields requested 2+ times are candidates to promote into the default schema. Report both the field names and their counts.
+
+**List length analysis** (reduces turns) — How often was the default row/result limit overridden? What values were used? Did any calls hit the limit (returned == requested)? Hitting the limit suggests the default is too low.
+
+**Parameterized default analysis** (reduces turns, improves success) — For any flag with a meaningful default (scopes, ranges, caps), track the same override-vs-default pattern as list length. High override rates or high empty-result rates signal the default isn't covering common cases.
+
+**Content truncation analysis** (reduces cost) — What fraction of calls used `--full`? High rates (>30%) suggest default truncation is too aggressive. Also report how many calls had truncated content, to distinguish "nobody needed full" from "nothing was long enough to truncate."
+
+**Empty result analysis** (improves success) — What fraction of successful calls returned 0 results? High empty rates signal that defaults aren't covering common agent queries. Break down by command.
+
+**Discovery friction** (reduces turns, cost) — How many parse errors occurred? How many were followed by `--help` lookups? Report the specific missing flags/commands with counts.
+
+**Retry cascades** (reduces turns, duration) — How many rapid re-invocations of the same command? Report by command, with the escalation pattern (e.g. "limit 10 → 20 → 50" or "same args, 3 attempts").
+
+**Follow-up patterns** (reduces turns) — How often does a detail command immediately follow a list of the same entity? Which fields does the detail call read that the list didn't include?
+
+**Command sequence analysis** (improves §9 contextual disclosure) — Extract the most frequent command-pair transitions (A→B) from the log. For each frequent pair, check whether A's recorded hints included a suggestion for B. Report:
+- *Unhinted transitions*: frequent A→B pairs where A didn't hint at B — these are missing hints that should be added.
+- *Unused hints*: hints that A consistently shows but no subsequent command ever matches — these are noise that can be removed or replaced.
+- *Effective hints*: A hinted at B and the agent followed through — these validate the current disclosure and should be preserved.
+
+This tells you whether your contextual disclosure (§9) is guiding agents toward what they actually do next, or toward commands they never use.
+
+**Error analysis** (improves success) — Categorize errors (parse errors, not-found, API errors, timeouts). Track what fraction included contextual hints — errors without hints are disclosure gaps (§9).
+
+**Latency analysis** (reduces duration) — Report avg and p95 duration. High latency makes pre-computed aggregates (§4) more valuable, since each prevented follow-up call saves more wall-clock time.
+
+**Actionable recommendations** — Synthesize the above into concrete suggestions:
+- "Add 'status' to default schema (requested 4 times — would save ~2 follow-up calls/session)"
+- "Consider adding flag: `mytool list --offset` (attempted 3 times, all parse errors)"
+- "Widen default --limit (65% of calls returned 0 results)"
+- "Add hints to parse error output (8 errors had no recovery guidance)"
+- "Add hint to `mytool list` suggesting `mytool view <id>` (12 list→view transitions, none hinted)"
+- "Remove hint for `mytool export` from `mytool list` (shown 30 times, never followed)"
+
+Don't just report statistics — tell the developer what to change and why.
+
+### The improvement cycle
+
+The usage log and summary command create an OODA loop (Observe → Orient → Decide → Act):
+
+1. **Observe** — Every invocation appends a JSONL record. The log accumulates naturally during normal agent sessions with no manual effort.
+2. **Orient** — `mytool usage` reads the log and interprets it through AXI principles and the failure modes (discovery friction, retry cascades, verification follow-ups, unhinted transitions). This is the analysis: override rates, empty-result rates, error categories, retry counts, command sequences.
+3. **Decide** — The summary synthesizes observations into actionable recommendations: which fields to promote, which flags to add, which defaults to widen, which errors need hints. The developer reviews these against domain knowledge — a high empty-result rate might be expected (late-night queries) rather than a signal to change defaults.
+4. **Act** — Implement the changes. `mytool usage --clear` resets the log so the next cycle measures the impact of the changes, not the old baseline.
+
+Ship with best-guess defaults (§1–10 guide the initial choices), then start the loop. The principles tell you what to optimize for; the OODA cycle tells you whether you got it right. Cycle quickly — don't wait for a formal review cadence. The log is always accumulating, and `mytool usage` is always available.
+
+AXI benchmarking ([axi.md](https://axi.md/)) defines the outcome metrics to orient around: task success rate, cost per task, wall-clock duration, and tool-call turns. The usage summary connects each insight to these metrics so you can prioritize the changes that matter most.

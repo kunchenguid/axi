@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.5](https://github.com/kunchenguid/axi/compare/axi-sdk-js-v0.1.4...axi-sdk-js-v0.1.5) (2026-04-24)
+
+
+### Bug Fixes
+
+* **axi-sdk-js:** install portable session hook commands ([#33](https://github.com/kunchenguid/axi/issues/33)) ([fb5ae20](https://github.com/kunchenguid/axi/commit/fb5ae200f2710bfb65cac00fff995c88d79f8f32))
+
 ## [0.1.4](https://github.com/kunchenguid/axi/compare/axi-sdk-js-v0.1.3...axi-sdk-js-v0.1.4) (2026-04-03)
 
 

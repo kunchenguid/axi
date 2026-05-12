@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.1.6](https://github.com/kunchenguid/axi/compare/axi-sdk-js-v0.1.5...axi-sdk-js-v0.1.6) (2026-05-12)
+
+
+### Features
+
+* **axi-sdk-js:** add OpenCode ambient integration ([#38](https://github.com/kunchenguid/axi/issues/38)) ([fc54e94](https://github.com/kunchenguid/axi/commit/fc54e9476210f5f6b20ed27a8b370142eac63a1e))
+
+
+### Bug Fixes
+
+* use canonical Codex hooks feature ([81a8dc7](https://github.com/kunchenguid/axi/commit/81a8dc79760f8fb06988275fc8973dcf5a678d81))
+* write canonical Codex hooks config key ([99e2e66](https://github.com/kunchenguid/axi/commit/99e2e66ea5081eeb32d2e2f3fc50582715941552))
+
 ## [0.1.5](https://github.com/kunchenguid/axi/compare/axi-sdk-js-v0.1.4...axi-sdk-js-v0.1.5) (2026-04-24)
 
 

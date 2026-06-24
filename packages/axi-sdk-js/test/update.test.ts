@@ -1,3 +1,4 @@
+import { EventEmitter } from "node:events";
 import { describe, expect, it, vi } from "vitest";
 import { AxiError } from "../src/errors.js";
 import {
@@ -148,6 +149,26 @@ describe("detectInstallMethod", () => {
     ).toEqual({ kind: "pnpm-global" });
   });
 
+  it("does not treat local pnpm virtual stores as global installs", () => {
+    expect(
+      detectInstallMethod({
+        entry:
+          "/Users/me/repo/node_modules/.pnpm/gh-axi@1.2.3/node_modules/gh-axi/dist/bin/gh-axi.js",
+        env: {},
+      }),
+    ).toEqual({ kind: "unknown" });
+  });
+
+  it("does not treat pnpm-shaped project paths as global installs", () => {
+    expect(
+      detectInstallMethod({
+        entry:
+          "/Users/me/repo/pnpm/global/5/.pnpm/gh-axi@1.2.3/node_modules/gh-axi/dist/bin/gh-axi.js",
+        env: {},
+      }),
+    ).toEqual({ kind: "unknown" });
+  });
+
   it("detects pnpm via PNPM_HOME", () => {
     expect(
       detectInstallMethod({
@@ -155,6 +176,15 @@ describe("detectInstallMethod", () => {
         env: { PNPM_HOME: "/custom/pnpm-root" },
       }),
     ).toEqual({ kind: "pnpm-global" });
+  });
+
+  it("requires PNPM_HOME matches to stay inside the configured root", () => {
+    expect(
+      detectInstallMethod({
+        entry: "/custom/pnpm-root-other/store/gh-axi/dist/bin/gh-axi.js",
+        env: { PNPM_HOME: "/custom/pnpm-root" },
+      }),
+    ).toEqual({ kind: "unknown" });
   });
 
   it("detects Homebrew formula from the Cellar segment", () => {
@@ -329,6 +359,23 @@ describe("runUpdate", () => {
     expect(runInstall).not.toHaveBeenCalled();
   });
 
+  it("rejects unknown args before fetching or installing", async () => {
+    const fetchLatest = vi.fn(async () => "1.3.0");
+    const runInstall = vi.fn();
+    const error = await runUpdate({
+      ...baseDeps,
+      args: ["--chek"],
+      stdout,
+      fetchLatest,
+      runInstall,
+    }).catch((caught: unknown) => caught);
+
+    expect(error).toBeInstanceOf(AxiError);
+    expect((error as AxiError).code).toBe("VALIDATION_ERROR");
+    expect(fetchLatest).not.toHaveBeenCalled();
+    expect(runInstall).not.toHaveBeenCalled();
+  });
+
   it("reports up-to-date and skips install", async () => {
     const runInstall = vi.fn();
     const output = await runUpdate({
@@ -429,5 +476,74 @@ describe("runUpdate", () => {
 
     expect(error).toBeInstanceOf(AxiError);
     expect((error as AxiError).message).toContain("package name");
+  });
+});
+
+describe("default install runner", () => {
+  it("forwards installer output to stderr", async () => {
+    vi.resetModules();
+
+    const spawn = vi.fn(() => {
+      const child = new EventEmitter() as EventEmitter & {
+        stdout: EventEmitter;
+        stderr: EventEmitter;
+      };
+      child.stdout = new EventEmitter();
+      child.stderr = new EventEmitter();
+      queueMicrotask(() => {
+        child.stdout.emit("data", "installer stdout\n");
+        child.stderr.emit("data", Buffer.from("installer stderr\n"));
+        child.emit("close", 0);
+      });
+      return child;
+    });
+    const execFile = vi.fn();
+    vi.doMock("node:child_process", () => ({ execFile, spawn }));
+    const stderrWrite = vi
+      .spyOn(process.stderr, "write")
+      .mockImplementation(() => true);
+    const stdout = { write: vi.fn(() => true) };
+
+    try {
+      const { runUpdate: runUpdateWithMockedSpawn } =
+        await import("../src/update.js");
+      const output = await runUpdateWithMockedSpawn({
+        args: [],
+        stdout,
+        invokedAs: "/usr/local/bin/gh-axi",
+        realpath: () => "/usr/local/lib/node_modules/gh-axi/dist/bin/gh-axi.js",
+        fs: fakeFs({
+          "/usr/local/lib/node_modules/gh-axi/package.json": JSON.stringify({
+            name: "gh-axi",
+            version: "1.2.3",
+          }),
+        }),
+        env: {},
+        fetchLatest: async () => "1.3.0",
+      });
+
+      expect(spawn).toHaveBeenCalledWith(
+        "npm",
+        ["install", "-g", "gh-axi@latest"],
+        { stdio: ["ignore", "pipe", "pipe"], shell: false },
+      );
+      expect(stdout.write).toHaveBeenCalledWith(
+        "running: npm install -g gh-axi@latest\n",
+      );
+      expect(stdout.write).not.toHaveBeenCalledWith(
+        expect.stringContaining("installer stdout"),
+      );
+      expect(stderrWrite).toHaveBeenCalledWith("installer stdout\n");
+      expect(stderrWrite).toHaveBeenCalledWith(
+        Buffer.from("installer stderr\n"),
+      );
+      expect(output).toMatchObject({
+        update: "gh-axi upgraded 1.2.3 -> 1.3.0",
+      });
+    } finally {
+      stderrWrite.mockRestore();
+      vi.doUnmock("node:child_process");
+      vi.resetModules();
+    }
   });
 });

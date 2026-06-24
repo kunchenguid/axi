@@ -204,15 +204,8 @@ export function detectInstallMethod(options: {
     return { kind: "homebrew", formula: cellar[1] };
   }
 
-  // pnpm global store (virtual store + global root, or PNPM_HOME).
-  const pnpmHome = env.PNPM_HOME?.replaceAll("\\", "/");
-  if (
-    path.includes("/pnpm/global/") ||
-    path.includes("/pnpm-global/") ||
-    path.includes("/.pnpm/") ||
-    /\/Library\/pnpm\//.test(path) ||
-    (pnpmHome && pnpmHome.length > 0 && path.startsWith(pnpmHome))
-  ) {
+  const pnpmHome = normalizePathRoot(env.PNPM_HOME);
+  if (isPathInsideRoot(path, pnpmHome) || isKnownPnpmGlobalStore(path)) {
     return { kind: "pnpm-global" };
   }
 
@@ -222,6 +215,23 @@ export function detectInstallMethod(options: {
   }
 
   return { kind: "unknown" };
+}
+
+function normalizePathRoot(path: string | undefined): string | undefined {
+  const normalized = path?.replaceAll("\\", "/").replace(/\/+$/, "");
+  return normalized && normalized.length > 0 ? normalized : undefined;
+}
+
+function isPathInsideRoot(path: string, root: string | undefined): boolean {
+  return root !== undefined && (path === root || path.startsWith(`${root}/`));
+}
+
+function isKnownPnpmGlobalStore(path: string): boolean {
+  return (
+    /\/Library\/pnpm\/global\/\d+\/\.pnpm\//.test(path) ||
+    /\/\.local\/share\/pnpm\/global\/\d+\/\.pnpm\//.test(path) ||
+    /\/AppData\/Local\/pnpm\/global\/\d+\/\.pnpm\//.test(path)
+  );
 }
 
 export interface UpgradePlan {
@@ -385,12 +395,20 @@ async function defaultRunInstall(
     return { ok: false, message: "No runnable upgrade command" };
   }
 
-  // Announce the command, then stream the installer's output straight through.
   stdout.write(`running: ${plan.command}\n`);
 
   return new Promise<InstallResult>((resolve) => {
     const [command, ...args] = argv;
-    const child = spawn(command, args, { stdio: "inherit", shell: false });
+    const child = spawn(command, args, {
+      stdio: ["ignore", "pipe", "pipe"],
+      shell: false,
+    });
+    child.stdout?.on("data", (chunk: string | Buffer) => {
+      process.stderr.write(chunk);
+    });
+    child.stderr?.on("data", (chunk: string | Buffer) => {
+      process.stderr.write(chunk);
+    });
     child.on("error", (error) => {
       resolve({ ok: false, message: error.message });
     });
@@ -443,8 +461,26 @@ export interface RunUpdateOptions {
   ) => Promise<InstallResult>;
 }
 
-function isCheckOnly(args: string[]): boolean {
-  return args.includes("--check") || args.includes("--dry-run");
+type UpdateMode = "check" | "install";
+
+function parseUpdateArgs(args: string[], binName: string): UpdateMode {
+  if (args.length === 0) {
+    return "install";
+  }
+
+  if (args.length === 1 && (args[0] === "--check" || args[0] === "--dry-run")) {
+    return "check";
+  }
+
+  const unknown = args.find((arg) => arg !== "--check" && arg !== "--dry-run");
+  throw new AxiError(
+    unknown ? `Unknown update option: ${unknown}` : "Invalid update arguments",
+    "VALIDATION_ERROR",
+    [
+      `Run \`${binName} update --help\``,
+      `Use \`${binName} update --check\` to check without installing`,
+    ],
+  );
 }
 
 /**
@@ -455,9 +491,9 @@ function isCheckOnly(args: string[]): boolean {
 export async function runUpdate(
   options: RunUpdateOptions,
 ): Promise<AxiRenderable> {
-  const checkOnly = isCheckOnly(options.args);
   const invokedAs = options.invokedAs ?? process.argv[1];
   const binName = binNameFromArgv(invokedAs);
+  const mode = parseUpdateArgs(options.args, binName);
   const realpath = options.realpath ?? ((path: string) => realpathSync(path));
   const entry = resolveEntry(invokedAs, realpath);
 
@@ -494,7 +530,7 @@ export async function runUpdate(
   const latest = await fetchLatest(packageName);
   const available = isUpdateAvailable(current, latest);
 
-  if (checkOnly) {
+  if (mode === "check") {
     const output: AxiRenderable = {
       update: { package: packageName, current, latest, available },
     };

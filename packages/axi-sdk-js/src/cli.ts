@@ -169,7 +169,7 @@ async function runBuiltinUpdate<TContext>(
   stdout: { write: (chunk: string) => unknown },
   options: AxiCliOptions<TContext>,
 ): Promise<void> {
-  if (args.includes("--help")) {
+  if (args.length === 1 && args[0] === "--help") {
     stdout.write(builtinUpdateHelp());
     return;
   }

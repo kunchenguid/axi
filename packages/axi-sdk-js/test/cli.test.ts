@@ -396,6 +396,8 @@ describe("runAxiCli", () => {
 
     expect(stdout.write).toHaveBeenCalledWith("top help");
     const combined = stdout.write.mock.calls.map((call) => call[0]).join("");
+    expect(combined).toContain('top help\n"built-in":');
+    expect(combined).not.toContain('top help"built-in":');
     expect(combined).toContain("update");
     expect(combined).toContain("update --check");
   });

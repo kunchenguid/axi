@@ -210,7 +210,7 @@ export function detectInstallMethod(options: {
   }
 
   // npm global (also covers npm-installed-under-Homebrew-node).
-  if (path.includes("/lib/node_modules/")) {
+  if (isKnownNpmGlobalInstall(path, env)) {
     return { kind: "npm-global" };
   }
 
@@ -232,6 +232,91 @@ function isKnownPnpmGlobalStore(path: string): boolean {
     /\/\.local\/share\/pnpm\/global\/\d+\/\.pnpm\//.test(path) ||
     /\/AppData\/Local\/pnpm\/global\/\d+\/\.pnpm\//.test(path)
   );
+}
+
+function isKnownNpmGlobalInstall(
+  path: string,
+  env: NodeJS.ProcessEnv,
+): boolean {
+  return (
+    npmGlobalNodeModulesRoots(env).some((root) =>
+      isPathInsideRoot(path, root),
+    ) || isKnownVersionManagerNpmGlobal(path, env)
+  );
+}
+
+function npmGlobalNodeModulesRoots(env: NodeJS.ProcessEnv): string[] {
+  const roots = [
+    "/usr/local/lib/node_modules",
+    "/usr/lib/node_modules",
+    "/opt/homebrew/lib/node_modules",
+    "/opt/local/lib/node_modules",
+  ];
+  const prefixes = [
+    env.npm_config_prefix,
+    env.NPM_CONFIG_PREFIX,
+    env.PREFIX,
+  ];
+
+  for (const prefix of prefixes) {
+    const normalized = normalizePathRoot(prefix);
+    if (normalized) {
+      roots.push(`${normalized}/lib/node_modules`, `${normalized}/node_modules`);
+    }
+  }
+
+  const appData = normalizePathRoot(env.APPDATA);
+  if (appData) {
+    roots.push(`${appData}/npm/node_modules`);
+  }
+
+  const home = normalizePathRoot(env.HOME ?? env.USERPROFILE);
+  if (home) {
+    roots.push(
+      `${home}/.npm-global/lib/node_modules`,
+      `${home}/.npm-packages/lib/node_modules`,
+    );
+  }
+
+  return [...new Set(roots)];
+}
+
+function isKnownVersionManagerNpmGlobal(
+  path: string,
+  env: NodeJS.ProcessEnv,
+): boolean {
+  return versionManagerNodeRoots(env).some(
+    (root) =>
+      isPathInsideRoot(path, root) && path.includes("/lib/node_modules/"),
+  );
+}
+
+function versionManagerNodeRoots(env: NodeJS.ProcessEnv): string[] {
+  const roots: string[] = [];
+  const home = normalizePathRoot(env.HOME ?? env.USERPROFILE);
+
+  if (home) {
+    roots.push(
+      `${home}/.nvm/versions/node`,
+      `${home}/.local/share/fnm/node-versions`,
+      `${home}/.asdf/installs/nodejs`,
+      `${home}/.nodenv/versions`,
+      `${home}/.local/share/mise/installs/node`,
+      `${home}/.volta/tools/image/node`,
+    );
+  }
+
+  const nvmDir = normalizePathRoot(env.NVM_DIR);
+  if (nvmDir) {
+    roots.push(`${nvmDir}/versions/node`);
+  }
+
+  const fnmDir = normalizePathRoot(env.FNM_DIR);
+  if (fnmDir) {
+    roots.push(`${fnmDir}/node-versions`);
+  }
+
+  return [...new Set(roots)];
 }
 
 export interface UpgradePlan {

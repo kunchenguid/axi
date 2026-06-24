@@ -82,6 +82,12 @@ export async function runAxiCli<TContext = undefined>(
   if (argv.length === 1 && argv[0] === "--help") {
     stdout.write(options.topLevelHelp);
     if (!options.commands.update) {
+      if (
+        options.topLevelHelp.length > 0 &&
+        !options.topLevelHelp.endsWith("\n")
+      ) {
+        stdout.write("\n");
+      }
       stdout.write(builtinCommandsHelp());
     }
     return;

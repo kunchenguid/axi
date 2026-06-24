@@ -139,6 +139,25 @@ describe("detectInstallMethod", () => {
     ).toEqual({ kind: "npm-global" });
   });
 
+  it("does not treat project lib/node_modules paths as npm global installs", () => {
+    expect(
+      detectInstallMethod({
+        entry: "/Users/me/repo/lib/node_modules/gh-axi/dist/bin/gh-axi.js",
+        env: {},
+      }),
+    ).toEqual({ kind: "unknown" });
+  });
+
+  it("detects npm globals under configured version manager roots", () => {
+    expect(
+      detectInstallMethod({
+        entry:
+          "/Users/me/.nvm/versions/node/v24.13.1/lib/node_modules/gh-axi/dist/bin/gh-axi.js",
+        env: { HOME: "/Users/me" },
+      }),
+    ).toEqual({ kind: "npm-global" });
+  });
+
   it("detects pnpm global installs", () => {
     expect(
       detectInstallMethod({
@@ -426,6 +445,29 @@ describe("runUpdate", () => {
       update: "gh-axi upgraded 1.2.3 -> 1.3.0",
       command: "npm install -g gh-axi@latest",
     });
+  });
+
+  it("does not auto-install from local lib/node_modules project paths", async () => {
+    const runInstall = vi.fn();
+    const output = await runUpdate({
+      ...baseDeps,
+      args: [],
+      realpath: () => "/Users/me/repo/lib/node_modules/gh-axi/dist/bin/gh-axi.js",
+      fs: fakeFs({
+        "/Users/me/repo/lib/node_modules/gh-axi/package.json": JSON.stringify({
+          name: "gh-axi",
+          version: "1.2.3",
+        }),
+      }),
+      stdout,
+      fetchLatest: async () => "1.3.0",
+      runInstall,
+    });
+
+    expect(output).toMatchObject({
+      update: { action: "manual", run: "npm install -g gh-axi@latest" },
+    });
+    expect(runInstall).not.toHaveBeenCalled();
   });
 
   it("is print-only for npx installs", async () => {

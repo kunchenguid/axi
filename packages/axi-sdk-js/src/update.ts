@@ -253,16 +253,15 @@ function npmGlobalNodeModulesRoots(env: NodeJS.ProcessEnv): string[] {
     "/opt/homebrew/lib/node_modules",
     "/opt/local/lib/node_modules",
   ];
-  const prefixes = [
-    env.npm_config_prefix,
-    env.NPM_CONFIG_PREFIX,
-    env.PREFIX,
-  ];
+  const prefixes = [env.npm_config_prefix, env.NPM_CONFIG_PREFIX];
 
   for (const prefix of prefixes) {
     const normalized = normalizePathRoot(prefix);
     if (normalized) {
-      roots.push(`${normalized}/lib/node_modules`, `${normalized}/node_modules`);
+      roots.push(
+        `${normalized}/lib/node_modules`,
+        `${normalized}/node_modules`,
+      );
     }
   }
 
@@ -441,6 +440,8 @@ function notPublishedError(packageName: string): AxiError {
   );
 }
 
+class RegistryNotFoundError extends Error {}
+
 export interface FetchLatestOptions {
   fetchImpl?: FetchLike | null;
   npmView?: (packageName: string) => Promise<string | null>;
@@ -487,7 +488,7 @@ async function fetchRegistryVersion(
         return data.version;
       }
     } else if (response.status === 404) {
-      throw notPublishedError(packageName);
+      throw new RegistryNotFoundError();
     }
 
     return null;
@@ -507,6 +508,7 @@ export async function fetchLatestVersion(
     options.fetchImpl === undefined
       ? (globalThis.fetch as unknown as FetchLike | undefined)
       : (options.fetchImpl ?? undefined);
+  let registryNotFound = false;
 
   if (typeof fetchImpl === "function") {
     try {
@@ -519,7 +521,9 @@ export async function fetchLatestVersion(
         return version;
       }
     } catch (error) {
-      if (error instanceof AxiError) {
+      if (error instanceof RegistryNotFoundError) {
+        registryNotFound = true;
+      } else if (error instanceof AxiError) {
         throw error;
       }
       // Network/parse failure: fall through to the npm CLI fallback.
@@ -527,10 +531,15 @@ export async function fetchLatestVersion(
   }
 
   const viewed = await (
-    options.npmView ?? ((name: string) => npmViewVersion(name, options.platform))
+    options.npmView ??
+    ((name: string) => npmViewVersion(name, options.platform))
   )(packageName);
   if (viewed) {
     return viewed;
+  }
+
+  if (registryNotFound) {
+    throw notPublishedError(packageName);
   }
 
   throw new AxiError(
@@ -566,10 +575,14 @@ async function defaultRunInstall(
 
   return new Promise<InstallResult>((resolve) => {
     const [command, ...args] = argv;
-    const child = spawn(packageManagerExecutable(command, context.platform), args, {
-      stdio: ["ignore", "pipe", "pipe"],
-      shell: shouldUseWindowsPackageManagerShell(command, context.platform),
-    });
+    const child = spawn(
+      packageManagerExecutable(command, context.platform),
+      args,
+      {
+        stdio: ["ignore", "pipe", "pipe"],
+        shell: shouldUseWindowsPackageManagerShell(command, context.platform),
+      },
+    );
     child.stdout?.on("data", (chunk: string | Buffer) => {
       process.stderr.write(chunk);
     });
@@ -605,6 +618,47 @@ function resolveEntry(
   } catch {
     return invokedAs;
   }
+}
+
+function resolveInstalledVersion(
+  invokedAs: string | undefined,
+  realpath: (path: string) => string,
+  fs: IdentityFs,
+): string | undefined {
+  const installedEntry = resolveEntry(invokedAs, realpath);
+  return installedEntry
+    ? readNearestPackageJson(installedEntry, fs).version
+    : undefined;
+}
+
+function homebrewUpgradeOutput(options: {
+  packageName: string;
+  current: string;
+  latest: string;
+  installedVersion: string | undefined;
+  command: string;
+}): AxiRenderable {
+  const update: Record<string, unknown> = {
+    package: options.packageName,
+    previous: options.current,
+    latest: options.latest,
+  };
+
+  if (options.installedVersion) {
+    update.installed = options.installedVersion;
+    update.available = isUpdateAvailable(
+      options.installedVersion,
+      options.latest,
+    );
+  } else {
+    update.action = "upgrade-command-ran";
+    update.result = "installed version unknown";
+  }
+
+  return {
+    update,
+    command: options.command,
+  };
 }
 
 export interface RunUpdateOptions {
@@ -666,10 +720,9 @@ export async function runUpdate(
   const platform = options.platform ?? process.platform;
   const realpath = options.realpath ?? ((path: string) => realpathSync(path));
   const entry = resolveEntry(invokedAs, realpath);
+  const fs = options.fs ?? nodeFs;
 
-  const fromPackageJson = entry
-    ? readNearestPackageJson(entry, options.fs ?? nodeFs)
-    : {};
+  const fromPackageJson = entry ? readNearestPackageJson(entry, fs) : {};
   const packageName = options.packageName ?? fromPackageJson.packageName;
   const current = options.version ?? fromPackageJson.version;
 
@@ -748,6 +801,16 @@ export async function runUpdate(
       `Run \`${plan.command}\` manually`,
       ...(result.message ? [result.message] : []),
     ]);
+  }
+
+  if (method.kind === "homebrew") {
+    return homebrewUpgradeOutput({
+      packageName,
+      current,
+      latest,
+      installedVersion: resolveInstalledVersion(invokedAs, realpath, fs),
+      command: plan.command,
+    });
   }
 
   return {

@@ -148,6 +148,15 @@ describe("detectInstallMethod", () => {
     ).toEqual({ kind: "unknown" });
   });
 
+  it("does not trust generic PREFIX as an npm global root", () => {
+    expect(
+      detectInstallMethod({
+        entry: "/Users/me/repo/node_modules/gh-axi/dist/bin/gh-axi.js",
+        env: { PREFIX: "/Users/me/repo" },
+      }),
+    ).toEqual({ kind: "unknown" });
+  });
+
   it("detects npm globals under configured version manager roots", () => {
     expect(
       detectInstallMethod({
@@ -365,7 +374,7 @@ describe("fetchLatestVersion", () => {
     expect(npmView).toHaveBeenCalledWith("gh-axi");
   });
 
-  it("throws a not-published AxiError on 404 without falling back", async () => {
+  it("falls back to npm view on registry 404", async () => {
     const fetchImpl = vi.fn(async () => ({
       ok: false,
       status: 404,
@@ -375,11 +384,25 @@ describe("fetchLatestVersion", () => {
 
     await expect(
       fetchLatestVersion("ghost-axi", { fetchImpl, npmView }),
+    ).resolves.toBe("9.9.9");
+    expect(npmView).toHaveBeenCalledWith("ghost-axi");
+  });
+
+  it("throws a not-published AxiError when registry and npm view miss", async () => {
+    const fetchImpl = vi.fn(async () => ({
+      ok: false,
+      status: 404,
+      json: async () => ({}),
+    }));
+    const npmView = vi.fn(async () => null);
+
+    await expect(
+      fetchLatestVersion("ghost-axi", { fetchImpl, npmView }),
     ).rejects.toMatchObject({
       code: "UPDATE_ERROR",
       message: expect.stringContaining("not published"),
     });
-    expect(npmView).not.toHaveBeenCalled();
+    expect(npmView).toHaveBeenCalledWith("ghost-axi");
   });
 
   it("throws a network AxiError when both paths fail", async () => {
@@ -508,13 +531,38 @@ describe("runUpdate", () => {
     const output = await runUpdate({
       ...baseDeps,
       args: [],
-      realpath: () => "/Users/me/repo/lib/node_modules/gh-axi/dist/bin/gh-axi.js",
+      realpath: () =>
+        "/Users/me/repo/lib/node_modules/gh-axi/dist/bin/gh-axi.js",
       fs: fakeFs({
         "/Users/me/repo/lib/node_modules/gh-axi/package.json": JSON.stringify({
           name: "gh-axi",
           version: "1.2.3",
         }),
       }),
+      stdout,
+      fetchLatest: async () => "1.3.0",
+      runInstall,
+    });
+
+    expect(output).toMatchObject({
+      update: { action: "manual", run: "npm install -g gh-axi@latest" },
+    });
+    expect(runInstall).not.toHaveBeenCalled();
+  });
+
+  it("does not auto-install local dependencies under generic PREFIX", async () => {
+    const runInstall = vi.fn();
+    const output = await runUpdate({
+      ...baseDeps,
+      args: [],
+      realpath: () => "/Users/me/repo/node_modules/gh-axi/dist/bin/gh-axi.js",
+      fs: fakeFs({
+        "/Users/me/repo/node_modules/gh-axi/package.json": JSON.stringify({
+          name: "gh-axi",
+          version: "1.2.3",
+        }),
+      }),
+      env: { PREFIX: "/Users/me/repo" },
       stdout,
       fetchLatest: async () => "1.3.0",
       runInstall,
@@ -559,6 +607,86 @@ describe("runUpdate", () => {
 
     expect(error).toBeInstanceOf(AxiError);
     expect((error as AxiError).code).toBe("UPDATE_ERROR");
+  });
+
+  it("reports the re-resolved Homebrew version after upgrade", async () => {
+    const runInstall = vi.fn(
+      async (): Promise<InstallResult> => ({ ok: true }),
+    );
+    const realpath = vi
+      .fn()
+      .mockReturnValueOnce(
+        "/opt/homebrew/Cellar/gh-axi/1.2.3/libexec/lib/node_modules/gh-axi/dist/bin/gh-axi.js",
+      )
+      .mockReturnValueOnce(
+        "/opt/homebrew/Cellar/gh-axi/1.2.4/libexec/lib/node_modules/gh-axi/dist/bin/gh-axi.js",
+      );
+
+    const output = await runUpdate({
+      ...baseDeps,
+      args: [],
+      invokedAs: "/opt/homebrew/bin/gh-axi",
+      realpath,
+      fs: fakeFs({
+        "/opt/homebrew/Cellar/gh-axi/1.2.3/libexec/lib/node_modules/gh-axi/package.json":
+          JSON.stringify({ name: "gh-axi", version: "1.2.3" }),
+        "/opt/homebrew/Cellar/gh-axi/1.2.4/libexec/lib/node_modules/gh-axi/package.json":
+          JSON.stringify({ name: "gh-axi", version: "1.2.4" }),
+      }),
+      env: {},
+      stdout,
+      fetchLatest: async () => "1.3.0",
+      runInstall,
+    });
+
+    const plan = runInstall.mock.calls[0]?.[0] as UpgradePlan;
+    expect(plan.command).toBe("brew upgrade gh-axi");
+    expect(output).toMatchObject({
+      update: {
+        package: "gh-axi",
+        previous: "1.2.3",
+        installed: "1.2.4",
+        latest: "1.3.0",
+        available: true,
+      },
+      command: "brew upgrade gh-axi",
+    });
+  });
+
+  it("does not claim a Homebrew result version when it cannot re-resolve it", async () => {
+    const output = await runUpdate({
+      ...baseDeps,
+      args: [],
+      invokedAs: "/opt/homebrew/bin/gh-axi",
+      realpath: vi
+        .fn()
+        .mockReturnValueOnce(
+          "/opt/homebrew/Cellar/gh-axi/1.2.3/libexec/lib/node_modules/gh-axi/dist/bin/gh-axi.js",
+        )
+        .mockReturnValueOnce("/opt/homebrew/bin/gh-axi"),
+      fs: fakeFs({
+        "/opt/homebrew/Cellar/gh-axi/1.2.3/libexec/lib/node_modules/gh-axi/package.json":
+          JSON.stringify({ name: "gh-axi", version: "1.2.3" }),
+      }),
+      env: {},
+      stdout,
+      fetchLatest: async () => "1.3.0",
+      runInstall: async () => ({ ok: true }),
+    });
+
+    expect(output).toMatchObject({
+      update: {
+        package: "gh-axi",
+        previous: "1.2.3",
+        latest: "1.3.0",
+        action: "upgrade-command-ran",
+        result: "installed version unknown",
+      },
+      command: "brew upgrade gh-axi",
+    });
+    expect(output).not.toMatchObject({
+      update: { installed: expect.any(String) },
+    });
   });
 
   it("raises an AxiError when the package name cannot be resolved", async () => {

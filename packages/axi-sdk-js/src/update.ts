@@ -9,6 +9,7 @@ import type { AxiRenderable } from "./output.js";
 const execFileAsync = promisify(execFile);
 
 const REGISTRY_BASE = "https://registry.npmjs.org";
+const REGISTRY_FETCH_TIMEOUT_MS = 20_000;
 
 /**
  * Minimal `fetch`-like shape so registry lookups stay decoupled from the global
@@ -16,7 +17,7 @@ const REGISTRY_BASE = "https://registry.npmjs.org";
  */
 export type FetchLike = (
   input: string,
-  init?: { headers?: Record<string, string> },
+  init?: { headers?: Record<string, string>; signal?: AbortSignal },
 ) => Promise<{
   ok: boolean;
   status: number;
@@ -378,12 +379,42 @@ export function planUpgrade(
   }
 }
 
-async function npmViewVersion(packageName: string): Promise<string | null> {
+function packageManagerExecutable(
+  command: string,
+  platform: NodeJS.Platform,
+): string {
+  if (
+    platform === "win32" &&
+    (command === "npm" || command === "pnpm" || command === "npx")
+  ) {
+    return `${command}.cmd`;
+  }
+  return command;
+}
+
+function shouldUseWindowsPackageManagerShell(
+  command: string,
+  platform: NodeJS.Platform,
+): boolean {
+  return (
+    platform === "win32" &&
+    (command === "npm" || command === "pnpm" || command === "npx")
+  );
+}
+
+async function npmViewVersion(
+  packageName: string,
+  platform: NodeJS.Platform = process.platform,
+): Promise<string | null> {
   try {
+    const command = packageManagerExecutable("npm", platform);
     const { stdout } = await execFileAsync(
-      "npm",
+      command,
       ["view", packageName, "version"],
-      { timeout: 20_000 },
+      {
+        timeout: 20_000,
+        shell: shouldUseWindowsPackageManagerShell("npm", platform),
+      },
     );
     const version = stdout.trim();
     return version.length > 0 ? version : null;
@@ -413,6 +444,54 @@ function notPublishedError(packageName: string): AxiError {
 export interface FetchLatestOptions {
   fetchImpl?: FetchLike | null;
   npmView?: (packageName: string) => Promise<string | null>;
+  fetchTimeoutMs?: number;
+  platform?: NodeJS.Platform;
+}
+
+async function withRegistryTimeout<T>(
+  timeoutMs: number,
+  operation: (signal: AbortSignal) => Promise<T>,
+): Promise<T> {
+  const controller = new AbortController();
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  const timeout = new Promise<never>((_resolve, reject) => {
+    timer = setTimeout(() => {
+      controller.abort();
+      reject(new Error(`Registry fetch timed out after ${timeoutMs}ms`));
+    }, timeoutMs);
+    timer.unref?.();
+  });
+
+  try {
+    return await Promise.race([operation(controller.signal), timeout]);
+  } finally {
+    if (timer) {
+      clearTimeout(timer);
+    }
+  }
+}
+
+async function fetchRegistryVersion(
+  fetchImpl: FetchLike,
+  packageName: string,
+  timeoutMs: number,
+): Promise<string | null> {
+  return withRegistryTimeout(timeoutMs, async (signal) => {
+    const response = await fetchImpl(
+      `${REGISTRY_BASE}/${registryPath(packageName)}/latest`,
+      { headers: { accept: "application/json" }, signal },
+    );
+    if (response.ok) {
+      const data = (await response.json()) as { version?: unknown };
+      if (typeof data.version === "string" && data.version.length > 0) {
+        return data.version;
+      }
+    } else if (response.status === 404) {
+      throw notPublishedError(packageName);
+    }
+
+    return null;
+  });
 }
 
 /**
@@ -431,17 +510,13 @@ export async function fetchLatestVersion(
 
   if (typeof fetchImpl === "function") {
     try {
-      const response = await fetchImpl(
-        `${REGISTRY_BASE}/${registryPath(packageName)}/latest`,
-        { headers: { accept: "application/json" } },
+      const version = await fetchRegistryVersion(
+        fetchImpl,
+        packageName,
+        options.fetchTimeoutMs ?? REGISTRY_FETCH_TIMEOUT_MS,
       );
-      if (response.ok) {
-        const data = (await response.json()) as { version?: unknown };
-        if (typeof data.version === "string" && data.version.length > 0) {
-          return data.version;
-        }
-      } else if (response.status === 404) {
-        throw notPublishedError(packageName);
+      if (version) {
+        return version;
       }
     } catch (error) {
       if (error instanceof AxiError) {
@@ -451,7 +526,9 @@ export async function fetchLatestVersion(
     }
   }
 
-  const viewed = await (options.npmView ?? npmViewVersion)(packageName);
+  const viewed = await (
+    options.npmView ?? ((name: string) => npmViewVersion(name, options.platform))
+  )(packageName);
   if (viewed) {
     return viewed;
   }
@@ -471,9 +548,14 @@ export interface InstallResult {
   message?: string;
 }
 
+export interface RunInstallContext {
+  platform: NodeJS.Platform;
+}
+
 async function defaultRunInstall(
   plan: UpgradePlan,
   stdout: { write: (chunk: string) => unknown },
+  context: RunInstallContext,
 ): Promise<InstallResult> {
   const argv = plan.argv;
   if (!argv || argv.length === 0) {
@@ -484,9 +566,9 @@ async function defaultRunInstall(
 
   return new Promise<InstallResult>((resolve) => {
     const [command, ...args] = argv;
-    const child = spawn(command, args, {
+    const child = spawn(packageManagerExecutable(command, context.platform), args, {
       stdio: ["ignore", "pipe", "pipe"],
-      shell: false,
+      shell: shouldUseWindowsPackageManagerShell(command, context.platform),
     });
     child.stdout?.on("data", (chunk: string | Buffer) => {
       process.stderr.write(chunk);
@@ -543,7 +625,9 @@ export interface RunUpdateOptions {
   runInstall?: (
     plan: UpgradePlan,
     stdout: { write: (chunk: string) => unknown },
+    context: RunInstallContext,
   ) => Promise<InstallResult>;
+  platform?: NodeJS.Platform;
 }
 
 type UpdateMode = "check" | "install";
@@ -579,6 +663,7 @@ export async function runUpdate(
   const invokedAs = options.invokedAs ?? process.argv[1];
   const binName = binNameFromArgv(invokedAs);
   const mode = parseUpdateArgs(options.args, binName);
+  const platform = options.platform ?? process.platform;
   const realpath = options.realpath ?? ((path: string) => realpathSync(path));
   const entry = resolveEntry(invokedAs, realpath);
 
@@ -611,7 +696,8 @@ export async function runUpdate(
   }
 
   const fetchLatest =
-    options.fetchLatest ?? ((name: string) => fetchLatestVersion(name));
+    options.fetchLatest ??
+    ((name: string) => fetchLatestVersion(name, { platform }));
   const latest = await fetchLatest(packageName);
   const available = isUpdateAvailable(current, latest);
 
@@ -656,7 +742,7 @@ export async function runUpdate(
   }
 
   const runInstall = options.runInstall ?? defaultRunInstall;
-  const result = await runInstall(plan, options.stdout);
+  const result = await runInstall(plan, options.stdout, { platform });
   if (!result.ok) {
     throw new AxiError(`Failed to upgrade ${packageName}`, "UPDATE_ERROR", [
       `Run \`${plan.command}\` manually`,

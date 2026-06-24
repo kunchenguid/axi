@@ -279,7 +279,10 @@ describe("fetchLatestVersion", () => {
     );
     expect(fetchImpl).toHaveBeenCalledWith(
       "https://registry.npmjs.org/gh-axi/latest",
-      { headers: { accept: "application/json" } },
+      expect.objectContaining({
+        headers: { accept: "application/json" },
+        signal: expect.any(Object),
+      }),
     );
   });
 
@@ -293,7 +296,10 @@ describe("fetchLatestVersion", () => {
     await fetchLatestVersion("@scope/tool-axi", { fetchImpl });
     expect(fetchImpl).toHaveBeenCalledWith(
       "https://registry.npmjs.org/@scope%2ftool-axi/latest",
-      { headers: { accept: "application/json" } },
+      expect.objectContaining({
+        headers: { accept: "application/json" },
+        signal: expect.any(Object),
+      }),
     );
   });
 
@@ -305,6 +311,56 @@ describe("fetchLatestVersion", () => {
 
     await expect(
       fetchLatestVersion("gh-axi", { fetchImpl, npmView }),
+    ).resolves.toBe("3.1.4");
+    expect(npmView).toHaveBeenCalledWith("gh-axi");
+  });
+
+  it("aborts stalled registry fetches and falls back to npm view", async () => {
+    const fetchImpl = vi.fn(
+      async (_input: string, init?: { signal?: AbortSignal }) =>
+        new Promise<never>((_resolve, reject) => {
+          init?.signal?.addEventListener(
+            "abort",
+            () => reject(new Error("aborted")),
+            { once: true },
+          );
+        }),
+    );
+    const npmView = vi.fn(async () => "3.1.4");
+
+    await expect(
+      fetchLatestVersion("gh-axi", {
+        fetchImpl,
+        npmView,
+        fetchTimeoutMs: 1,
+      }),
+    ).resolves.toBe("3.1.4");
+    expect(npmView).toHaveBeenCalledWith("gh-axi");
+  });
+
+  it("aborts stalled registry response bodies and falls back to npm view", async () => {
+    const fetchImpl = vi.fn(
+      async (_input: string, init?: { signal?: AbortSignal }) => ({
+        ok: true,
+        status: 200,
+        json: async () =>
+          new Promise<never>((_resolve, reject) => {
+            init?.signal?.addEventListener(
+              "abort",
+              () => reject(new Error("aborted")),
+              { once: true },
+            );
+          }),
+      }),
+    );
+    const npmView = vi.fn(async () => "3.1.4");
+
+    await expect(
+      fetchLatestVersion("gh-axi", {
+        fetchImpl,
+        npmView,
+        fetchTimeoutMs: 1,
+      }),
     ).resolves.toBe("3.1.4");
     expect(npmView).toHaveBeenCalledWith("gh-axi");
   });
@@ -584,6 +640,75 @@ describe("default install runner", () => {
       });
     } finally {
       stderrWrite.mockRestore();
+      vi.doUnmock("node:child_process");
+      vi.resetModules();
+    }
+  });
+
+  it("runs Windows package-manager installs through command shims", async () => {
+    vi.resetModules();
+
+    const spawn = vi.fn(() => {
+      const child = new EventEmitter() as EventEmitter & {
+        stdout: EventEmitter;
+        stderr: EventEmitter;
+      };
+      child.stdout = new EventEmitter();
+      child.stderr = new EventEmitter();
+      queueMicrotask(() => {
+        child.emit("close", 0);
+      });
+      return child;
+    });
+    const execFile = vi.fn();
+    vi.doMock("node:child_process", () => ({ execFile, spawn }));
+    const stdout = { write: vi.fn(() => true) };
+
+    try {
+      const { runUpdate: runUpdateWithMockedSpawn } =
+        await import("../src/update.js");
+      await runUpdateWithMockedSpawn({
+        args: [],
+        stdout,
+        invokedAs: "C:/Users/me/AppData/Roaming/npm/gh-axi",
+        realpath: () =>
+          "C:/Users/me/AppData/Roaming/npm/node_modules/gh-axi/dist/bin/gh-axi.js",
+        fs: fakeFs({
+          "C:/Users/me/AppData/Roaming/npm/node_modules/gh-axi/package.json":
+            JSON.stringify({ name: "gh-axi", version: "1.2.3" }),
+        }),
+        env: { APPDATA: "C:/Users/me/AppData/Roaming" },
+        fetchLatest: async () => "1.3.0",
+        platform: "win32",
+      });
+      await runUpdateWithMockedSpawn({
+        args: [],
+        stdout,
+        invokedAs: "C:/Users/me/AppData/Local/pnpm/gh-axi",
+        realpath: () =>
+          "C:/Users/me/AppData/Local/pnpm/global/5/.pnpm/gh-axi@1.2.3/node_modules/gh-axi/dist/bin/gh-axi.js",
+        fs: fakeFs({
+          "C:/Users/me/AppData/Local/pnpm/global/5/.pnpm/gh-axi@1.2.3/node_modules/gh-axi/package.json":
+            JSON.stringify({ name: "gh-axi", version: "1.2.3" }),
+        }),
+        env: {},
+        fetchLatest: async () => "1.3.0",
+        platform: "win32",
+      });
+
+      expect(spawn).toHaveBeenNthCalledWith(
+        1,
+        "npm.cmd",
+        ["install", "-g", "gh-axi@latest"],
+        { stdio: ["ignore", "pipe", "pipe"], shell: true },
+      );
+      expect(spawn).toHaveBeenNthCalledWith(
+        2,
+        "pnpm.cmd",
+        ["add", "-g", "gh-axi@latest"],
+        { stdio: ["ignore", "pipe", "pipe"], shell: true },
+      );
+    } finally {
       vi.doUnmock("node:child_process");
       vi.resetModules();
     }

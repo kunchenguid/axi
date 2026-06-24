@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.8](https://github.com/kunchenguid/axi/compare/axi-sdk-js-v0.1.7...axi-sdk-js-v0.1.8) (2026-06-24)
+
+
+### Features
+
+* **axi-sdk-js:** add built-in self-update command ([#60](https://github.com/kunchenguid/axi/issues/60)) ([d6560fc](https://github.com/kunchenguid/axi/commit/d6560fca9e6dd8fdd9672bb8fa49e740ca86658f))
+
 ## [0.1.7](https://github.com/kunchenguid/axi/compare/axi-sdk-js-v0.1.6...axi-sdk-js-v0.1.7) (2026-05-23)
 
 

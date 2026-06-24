@@ -199,14 +199,13 @@ export function detectInstallMethod(options: {
     return { kind: "npx" };
   }
 
-  // Homebrew formula: the Cellar segment names the formula.
-  const cellar = path.match(/\/Cellar\/([^/]+)\//);
-  if (cellar) {
-    return { kind: "homebrew", formula: cellar[1] };
+  const homebrewFormula = homebrewFormulaFromPath(path, env);
+  if (homebrewFormula) {
+    return { kind: "homebrew", formula: homebrewFormula };
   }
 
   const pnpmHome = normalizePathRoot(env.PNPM_HOME);
-  if (isPathInsideRoot(path, pnpmHome) || isKnownPnpmGlobalStore(path)) {
+  if (isPathInsideRoot(path, pnpmHome) || isKnownPnpmGlobalStore(path, env)) {
     return { kind: "pnpm-global" };
   }
 
@@ -227,12 +226,77 @@ function isPathInsideRoot(path: string, root: string | undefined): boolean {
   return root !== undefined && (path === root || path.startsWith(`${root}/`));
 }
 
-function isKnownPnpmGlobalStore(path: string): boolean {
-  return (
-    /\/Library\/pnpm\/global\/\d+\/\.pnpm\//.test(path) ||
-    /\/\.local\/share\/pnpm\/global\/\d+\/\.pnpm\//.test(path) ||
-    /\/AppData\/Local\/pnpm\/global\/\d+\/\.pnpm\//.test(path)
-  );
+function homebrewFormulaFromPath(
+  path: string,
+  env: NodeJS.ProcessEnv,
+): string | null {
+  for (const root of homebrewCellarRoots(env)) {
+    if (!isPathInsideRoot(path, root)) {
+      continue;
+    }
+
+    const relative = path.slice(root.length).replace(/^\/+/, "");
+    const formula = relative.split("/")[0];
+    if (formula) {
+      return formula;
+    }
+  }
+
+  return null;
+}
+
+function homebrewCellarRoots(env: NodeJS.ProcessEnv): string[] {
+  const roots: string[] = [];
+  const explicitCellar = normalizePathRoot(env.HOMEBREW_CELLAR);
+  if (explicitCellar) {
+    roots.push(explicitCellar);
+  }
+
+  const prefixes = [
+    env.HOMEBREW_PREFIX,
+    "/opt/homebrew",
+    "/usr/local",
+    "/home/linuxbrew/.linuxbrew",
+  ];
+  for (const prefix of prefixes) {
+    const normalized = normalizePathRoot(prefix);
+    if (normalized) {
+      roots.push(`${normalized}/Cellar`);
+    }
+  }
+
+  return [...new Set(roots)];
+}
+
+function isKnownPnpmGlobalStore(
+  path: string,
+  env: NodeJS.ProcessEnv,
+): boolean {
+  return pnpmGlobalStoreRoots(env).some((root) => {
+    if (!isPathInsideRoot(path, root)) {
+      return false;
+    }
+
+    const relative = path.slice(root.length).replace(/^\/+/, "");
+    return /^\d+\/\.pnpm\//.test(relative);
+  });
+}
+
+function pnpmGlobalStoreRoots(env: NodeJS.ProcessEnv): string[] {
+  const roots: string[] = [];
+  const home = normalizePathRoot(env.HOME ?? env.USERPROFILE);
+  if (home) {
+    roots.push(`${home}/Library/pnpm/global`);
+    roots.push(`${home}/.local/share/pnpm/global`);
+    roots.push(`${home}/AppData/Local/pnpm/global`);
+  }
+
+  const localAppData = normalizePathRoot(env.LOCALAPPDATA);
+  if (localAppData) {
+    roots.push(`${localAppData}/pnpm/global`);
+  }
+
+  return [...new Set(roots)];
 }
 
 function isKnownNpmGlobalInstall(

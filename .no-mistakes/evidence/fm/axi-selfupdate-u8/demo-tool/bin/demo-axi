@@ -1,0 +1,28 @@
+#!/usr/bin/env node
+import { fileURLToPath } from "node:url";
+import { runAxiCli } from "../../../../../../packages/axi-sdk-js/src/index.js";
+
+process.argv[1] = fileURLToPath(import.meta.url);
+
+const latest = process.env.DEMO_AXI_LATEST ?? "0.1.0";
+globalThis.fetch = async () => ({
+  ok: true,
+  status: 200,
+  json: async () => ({ version: latest }),
+});
+
+const commands = {
+  status: async () => ({ status: "ok" }),
+};
+
+if (process.env.DEMO_AXI_OVERRIDE_UPDATE === "1") {
+  commands.update = async () => ({ update: "tool-owned update handler" });
+}
+
+await runAxiCli({
+  description: "Demo AXI tool with no SDK update wiring",
+  version: "0.1.0",
+  topLevelHelp: "usage: demo-axi <command>\ncommands[1]: status\n",
+  home: async () => ({ demo: "home" }),
+  commands,
+});

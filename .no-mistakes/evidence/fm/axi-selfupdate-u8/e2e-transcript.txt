@@ -1,0 +1,112 @@
+# AXI SDK built-in update end-to-end transcript
+
+Fixture package intentionally does not pass packageName and does not register an update command unless DEMO_AXI_OVERRIDE_UPDATE=1.
+The fixture is executed through vite-node so the transcript exercises packages/axi-sdk-js/src directly, with argv[1] normalized to the fixture entrypoint.
+
+## bare --help advertises the SDK-owned update command
+$ demo-axi --help
+# executed as: packages/axi-sdk-js/node_modules/.bin/vite-node .no-mistakes/evidence/fm/axi-selfupdate-u8/demo-tool/bin/demo-axi --help
+
+stdout:
+usage: demo-axi <command>
+commands[1]: status
+"built-in":
+  update: Upgrade `demo-axi` to the latest published version
+  "update --check": Report current vs latest without installing
+
+stderr:
+<empty>
+
+## update --help shows the built-in reference
+$ demo-axi update --help
+# executed as: packages/axi-sdk-js/node_modules/.bin/vite-node .no-mistakes/evidence/fm/axi-selfupdate-u8/demo-tool/bin/demo-axi update --help
+
+stdout:
+command: update
+description: Upgrade `demo-axi` to the latest published npm version
+flags:
+  "--check": Report current vs latest and exit without installing
+examples[2]: demo-axi update,demo-axi update --check
+
+stderr:
+<empty>
+
+## update --check reports current vs latest without installing
+$ DEMO_AXI_LATEST=0.2.0 demo-axi update --check
+# executed as: packages/axi-sdk-js/node_modules/.bin/vite-node .no-mistakes/evidence/fm/axi-selfupdate-u8/demo-tool/bin/demo-axi update --check
+
+stdout:
+update:
+  package: @no-mistakes/demo-axi-update
+  current: 0.1.0
+  latest: 0.2.0
+  available: true
+help[1]: Run `demo-axi update` to upgrade
+
+stderr:
+<empty>
+
+## update --dry-run is accepted as the check alias
+$ DEMO_AXI_LATEST=0.2.0 demo-axi update --dry-run
+# executed as: packages/axi-sdk-js/node_modules/.bin/vite-node .no-mistakes/evidence/fm/axi-selfupdate-u8/demo-tool/bin/demo-axi update --dry-run
+
+stdout:
+update:
+  package: @no-mistakes/demo-axi-update
+  current: 0.1.0
+  latest: 0.2.0
+  available: true
+help[1]: Run `demo-axi update` to upgrade
+
+stderr:
+<empty>
+
+## unknown install method prints the manual command instead of guessing
+$ DEMO_AXI_LATEST=0.2.0 demo-axi update
+# executed as: packages/axi-sdk-js/node_modules/.bin/vite-node .no-mistakes/evidence/fm/axi-selfupdate-u8/demo-tool/bin/demo-axi update
+
+stdout:
+update:
+  package: @no-mistakes/demo-axi-update
+  current: 0.1.0
+  latest: 0.2.0
+  available: true
+  action: manual
+  reason: Could not determine how this tool was installed
+  run: npm install -g @no-mistakes/demo-axi-update@latest
+help[1]: Run `npm install -g @no-mistakes/demo-axi-update@latest` to upgrade
+
+stderr:
+<empty>
+
+## already-latest update exits cleanly without installing
+$ DEMO_AXI_LATEST=0.1.0 demo-axi update
+# executed as: packages/axi-sdk-js/node_modules/.bin/vite-node .no-mistakes/evidence/fm/axi-selfupdate-u8/demo-tool/bin/demo-axi update
+
+stdout:
+update: @no-mistakes/demo-axi-update is already on the latest version (0.1.0)
+
+stderr:
+<empty>
+
+## a tool-owned update command suppresses the built-in help footer
+$ DEMO_AXI_OVERRIDE_UPDATE=1 demo-axi --help
+# executed as: packages/axi-sdk-js/node_modules/.bin/vite-node .no-mistakes/evidence/fm/axi-selfupdate-u8/demo-tool/bin/demo-axi --help
+
+stdout:
+usage: demo-axi <command>
+commands[1]: status
+
+stderr:
+<empty>
+
+## a tool-owned update command receives update dispatch
+$ DEMO_AXI_OVERRIDE_UPDATE=1 demo-axi update
+# executed as: packages/axi-sdk-js/node_modules/.bin/vite-node .no-mistakes/evidence/fm/axi-selfupdate-u8/demo-tool/bin/demo-axi update
+
+stdout:
+update: tool-owned update handler
+
+stderr:
+<empty>
+

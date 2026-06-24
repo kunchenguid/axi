@@ -56,6 +56,7 @@ await runAxiCli({
 ## Built-in self-update
 
 `runAxiCli()` reserves `update` as a built-in command, so every tool gains `<tool> update` and `<tool> update --check` with **zero per-tool code**.
+`<tool> update --dry-run` is accepted as an alias for `--check`.
 
 ```sh
 $ gh-axi update --check
@@ -77,12 +78,13 @@ How it works:
 - **Identity is auto-derived.** The package name and version are read from the nearest `package.json` (walking up from the realpath-resolved entrypoint). `version` from `runAxiCli()` is preferred when present. No wiring needed.
 - **The latest version comes from the registry.** It queries `https://registry.npmjs.org/<pkg>/latest`, falling back to `npm view <pkg> version`, and compares with proper semver. Network, registry, and not-found failures surface as structured `AxiError`s.
 - **The upgrade matches the install method**, detected from the entrypoint path and environment:
-  - npm global → `npm install -g <pkg>@latest`
-  - pnpm global → `pnpm add -g <pkg>@latest`
-  - Homebrew (`/Cellar/`) → `brew upgrade <formula>`
-  - npx / ephemeral cache → reports that `npx -y <tool>` already runs the latest (print-only)
-  - unknown → prints the recommended command without guessing (print-only)
+  - npm global -> `npm install -g <pkg>@latest`
+  - pnpm global -> `pnpm add -g <pkg>@latest`
+  - Homebrew (`/Cellar/`) -> `brew upgrade <formula>`
+  - npx / ephemeral cache -> reports that `npx -y <pkg>@latest` already runs the latest (print-only)
+  - unknown -> prints the recommended command without guessing (print-only)
 - **`update --check`** (a/k/a `--dry-run`) reports current vs latest and whether an update is available, installing nothing. When already on the latest version, `update` reports up-to-date and exits 0.
+- **Discoverability is SDK-owned.** Bare `--help` gets a compact built-in command footer when the tool has not registered its own `update`, and `<tool> update --help` shows the command reference.
 
 `update` is a **reserved command name**. A tool that registers its own `update` in `commands` keeps full control - the built-in never shadows it. Pass `packageName` to `runAxiCli()` only as an escape hatch when the package name cannot be derived from `package.json`:
 
@@ -109,7 +111,11 @@ Most AXI authors should not need these directly.
 | API                                      | Description                                                                                     |
 | ---------------------------------------- | ----------------------------------------------------------------------------------------------- |
 | `AxiError`                               | Throw structured AXI errors from command handlers                                               |
+| `RESERVED_COMMANDS`                      | SDK-owned built-in command names, currently `update`                                            |
 | `runUpdate()`                            | The built-in self-update flow (registry lookup, install-method detection, upgrade)              |
+| `fetchLatestVersion()`                   | Resolve the latest npm version through the registry endpoint with an `npm view` fallback        |
+| `detectInstallMethod()`, `planUpgrade()` | Inspect an entrypoint path and map it to the upgrade command the built-in updater would use     |
+| `compareSemver()`, `isUpdateAvailable()` | Semver helpers used by the updater, including prerelease ordering                               |
 | `installSessionStartHooks()`             | Install or repair Claude Code hooks, Codex hooks, and OpenCode ambient context plugins directly |
 | `resolvePortableHookCommand()`           | Resolve a hook command to a safe binary name or absolute path                                   |
 | `PortableHookCommandContext`             | Context for resolving portable hook commands                                                    |

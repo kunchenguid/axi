@@ -1,0 +1,8 @@
+{
+  "name": "@no-mistakes/demo-axi-update",
+  "version": "9.9.9",
+  "type": "module",
+  "bin": {
+    "demo-axi": "./bin/demo-axi"
+  }
+}

@@ -24,6 +24,7 @@ export type FetchLike = (
   json: () => Promise<unknown>;
 }>;
 
+/** Structured semver components returned by `parseSemver()`. */
 export interface ParsedSemver {
   major: number;
   minor: number;
@@ -111,12 +112,17 @@ export function isUpdateAvailable(current: string, latest: string): boolean {
   return compareSemver(latest, current) > 0;
 }
 
+/** Package metadata resolved from the nearest named `package.json`. */
 export interface PackageIdentity {
+  /** npm package name, when a named package.json was found. */
   packageName?: string;
+  /** package.json version, when declared. */
   version?: string;
+  /** Absolute path to the package.json that supplied the identity. */
   packageJsonPath?: string;
 }
 
+/** Small filesystem seam used by updater tests and custom embedders. */
 export interface IdentityFs {
   existsSync: (path: string) => boolean;
   readFileSync: (path: string, encoding: "utf-8") => string;
@@ -170,6 +176,7 @@ export function readNearestPackageJson(
   return {};
 }
 
+/** Installation source inferred from the realpath-resolved CLI entrypoint. */
 export type InstallMethod =
   | { kind: "npm-global" }
   | { kind: "pnpm-global" }
@@ -268,10 +275,7 @@ function homebrewCellarRoots(env: NodeJS.ProcessEnv): string[] {
   return [...new Set(roots)];
 }
 
-function isKnownPnpmGlobalStore(
-  path: string,
-  env: NodeJS.ProcessEnv,
-): boolean {
+function isKnownPnpmGlobalStore(path: string, env: NodeJS.ProcessEnv): boolean {
   return pnpmGlobalStoreRoots(env).some((root) => {
     if (!isPathInsideRoot(path, root)) {
       return false;
@@ -383,6 +387,7 @@ function versionManagerNodeRoots(env: NodeJS.ProcessEnv): string[] {
   return [...new Set(roots)];
 }
 
+/** Upgrade command selected for a detected install method. */
 export interface UpgradePlan {
   method: InstallMethod["kind"];
   /** Human-readable command, used both for announcing and print-only output. */
@@ -506,10 +511,15 @@ function notPublishedError(packageName: string): AxiError {
 
 class RegistryNotFoundError extends Error {}
 
+/** Injection points for fetching the latest published npm version. */
 export interface FetchLatestOptions {
+  /** Custom fetch implementation. Pass `null` to skip HTTP and use npm only. */
   fetchImpl?: FetchLike | null;
+  /** Custom `npm view` fallback. */
   npmView?: (packageName: string) => Promise<string | null>;
+  /** Registry HTTP timeout in milliseconds. */
   fetchTimeoutMs?: number;
+  /** Platform used when invoking npm through the fallback path. */
   platform?: NodeJS.Platform;
 }
 
@@ -616,11 +626,13 @@ export async function fetchLatestVersion(
   );
 }
 
+/** Result returned by the install runner used by `runUpdate()`. */
 export interface InstallResult {
   ok: boolean;
   message?: string;
 }
 
+/** Runtime context passed to a custom install runner. */
 export interface RunInstallContext {
   platform: NodeJS.Platform;
 }
@@ -725,26 +737,34 @@ function homebrewUpgradeOutput(options: {
   };
 }
 
+/** Options for invoking the built-in self-update flow directly. */
 export interface RunUpdateOptions {
   /** Args after the `update` command (e.g. `["--check"]`). */
   args: string[];
+  /** Output stream used for the `running:` announcement. */
   stdout: { write: (chunk: string) => unknown };
   /** Explicit npm package name override (escape hatch). */
   packageName?: string;
   /** Current version, normally `options.version` from `runAxiCli`. */
   version?: string;
 
-  // Injectable seams (default to real implementations).
+  /** CLI entrypoint path, normally `process.argv[1]`. */
   invokedAs?: string;
+  /** Environment used for install-method detection. */
   env?: NodeJS.ProcessEnv;
+  /** Realpath resolver for the invoked entrypoint. */
   realpath?: (path: string) => string;
+  /** Filesystem seam used to read package metadata. */
   fs?: IdentityFs;
+  /** Latest-version resolver. */
   fetchLatest?: (packageName: string) => Promise<string>;
+  /** Installer seam. Defaults to spawning the planned package-manager command. */
   runInstall?: (
     plan: UpgradePlan,
     stdout: { write: (chunk: string) => unknown },
     context: RunInstallContext,
   ) => Promise<InstallResult>;
+  /** Platform used for package-manager command shims. */
   platform?: NodeJS.Platform;
 }
 

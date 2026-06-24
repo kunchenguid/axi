@@ -8,12 +8,27 @@ const { installSessionStartHooks } = vi.hoisted(() => ({
   installSessionStartHooks: vi.fn(),
 }));
 
+const { runUpdate } = vi.hoisted(() => ({
+  runUpdate: vi.fn(async () => ({ update: "mock update output" })),
+}));
+
 vi.mock("../src/hooks.js", async () => {
   const actual =
     await vi.importActual<typeof import("../src/hooks.js")>("../src/hooks.js");
   return {
     ...actual,
     installSessionStartHooks,
+  };
+});
+
+vi.mock("../src/update.js", async () => {
+  const actual =
+    await vi.importActual<typeof import("../src/update.js")>(
+      "../src/update.js",
+    );
+  return {
+    ...actual,
+    runUpdate,
   };
 });
 
@@ -305,6 +320,100 @@ describe("runAxiCli", () => {
     });
 
     expect(installSessionStartHooks).not.toHaveBeenCalled();
+  });
+
+  it("handles the built-in update command via runUpdate", async () => {
+    process.argv = ["node", "gh-axi", "update", "--check"];
+
+    await runAxiCli({
+      description: "Manage GitHub state",
+      version: "1.2.3",
+      packageName: "gh-axi",
+      topLevelHelp: "top help",
+      home,
+      commands: { issue },
+      stdout,
+    });
+
+    expect(runUpdate).toHaveBeenCalledTimes(1);
+    expect(runUpdate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        args: ["--check"],
+        version: "1.2.3",
+        packageName: "gh-axi",
+      }),
+    );
+    expect(String(stdout.write.mock.calls.at(-1)?.[0])).toContain(
+      "mock update output",
+    );
+  });
+
+  it("defers to a tool's own update command when registered", async () => {
+    process.argv = ["node", "gh-axi", "update"];
+    const update = vi.fn(async () => "tool update output");
+
+    await runAxiCli({
+      description: "Manage GitHub state",
+      topLevelHelp: "top help",
+      home,
+      commands: { issue, update },
+      stdout,
+    });
+
+    expect(update).toHaveBeenCalledTimes(1);
+    expect(runUpdate).not.toHaveBeenCalled();
+    expect(stdout.write).toHaveBeenCalledWith("tool update output\n");
+  });
+
+  it("shows built-in update help without running the upgrade", async () => {
+    process.argv = ["node", "gh-axi", "update", "--help"];
+
+    await runAxiCli({
+      description: "Manage GitHub state",
+      version: "1.2.3",
+      topLevelHelp: "top help",
+      home,
+      commands: { issue },
+      stdout,
+    });
+
+    expect(runUpdate).not.toHaveBeenCalled();
+    expect(String(stdout.write.mock.calls[0]?.[0])).toContain(
+      "command: update",
+    );
+  });
+
+  it("advertises the built-in update command in bare --help", async () => {
+    process.argv = ["node", "gh-axi", "--help"];
+
+    await runAxiCli({
+      description: "Manage GitHub state",
+      topLevelHelp: "top help",
+      home,
+      commands: { issue },
+      stdout,
+    });
+
+    expect(stdout.write).toHaveBeenCalledWith("top help");
+    const combined = stdout.write.mock.calls.map((call) => call[0]).join("");
+    expect(combined).toContain("update");
+    expect(combined).toContain("update --check");
+  });
+
+  it("does not advertise the built-in update when a tool overrides it", async () => {
+    process.argv = ["node", "gh-axi", "--help"];
+    const update = vi.fn(async () => "tool update output");
+
+    await runAxiCli({
+      description: "Manage GitHub state",
+      topLevelHelp: "top help",
+      home,
+      commands: { issue, update },
+      stdout,
+    });
+
+    expect(stdout.write).toHaveBeenCalledTimes(1);
+    expect(stdout.write).toHaveBeenCalledWith("top help");
   });
 
   it("maps validation errors to exit code 2", async () => {

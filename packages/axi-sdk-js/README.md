@@ -19,6 +19,8 @@ If you want agent session context plumbing, wire `installSessionStartHooks()` in
 
 `runAxiCli()` assumes a command-first CLI shape: `<bin> <command> ...args ...flags`. Bare `--help` is still supported, but flags are not allowed before the top-level command.
 
+Every tool built on `runAxiCli()` also gets a built-in `update` self-update command for free (alongside `--help` and `-v`/`--version`). See [Built-in self-update](#built-in-self-update).
+
 If your executable boundary needs to normalize loader-specific arguments before dispatch, pass `argv` explicitly to `runAxiCli()` instead of relying on `process.argv.slice(2)`.
 
 ## Quick Start
@@ -51,13 +53,54 @@ await runAxiCli({
 });
 ```
 
+## Built-in self-update
+
+`runAxiCli()` reserves `update` as a built-in command, so every tool gains `<tool> update` and `<tool> update --check` with **zero per-tool code**.
+
+```sh
+$ gh-axi update --check
+update:
+  package: gh-axi
+  current: 1.2.3
+  latest: 1.3.0
+  available: true
+help[1]: Run `gh-axi update` to upgrade
+
+$ gh-axi update
+running: npm install -g gh-axi@latest
+update: gh-axi upgraded 1.2.3 -> 1.3.0
+command: npm install -g gh-axi@latest
+```
+
+How it works:
+
+- **Identity is auto-derived.** The package name and version are read from the nearest `package.json` (walking up from the realpath-resolved entrypoint). `version` from `runAxiCli()` is preferred when present. No wiring needed.
+- **The latest version comes from the registry.** It queries `https://registry.npmjs.org/<pkg>/latest`, falling back to `npm view <pkg> version`, and compares with proper semver. Network, registry, and not-found failures surface as structured `AxiError`s.
+- **The upgrade matches the install method**, detected from the entrypoint path and environment:
+  - npm global → `npm install -g <pkg>@latest`
+  - pnpm global → `pnpm add -g <pkg>@latest`
+  - Homebrew (`/Cellar/`) → `brew upgrade <formula>`
+  - npx / ephemeral cache → reports that `npx -y <tool>` already runs the latest (print-only)
+  - unknown → prints the recommended command without guessing (print-only)
+- **`update --check`** (a/k/a `--dry-run`) reports current vs latest and whether an update is available, installing nothing. When already on the latest version, `update` reports up-to-date and exits 0.
+
+`update` is a **reserved command name**. A tool that registers its own `update` in `commands` keeps full control - the built-in never shadows it. Pass `packageName` to `runAxiCli()` only as an escape hatch when the package name cannot be derived from `package.json`:
+
+```ts
+await runAxiCli({
+  // ...other options
+  version: "1.2.3",
+  packageName: "gh-axi", // optional override; normally auto-derived
+});
+```
+
 ## Reference
 
 `axi-sdk-js` is a library package. In normal use, `runAxiCli()` should be the main entry point.
 
-| API           | Description                                                                                                                                                                  |
-| ------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `runAxiCli()` | Shared runtime for command-first dispatch, bare `--help`/`--version` fast paths, lazy context resolution, home header injection, TOON serialization, and standardized errors |
+| API           | Description                                                                                                                                                                                    |
+| ------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `runAxiCli()` | Shared runtime for command-first dispatch, bare `--help`/`--version` fast paths, the built-in `update` command, lazy context resolution, home header injection, TOON serialization, and errors |
 
 ### Advanced Exports
 
@@ -66,6 +109,7 @@ Most AXI authors should not need these directly.
 | API                                      | Description                                                                                     |
 | ---------------------------------------- | ----------------------------------------------------------------------------------------------- |
 | `AxiError`                               | Throw structured AXI errors from command handlers                                               |
+| `runUpdate()`                            | The built-in self-update flow (registry lookup, install-method detection, upgrade)              |
 | `installSessionStartHooks()`             | Install or repair Claude Code hooks, Codex hooks, and OpenCode ambient context plugins directly |
 | `resolvePortableHookCommand()`           | Resolve a hook command to a safe binary name or absolute path                                   |
 | `PortableHookCommandContext`             | Context for resolving portable hook commands                                                    |

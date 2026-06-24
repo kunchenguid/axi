@@ -7,6 +7,13 @@ import {
   type AxiRenderable,
   type AxiStructuredOutput,
 } from "./output.js";
+import { runUpdate } from "./update.js";
+
+/**
+ * Command names reserved by the SDK as built-ins. A tool may shadow one by
+ * registering its own handler in `options.commands`.
+ */
+export const RESERVED_COMMANDS = ["update"] as const;
 
 type MaybePromise<T> = T | Promise<T>;
 
@@ -23,6 +30,11 @@ export interface AxiResolveContextInput {
 export interface AxiCliOptions<TContext = undefined> {
   description: string;
   version?: string;
+  /**
+   * npm package name override for the built-in `update` command. Defaults to the
+   * name resolved from the nearest `package.json`, so most tools never set it.
+   */
+  packageName?: string;
   argv?: string[];
   topLevelHelp: string;
   commands: Record<string, AxiCliCommand<TContext>>;
@@ -69,6 +81,9 @@ export async function runAxiCli<TContext = undefined>(
 
   if (argv.length === 1 && argv[0] === "--help") {
     stdout.write(options.topLevelHelp);
+    if (!options.commands.update) {
+      stdout.write(builtinCommandsHelp());
+    }
     return;
   }
 
@@ -102,6 +117,13 @@ export async function runAxiCli<TContext = undefined>(
   }
 
   const args = argv.slice(1);
+
+  // `update` is a reserved built-in. A tool may shadow it by registering its own
+  // handler; otherwise the SDK handles the self-update.
+  if (command === "update" && !options.commands.update) {
+    await runBuiltinUpdate(args, stdout, options);
+    return;
+  }
 
   if (args.includes("--help")) {
     const help = options.getCommandHelp?.(command);
@@ -140,6 +162,57 @@ async function runHandler<TContext>(
     stdout.write(formatted.output);
     process.exitCode = formatted.exitCode;
   }
+}
+
+async function runBuiltinUpdate<TContext>(
+  args: string[],
+  stdout: { write: (chunk: string) => unknown },
+  options: AxiCliOptions<TContext>,
+): Promise<void> {
+  if (args.includes("--help")) {
+    stdout.write(builtinUpdateHelp());
+    return;
+  }
+
+  try {
+    const output = await runUpdate({
+      args,
+      stdout,
+      packageName: options.packageName,
+      version: options.version,
+    });
+    stdout.write(`${renderOutput(output)}\n`);
+  } catch (error) {
+    const formatted = (options.formatError ?? defaultFormatError)(error);
+    stdout.write(formatted.output);
+    process.exitCode = formatted.exitCode;
+  }
+}
+
+function resolveBinName(): string {
+  return basename(process.argv[1] ?? "tool") || "tool";
+}
+
+function builtinCommandsHelp(): string {
+  const bin = resolveBinName();
+  return `${renderOutput({
+    "built-in": {
+      update: `Upgrade \`${bin}\` to the latest published version`,
+      "update --check": "Report current vs latest without installing",
+    },
+  })}\n`;
+}
+
+function builtinUpdateHelp(): string {
+  const bin = resolveBinName();
+  return `${renderOutput({
+    command: "update",
+    description: `Upgrade \`${bin}\` to the latest published npm version`,
+    flags: {
+      "--check": "Report current vs latest and exit without installing",
+    },
+    examples: [`${bin} update`, `${bin} update --check`],
+  })}\n`;
 }
 
 function renderLeadingFlagError(flag: string): string {

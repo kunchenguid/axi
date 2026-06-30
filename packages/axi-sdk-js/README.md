@@ -164,6 +164,8 @@ Claude Code and Codex receive native `SessionStart` hooks, while OpenCode receiv
 
 Hook commands use a plain binary name such as `gh-axi` only when that name contains the hook marker and `binaryNames` resolves through the current `PATH` to the same executable; otherwise they use the absolute `execPath`.
 
+On Windows, npm global bins are wrapper shims (`.cmd` files and extensionless Git Bash scripts) rather than symlinks, so the realpath match never succeeds. The resolver also parses each shim to recover the script it ultimately runs and matches that against the executable, so the plain binary name still works there.
+
 For custom wrappers, pass `binaryNames: ["my-axi"]` to `installSessionStartHooks()`.
 
 ## Development

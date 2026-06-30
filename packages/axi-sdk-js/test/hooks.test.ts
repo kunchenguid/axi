@@ -16,6 +16,7 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import {
   computeCodexConfigUpdate,
   computeSessionStartHookUpdate,
+  extractNpmShimScriptPath,
   installSessionStartHooks,
   resolvePortableHookCommand,
   shouldInstallHooksForNodeAxiExecPath,
@@ -304,6 +305,75 @@ describe("resolvePortableHookCommand", () => {
     const context = makeContext({ [exec]: exec });
     expect(resolvePortableHookCommand(exec, [], "gh-axi", context)).toBe(exec);
   });
+
+  it("returns the plain binary name when a shim wrapper targets the exec file", () => {
+    const exec = "/npm/node_modules/gh-axi/dist/bin/gh-axi.js";
+    const shim = join("/npm", "gh-axi");
+    const context = {
+      pathEntries: ["/npm"],
+      pathExtensions: ["", ".CMD"],
+      // npm shims are wrappers, so realpath equals the shim itself, never exec.
+      resolveRealPath: (p: string) => ({ [exec]: exec, [shim]: shim })[p],
+      resolveShimTarget: (p: string) => (p === shim ? exec : undefined),
+    };
+
+    expect(
+      resolvePortableHookCommand(exec, ["gh-axi"], "gh-axi", context),
+    ).toBe("gh-axi");
+  });
+
+  it("ignores a shim wrapper that targets a different install", () => {
+    const exec = "/src/gh-axi/dist/bin/gh-axi.js";
+    const shim = join("/npm", "gh-axi");
+    const context = {
+      pathEntries: ["/npm"],
+      pathExtensions: ["", ".CMD"],
+      resolveRealPath: (p: string) => ({ [exec]: exec, [shim]: shim })[p],
+      resolveShimTarget: (p: string) =>
+        p === shim ? "/other/gh-axi.js" : undefined,
+    };
+
+    expect(
+      resolvePortableHookCommand(exec, ["gh-axi"], "gh-axi", context),
+    ).toBe(exec);
+  });
+});
+
+describe("extractNpmShimScriptPath", () => {
+  it("reads the script reference from a Git Bash shim", () => {
+    const shim = [
+      "#!/bin/sh",
+      'basedir=$(dirname "$(echo "$0" | sed -e \'s,\\\\,/,g\')")',
+      'if [ -x "$basedir/node" ]; then',
+      '  exec "$basedir/node"  "$basedir/node_modules/gh-axi/dist/bin/gh-axi.js" "$@"',
+      "else",
+      '  exec node  "$basedir/node_modules/gh-axi/dist/bin/gh-axi.js" "$@"',
+      "fi",
+    ].join("\n");
+
+    expect(extractNpmShimScriptPath(shim)).toBe(
+      "node_modules/gh-axi/dist/bin/gh-axi.js",
+    );
+  });
+
+  it("reads the script reference from a Windows .cmd shim", () => {
+    const shim = [
+      "@ECHO off",
+      "SETLOCAL",
+      "SET dp0=%~dp0",
+      '"%_prog%"  "%dp0%\\node_modules\\gh-axi\\dist\\bin\\gh-axi.js" %*',
+    ].join("\r\n");
+
+    expect(extractNpmShimScriptPath(shim)).toBe(
+      "node_modules\\gh-axi\\dist\\bin\\gh-axi.js",
+    );
+  });
+
+  it("returns undefined when no script reference is present", () => {
+    expect(extractNpmShimScriptPath("#!/bin/sh\nexec node --version\n")).toBe(
+      undefined,
+    );
+  });
 });
 
 describe("shouldInstallHooksForNodeAxiExecPath", () => {
@@ -412,6 +482,43 @@ describe("installSessionStartHooks (portable command)", () => {
     const execFile = join(pkgBin, "gh-axi.js");
     writeFileSync(execFile, "// stub\n", "utf-8");
     symlinkSync(execFile, join(pathDir, "gh-axi"));
+
+    process.env.PATH = pathDir;
+
+    installSessionStartHooks({
+      marker: "gh-axi",
+      execPath: execFile,
+      binaryNames: ["gh-axi"],
+      homeDir: home,
+    });
+
+    const settings = JSON.parse(
+      readFileSync(join(home, ".claude", "settings.json"), "utf-8"),
+    );
+    expect(settings.hooks.SessionStart[0].hooks[0].command).toBe("gh-axi");
+  });
+
+  it("writes the plain binary name when a PATH npm wrapper shim targets the exec file", () => {
+    const home = join(tmp, "home");
+    const pathDir = join(tmp, "path-bin");
+    const pkgBin = join(pathDir, "node_modules", "gh-axi", "dist", "bin");
+    mkdirSync(home, { recursive: true });
+    mkdirSync(pkgBin, { recursive: true });
+
+    const execFile = join(pkgBin, "gh-axi.js");
+    writeFileSync(execFile, "// stub\n", "utf-8");
+
+    // npm installs an extensionless wrapper shim on PATH (not a symlink); Git
+    // Bash runs it and it execs the .js relative to its own directory.
+    writeFileSync(
+      join(pathDir, "gh-axi"),
+      [
+        "#!/bin/sh",
+        'basedir=$(dirname "$0")',
+        '  exec node  "$basedir/node_modules/gh-axi/dist/bin/gh-axi.js" "$@"',
+      ].join("\n"),
+      "utf-8",
+    );
 
     process.env.PATH = pathDir;
 

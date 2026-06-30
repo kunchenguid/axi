@@ -58,6 +58,7 @@ export interface PortableHookCommandContext {
   pathEntries: string[];
   pathExtensions: string[];
   resolveRealPath: (absolutePath: string) => string | undefined;
+  resolveShimTarget?: (shimPath: string) => string | undefined;
 }
 
 function isManagedHook(hook: HookEntry | undefined, marker: string): boolean {
@@ -379,6 +380,14 @@ export function resolvePortableHookCommand(
         if (resolvedCandidate && resolvedCandidate === resolvedExec) {
           return name;
         }
+
+        // npm global bins on Windows are wrapper shims, not symlinks, so the
+        // realpath check above never matches. Parse the shim to recover the
+        // script it ultimately runs and compare that instead.
+        const shimTarget = context.resolveShimTarget?.(candidate);
+        if (shimTarget && shimTarget === resolvedExec) {
+          return name;
+        }
       }
     }
   }
@@ -386,12 +395,30 @@ export function resolvePortableHookCommand(
   return execPath;
 }
 
+const NPM_SHIM_SCRIPT_PATTERNS = [
+  // Git Bash / POSIX shim: exec node "$basedir/node_modules/<pkg>/.../cli.js"
+  /"\$basedir\/([^"]+\.[cm]?js)"/,
+  // Windows .cmd shim: "%dp0%\node_modules\<pkg>\...\cli.js"
+  /%~?dp0%?[\\/]([^"\r\n]+\.[cm]?js)/i,
+];
+
+export function extractNpmShimScriptPath(content: string): string | undefined {
+  for (const pattern of NPM_SHIM_SCRIPT_PATTERNS) {
+    const match = content.match(pattern);
+    if (match?.[1]) {
+      return match[1];
+    }
+  }
+  return undefined;
+}
+
 function buildDefaultPortableCommandContext(): PortableHookCommandContext {
   const rawPath = process.env.PATH ?? process.env.Path ?? "";
   const pathEntries = rawPath.split(delimiter).filter(Boolean);
   const pathExtensions =
     process.platform === "win32"
-      ? (process.env.PATHEXT ?? ".COM;.EXE;.BAT;.CMD").split(";")
+      ? // Git Bash resolves the extensionless shim, which PATHEXT omits.
+        ["", ...(process.env.PATHEXT ?? ".COM;.EXE;.BAT;.CMD").split(";")]
       : [""];
   return {
     pathEntries,
@@ -403,6 +430,19 @@ function buildDefaultPortableCommandContext(): PortableHookCommandContext {
           return undefined;
         }
         return realpathSync(absolutePath);
+      } catch {
+        return undefined;
+      }
+    },
+    resolveShimTarget: (shimPath) => {
+      try {
+        const relative = extractNpmShimScriptPath(
+          readFileSync(shimPath, "utf-8"),
+        );
+        if (!relative) {
+          return undefined;
+        }
+        return realpathSync(resolve(dirname(shimPath), relative));
       } catch {
         return undefined;
       }

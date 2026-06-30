@@ -109,6 +109,7 @@ AXIs built and maintained by the community:
 | [`metabase-axi`](https://github.com/JarvusInnovations/metabase-axi)                                | Jarvus Innovations | Analytics / BI   | Query, explore, and export from Metabase over the shell - SQL/MBQL, saved questions, schema introspection, full-data export.       |
 | [`otter-axi`](https://github.com/JarvusInnovations/otter-axi)                                      | Jarvus Innovations | Meetings         | Find and pull Otter.ai meeting transcripts from the shell - wraps Otter.ai's hosted MCP server as a scriptable, headless CLI.      |
 | [`notion-axi`](https://github.com/maximebrmd/notion-axi)                                           | maximebrmd         | Notion           | Search, read, create, and update Notion pages and databases over the shell - token-efficient TOON output, PAT or integration auth. |
+| [`mobbin-axi`](https://github.com/intelligentrascal/mobbin-axi)                                     | intelligentrascal  | UI/UX Design     | Search screens, flows, and website sections by natural-language description from the Mobbin design pattern library. Token-efficient TOON output with reference screenshot downloads. |
 
 Built an AXI? Follow the [contributor workflow](CONTRIBUTING.md) to add it to this list.
 

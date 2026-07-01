@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.9](https://github.com/kunchenguid/axi/compare/axi-sdk-js-v0.1.8...axi-sdk-js-v0.1.9) (2026-07-01)
+
+
+### Bug Fixes
+
+* **axi-sdk-js:** resolve portable hook command from npm wrapper shims ([#67](https://github.com/kunchenguid/axi/issues/67)) ([eddde85](https://github.com/kunchenguid/axi/commit/eddde85bcd6035d2e1390596aff2af2daa10b1a3))
+
 ## [0.1.8](https://github.com/kunchenguid/axi/compare/axi-sdk-js-v0.1.7...axi-sdk-js-v0.1.8) (2026-06-24)
 
 

@@ -1,0 +1,36 @@
+{
+  "name": "linear-axi",
+  "version": "0.1.0",
+  "description": "AXI-style CLI for Linear issues, workflow states, and comments",
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kunchenguid/axi.git",
+    "directory": "packages/linear-axi"
+  },
+  "bin": {
+    "linear-axi": "./dist/index.js"
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist",
+    "LICENSE",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "prepublishOnly": "npm run build"
+  },
+  "dependencies": {
+    "axi-sdk-js": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "typescript": "^5.7.0"
+  },
+  "license": "MIT",
+  "engines": {
+    "node": ">=20"
+  }
+}

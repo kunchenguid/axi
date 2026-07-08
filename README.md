@@ -110,6 +110,7 @@ AXIs built and maintained by the community:
 | [`otter-axi`](https://github.com/JarvusInnovations/otter-axi)                                      | Jarvus Innovations | Meetings         | Find and pull Otter.ai meeting transcripts from the shell - wraps Otter.ai's hosted MCP server as a scriptable, headless CLI.      |
 | [`notion-axi`](https://github.com/maximebrmd/notion-axi)                                           | maximebrmd         | Notion           | Search, read, create, and update Notion pages and databases over the shell - token-efficient TOON output, PAT or integration auth. |
 | [`clickup-axi`](https://github.com/JanSuthacheeva/clickup-axi)                                     | JanSuthacheeva     | ClickUp          | List your open tasks, view a task with its newest comments inline, and change task status - truncation-aware, TOON-style output.   |
+| [`databricks-axi`](https://github.com/p33ves/databricks-axi)                                       | p33ves             | Databricks       | Run Databricks jobs, watch runs, and pull failure logs inline over the official databricks CLI - more domains coming soon.         |
 
 Built an AXI? Follow the [contributor workflow](CONTRIBUTING.md) to add it to this list.
 

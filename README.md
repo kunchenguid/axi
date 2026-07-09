@@ -113,6 +113,7 @@ AXIs built and maintained by the community:
 | [`clickup-axi`](https://github.com/JanSuthacheeva/clickup-axi)                                     | JanSuthacheeva     | ClickUp          | List your open tasks, view a task with its newest comments inline, and change task status - truncation-aware, TOON-style output.                             |
 | [`databricks-axi`](https://github.com/p33ves/databricks-axi)                                       | p33ves             | Databricks       | Run Databricks jobs, watch runs, and pull failure logs inline over the official databricks CLI - more domains coming soon.                                   |
 | [`aws-axi`](https://github.com/thatdudealso/aws-axi)                                               | thatdudealso       | AWS              | Discover, plan, provision, deploy, and inspect AWS services for hosting web, backend, database, and AI workloads through safe token-efficient CLI workflows. |
+| [`docker-axi`](https://github.com/thatdudealso/docker-axi)                                         | thatdudealso       | Docker           | Discover, build, run, debug, publish, inspect, and clean up Docker apps through safe token-efficient CLI workflows.                                          |
 
 Built an AXI? Follow the [contributor workflow](CONTRIBUTING.md) to add it to this list.
 

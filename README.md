@@ -142,7 +142,7 @@ AXIs built and maintained by the community:
 | [`redis-axi`](https://github.com/thatdudealso/redis-axi)                                           | thatdudealso       | Redis                 | Discover, inspect, query, export, import, maintain, and diagnose Redis databases through safe token-efficient CLI workflows.                                 |
 | [`celery-axi`](https://github.com/thatdudealso/celery-axi)                                         | thatdudealso       | Celery                | Discover, inspect, run, debug, monitor, schedule, control, and safely operate Celery task queues through token-efficient CLI workflows.                      |
 | [`cyber-mux`](https://github.com/cyberuni/cyber-mux)                                               | unional            | Terminal multiplexers | Open, send, read, focus, and close terminal panes across tmux, herdr, and WezTerm through one detection-driven contract with token-efficient output.         |
-| [`oracle-axi`](https://github.com/thatdudealso/oracle-axi)                                         | thatdudealso       | Oracle Database      | Discover, create, inspect, query, export, import, maintain, and diagnose Oracle databases through safe token-efficient CLI workflows.                         |
+| [`oracle-axi`](https://github.com/thatdudealso/oracle-axi)                                         | thatdudealso       | Oracle Database       | Discover, create, inspect, query, export, import, maintain, and diagnose Oracle databases through safe token-efficient CLI workflows.                        |
 
 <!-- generated:catalog-community:end -->
 

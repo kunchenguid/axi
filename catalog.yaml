@@ -141,3 +141,8 @@ community:
     author: unional
     domain: Terminal multiplexers
     description: "Open, send, read, focus, and close terminal panes across tmux, herdr, and WezTerm through one detection-driven contract with token-efficient output."
+  - name: oracle-axi
+    url: https://github.com/thatdudealso/oracle-axi
+    author: thatdudealso
+    domain: Oracle Database
+    description: "Discover, create, inspect, query, export, import, maintain, and diagnose Oracle databases through safe token-efficient CLI workflows."

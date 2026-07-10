@@ -68,7 +68,7 @@ export interface CapabilityPins {
 export interface PassthroughPathRule {
   method: HttpMethod;
   pattern: string;
-  decision: "deny";
+  decision: "allow";
 }
 
 export interface CapabilityPolicy {
@@ -204,6 +204,10 @@ const READ_METHODS = ["GET", "HEAD"] as const;
 const TOKEN_PATTERN = /^(?:[a-z][a-z0-9-]*|-{1,2}[A-Za-z][A-Za-z0-9-]*)$/;
 const FLAG_PATTERN = /^-{1,2}[A-Za-z][A-Za-z-]*$/;
 const SHA256_PATTERN = /^[a-f0-9]{64}$/;
+
+function unsupportedSchemaMessage(document: string, actual: unknown): string {
+  return `${document} schemaVersion ${String(actual)} is not supported; supported version: 1. Install an SDK version that supports schemaVersion ${String(actual)}, or restore and re-pin a supported v1 document.`;
+}
 
 function enumArray<T extends string>(
   value: unknown,
@@ -429,7 +433,7 @@ export function parseCapabilityManifest(input: unknown): CapabilityManifest {
   if (manifest.schemaVersion !== 1) {
     fail(
       "MANIFEST_SCHEMA_UNSUPPORTED",
-      `Capability manifest schemaVersion ${String(manifest.schemaVersion)} is not supported; supported version: 1.`,
+      unsupportedSchemaMessage("Capability manifest", manifest.schemaVersion),
       "manifest.schemaVersion",
     );
   }
@@ -518,7 +522,7 @@ export function parseCapabilityPolicy(input: unknown): CapabilityPolicy {
   if (policy.schemaVersion !== 1) {
     throw new CapabilityPolicyError(
       "POLICY_SCHEMA_UNSUPPORTED",
-      `Capability policy schemaVersion ${String(policy.schemaVersion)} is not supported; supported version: 1.`,
+      unsupportedSchemaMessage("Capability policy", policy.schemaVersion),
       { path: "policy.schemaVersion" },
     );
   }
@@ -595,9 +599,9 @@ export function parseCapabilityPolicy(input: unknown): CapabilityPolicy {
         policyFail(`${path}.method is not supported.`, `${path}.method`);
       }
       validatePathPattern(rule.pattern, `${path}.pattern`);
-      if (rule.decision !== "deny") {
+      if (rule.decision !== "allow") {
         policyFail(
-          `${path}.decision must be deny (path rules are restrict-only).`,
+          `${path}.decision must be allow (path rules are restrict-only allowlist entries).`,
           `${path}.decision`,
         );
       }
@@ -852,14 +856,17 @@ export function evaluateCapabilityPolicy(
         reason: "PASSTHROUGH_METHOD_DENIED",
       };
     }
-    const pathDenied =
-      resolution.endpoint !== undefined &&
-      policy.passthrough.paths?.some(
-        (rule) =>
-          rule.method === resolution.method &&
+    const methodPathRules = policy.passthrough.paths?.filter(
+      (rule) => rule.method === resolution.method,
+    );
+    if (
+      methodPathRules !== undefined &&
+      methodPathRules.length > 0 &&
+      (resolution.endpoint === undefined ||
+        !methodPathRules.some((rule) =>
           pathMatches(rule.pattern, resolution.endpoint as string),
-      );
-    if (pathDenied) {
+        ))
+    ) {
       return {
         ...resolution,
         decision: "deny",
@@ -888,7 +895,7 @@ function parsePublisherIdentityDocument(
   if (identity.schemaVersion !== 1) {
     throw new CapabilityPolicyError(
       "IDENTITY_SCHEMA_UNSUPPORTED",
-      `Publisher identity schemaVersion ${String(identity.schemaVersion)} is not supported; supported version: 1.`,
+      unsupportedSchemaMessage("Publisher identity", identity.schemaVersion),
     );
   }
   for (const key of Object.keys(identity)) {

@@ -43,9 +43,7 @@ const policy = {
       DELETE: "deny",
       HEAD: "allow",
     },
-    paths: [
-      { method: "GET", pattern: "projects/*/access_tokens", decision: "deny" },
-    ],
+    paths: [{ method: "GET", pattern: "projects/*", decision: "allow" }],
   },
 };
 
@@ -165,6 +163,19 @@ describe("capability document validation", () => {
 
     expect(parseCapabilityManifest(extended)).toEqual(extended);
   });
+
+  it("gives concrete remediation for an unsupported manifest schema", () => {
+    expect(() =>
+      parseCapabilityManifest({ ...manifest, schemaVersion: 7 }),
+    ).toThrowError(
+      expect.objectContaining({
+        code: "MANIFEST_SCHEMA_UNSUPPORTED",
+        message: expect.stringMatching(
+          /schemaVersion 7.*supported version: 1.*install an SDK.*restore and re-pin.*v1/i,
+        ),
+      }),
+    );
+  });
 });
 
 describe("capability policy validation", () => {
@@ -183,12 +194,12 @@ describe("capability policy validation", () => {
       },
     ],
     [
-      "path rule that could widen access",
+      "deny path rule",
       {
         ...policy,
         passthrough: {
           ...policy.passthrough,
-          paths: [{ method: "POST", pattern: "projects/*", decision: "allow" }],
+          paths: [{ method: "POST", pattern: "projects/*", decision: "deny" }],
         },
       },
     ],
@@ -198,12 +209,25 @@ describe("capability policy validation", () => {
         ...policy,
         passthrough: {
           ...policy.passthrough,
-          paths: [{ method: "GET", pattern: "projects/**", decision: "deny" }],
+          paths: [{ method: "GET", pattern: "projects/**", decision: "allow" }],
         },
       },
     ],
   ])("rejects malformed policy: %s", (_name, value) => {
     expect(() => parseCapabilityPolicy(value)).toThrow(CapabilityPolicyError);
+  });
+
+  it("gives concrete remediation for an unsupported policy schema", () => {
+    expect(() =>
+      parseCapabilityPolicy({ ...policy, schemaVersion: 9 }),
+    ).toThrowError(
+      expect.objectContaining({
+        code: "POLICY_SCHEMA_UNSUPPORTED",
+        message: expect.stringMatching(
+          /schemaVersion 9.*supported version: 1.*install an SDK.*restore and re-pin.*v1/i,
+        ),
+      }),
+    );
   });
 });
 
@@ -343,6 +367,40 @@ describe("evaluateCapabilityPolicy", () => {
       reason: "PASSTHROUGH_PATH_DENIED",
     });
   });
+
+  it("a mistyped path allowlist rule denies instead of granting", () => {
+    const typoPolicy = parseCapabilityPolicy({
+      ...policy,
+      passthrough: {
+        ...policy.passthrough,
+        paths: [{ method: "GET", pattern: "project/*", decision: "allow" }],
+      },
+    });
+    const request = resolveCapabilityInvocation(routingManifest, [
+      "api",
+      "projects/1",
+    ]);
+
+    expect(evaluateCapabilityPolicy(typoPolicy, request)).toMatchObject({
+      decision: "deny",
+      reason: "PASSTHROUGH_PATH_DENIED",
+    });
+  });
+
+  it("path allowlist rules cannot widen a denied method", () => {
+    const request = resolveCapabilityInvocation(routingManifest, [
+      "api",
+      "projects/1",
+      "--method=POST",
+    ]);
+
+    expect(
+      evaluateCapabilityPolicy(parseCapabilityPolicy(policy), request),
+    ).toMatchObject({
+      decision: "deny",
+      reason: "PASSTHROUGH_METHOD_DENIED",
+    });
+  });
 });
 
 describe("verifyCapabilityPins", () => {
@@ -409,6 +467,31 @@ describe("verifyCapabilityPins", () => {
       }),
     ).toThrowError(
       expect.objectContaining({ code: "PUBLISHER_IDENTITY_MISMATCH" }),
+    );
+  });
+
+  it("gives concrete remediation for an unsupported identity schema", () => {
+    const pinned = parseCapabilityPolicy({
+      ...policy,
+      pins: {
+        ...policy.pins,
+        manifestSha256: canonicalSha256(routingManifest),
+      },
+    });
+
+    expect(() =>
+      verifyCapabilityPins({
+        manifest: routingManifest,
+        policy: pinned,
+        identity: { ...identity, schemaVersion: 4 } as typeof identity,
+      }),
+    ).toThrowError(
+      expect.objectContaining({
+        code: "IDENTITY_SCHEMA_UNSUPPORTED",
+        message: expect.stringMatching(
+          /schemaVersion 4.*supported version: 1.*install an SDK.*restore and re-pin.*v1/i,
+        ),
+      }),
     );
   });
 });

@@ -507,10 +507,18 @@ function tokenResolvesProtectedBin(token: string, bin: string): boolean {
 
 const EMBEDDED_SHELL_WORD_SEPARATORS = /[\s;&|<>()`$]+/;
 
+function wordTargetsProtectedBin(word: string, bin: string): boolean {
+  if (tokenResolvesProtectedBin(word, bin)) return true;
+  const packageSpec = word.startsWith("--package=")
+    ? word.slice("--package=".length)
+    : word;
+  return packageSpec === bin || packageSpec.startsWith(`${bin}@`);
+}
+
 function tokenEmbedsProtectedBin(token: string, bin: string): boolean {
   return token
     .split(EMBEDDED_SHELL_WORD_SEPARATORS)
-    .some((word) => word.length > 0 && tokenResolvesProtectedBin(word, bin));
+    .some((word) => word.length > 0 && wordTargetsProtectedBin(word, bin));
 }
 
 function npxTargetsProtectedBin(tokens: string[], bin: string): boolean {
@@ -688,7 +696,7 @@ function tokenizeStaticShell(
       markCommandStart();
       continue;
     }
-    if ("()".includes(char) || "*?[]{}".includes(char)) {
+    if ("*?[]{}".includes(char)) {
       if (mode === "invocation") return undefined;
       finishToken();
       continue;

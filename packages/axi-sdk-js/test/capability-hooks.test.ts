@@ -625,6 +625,24 @@ describe("runClaudeCapabilityPreToolUse", () => {
       null,
     ],
     [
+      "env-prefixed version-qualified npx execution",
+      "TOKEN=x npx gl-axi-fixture@1.2.3 issue close 42",
+      "COMMAND_NOT_STANDALONE",
+      null,
+    ],
+    [
+      "version-qualified pnpm dlx execution",
+      "pnpm dlx gl-axi-fixture@1.2.3 issue list",
+      "COMMAND_NOT_STANDALONE",
+      null,
+    ],
+    [
+      "version-qualified bunx execution",
+      "bunx gl-axi-fixture@1.2.3 issue list",
+      "COMMAND_NOT_STANDALONE",
+      null,
+    ],
+    [
       "policy-denied effects",
       "gl-axi-fixture issue close 42",
       "EFFECT_DENIED",
@@ -685,6 +703,18 @@ describe("runClaudeCapabilityPreToolUse", () => {
       "version-qualified npx target inside backticks",
       "true && echo `npx g''l-axi-fixture@1.2.3 issue list`",
     ],
+    [
+      "env-prefixed version-qualified npx target after a command chain",
+      "true && TOKEN=x npx g''l-axi-fixture@1.2.3 issue list",
+    ],
+    [
+      "version-qualified pnpm dlx target after a command chain",
+      "true && pnpm dlx g''l-axi-fixture@1.2.3 issue list",
+    ],
+    [
+      "version-qualified --package flag behind an env prefix",
+      "true && TOKEN=x npx --package=g''l-axi-fixture@1.2.3 -c 'issue list'",
+    ],
   ])("denies a compound command containing an %s", (_name, command) => {
     const paths = capabilityFixture();
     const output = runClaudeCapabilityPreToolUse(
@@ -724,6 +754,23 @@ describe("runClaudeCapabilityPreToolUse", () => {
           tool_input: {
             command:
               "TOOL_NAME=g''l-axi-fixture git status --short && printf done",
+          },
+        },
+        paths,
+      ),
+    ).toEqual({});
+    expect(existsSync(paths.evidencePath)).toBe(false);
+  });
+
+  it("has no opinion when a compound command only assigns a version-qualified bin name as data", () => {
+    const paths = capabilityFixture();
+    expect(
+      runClaudeCapabilityPreToolUse(
+        {
+          tool_name: "Bash",
+          tool_input: {
+            command:
+              "TOOL_SPEC=gl-axi-fixture@1.2.3 git status --short && printf done",
           },
         },
         paths,

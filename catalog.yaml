@@ -101,3 +101,8 @@ community:
     author: thatdudealso
     domain: PostgreSQL
     description: "Discover, create, inspect, query, back up, restore, and maintain PostgreSQL databases through safe token-efficient CLI workflows."
+  - name: redis-axi
+    url: https://github.com/thatdudealso/redis-axi
+    author: thatdudealso
+    domain: Redis
+    description: "Discover, inspect, query, export, import, maintain, and diagnose Redis databases through safe token-efficient CLI workflows."

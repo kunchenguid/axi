@@ -128,6 +128,7 @@ AXIs built and maintained by the community:
 | [`aws-axi`](https://github.com/thatdudealso/aws-axi)                                               | thatdudealso       | AWS              | Discover, plan, provision, deploy, and inspect AWS services for hosting web, backend, database, and AI workloads through safe token-efficient CLI workflows. |
 | [`docker-axi`](https://github.com/thatdudealso/docker-axi)                                         | thatdudealso       | Docker           | Discover, build, run, debug, publish, inspect, and clean up Docker apps through safe token-efficient CLI workflows.                                          |
 | [`pg-axi`](https://github.com/thatdudealso/pg-axi)                                                 | thatdudealso       | PostgreSQL       | Discover, create, inspect, query, back up, restore, and maintain PostgreSQL databases through safe token-efficient CLI workflows.                            |
+| [`redis-axi`](https://github.com/thatdudealso/redis-axi)                                           | thatdudealso       | Redis            | Discover, inspect, query, export, import, maintain, and diagnose Redis databases through safe token-efficient CLI workflows.                                 |
 
 <!-- generated:catalog-community:end -->
 

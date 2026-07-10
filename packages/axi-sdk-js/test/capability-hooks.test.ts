@@ -89,6 +89,19 @@ describe("computeClaudeCapabilityHookUpdate", () => {
     expect(again).toBe(updated);
   });
 
+  it("rejects a spec whose marker is not embedded in both hook commands", () => {
+    expect(() =>
+      computeClaudeCapabilityHookUpdate(
+        {},
+        {
+          marker: "gl-axi-capability-policy",
+          sessionStartCommand: "/opt/bin/axi-capability-hook session-start",
+          preToolUseCommand: "/opt/bin/axi-capability-hook pre-tool-use",
+        },
+      ),
+    ).toThrowError(/spec\.sessionStartCommand must contain spec\.marker/);
+  });
+
   it("repairs stale managed matchers without changing a foreign hook in the same group", () => {
     const [updated] = computeClaudeCapabilityHookUpdate(
       {
@@ -381,6 +394,31 @@ process.stdout.write(JSON.stringify({ hookSpecificOutput: { hookEventName: "Sess
     expect(output.system).toEqual([]);
   });
 
+  it("installs nothing when the marker is missing from a hook command", () => {
+    const home = mkdtempSync(join(tmpdir(), "axi-capability-marker-"));
+    tempDirs.push(home);
+    const errors: string[] = [];
+
+    const changed = installCapabilityHooks({
+      homeDir: home,
+      spec: {
+        marker: "gl-axi-capability-policy",
+        sessionStartCommand: "axi-capability-hook session-start",
+        preToolUseCommand: "axi-capability-hook pre-tool-use",
+      },
+      onError: (message) => errors.push(message),
+    });
+
+    expect(changed).toBe(false);
+    expect(errors).toHaveLength(1);
+    expect(errors[0]).toContain(
+      "spec.sessionStartCommand must contain spec.marker",
+    );
+    expect(existsSync(join(home, ".claude", "settings.json"))).toBe(false);
+    expect(existsSync(join(home, ".codex", "hooks.json"))).toBe(false);
+    expect(existsSync(join(home, ".config", "opencode"))).toBe(false);
+  });
+
   it("does not overwrite a foreign OpenCode plugin at the managed target", () => {
     const home = mkdtempSync(join(tmpdir(), "axi-opencode-foreign-"));
     tempDirs.push(home);
@@ -569,6 +607,12 @@ describe("runClaudeCapabilityPreToolUse", () => {
     ],
     ["unknown routes", "gl-axi-fixture surprise", "ROUTE_UNKNOWN", null],
     [
+      "brace expansion smuggling",
+      "gl-axi-fixture api projects --method{,}=POST",
+      "COMMAND_UNDECOMPOSABLE",
+      null,
+    ],
+    [
       "absolute executable paths",
       "/opt/sdk/bin/gl-axi-fixture issue list",
       "COMMAND_NOT_STANDALONE",
@@ -687,6 +731,25 @@ describe("runClaudeCapabilityPreToolUse", () => {
     );
   });
 
+  it("enforces escaped spellings that resolve to the policed bin", () => {
+    const paths = capabilityFixture();
+    const output = runClaudeCapabilityPreToolUse(
+      {
+        tool_name: "Bash",
+        tool_input: { command: "g\\l-axi-fixture issue close 42" },
+      },
+      paths,
+    );
+
+    expect(output.hookSpecificOutput?.permissionDecision).toBe("deny");
+    expect(output.hookSpecificOutput?.permissionDecisionReason).toContain(
+      "POLICY_DENIED: EFFECT_DENIED",
+    );
+    expect(
+      JSON.parse(readFileSync(paths.evidencePath, "utf8").trim()),
+    ).toMatchObject({ decision: "deny", reason: "EFFECT_DENIED" });
+  });
+
   it("does not decide or log unrelated Bash commands", () => {
     const paths = capabilityFixture();
     expect(
@@ -776,17 +839,21 @@ describe("runCapabilityHookProcess", () => {
     });
   });
 
-  it("returns nonzero when SessionStart integrity fails", () => {
+  it("returns nonzero and reports the denial on stderr when SessionStart integrity fails", () => {
     const paths = capabilityFixture();
     const policy = JSON.parse(readFileSync(paths.policyPath, "utf8"));
     policy.pins.manifestSha256 = "0".repeat(64);
     writeFileSync(paths.policyPath, JSON.stringify(policy));
     let stdout = "";
+    let stderr = "";
 
     const exitCode = runCapabilityHookProcess("session-start", paths, {
       readStdin: () => JSON.stringify({ hook_event_name: "SessionStart" }),
       writeStdout: (text) => {
         stdout += text;
+      },
+      writeStderr: (text) => {
+        stderr += text;
       },
     });
 
@@ -795,5 +862,6 @@ describe("runCapabilityHookProcess", () => {
       "gl-axi-fixture",
     );
     expect(stdout).not.toContain("Invoke gl-axi as");
+    expect(stderr).toContain("POLICY_DENIED: MANIFEST_HASH_MISMATCH");
   });
 });

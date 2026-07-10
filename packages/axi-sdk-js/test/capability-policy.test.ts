@@ -265,6 +265,7 @@ describe("resolveCapabilityInvocation", () => {
     [["api", "projects", "--method=POST"], "POST", "projects", "mutate"],
     [["api", "-R", "group/project", "graphql"], "POST", "graphql", "mutate"],
     [["api", "graphql", "-X", "GET"], "POST", "graphql", "mutate"],
+    [["api", "/graphql", "-X", "GET"], "POST", "/graphql", "mutate"],
   ] as const)("derives API request %j", (argv, method, endpoint, effect) => {
     expect(
       resolveCapabilityInvocation(routingManifest, [...argv]),
@@ -283,6 +284,8 @@ describe("resolveCapabilityInvocation", () => {
     [["api", "projects", "--method=TRACE"]],
     [["api", "projects", "-X"]],
     [["api"]],
+    [["-R", "group/project", "issue", "close", "42"]],
+    [["issue", "--limit=1", "close", "42"]],
   ])("fails closed for unknown or malformed argv %j", (argv) => {
     expect(() => resolveCapabilityInvocation(routingManifest, argv)).toThrow(
       CapabilityPolicyError,

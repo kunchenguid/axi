@@ -74,10 +74,25 @@ export type CapabilityHookMode = "session-start" | "pre-tool-use";
 export interface CapabilityHookProcessIo {
   readStdin?: () => string;
   writeStdout?: (text: string) => void;
+  writeStderr?: (text: string) => void;
 }
 
 function managed(command: string | undefined, marker: string): boolean {
   return typeof command === "string" && command.includes(marker);
+}
+
+function assertSpecCommandsCarryMarker(spec: ClaudeCapabilityHookSpec): void {
+  const commands = [
+    ["sessionStartCommand", spec.sessionStartCommand],
+    ["preToolUseCommand", spec.preToolUseCommand],
+  ] as const;
+  for (const [name, command] of commands) {
+    if (!managed(command, spec.marker)) {
+      throw new Error(
+        `spec.${name} must contain spec.marker (${spec.marker}); otherwise repeated installs cannot recognize managed hooks and would append duplicates.`,
+      );
+    }
+  }
 }
 
 function updateManagedEvent(
@@ -105,6 +120,7 @@ export function computeClaudeCapabilityHookUpdate(
   settings: HookSettings,
   spec: ClaudeCapabilityHookSpec,
 ): [HookSettings, boolean] {
+  assertSpecCommandsCarryMarker(spec);
   const updated = structuredClone(settings);
   updated.hooks ??= {};
   const timeout = spec.timeoutSeconds ?? 10;
@@ -134,6 +150,7 @@ export function computeCapabilitySessionStartHookUpdate(
   settings: HookSettings,
   spec: ClaudeCapabilityHookSpec,
 ): [HookSettings, boolean] {
+  assertSpecCommandsCarryMarker(spec);
   const updated = structuredClone(settings);
   updated.hooks ??= {};
   updated.hooks.SessionStart = updateManagedEvent(
@@ -332,6 +349,12 @@ function installOpenCodeCapabilityPlugin(
 export function installCapabilityHooks(
   options: InstallCapabilityHooksOptions,
 ): boolean {
+  try {
+    assertSpecCommandsCarryMarker(options.spec);
+  } catch (error) {
+    options.onError?.(error instanceof Error ? error.message : String(error));
+    return false;
+  }
   const home = options.homeDir ?? homedir();
   const claudePath =
     options.claudeSettingsPath ?? join(home, ".claude", "settings.json");
@@ -557,7 +580,7 @@ function tokenizeSimpleShell(command: string): string[] | undefined {
       continue;
     }
     if (";&|<>\n\r`()$".includes(char)) return undefined;
-    if ("*?[]".includes(char)) return undefined;
+    if ("*?[]{}".includes(char)) return undefined;
     if (char === "#" && !tokenStarted) return undefined;
     token += char;
     tokenStarted = true;
@@ -708,7 +731,8 @@ export function runClaudeCapabilityPreToolUse(
     }
   }
   if (bin && !commandMentionsTool(command, bin)) {
-    return {};
+    const tokens = tokenizeSimpleShell(command);
+    if (!tokens || tokens[0] !== bin) return {};
   }
 
   const context = evidenceContext(options);
@@ -927,5 +951,14 @@ export function runCapabilityHookProcess(
   const serialized = `${JSON.stringify(output)}\n`;
   if (io.writeStdout) io.writeStdout(serialized);
   else process.stdout.write(serialized);
+  if (exitCode !== 0) {
+    const detail =
+      output.hookSpecificOutput?.additionalContext ??
+      output.hookSpecificOutput?.permissionDecisionReason ??
+      "POLICY_DENIED: INTEGRITY_CHECK_FAILED.";
+    const line = `${detail}\n`;
+    if (io.writeStderr) io.writeStderr(line);
+    else process.stderr.write(line);
+  }
   return exitCode;
 }

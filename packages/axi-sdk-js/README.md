@@ -255,14 +255,16 @@ const common = [
 
 installCapabilityHooks({
   spec: {
-    marker: "gl-axi-capability-policy",
+    marker: "axi-capability-hook",
     sessionStartCommand: `${capabilityHook} session-start ${common}`,
     preToolUseCommand: `${capabilityHook} pre-tool-use ${common}`,
   },
 });
 ```
 
-Installation is repeat-safe and preserves foreign configuration. Claude Code receives both the SessionStart integrity check and a Bash `PreToolUse` policy hook. Codex and OpenCode receive the SessionStart integrity check. Across Claude Code, Codex, and OpenCode, a failed SessionStart integrity check aborts startup: the native Claude Code and Codex hooks exit nonzero, and the OpenCode session transform rejects instead of adding advisory context. Only a verified manifest, policy, identity, and writable evidence path allow startup to continue.
+The marker must be a substring of both hook commands: repeated installs recognize previously managed hooks by that substring, and `installCapabilityHooks()` rejects a spec whose marker is missing from either command instead of appending duplicates.
+
+Installation is repeat-safe and preserves foreign configuration. Claude Code receives both the SessionStart integrity check and a Bash `PreToolUse` policy hook. Codex and OpenCode receive the SessionStart integrity check. A failed SessionStart integrity check fails closed: the native Claude Code and Codex hooks exit nonzero and write the denial detail to stderr, and the OpenCode session transform rejects instead of adding advisory context. Claude Code does not abort a session on a nonzero SessionStart hook — it surfaces the stderr detail, and the `PreToolUse` hook independently keeps denying every policed invocation. Only a verified manifest, policy, identity, and writable evidence path produce a clean integrity report.
 
 Codex and OpenCode do not currently expose compatible per-tool enforcement hooks, so v1 does not claim per-invocation enforcement on those harnesses; use their OS sandbox or other harness controls for execution policy. Claude Code is the only v1 harness with `PreToolUse` enforcement.
 
@@ -283,6 +285,8 @@ Claude supplies one hook event as JSON on stdin. The executable writes one Claud
 ### Decisions and evidence
 
 `PreToolUse` resolves only a simple standalone AXI command. Unknown routes, guarded routes, undecomposable or compound shell commands that mention the AXI, unsupported schema versions, invalid or missing documents, manifest hash mismatches, publisher identity mismatches, and policy denials all fail closed. Passthrough path allowlists can only narrow the per-method decision; they cannot grant a method the policy denies. GraphQL is treated as a mutation.
+
+`flags-only` route matching is a boundary of the v1 contract: the manifest does not declare flag arity, so the hook assumes each space-separated flag consumes at most one following value token and rejects any other bare token, failing closed to `ROUTE_UNKNOWN`. A value token that follows a boolean flag can therefore be misread as its value; declare explicit route tokens for any subcommand whose effect must not depend on this heuristic.
 
 The evidence file is written before an allowed AXI command can execute. An unwritable evidence file produces an `EVIDENCE_UNWRITABLE` denial. Each JSONL decision contains:
 

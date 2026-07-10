@@ -627,8 +627,16 @@ function routeMatches(
   if ((match.rest ?? "any") === "any") {
     return true;
   }
-  const firstRemaining = argv[match.tokens.length];
-  return firstRemaining === undefined || firstRemaining.startsWith("-");
+  const remainder = argv.slice(match.tokens.length);
+  return remainder.every((token, index) => {
+    if (token.startsWith("-")) return true;
+    const previous = remainder[index - 1];
+    return (
+      previous !== undefined &&
+      previous.startsWith("-") &&
+      !previous.includes("=")
+    );
+  });
 }
 
 interface DerivedHttpRequest {
@@ -727,7 +735,12 @@ function deriveHttpRequest(
       "Passthrough invocation requires an endpoint.",
     );
   }
-  if (derivation.alwaysMutateEndpoints?.includes(endpoint)) {
+  const normalizedEndpoint = endpoint.replace(/^\/+/, "");
+  if (
+    derivation.alwaysMutateEndpoints?.some(
+      (always) => always.replace(/^\/+/, "") === normalizedEndpoint,
+    )
+  ) {
     return { method: "POST", endpoint };
   }
   return { method: method ?? derivation.default, endpoint };

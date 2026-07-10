@@ -463,6 +463,22 @@ function loadVerifiedBundle(
   };
 }
 
+function bindToolBinToManifest(
+  options: CapabilityHookRuntimeOptions,
+  bundle: VerifiedBundle,
+): string {
+  const manifestBin = bundle.manifest.tool.bin;
+  const configuredBin = options.toolBin ?? manifestBin;
+  if (configuredBin !== manifestBin) {
+    throw new CapabilityPolicyError(
+      "TOOL_BIN_MISMATCH",
+      `The configured executable ${configuredBin} does not match pinned manifest executable ${manifestBin}; update the hook configuration or restore and re-pin the admitted manifest.`,
+      { configuredBin, manifestBin },
+    );
+  }
+  return configuredBin;
+}
+
 function trustedToolBin(
   options: CapabilityHookRuntimeOptions,
 ): string | undefined {
@@ -717,6 +733,7 @@ export function runClaudeCapabilityPreToolUse(
       );
     }
     const bundle = bundleFromBinResolution ?? loadVerifiedBundle(options);
+    bindToolBinToManifest(options, bundle);
     context.manifestSha256 = bundle.manifestSha256;
     context.policySha256 = bundle.policySha256;
     resolution = resolveCapabilityInvocation(bundle.manifest, invocation.argv);
@@ -792,9 +809,9 @@ function evaluateCapabilitySessionStart(
 
   try {
     const bundle = loadVerifiedBundle(options);
+    toolName = bindToolBinToManifest(options, bundle);
     context.manifestSha256 = bundle.manifestSha256;
     context.policySha256 = bundle.policySha256;
-    toolName = bundle.manifest.tool.bin;
     decision = "allow";
   } catch (error) {
     reason =

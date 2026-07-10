@@ -503,6 +503,63 @@ describe("runClaudeCapabilityPreToolUse", () => {
     expect(records[0].policySha256).toMatch(/^[0-9a-f]{64}$/);
   });
 
+  it("allows an explicit toolBin only when it matches the verified manifest bin", () => {
+    const paths = capabilityFixture();
+    const output = runClaudeCapabilityPreToolUse(
+      {
+        tool_name: "Bash",
+        tool_input: { command: "gl-axi-fixture issue list" },
+      },
+      { ...paths, toolBin: "gl-axi-fixture" },
+    );
+
+    expect(output.hookSpecificOutput?.permissionDecision).toBe("allow");
+  });
+
+  it("denies when configured toolBin differs from the verified manifest identity", () => {
+    const paths = capabilityFixture();
+    const output = runClaudeCapabilityPreToolUse(
+      {
+        tool_name: "Bash",
+        tool_input: { command: "alternate-axi issue list" },
+      },
+      { ...paths, toolBin: "alternate-axi" },
+    );
+
+    expect(output.hookSpecificOutput?.permissionDecision).toBe("deny");
+    expect(output.hookSpecificOutput?.permissionDecisionReason).toContain(
+      "POLICY_DENIED: TOOL_BIN_MISMATCH",
+    );
+    expect(output.hookSpecificOutput?.permissionDecisionReason).toContain(
+      "configured executable alternate-axi does not match pinned manifest executable gl-axi-fixture",
+    );
+    expect(output.hookSpecificOutput?.permissionDecisionReason).toContain(
+      "update the hook configuration or restore and re-pin the admitted manifest",
+    );
+    expect(
+      JSON.parse(readFileSync(paths.evidencePath, "utf8").trim()),
+    ).toMatchObject({ decision: "deny", reason: "TOOL_BIN_MISMATCH" });
+  });
+
+  it("uses the verified manifest bin when toolBin is omitted", () => {
+    const fixture = capabilityFixture();
+    const paths = {
+      manifestPath: fixture.manifestPath,
+      identityPath: fixture.identityPath,
+      policyPath: fixture.policyPath,
+      evidencePath: fixture.evidencePath,
+    };
+    const output = runClaudeCapabilityPreToolUse(
+      {
+        tool_name: "Bash",
+        tool_input: { command: "gl-axi-fixture issue list" },
+      },
+      paths,
+    );
+
+    expect(output.hookSpecificOutput?.permissionDecision).toBe("allow");
+  });
+
   it.each([
     [
       "compound commands",

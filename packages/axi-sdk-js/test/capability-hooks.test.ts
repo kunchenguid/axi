@@ -652,6 +652,61 @@ describe("runClaudeCapabilityPreToolUse", () => {
     expect(record).toMatchObject({ decision: "deny", reason, routeKey });
   });
 
+  it.each([
+    ["escaped wrapper", "env g\\l-axi-fixture issue list"],
+    ["quote-split wrapper", "command g''l-axi-fixture issue list"],
+    ["assignment prefix", "TOKEN=value gl-axi-fixture issue list"],
+    ["flag-like env wrapper", "env -u TOKEN gl-axi-fixture issue list"],
+    ["protected bin as an argument", "printf %s g\\l-axi-fixture"],
+  ])(
+    "denies a reconstructed protected-bin token behind a %s",
+    (_name, command) => {
+      const paths = capabilityFixture();
+      const output = runClaudeCapabilityPreToolUse(
+        { tool_name: "Bash", tool_input: { command } },
+        paths,
+      );
+
+      expect(output.hookSpecificOutput?.permissionDecision).toBe("deny");
+      expect(output.hookSpecificOutput?.permissionDecisionReason).toContain(
+        "POLICY_DENIED: COMMAND_NOT_STANDALONE",
+      );
+      expect(
+        JSON.parse(readFileSync(paths.evidencePath, "utf8").trim()),
+      ).toMatchObject({ decision: "deny", reason: "COMMAND_NOT_STANDALONE" });
+    },
+  );
+
+  it("has no opinion on parsed commands without the exact protected-bin token", () => {
+    const paths = capabilityFixture();
+    expect(
+      runClaudeCapabilityPreToolUse(
+        {
+          tool_name: "Bash",
+          tool_input: { command: "printf %s g\\l-axi-fixture-suffix" },
+        },
+        paths,
+      ),
+    ).toEqual({});
+    expect(existsSync(paths.evidencePath)).toBe(false);
+  });
+
+  it("has no opinion when the protected bin is only part of an unrelated environment value", () => {
+    const paths = capabilityFixture();
+    expect(
+      runClaudeCapabilityPreToolUse(
+        {
+          tool_name: "Bash",
+          tool_input: {
+            command: "TOOL_NAME=gl-axi-fixture git status --short",
+          },
+        },
+        paths,
+      ),
+    ).toEqual({});
+    expect(existsSync(paths.evidencePath)).toBe(false);
+  });
+
   it("keeps typed policy error detail in the permission reason and a stable evidence code", () => {
     const paths = capabilityFixture();
     const output = runClaudeCapabilityPreToolUse(

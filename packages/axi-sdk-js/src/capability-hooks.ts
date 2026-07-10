@@ -524,6 +524,24 @@ function commandMentionsTool(command: string, bin: string): boolean {
   ).test(command);
 }
 
+function tokenResolvesProtectedBin(token: string, bin: string): boolean {
+  if (token === bin) return true;
+  const normalized = token.replaceAll("\\", "/");
+  return normalized.includes("/") && normalized.split("/").pop() === bin;
+}
+
+function npxTargetsProtectedBin(tokens: string[], bin: string): boolean {
+  if (!["npx", "npx.cmd"].includes(tokens[0]?.toLowerCase() ?? "")) {
+    return false;
+  }
+  return tokens.slice(1).some((token) => {
+    const packageToken = token.startsWith("--package=")
+      ? token.slice("--package=".length)
+      : token;
+    return packageToken === bin || packageToken.startsWith(`${bin}@`);
+  });
+}
+
 function tokenizeSimpleShell(command: string): string[] | undefined {
   const tokens: string[] = [];
   let token = "";
@@ -730,9 +748,17 @@ export function runClaudeCapabilityPreToolUse(
       binResolutionError = error;
     }
   }
-  if (bin && !commandMentionsTool(command, bin)) {
+  if (bin) {
+    const rawMention = commandMentionsTool(command, bin);
     const tokens = tokenizeSimpleShell(command);
-    if (!tokens || tokens[0] !== bin) return {};
+    if (!tokens) {
+      if (!rawMention) return {};
+    } else if (
+      !tokens.some((token) => tokenResolvesProtectedBin(token, bin)) &&
+      !npxTargetsProtectedBin(tokens, bin)
+    ) {
+      return {};
+    }
   }
 
   const context = evidenceContext(options);

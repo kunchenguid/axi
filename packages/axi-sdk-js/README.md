@@ -183,7 +183,7 @@ The v1 runtime reads four local paths and performs no network requests:
 
 - an authored capability manifest that declares the AXI binary, route matches, effects, reached systems, scopes, and the two supported derivations (`http-method` and `flag-presence`);
 - a local policy with `schemaVersion: 1`, `engine: "builtin"`, manifest and publisher pins, per-effect decisions, per-method passthrough decisions, and optional per-method path allowlists;
-- a publisher identity document containing the OIDC issuer and project path admitted by the organization;
+- a publisher identity document with `schemaVersion: 1` containing the OIDC issuer and project path admitted by the organization;
 - an append-only JSONL evidence path outside the agent workspace.
 
 A v1 policy has this shape:
@@ -285,11 +285,11 @@ The executable also supports equals-form flags:
 
 Claude supplies one hook event as JSON on stdin. The executable writes one Claude hook response as JSON on stdout. Missing modes, paths, values, or unsupported flags return a structured `INVALID_USAGE` error on stderr and exit 2 before hook input is read.
 
-`--tool-bin` is required so Bash scoping never depends on reading the pinned artifacts: when the manifest, policy, or identity file is unreadable, only invocations of the configured executable are denied, and unrelated Bash commands stay out of scope.
+`--tool-bin` is required so Bash scoping never depends on reading the pinned artifacts: when the manifest, policy, or identity file is unreadable, only invocations of the configured executable are denied, and unrelated Bash commands stay out of scope. The configured name is also bound to the verified manifest: when `--tool-bin` differs from the manifest's `tool.bin`, both hooks fail closed with `TOOL_BIN_MISMATCH` until the hook configuration or the pinned manifest is corrected.
 
 ### Decisions and evidence
 
-`PreToolUse` resolves only a simple standalone AXI command. Unknown routes, guarded routes, undecomposable or compound shell commands that mention the AXI, unsupported schema versions, invalid or missing documents, manifest hash mismatches, publisher identity mismatches, and policy denials all fail closed. Passthrough path allowlists can only narrow the per-method decision; they cannot grant a method the policy denies. A passthrough invocation that resolves to more than one endpoint positional is denied as `HTTP_ENDPOINT_AMBIGUOUS`, so an undeclared value-taking flag cannot shift the checked endpoint. GraphQL is treated as a mutation.
+`PreToolUse` resolves only a simple standalone AXI command whose exact first token is the configured executable. Wrapped invocations are denied as `COMMAND_NOT_STANDALONE`: `npx` package execution, absolute or relative executable paths, `env`/`command`/`sh -c` style wrappers, assignment prefixes, and executable tokens reconstructed through escapes or quote splits. Unknown routes, guarded routes, undecomposable or compound shell commands that mention the AXI, unsupported schema versions, invalid or missing documents, manifest hash mismatches, publisher identity mismatches, and policy denials all fail closed. Passthrough path allowlists can only narrow the per-method decision; they cannot grant a method the policy denies. A passthrough invocation that resolves to more than one endpoint positional is denied as `HTTP_ENDPOINT_AMBIGUOUS`, so an undeclared value-taking flag cannot shift the checked endpoint. GraphQL is treated as a mutation.
 
 `flags-only` route matching is a boundary of the v1 contract: the manifest does not declare flag arity, so the hook assumes each space-separated flag consumes at most one following value token and rejects any other bare token, failing closed to `ROUTE_UNKNOWN`. A value token that follows a boolean flag can therefore be misread as its value; declare explicit route tokens for any subcommand whose effect must not depend on this heuristic.
 

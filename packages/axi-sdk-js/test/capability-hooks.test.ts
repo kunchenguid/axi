@@ -658,6 +658,15 @@ describe("runClaudeCapabilityPreToolUse", () => {
     ["assignment prefix", "TOKEN=value gl-axi-fixture issue list"],
     ["flag-like env wrapper", "env -u TOKEN gl-axi-fixture issue list"],
     ["protected bin as an argument", "printf %s g\\l-axi-fixture"],
+    ["single-quoted shell wrapper", "bash -c 'gl-axi-fixture issue close 42'"],
+    [
+      "double-quoted shell wrapper",
+      'sh -c "gl-axi-fixture api --method DELETE projects/1"',
+    ],
+    [
+      "quoted metacharacter payload",
+      "bash -c 'true;gl-axi-fixture issue close 42'",
+    ],
   ])(
     "denies a reconstructed protected-bin token behind a %s",
     (_name, command) => {

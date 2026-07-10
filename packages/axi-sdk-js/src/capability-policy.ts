@@ -735,6 +735,13 @@ function deriveHttpRequest(
       "Passthrough invocation requires an endpoint.",
     );
   }
+  if (positionals.length > 1) {
+    throw new CapabilityPolicyError(
+      "HTTP_ENDPOINT_AMBIGUOUS",
+      "Passthrough invocation must name exactly one endpoint.",
+      { positionals: [...positionals] },
+    );
+  }
   const normalizedEndpoint = endpoint.replace(/^\/+/, "");
   if (
     derivation.alwaysMutateEndpoints?.some(

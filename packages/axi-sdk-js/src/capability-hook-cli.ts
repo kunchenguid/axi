@@ -6,7 +6,7 @@ import {
 } from "./capability-hooks.js";
 
 const USAGE =
-  "Usage: axi-capability-hook <session-start|pre-tool-use> --manifest <path> --policy <path> --identity <path> --evidence <path> [--tool-bin <name>] [--hook-version <version>]";
+  "Usage: axi-capability-hook <session-start|pre-tool-use> --manifest <path> --policy <path> --identity <path> --evidence <path> --tool-bin <name> [--hook-version <version>]";
 
 const FLAG_PROPERTIES = {
   "--manifest": "manifestPath",
@@ -22,6 +22,7 @@ const REQUIRED_FLAGS = [
   "--policy",
   "--identity",
   "--evidence",
+  "--tool-bin",
 ] as const;
 
 function usageError(message: string): number {

@@ -143,6 +143,7 @@ describe("axi-capability-hook executable", () => {
         `--policy=${paths.policyPath}`,
         `--identity=${paths.identityPath}`,
         `--evidence=${paths.evidencePath}`,
+        "--tool-bin=gl-axi",
       ],
       { hook_event_name: "SessionStart" },
     );
@@ -186,8 +187,35 @@ describe("axi-capability-hook executable", () => {
         message: "Missing required flag: --evidence.",
       },
       help: [
-        "Usage: axi-capability-hook <session-start|pre-tool-use> --manifest <path> --policy <path> --identity <path> --evidence <path> [--tool-bin <name>] [--hook-version <version>]",
+        "Usage: axi-capability-hook <session-start|pre-tool-use> --manifest <path> --policy <path> --identity <path> --evidence <path> --tool-bin <name> [--hook-version <version>]",
       ],
+    });
+  });
+
+  it("requires --tool-bin so Bash scoping cannot depend on readable artifacts", async () => {
+    const paths = capabilityFixture();
+    const result = await runCli(
+      [
+        "pre-tool-use",
+        "--manifest",
+        paths.manifestPath,
+        "--policy",
+        paths.policyPath,
+        "--identity",
+        paths.identityPath,
+        "--evidence",
+        paths.evidencePath,
+      ],
+      { hook_event_name: "PreToolUse" },
+    );
+
+    expect(result.code).toBe(2);
+    expect(result.stdout).toBe("");
+    expect(JSON.parse(result.stderr)).toMatchObject({
+      error: {
+        code: "INVALID_USAGE",
+        message: "Missing required flag: --tool-bin.",
+      },
     });
   });
 });

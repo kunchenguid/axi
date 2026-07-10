@@ -291,6 +291,22 @@ describe("resolveCapabilityInvocation", () => {
       CapabilityPolicyError,
     );
   });
+
+  it("rejects passthrough invocations naming more than one endpoint", () => {
+    expect(() =>
+      resolveCapabilityInvocation(routingManifest, [
+        "api",
+        "--paginate",
+        "projects/1",
+        "admin/runners",
+      ]),
+    ).toThrowError(
+      expect.objectContaining({
+        code: "HTTP_ENDPOINT_AMBIGUOUS",
+        message: expect.stringContaining("exactly one endpoint"),
+      }),
+    );
+  });
 });
 
 describe("evaluateCapabilityPolicy", () => {

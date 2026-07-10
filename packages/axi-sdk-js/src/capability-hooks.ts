@@ -173,29 +173,11 @@ export function installClaudeCapabilityHooks(
   const settingsPath =
     options.settingsPath ??
     join(options.homeDir ?? homedir(), ".claude", "settings.json");
-
-  try {
-    const settings = existsSync(settingsPath)
-      ? (JSON.parse(readFileSync(settingsPath, "utf8")) as HookSettings)
-      : {};
-    const [updated, changed] = computeClaudeCapabilityHookUpdate(
-      settings,
-      options.spec,
-    );
-    if (!changed) return false;
-
-    mkdirSync(dirname(settingsPath), { recursive: true });
-    writeFileSync(
-      settingsPath,
-      `${JSON.stringify(updated, null, 2)}\n`,
-      "utf8",
-    );
-    return true;
-  } catch (error) {
-    const message = error instanceof Error ? error.message : String(error);
-    options.onError?.(`${settingsPath}: ${message}`);
-    return false;
-  }
+  return writeHookSettings(
+    settingsPath,
+    (settings) => computeClaudeCapabilityHookUpdate(settings, options.spec),
+    options.onError,
+  );
 }
 
 const OPENCODE_CAPABILITY_PLUGIN_MARKER =
@@ -530,6 +512,14 @@ function tokenResolvesProtectedBin(token: string, bin: string): boolean {
   return normalized.includes("/") && normalized.split("/").pop() === bin;
 }
 
+const EMBEDDED_SHELL_WORD_SEPARATORS = /[\s;&|<>()`$]+/;
+
+function tokenEmbedsProtectedBin(token: string, bin: string): boolean {
+  return token
+    .split(EMBEDDED_SHELL_WORD_SEPARATORS)
+    .some((word) => word.length > 0 && tokenResolvesProtectedBin(word, bin));
+}
+
 function npxTargetsProtectedBin(tokens: string[], bin: string): boolean {
   if (!["npx", "npx.cmd"].includes(tokens[0]?.toLowerCase() ?? "")) {
     return false;
@@ -754,7 +744,7 @@ export function runClaudeCapabilityPreToolUse(
     if (!tokens) {
       if (!rawMention) return {};
     } else if (
-      !tokens.some((token) => tokenResolvesProtectedBin(token, bin)) &&
+      !tokens.some((token) => tokenEmbedsProtectedBin(token, bin)) &&
       !npxTargetsProtectedBin(tokens, bin)
     ) {
       return {};

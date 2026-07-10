@@ -277,16 +277,19 @@ The executable also supports equals-form flags:
   --manifest=/etc/axi/gl-axi/capabilities.json \
   --policy=/etc/axi/gl-axi/policy.json \
   --identity=/etc/axi/gl-axi/identity.json \
-  --evidence=/var/log/axi/gl-axi-decisions.jsonl
+  --evidence=/var/log/axi/gl-axi-decisions.jsonl \
+  --tool-bin=gl-axi
 ```
 
 <!-- x-release-please-end -->
 
 Claude supplies one hook event as JSON on stdin. The executable writes one Claude hook response as JSON on stdout. Missing modes, paths, values, or unsupported flags return a structured `INVALID_USAGE` error on stderr and exit 2 before hook input is read.
 
+`--tool-bin` is required so Bash scoping never depends on reading the pinned artifacts: when the manifest, policy, or identity file is unreadable, only invocations of the configured executable are denied, and unrelated Bash commands stay out of scope.
+
 ### Decisions and evidence
 
-`PreToolUse` resolves only a simple standalone AXI command. Unknown routes, guarded routes, undecomposable or compound shell commands that mention the AXI, unsupported schema versions, invalid or missing documents, manifest hash mismatches, publisher identity mismatches, and policy denials all fail closed. Passthrough path allowlists can only narrow the per-method decision; they cannot grant a method the policy denies. GraphQL is treated as a mutation.
+`PreToolUse` resolves only a simple standalone AXI command. Unknown routes, guarded routes, undecomposable or compound shell commands that mention the AXI, unsupported schema versions, invalid or missing documents, manifest hash mismatches, publisher identity mismatches, and policy denials all fail closed. Passthrough path allowlists can only narrow the per-method decision; they cannot grant a method the policy denies. A passthrough invocation that resolves to more than one endpoint positional is denied as `HTTP_ENDPOINT_AMBIGUOUS`, so an undeclared value-taking flag cannot shift the checked endpoint. GraphQL is treated as a mutation.
 
 `flags-only` route matching is a boundary of the v1 contract: the manifest does not declare flag arity, so the hook assumes each space-separated flag consumes at most one following value token and rejects any other bare token, failing closed to `ROUTE_UNKNOWN`. A value token that follows a boolean flag can therefore be misread as its value; declare explicit route tokens for any subcommand whose effect must not depend on this heuristic.
 

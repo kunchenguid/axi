@@ -101,6 +101,11 @@ community:
     author: thatdudealso
     domain: PostgreSQL
     description: "Discover, create, inspect, query, back up, restore, and maintain PostgreSQL databases through safe token-efficient CLI workflows."
+  - name: mongodb-axi
+    url: https://github.com/thatdudealso/mongodb-axi
+    author: thatdudealso
+    domain: MongoDB
+    description: "Discover, create, inspect, query, export, import, maintain, and diagnose MongoDB databases through safe token-efficient CLI workflows."
   - name: elasticsearch-axi
     url: https://github.com/thatdudealso/elasticsearch-axi
     author: thatdudealso

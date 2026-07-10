@@ -108,18 +108,23 @@ await runAxiCli({
 
 Most AXI authors should not need these directly.
 
-| API                                      | Description                                                                                     |
-| ---------------------------------------- | ----------------------------------------------------------------------------------------------- |
-| `AxiError`                               | Throw structured AXI errors from command handlers                                               |
-| `RESERVED_COMMANDS`                      | SDK-owned built-in command names, currently `update`                                            |
-| `runUpdate()`                            | The built-in self-update flow (registry lookup, install-method detection, upgrade)              |
-| `fetchLatestVersion()`                   | Resolve the latest npm version through the registry endpoint with an `npm view` fallback        |
-| `detectInstallMethod()`, `planUpgrade()` | Inspect an entrypoint path and map it to the upgrade command the built-in updater would use     |
-| `compareSemver()`, `isUpdateAvailable()` | Semver helpers used by the updater, including prerelease ordering                               |
-| `installSessionStartHooks()`             | Install or repair Claude Code hooks, Codex hooks, and OpenCode ambient context plugins directly |
-| `resolvePortableHookCommand()`           | Resolve a hook command to a safe binary name or absolute path                                   |
-| `PortableHookCommandContext`             | Context for resolving portable hook commands                                                    |
-| `shouldInstallHooksForNodeAxiExecPath()` | Check whether an executable path is safe for hook installation                                  |
+| API                                                           | Description                                                                                                                |
+| ------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| `AxiError`                                                    | Throw structured AXI errors from command handlers                                                                          |
+| `RESERVED_COMMANDS`                                           | SDK-owned built-in command names, currently `update`                                                                       |
+| `runUpdate()`                                                 | The built-in self-update flow (registry lookup, install-method detection, upgrade)                                         |
+| `fetchLatestVersion()`                                        | Resolve the latest npm version through the registry endpoint with an `npm view` fallback                                   |
+| `detectInstallMethod()`, `planUpgrade()`                      | Inspect an entrypoint path and map it to the upgrade command the built-in updater would use                                |
+| `compareSemver()`, `isUpdateAvailable()`                      | Semver helpers used by the updater, including prerelease ordering                                                          |
+| `installSessionStartHooks()`                                  | Install or repair Claude Code hooks, Codex hooks, and OpenCode ambient context plugins directly                            |
+| `installCapabilityHooks()`                                    | Install capability integrity at SessionStart for Claude Code, Codex, and OpenCode, plus Claude Code PreToolUse enforcement |
+| `runCapabilityHookProcess()`                                  | Adapt one Claude hook JSON event from stdin to the capability runtime and write one hook response to stdout                |
+| `parseCapabilityManifest()`, `parseCapabilityPolicy()`        | Validate strict capability manifest and policy schema version 1 documents                                                  |
+| `verifyCapabilityPins()`                                      | Verify the installed manifest hash and publisher identity against the local policy pins                                    |
+| `resolveCapabilityInvocation()`, `evaluateCapabilityPolicy()` | Resolve declared routes and make deterministic allow or deny decisions                                                     |
+| `resolvePortableHookCommand()`                                | Resolve a hook command to a safe binary name or absolute path                                                              |
+| `PortableHookCommandContext`                                  | Context for resolving portable hook commands                                                                               |
+| `shouldInstallHooksForNodeAxiExecPath()`                      | Check whether an executable path is safe for hook installation                                                             |
 
 ### Session Hook Setup
 
@@ -167,6 +172,110 @@ Hook commands use a plain binary name such as `gh-axi` only when that name conta
 On Windows, npm global bins are wrapper shims (`.cmd` files and extensionless Git Bash scripts) rather than symlinks, so the realpath match never succeeds. The resolver also parses each shim to recover the script it ultimately runs and matches that against the executable, so the plain binary name still works there.
 
 For custom wrappers, pass `binaryNames: ["my-axi"]` to `installSessionStartHooks()`.
+
+## Capability Policy Hooks
+
+Capability policy hooks let a harness verify an AXI's authored capability manifest at session start and enforce a local organization policy before Claude Code runs the AXI. The enforcement executable is part of `axi-sdk-js` itself, so the harness installs and invokes `axi-capability-hook` from an independently reviewed SDK installation. It does not import code from the AXI's `node_modules` tree.
+
+The v1 runtime reads four local paths and performs no network requests:
+
+- an authored capability manifest that declares the AXI binary, route matches, effects, reached systems, scopes, and the two supported derivations (`http-method` and `flag-presence`);
+- a local policy with `schemaVersion: 1`, `engine: "builtin"`, manifest and publisher pins, per-effect decisions, per-method passthrough decisions, and optional deny-only path rules;
+- a publisher identity document containing the OIDC issuer and project path admitted by the organization;
+- an append-only JSONL evidence path outside the agent workspace.
+
+A v1 policy has this shape:
+
+```json
+{
+  "schemaVersion": 1,
+  "engine": "builtin",
+  "pins": {
+    "manifestSha256": "<64 lowercase hex characters>",
+    "publisher": {
+      "oidcIssuer": "https://gitlab.com",
+      "projectPath": "axi-tooling/gl-axi"
+    }
+  },
+  "effects": {
+    "none": "allow",
+    "read": "allow",
+    "mutate": "deny"
+  },
+  "passthrough": {
+    "methods": {
+      "GET": "allow",
+      "HEAD": "allow",
+      "POST": "deny",
+      "PUT": "deny",
+      "PATCH": "deny",
+      "DELETE": "deny"
+    },
+    "paths": [
+      {
+        "method": "GET",
+        "pattern": "projects/*/access_tokens",
+        "decision": "deny"
+      }
+    ]
+  }
+}
+```
+
+The harness owns the policy file and pins it through its normal deployment controls. The policy pins the canonical SHA-256 of the installed manifest and the admitted publisher identity tuple. Every evidence record carries both the verified manifest SHA-256 and the canonical policy SHA-256, so a collector can identify the exact claims and policy used for a decision. Admission-time provenance verification remains separate from the offline runtime check.
+
+### Install the hooks
+
+Install the SDK independently in the harness environment so `axi-capability-hook` resolves without relying on the policed AXI package. The following commands use fixed local files and are suitable for generated Claude Code hook configuration:
+
+```ts
+import { installCapabilityHooks } from "axi-sdk-js";
+
+const common = [
+  "--manifest /etc/axi/gl-axi/capabilities.json",
+  "--policy /etc/axi/gl-axi/policy.json",
+  "--identity /etc/axi/gl-axi/identity.json",
+  "--evidence /var/log/axi/gl-axi-decisions.jsonl",
+  "--tool-bin gl-axi",
+  "--hook-version 1",
+].join(" ");
+
+installCapabilityHooks({
+  spec: {
+    marker: "gl-axi-capability-policy",
+    sessionStartCommand: `axi-capability-hook session-start ${common}`,
+    preToolUseCommand: `axi-capability-hook pre-tool-use ${common}`,
+  },
+});
+```
+
+Installation is repeat-safe and preserves foreign configuration. Claude Code receives both the SessionStart integrity check and a Bash `PreToolUse` policy hook. Codex and OpenCode receive SessionStart integrity context. Codex and OpenCode do not currently expose compatible per-tool enforcement hooks, so v1 does not claim per-invocation enforcement on those harnesses; use their OS sandbox or other harness controls for execution policy.
+
+The executable also supports equals-form flags:
+
+```sh
+axi-capability-hook pre-tool-use \
+  --manifest=/etc/axi/gl-axi/capabilities.json \
+  --policy=/etc/axi/gl-axi/policy.json \
+  --identity=/etc/axi/gl-axi/identity.json \
+  --evidence=/var/log/axi/gl-axi-decisions.jsonl
+```
+
+Claude supplies one hook event as JSON on stdin. The executable writes one Claude hook response as JSON on stdout. Missing modes, paths, values, or unsupported flags return a structured `INVALID_USAGE` error on stderr and exit 2 before hook input is read.
+
+### Decisions and evidence
+
+`PreToolUse` resolves only a simple standalone AXI command. Unknown routes, guarded routes, undecomposable or compound shell commands that mention the AXI, unsupported schema versions, invalid or missing documents, manifest hash mismatches, publisher identity mismatches, and policy denials all fail closed. Passthrough path rules can only narrow the per-method decision; they cannot grant a method the policy denies. GraphQL is treated as a mutation.
+
+The evidence file is written before an allowed AXI command can execute. An unwritable evidence file produces an `EVIDENCE_UNWRITABLE` denial. Each JSONL decision contains:
+
+- `timestamp`, `hookVersion`, and `hookEventName`;
+- `toolInputSha256`;
+- `routeKey`, `declaredEffect`, and derived `effect`;
+- `decision` and `reason`;
+- `manifestSha256`, `manifestSchemaVersion`, `policySha256`, and `policySchemaVersion`.
+
+SessionStart records the same integrity context with route and effect fields set to `null`. The decision log is append-only at this process boundary but is not hash-chained; deploy it on an OS-protected or WORM-backed collector path when the agent must not be able to alter evidence.
 
 ## Development
 

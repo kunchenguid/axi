@@ -18,10 +18,21 @@
   ],
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
+  "bin": {
+    "axi-capability-hook": "./dist/capability-hook-cli.js"
+  },
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
+    },
+    "./capability-policy": {
+      "types": "./dist/capability-policy.d.ts",
+      "import": "./dist/capability-policy.js"
+    },
+    "./capability-hooks": {
+      "types": "./dist/capability-hooks.d.ts",
+      "import": "./dist/capability-hooks.js"
     }
   },
   "files": [

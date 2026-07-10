@@ -1,0 +1,873 @@
+- generic [ref=e2]:
+  - banner [ref=e3]:
+    - paragraph [ref=e4]: AXI — Agent eXperience Interface
+    - heading "Let's build apps that [agents] love." [level=1] [ref=e5]
+    - paragraph [ref=e6]: 10 design principles for agent-ergonomic CLI. 100% task success at the lowest cost — validated across two benchmarks and 915 runs.
+    - generic [ref=e7]:
+      - generic [ref=e8]:
+        - paragraph [ref=e9]: Avg Cost per Task
+        - generic [ref=e10]:
+          - generic [ref=e11]:
+            - generic [ref=e12]: chrome-devtools-mcp-code
+            - generic [ref=e15]: $0.120
+          - generic [ref=e16]:
+            - generic [ref=e17]: chrome-devtools-mcp
+            - generic [ref=e20]: $0.100
+          - generic [ref=e21]:
+            - generic [ref=e22]: chrome-devtools-mcp-search
+            - generic [ref=e25]: $0.096
+          - generic [ref=e26]:
+            - generic [ref=e27]: chrome-devtools-mcp-compressed
+            - generic [ref=e30]: $0.091
+          - generic [ref=e31]:
+            - generic [ref=e32]: agent-browser
+            - generic [ref=e35]: $0.088
+          - generic [ref=e36]:
+            - generic [ref=e37]: dev-browser
+            - generic [ref=e40]: $0.078
+          - generic [ref=e41]:
+            - generic [ref=e42]: chrome-devtools-axi
+            - generic [ref=e45]: $0.074
+      - generic [ref=e46]:
+        - paragraph [ref=e47]: Avg Duration per Task
+        - generic [ref=e48]:
+          - generic [ref=e49]:
+            - generic [ref=e50]: chrome-devtools-mcp-code
+            - generic [ref=e53]: 36.2s
+          - generic [ref=e54]:
+            - generic [ref=e55]: chrome-devtools-mcp-compressed
+            - generic [ref=e58]: 29.7s
+          - generic [ref=e59]:
+            - generic [ref=e60]: chrome-devtools-mcp-search
+            - generic [ref=e63]: 29.4s
+          - generic [ref=e64]:
+            - generic [ref=e65]: dev-browser
+            - generic [ref=e68]: 28.6s
+          - generic [ref=e69]:
+            - generic [ref=e70]: chrome-devtools-mcp
+            - generic [ref=e73]: 26.0s
+          - generic [ref=e74]:
+            - generic [ref=e75]: agent-browser
+            - generic [ref=e78]: 24.6s
+          - generic [ref=e79]:
+            - generic [ref=e80]: chrome-devtools-axi
+            - generic [ref=e83]: 21.5s
+    - generic [ref=e84]:
+      - generic [ref=e85]:
+        - paragraph [ref=e86]: Tell your agent to try it out
+        - generic [ref=e87]:
+          - code [ref=e88]: "Run `npx -y gh-axi` for Github operations"
+          - button "Copy to clipboard" [ref=e89] [cursor=pointer]
+        - generic [ref=e93]:
+          - code [ref=e94]: "Run `npx -y chrome-devtools-axi` for browser automation"
+          - button "Copy to clipboard" [ref=e95] [cursor=pointer]
+      - generic [ref=e99]:
+        - paragraph [ref=e100]: Build your own AXI
+        - paragraph [ref=e101]: "Install the AXI skill to get the design guidelines and scaffolding:"
+        - generic [ref=e102]:
+          - code [ref=e103]: npx skills add kunchenguid/axi
+          - button "Copy to clipboard" [ref=e104] [cursor=pointer]
+    - paragraph [ref=e108]:
+      - link "Github Repo" [ref=e109] [cursor=pointer]:
+        - /url: https://github.com/kunchenguid/axi
+      - text: ·
+      - link "Kun Chen" [ref=e110] [cursor=pointer]:
+        - /url: https://x.com/kunchenguid
+      - text: Presents
+  - generic [ref=e111]:
+    - paragraph [ref=e112]: Ecosystem
+    - heading "The [AXI catalog]." [level=2] [ref=e113]
+    - paragraph [ref=e114]: AXIs in the wild - official reference implementations maintained by the AXI project, and tools built by the community on the same principles.
+    - generic [ref=e115]:
+      - paragraph [ref=e116]: Official
+      - table [ref=e118]:
+        - rowgroup [ref=e119]:
+          - row [ref=e120]:
+            - columnheader "AXI" [ref=e121]
+            - columnheader "Domain" [ref=e122]
+            - columnheader "Description" [ref=e123]
+        - rowgroup [ref=e124]:
+          - row [ref=e125]:
+            - cell [ref=e126]:
+              - link [ref=e127] [cursor=pointer]:
+                - /url: https://github.com/kunchenguid/gh-axi
+                - code [ref=e128]: gh-axi
+            - cell "GitHub" [ref=e129]
+            - cell [ref=e130]:
+              - text: Issues, PRs, workflow runs, releases, and more. Wraps the official
+              - code [ref=e131]: gh
+              - text: CLI with agent-ergonomic output.
+          - row [ref=e132]:
+            - cell [ref=e133]:
+              - link [ref=e134] [cursor=pointer]:
+                - /url: https://github.com/kunchenguid/chrome-devtools-axi
+                - code [ref=e135]: chrome-devtools-axi
+            - cell "Browser automation" [ref=e136]
+            - cell "Navigate, click, fill, and extract with combined operations and query filtering. Wraps chrome-devtools-mcp." [ref=e137]
+          - row [ref=e138]:
+            - cell [ref=e139]:
+              - link [ref=e140] [cursor=pointer]:
+                - /url: https://github.com/kunchenguid/lavish-axi
+                - code [ref=e141]: lavish-axi
+            - cell "Human review" [ref=e142]
+            - cell "Turns agent-generated HTML artifacts into collaborative review surfaces - annotate, comment, and send feedback back to the agent." [ref=e143]
+          - row [ref=e144]:
+            - cell [ref=e145]:
+              - link [ref=e146] [cursor=pointer]:
+                - /url: https://github.com/kunchenguid/quota-axi
+                - code [ref=e147]: quota-axi
+            - cell "Quota / usage" [ref=e148]
+            - cell "Reports local Claude, Codex, Cursor, Copilot, and Grok quota/usage windows for routing-aware agents - data-only and local-first." [ref=e149]
+    - generic [ref=e150]:
+      - paragraph [ref=e151]: Community
+      - table [ref=e153]:
+        - rowgroup [ref=e154]:
+          - row [ref=e155]:
+            - columnheader "AXI" [ref=e156]
+            - columnheader "Author" [ref=e157]
+            - columnheader "Domain" [ref=e158]
+            - columnheader "Description" [ref=e159]
+        - rowgroup [ref=e160]:
+          - row [ref=e161]:
+            - cell [ref=e162]:
+              - link [ref=e163] [cursor=pointer]:
+                - /url: https://github.com/SSBrouhard/npm-axi
+                - code [ref=e164]: npm-axi
+            - cell "SSBrouhard" [ref=e165]
+            - cell "npm" [ref=e166]
+            - cell "Search and inspect npm registry packages, versions, dependencies, README previews, and downloads with token-efficient output." [ref=e167]
+          - row [ref=e168]:
+            - cell [ref=e169]:
+              - link [ref=e170] [cursor=pointer]:
+                - /url: https://github.com/SSBrouhard/sqlite-axi
+                - code [ref=e171]: sqlite-axi
+            - cell "SSBrouhard" [ref=e172]
+            - cell "SQLite" [ref=e173]
+            - cell "Inspect schemas, sample rows, and run capped read-only SQLite queries with token-efficient TOON output." [ref=e174]
+          - row [ref=e175]:
+            - cell [ref=e176]:
+              - link [ref=e177] [cursor=pointer]:
+                - /url: https://github.com/JarvusInnovations/slack-axi
+                - code [ref=e178]: slack-axi
+            - cell "Jarvus Innovations" [ref=e179]
+            - cell "Slack" [ref=e180]
+            - cell "Read, search, sweep, and safely draft Slack messages with token-efficient output." [ref=e181]
+          - row [ref=e182]:
+            - cell [ref=e183]:
+              - link [ref=e184] [cursor=pointer]:
+                - /url: https://github.com/JarvusInnovations/gws-axi
+                - code [ref=e185]: gws-axi
+            - cell "Jarvus Innovations" [ref=e186]
+            - cell "Google Workspace" [ref=e187]
+            - cell "Gmail, Calendar, Docs, Drive, and Slides behind one command, with multi-account write-safety - drafts mail, never sends." [ref=e188]
+          - row [ref=e189]:
+            - cell [ref=e190]:
+              - link [ref=e191] [cursor=pointer]:
+                - /url: https://github.com/JarvusInnovations/harvest-axi
+                - code [ref=e192]: harvest-axi
+            - cell "Jarvus Innovations" [ref=e193]
+            - cell "Time tracking" [ref=e194]
+            - cell "Review, log, and edit Harvest time entries by period - for yourself, your team, a project, or a client." [ref=e195]
+          - row [ref=e196]:
+            - cell [ref=e197]:
+              - link [ref=e198] [cursor=pointer]:
+                - /url: https://github.com/JarvusInnovations/specops
+                - code [ref=e199]: specops
+            - cell "Jarvus Innovations" [ref=e200]
+            - cell "Spec-driven dev" [ref=e201]
+            - cell "Spec-driven development for agents - and a demo of shipping an AXI embedded in a skill, not a standalone npm executable." [ref=e202]
+          - row [ref=e203]:
+            - cell [ref=e204]:
+              - link [ref=e205] [cursor=pointer]:
+                - /url: https://github.com/JarvusInnovations/gitsheets/tree/main/packages/gitsheets-axi
+                - code [ref=e206]: gitsheets-axi
+            - cell "Jarvus Innovations" [ref=e207]
+            - cell "Git-backed data" [ref=e208]
+            - cell "Read and mutate git-backed record sheets over the shell - TOON output, idempotent commits." [ref=e209]
+          - row [ref=e210]:
+            - cell [ref=e211]:
+              - link [ref=e212] [cursor=pointer]:
+                - /url: https://github.com/JarvusInnovations/metabase-axi
+                - code [ref=e213]: metabase-axi
+            - cell "Jarvus Innovations" [ref=e214]
+            - cell "Analytics / BI" [ref=e215]
+            - cell "Query, explore, and export from Metabase over the shell - SQL/MBQL, saved questions, schema introspection, full-data export." [ref=e216]
+          - row [ref=e217]:
+            - cell [ref=e218]:
+              - link [ref=e219] [cursor=pointer]:
+                - /url: https://github.com/JarvusInnovations/otter-axi
+                - code [ref=e220]: otter-axi
+            - cell "Jarvus Innovations" [ref=e221]
+            - cell "Meetings" [ref=e222]
+            - cell "Find and pull Otter.ai meeting transcripts from the shell - wraps Otter.ai's hosted MCP server as a scriptable, headless CLI." [ref=e223]
+          - row [ref=e224]:
+            - cell [ref=e225]:
+              - link [ref=e226] [cursor=pointer]:
+                - /url: https://github.com/maximebrmd/notion-axi
+                - code [ref=e227]: notion-axi
+            - cell "maximebrmd" [ref=e228]
+            - cell "Notion" [ref=e229]
+            - cell "Search, read, create, and update Notion pages and databases over the shell - token-efficient TOON output, PAT or integration auth." [ref=e230]
+          - row [ref=e231]:
+            - cell [ref=e232]:
+              - link [ref=e233] [cursor=pointer]:
+                - /url: https://github.com/JanSuthacheeva/clickup-axi
+                - code [ref=e234]: clickup-axi
+            - cell "JanSuthacheeva" [ref=e235]
+            - cell "ClickUp" [ref=e236]
+            - cell "List your open tasks, view a task with its newest comments inline, and change task status - truncation-aware, TOON-style output." [ref=e237]
+          - row [ref=e238]:
+            - cell [ref=e239]:
+              - link [ref=e240] [cursor=pointer]:
+                - /url: https://github.com/p33ves/databricks-axi
+                - code [ref=e241]: databricks-axi
+            - cell "p33ves" [ref=e242]
+            - cell "Databricks" [ref=e243]
+            - cell "Run Databricks jobs, watch runs, and pull failure logs inline over the official databricks CLI - more domains coming soon." [ref=e244]
+          - row [ref=e245]:
+            - cell [ref=e246]:
+              - link [ref=e247] [cursor=pointer]:
+                - /url: https://github.com/thatdudealso/aws-axi
+                - code [ref=e248]: aws-axi
+            - cell "thatdudealso" [ref=e249]
+            - cell "AWS" [ref=e250]
+            - cell "Discover, plan, provision, deploy, and inspect AWS services for hosting web, backend, database, and AI workloads through safe token-efficient CLI workflows." [ref=e251]
+          - row [ref=e252]:
+            - cell [ref=e253]:
+              - link [ref=e254] [cursor=pointer]:
+                - /url: https://github.com/thatdudealso/docker-axi
+                - code [ref=e255]: docker-axi
+            - cell "thatdudealso" [ref=e256]
+            - cell "Docker" [ref=e257]
+            - cell "Discover, build, run, debug, publish, inspect, and clean up Docker apps through safe token-efficient CLI workflows." [ref=e258]
+          - row [ref=e259]:
+            - cell [ref=e260]:
+              - link [ref=e261] [cursor=pointer]:
+                - /url: https://github.com/thatdudealso/pg-axi
+                - code [ref=e262]: pg-axi
+            - cell "thatdudealso" [ref=e263]
+            - cell "PostgreSQL" [ref=e264]
+            - cell "Discover, create, inspect, query, back up, restore, and maintain PostgreSQL databases through safe token-efficient CLI workflows." [ref=e265]
+    - paragraph [ref=e266]:
+      - text: Built an AXI?
+      - link "Follow the contributor workflow" [ref=e267] [cursor=pointer]:
+        - /url: https://github.com/kunchenguid/axi/blob/main/CONTRIBUTING.md
+      - text: to add it to the catalog.
+  - generic [ref=e268]:
+    - paragraph [ref=e269]: Premise
+    - heading "Neither CLI nor MCP gives [agents] enough love." [level=2] [ref=e270]
+    - paragraph [ref=e271]:
+      - text: AI agents interact with external services through two dominant paradigms. The first is
+      - strong [ref=e272]: shell-based CLI execution
+      - text: ": the agent runs commands like"
+      - code [ref=e273]: gh issue list
+      - text: or
+      - code [ref=e274]: agent-browser navigate
+      - text: and parses the text output. The second is
+      - strong [ref=e275]: structured tool protocols
+      - text: like MCP (Model Context Protocol), where the agent invokes typed tool functions through the hosting framework’s native tool-calling interface.
+    - paragraph [ref=e276]: "Both approaches have significant problems for agents:"
+    - list [ref=e277]:
+      - listitem [ref=e278]:
+        - strong [ref=e279]: "CLI: action and observation are separated."
+        - text: Browser CLIs return minimal confirmations —
+        - code [ref=e280]: navigate
+        - text: returns only a page title,
+        - code [ref=e281]: click
+        - text: returns “Done” — forcing the agent to call
+        - code [ref=e282]: snapshot
+        - text: after every action. This doubles tool calls and wastes token budget.
+      - listitem [ref=e283]:
+        - strong [ref=e284]: "MCP: schema overhead scales with tool count."
+        - text: A browser MCP server exposes ~30 tools. Their schemas inflate input tokens — MCP conditions average 185K tokens per task vs. 79K for AXI — and the overhead compounds across every turn.
+      - listitem [ref=e285]:
+        - strong [ref=e286]: "Both: poor discoverability."
+        - text: CLI agents must guess subcommands or read
+        - code [ref=e287]: "--help"
+        - text: . MCP agents with lazy loading guess wrong tool names — selecting
+        - code [ref=e288]: take_screenshot
+        - text: (1MB base64 PNG) instead of
+        - code [ref=e289]: take_snapshot
+        - text: (80KB text) — and crash the session. Neither provides in-context guidance on what to do next.
+    - paragraph [ref=e290]:
+      - text: Recent debate has framed this as “MCP vs. CLI”
+      - link "[2]" [ref=e291] [cursor=pointer]:
+        - /url: "#ref-smithery"
+      - text: ", but the real question is neither"
+      - emphasis [ref=e292]: which
+      - text: protocol nor
+      - emphasis [ref=e293]: which
+      - text: transport, but rather
+      - emphasis [ref=e294]: what design principles
+      - text: make an agent-tool interface effective.
+    - paragraph [ref=e295]:
+      - text: AXI is
+      - strong [ref=e296]: 10 principles for agent-ergonomic CLI design
+      - text: that treat token budget as a first-class constraint. AXI achieves the reliability advantages MCP promises (structured output, discoverability) at the cost profile of a CLI.
+    - separator [ref=e297]
+    - heading "Contributions" [level=3] [ref=e298]
+    - list [ref=e299]:
+      - listitem [ref=e300]: Ten design principles for agent-ergonomic CLI tools, organized into four categories.
+      - listitem [ref=e301]:
+        - text: Reference implementations (
+        - link [ref=e302] [cursor=pointer]:
+          - /url: https://github.com/kunchenguid/gh-axi
+          - code [ref=e303]: gh-axi
+        - text: for GitHub,
+        - link [ref=e304] [cursor=pointer]:
+          - /url: https://github.com/kunchenguid/chrome-devtools-axi
+          - code [ref=e305]: chrome-devtools-axi
+        - text: for browser automation) demonstrating the principles across two domains.
+      - listitem [ref=e306]:
+        - text: Two benchmarks — 490 browser automation runs and
+        - link "425 GitHub API runs" [ref=e307] [cursor=pointer]:
+          - /url: https://github.com/kunchenguid/axi/blob/main/bench-github/published-results/STUDY.md
+        - text: — comparing seven interface conditions each, with trajectory-level analysis showing where and why each interface succeeds or fails.
+  - generic [ref=e308]:
+    - paragraph [ref=e309]: Context
+    - heading "Related Work" [level=2] [ref=e310]
+    - heading "Model Context Protocol (MCP)" [level=4] [ref=e311]
+    - paragraph [ref=e312]:
+      - text: Anthropic’s Model Context Protocol
+      - link "[1]" [ref=e313] [cursor=pointer]:
+        - /url: "#ref-mcp"
+      - text: "provides a standardized way to connect AI models to external tools through structured, typed tool definitions. While MCP offers type-safe schemas and discoverable tool catalogs, the schema overhead is substantial. The evaluation below quantifies this cost: MCP conditions use 2.3× more input tokens than AXI (185K vs. 79K per task), and the overhead compounds across multi-step tasks."
+    - heading "MCP vs. CLI benchmarks" [level=4] [ref=e314]
+    - paragraph [ref=e315]:
+      - text: Mao and Pradhan
+      - link "[2]" [ref=e316] [cursor=pointer]:
+        - /url: "#ref-smithery"
+      - text: "benchmarked 756 runs comparing raw APIs, CLI, and native MCP across GitHub, Linear, and Singapore Bus APIs. They found native MCP achieved 91.7% success vs. 83.3% for CLI, with CLI using 2.9× more billed tokens. However, their CLI was auto-generated from API specs, not hand-designed for agents. They note: “What this does not settle is whether a hand-crafted, agent-first CLI could close the remaining gap.” AXI answers this question directly — an agent-first CLI not only closes the gap but surpasses MCP on every metric."
+    - heading "Code execution with MCP" [level=4] [ref=e317]
+    - paragraph [ref=e318]:
+      - text: Jones and Kelly
+      - link "[3]" [ref=e319] [cursor=pointer]:
+        - /url: "#ref-anthropic-code"
+      - text: "identified two scaling problems with direct MCP tool calls: tool definitions overload the context window, and intermediate results consume additional tokens as they pass through the model between calls. They proposed presenting MCP tools as a code API that the agent programs against, so that data flows through the execution environment rather than the context window. Varda and Pai"
+      - link "[4]" [ref=e320] [cursor=pointer]:
+        - /url: "#ref-cloudflare-code"
+      - text: independently arrived at the same insight, coining the term “Code Mode” and reporting that LLMs handle complex, multi-step tool interactions better when writing TypeScript than when making direct tool calls. The code-mode condition in our browser benchmark evaluates this approach. Code execution achieves 100% reliability, but write-run-debug loops make it the slowest condition (36.2s avg) and, at $0.120/task, the most expensive condition. In a
+      - link "separate GitHub benchmark" [ref=e321] [cursor=pointer]:
+        - /url: https://github.com/kunchenguid/axi/blob/main/bench-github/published-results/STUDY.md
+      - text: ", code mode was the cheapest MCP condition ($0.101/task) by batching API calls — suggesting the trade-off is domain-dependent."
+  - generic [ref=e322]:
+    - paragraph [ref=e323]: The Model
+    - heading "The [10 principles]." [level=2] [ref=e324]
+    - list [ref=e326]:
+      - listitem [ref=e327]:
+        - strong [ref=e328]: Token-efficient output
+        - text: — Use TOON format for ~40% token savings over JSON
+      - listitem [ref=e329]:
+        - strong [ref=e330]: Minimal default schemas
+        - text: — 3–4 fields per list item, not 10+
+      - listitem [ref=e331]:
+        - strong [ref=e332]: Content truncation
+        - text: — Truncate large text fields with size hints and escape hatches
+      - listitem [ref=e333]:
+        - strong [ref=e334]: Pre-computed aggregates
+        - text: — Include aggregated counts and statuses that eliminate round trips
+      - listitem [ref=e335]:
+        - strong [ref=e336]: Definitive empty states
+        - text: — Explicit “0 results” rather than ambiguous empty output
+      - listitem [ref=e337]:
+        - strong [ref=e338]: Structured errors & exit codes
+        - text: — Idempotent mutations, structured errors, no interactive prompts, fail loud on unknown flags
+      - listitem [ref=e339]:
+        - strong [ref=e340]: Ambient context
+        - text: — Install opt-in session integrations first, then offer an on-demand skill
+      - listitem [ref=e341]:
+        - strong [ref=e342]: Content first
+        - text: — Prefer showing actual data, not a wall of help text
+      - listitem [ref=e343]:
+        - strong [ref=e344]: Contextual disclosure
+        - text: — Append relevant next-step commands after output, not all upfront
+      - listitem [ref=e345]:
+        - strong [ref=e346]: Consistent way to get help
+        - text: — Concise per-subcommand reference for when agents need it
+    - heading "Efficiency" [level=3] [ref=e347]
+    - heading "1. Token-efficient output" [level=4] [ref=e348]
+    - paragraph [ref=e349]: Use TOON (Token-Optimized Object Notation) format instead of JSON or tab-separated tables. TOON omits braces, quotes, and commas, yielding approximately 40% token savings over equivalent JSON while remaining unambiguous to LLMs.
+    - generic [ref=e350]:
+      - generic [ref=e351]:
+        - paragraph [ref=e352]: Conventional (JSON)
+        - code [ref=e354]: "[{\"number\":42,\"title\":\"Fix login bug\",\"state\":\"open\", \"author\":\"alice\",\"labels\":[\"bug\",\"P1\"]}, {\"number\":43,\"title\":\"Add dark mode\",\"state\":\"open\", \"author\":\"bob\",\"labels\":[\"feature\"]}]"
+      - generic [ref=e355]:
+        - paragraph [ref=e356]: AXI (TOON)
+        - code [ref=e358]: "issues[2]{number,title,state}: 42,Fix login bug,open 43,Add dark mode,open"
+    - heading "2. Minimal default schemas" [level=4] [ref=e359]
+    - paragraph [ref=e360]:
+      - text: Return 3–4 fields per list item by default, not 10+. Agents rarely need all available fields and can request additional ones explicitly via a
+      - code [ref=e361]: "--fields"
+      - text: flag.
+    - heading "3. Content truncation" [level=4] [ref=e362]
+    - paragraph [ref=e363]:
+      - text: Truncate large text fields to a configurable limit, appending a size hint such as
+      - code [ref=e364]: (truncated, 2847 chars total — use --full to see complete body)
+      - text: . This prevents a single verbose response from consuming the agent’s context budget while preserving enough content for most tasks.
+    - separator [ref=e365]
+    - heading "Robustness" [level=3] [ref=e366]
+    - heading "4. Pre-computed aggregates" [level=4] [ref=e367]
+    - paragraph [ref=e368]:
+      - text: Include aggregate or derived fields that eliminate round trips. The most impactful example is
+      - code [ref=e369]: totalCount
+      - text: ": always report the total number of items, not just the page size. Other examples include computed CI status summaries (e.g., “27 passed, 0 failed, 10 skipped”) inline in PR views."
+    - generic [ref=e370]:
+      - generic [ref=e371]:
+        - paragraph [ref=e372]: "Conventional: no total count"
+        - code [ref=e374]: "$ gh label list bug Something isn't working #d73a4a docs Improvements or additions #0075ca ... (30 rows -- default page, no total)"
+      - generic [ref=e375]:
+        - paragraph [ref=e376]: "AXI: total count + CI pre-computed"
+        - code [ref=e378]: "$ gh-axi label list count: 126 labels[126]{name}: bug docs ... $ gh-axi pr view 51772 pull_request: title: \"refactor(plugins): route...\" state: merged checks: \"27 passed, 0 failed, 10 skipped\""
+    - heading "5. Definitive empty states" [level=4] [ref=e379]
+    - paragraph [ref=e380]: When a query returns no results, output an explicit zero-result message rather than empty output. Agents cannot distinguish “no output” from “command failed silently” without this signal.
+    - heading "6. Structured errors & exit codes" [level=4] [ref=e381]
+    - paragraph [ref=e382]: "Mutations should be idempotent, errors should be structured and written to stdout (not stderr), and commands must never prompt for interactive input. Reserve stdout for structured data and stderr for debug/log output. Use clean exit codes: 0 for success, 1 for errors. Unknown flags must fail loud (exit 2) rather than be silently ignored — the same guarantee a CLI already gives for an unknown command — so an agent that invents a flag learns it did nothing instead of trusting unscoped output."
+    - separator [ref=e383]
+    - heading "Discoverability" [level=3] [ref=e384]
+    - heading "7. Ambient context" [level=4] [ref=e385]
+    - paragraph [ref=e386]: Install into the agent’s session hooks or plugin system from an explicit setup command so that every conversation starts with relevant state already visible — before the agent takes any action. The integration provides a compact, directory-scoped dashboard as initial context. As a secondary recommendation, also ship an installable Agent Skill (generated from the same home-view guidance) so agents that support the skill format can load your guidance on demand, without the per-session cost of a hook.
+    - heading "8. Content first" [level=4] [ref=e387]
+    - paragraph [ref=e388]:
+      - text: Running a command with no arguments should display live, actionable data rather than help text. The home view should also include the current executable path, with the home-directory prefix rendered as
+      - code [ref=e389]: ~
+      - text: ", and a one-sentence description of what the AXI does."
+    - generic [ref=e390]:
+      - generic [ref=e391]:
+        - paragraph [ref=e392]: "Conventional: no-args shows help"
+        - code [ref=e394]: $ gh issue Work with GitHub issues. USAGE gh issue <command> [flags] AVAILABLE COMMANDS close, create, list, view, ...
+      - generic [ref=e395]:
+        - paragraph [ref=e396]: "AXI: no-args shows live state"
+        - code [ref=e398]: "$ gh-axi issue bin: ~/.local/bin/gh-axi description: Browse and manage GitHub issues for the current repository count: 14 of 8771 total issues[14]{number,title,state}: 51815,\"[Bug]: Telegram plugin...\",open ... help[2]: Run `gh-axi issue view <number>` Run `gh-axi issue create --title \"...\"`"
+    - heading "9. Contextual disclosure" [level=4] [ref=e399]
+    - paragraph [ref=e400]:
+      - text: Append
+      - code [ref=e401]: help[]
+      - text: lines after output, suggesting logical next steps as concrete command templates. Carry forward fixed disambiguating flags, but leave runtime values parameterized as placeholders like
+      - code [ref=e402]: <id>
+      - text: instead of guessing them. This eliminates tool-discovery turns and guides agents through multi-step workflows.
+    - heading "10. Consistent way to get help" [level=4] [ref=e403]
+    - paragraph [ref=e404]:
+      - text: Each subcommand should offer a concise
+      - code [ref=e405]: "--help"
+      - text: flag as a fallback when contextual hints are insufficient.
+  - generic [ref=e406]:
+    - paragraph [ref=e407]: Method
+    - heading "Experimental Setup" [level=2] [ref=e408]
+    - heading "Conditions" [level=4] [ref=e409]
+    - paragraph [ref=e410]: "The benchmark evaluates seven agent-tool interface conditions for browser automation:"
+    - table [ref=e413]:
+      - rowgroup [ref=e414]:
+        - row [ref=e415]:
+          - columnheader "Condition" [ref=e416]
+          - columnheader "Interface" [ref=e417]
+          - columnheader "Description" [ref=e418]
+      - rowgroup [ref=e419]:
+        - row [ref=e420]:
+          - cell [ref=e421]:
+            - strong [ref=e422]: chrome-devtools-axi
+          - cell "Bash CLI (AXI)" [ref=e423]
+          - cell "AXI wrapper around chrome-devtools-mcp. Combined operations, TOON metadata, contextual suggestions." [ref=e424]
+        - row [ref=e425]:
+          - cell [ref=e426]:
+            - strong [ref=e427]: dev-browser
+          - cell "Bash CLI" [ref=e428]
+          - cell [ref=e429]:
+            - text: Sandboxed browser scripting via
+            - code [ref=e430]: dev-browser run script.js
+            - text: . Agent writes small JS files and prints only targeted results.
+        - row [ref=e431]:
+          - cell [ref=e432]:
+            - strong [ref=e433]: agent-browser
+          - cell "Bash CLI (Rust)" [ref=e434]
+          - cell "Vercel’s Agent Browser — the raw CLI baseline." [ref=e435]
+        - row [ref=e436]:
+          - cell [ref=e437]:
+            - strong [ref=e438]: chrome-devtools-mcp
+          - cell "MCP (no ToolSearch)" [ref=e439]
+          - cell "Chrome DevTools MCP server. All ~30 tool schemas loaded upfront." [ref=e440]
+        - row [ref=e441]:
+          - cell [ref=e442]:
+            - strong [ref=e443]: chrome-devtools-mcp-search
+          - cell "MCP + ToolSearch" [ref=e444]
+          - cell "Same MCP server, tools discovered on-demand." [ref=e445]
+        - row [ref=e446]:
+          - cell [ref=e447]:
+            - strong [ref=e448]: chrome-devtools-mcp-code
+          - cell "TypeScript scripts" [ref=e449]
+          - cell [ref=e450]:
+            - text: Agent writes
+            - code [ref=e451]: .ts
+            - text: scripts calling
+            - code [ref=e452]: callTool()
+            - text: which forwards to chrome-devtools-mcp via a persistent MCP bridge.
+        - row [ref=e453]:
+          - cell [ref=e454]:
+            - strong [ref=e455]: chrome-devtools-mcp-compressed
+          - cell "MCP Compressor CLI" [ref=e456]
+          - cell "mcp-compressor wraps the MCP server into CLI subcommands. Agent uses Bash." [ref=e457]
+    - heading "Task design" [level=4] [ref=e458]
+    - paragraph [ref=e459]: "The benchmark includes 14 tasks across four categories:"
+    - list [ref=e460]:
+      - listitem [ref=e461]:
+        - strong [ref=e462]: "Single-step (4 tasks):"
+        - code [ref=e463]: read_static_page
+        - text: ","
+        - code [ref=e464]: wikipedia_fact_lookup
+        - text: ","
+        - code [ref=e465]: github_repo_stars
+        - text: ","
+        - code [ref=e466]: wikipedia_table_read
+        - text: — navigate to one page and extract information.
+      - listitem [ref=e467]:
+        - strong [ref=e468]: "Multi-step (5 tasks):"
+        - code [ref=e469]: wikipedia_link_follow
+        - text: ","
+        - code [ref=e470]: github_navigate_to_file
+        - text: ","
+        - code [ref=e471]: wikipedia_infobox_hop
+        - text: ","
+        - code [ref=e472]: multi_page_comparison
+        - text: ","
+        - code [ref=e473]: wikipedia_search_click
+        - text: — navigate, interact, and follow links across pages.
+      - listitem [ref=e474]:
+        - strong [ref=e475]: "Investigation (4 tasks):"
+        - code [ref=e476]: wikipedia_deep_extraction
+        - text: ","
+        - code [ref=e477]: github_issue_investigation
+        - text: ","
+        - code [ref=e478]: multi_site_research
+        - text: ","
+        - code [ref=e479]: tabular_data_analysis
+        - text: — complex multi-page extraction requiring context across navigations.
+      - listitem [ref=e480]:
+        - strong [ref=e481]: "Error recovery (1 task):"
+        - code [ref=e482]: navigate_404
+        - text: — handle failures gracefully.
+    - heading "Infrastructure" [level=4] [ref=e483]
+    - paragraph [ref=e484]:
+      - text: Each run creates a fresh workspace with condition-specific
+      - code [ref=e485]: CLAUDE.md
+      - text: ". All MCP-based conditions use the same backend:"
+      - code [ref=e486]: chrome-devtools-mcp@latest --headless --isolated
+      - text: ". Agent: Claude Sonnet 4.6. Judge: Claude Sonnet 4.6. Five repeats per condition–task pair: 14 × 7 × 5 = 490 total runs."
+    - paragraph [ref=e487]:
+      - text: A
+      - link "separate benchmark targeting GitHub API tasks" [ref=e488] [cursor=pointer]:
+        - /url: https://github.com/kunchenguid/axi/blob/main/bench-github/published-results/STUDY.md
+      - text: (425 runs, 5 conditions, 17 tasks) validates the same pattern in a different domain.
+    - heading "Metrics" [level=4] [ref=e489]
+    - list [ref=e490]:
+      - listitem [ref=e491]:
+        - strong [ref=e492]: Task success
+        - text: "(binary): determined by an LLM judge comparing the agent’s answer against a reference answer and rubric."
+      - listitem [ref=e493]:
+        - strong [ref=e494]: Cost
+        - text: "(USD): total API cost, computed from input/output token counts at published rates."
+      - listitem [ref=e495]:
+        - strong [ref=e496]: Duration
+        - text: "(seconds): wall-clock time from task start to final response."
+      - listitem [ref=e497]:
+        - strong [ref=e498]: Turns
+        - text: ": number of tool invocations the agent makes."
+  - generic [ref=e499]:
+    - paragraph [ref=e500]: Proof
+    - heading "Results" [level=2] [ref=e501]
+    - paragraph [ref=e502]: 490 runs, 14 tasks × 5 repetitions × 7 conditions
+    - generic [ref=e503]:
+      - paragraph [ref=e504]: Aggregate
+      - table [ref=e506]:
+        - rowgroup [ref=e507]:
+          - row [ref=e508]:
+            - columnheader "Condition" [ref=e509]
+            - columnheader "Success" [ref=e510]
+            - columnheader "Avg Cost" [ref=e511]
+            - columnheader "Avg Duration" [ref=e512]
+            - columnheader "Avg Turns" [ref=e513]
+        - rowgroup [ref=e514]:
+          - row [ref=e515]:
+            - cell [ref=e516]:
+              - strong [ref=e517]: chrome-devtools-axi
+            - cell [ref=e518]:
+              - strong [ref=e519]: 100%
+            - cell [ref=e520]:
+              - strong [ref=e521]: $0.074
+            - cell [ref=e522]:
+              - strong [ref=e523]: 21.5s
+            - cell [ref=e524]:
+              - strong [ref=e525]: "4.5"
+          - row [ref=e526]:
+            - cell "dev-browser" [ref=e527]
+            - cell "99%" [ref=e528]
+            - cell "$0.078" [ref=e529]
+            - cell "28.6s" [ref=e530]
+            - cell "4.9" [ref=e531]
+          - row [ref=e532]:
+            - cell "agent-browser" [ref=e533]
+            - cell "99%" [ref=e534]
+            - cell "$0.088" [ref=e535]
+            - cell "24.6s" [ref=e536]
+            - cell "4.8" [ref=e537]
+          - row [ref=e538]:
+            - cell "chrome-devtools-mcp-compressed" [ref=e539]
+            - cell "100%" [ref=e540]
+            - cell "$0.091" [ref=e541]
+            - cell "29.7s" [ref=e542]
+            - cell "7.6" [ref=e543]
+          - row [ref=e544]:
+            - cell "chrome-devtools-mcp-search" [ref=e545]
+            - cell "99%" [ref=e546]
+            - cell "$0.096" [ref=e547]
+            - cell "29.4s" [ref=e548]
+            - cell "7.5" [ref=e549]
+          - row [ref=e550]:
+            - cell "chrome-devtools-mcp" [ref=e551]
+            - cell "99%" [ref=e552]
+            - cell "$0.100" [ref=e553]
+            - cell "26.0s" [ref=e554]
+            - cell "6.2" [ref=e555]
+          - row [ref=e556]:
+            - cell "chrome-devtools-mcp-code" [ref=e557]
+            - cell "100%" [ref=e558]
+            - cell "$0.120" [ref=e559]
+            - cell "36.2s" [ref=e560]
+            - cell "6.4" [ref=e561]
+    - paragraph [ref=e562]:
+      - text: AXI (
+      - code [ref=e563]: chrome-devtools-axi
+      - text: ) achieves 100% task success at the lowest average cost ($0.074/task), shortest duration (21.5s), and fewest turns (4.5). It is the only condition that leads simultaneously on all four metrics. The field is competitive — dev-browser is within 5% on cost — but AXI’s consistency across the full task suite gives it the edge.
+    - separator [ref=e564]
+    - 'heading "Corroborating evidence: GitHub benchmark" [level=3] [ref=e565]'
+    - paragraph [ref=e566]:
+      - text: A
+      - link "separate 425-run benchmark" [ref=e567] [cursor=pointer]:
+        - /url: https://github.com/kunchenguid/axi/blob/main/bench-github/published-results/STUDY.md
+      - text: comparing
+      - code [ref=e568]: gh-axi
+      - text: against raw
+      - code [ref=e569]: gh
+      - text: "CLI and GitHub MCP across 17 tasks arrives at the same conclusions:"
+      - strong [ref=e570]: AXI achieves 100% success at $0.050/task
+      - text: ", vs. 86% at $0.054 for CLI and 82–87% at $0.101–$0.148 for MCP. The cost gap widens dramatically on complex tasks:"
+      - code [ref=e571]: ci_failure_investigation
+      - text: costs $0.065 for AXI vs. $0.758 for MCP (12×).
+  - generic [ref=e572]:
+    - paragraph [ref=e573]: Analysis
+    - heading "Findings" [level=2] [ref=e574]
+    - generic [ref=e575]:
+      - paragraph [ref=e576]: Finding 1
+      - heading "AXI leads on every metric." [level=4] [ref=e577]
+      - paragraph [ref=e578]:
+        - code [ref=e579]: chrome-devtools-axi
+        - text: achieves 100% success at the lowest cost ($0.074/task), fewest turns (4.5), and fastest execution (21.5s). It is the only condition that leads simultaneously on all four metrics. The field is competitive —
+        - code [ref=e580]: dev-browser
+        - text: is within 5% on cost ($0.078) — but AXI’s consistency across the full task suite gives it the edge.
+      - paragraph [ref=e581]: "Trajectory analysis across all 70 AXI runs reveals multiple mechanisms behind the cost advantage:"
+      - list [ref=e582]:
+        - listitem [ref=e583]:
+          - strong [ref=e584]: Specialized extraction commands.
+          - text: AXI’s
+          - code [ref=e585]: tables --url
+          - text: command navigates to a page and returns structured table data in a single step. On extraction tasks, this reduces the entire interaction to 2 turns at $0.047/task — a 3.1× cost reduction vs. MCP-code on the same task ($0.147).
+        - listitem [ref=e586]:
+          - strong [ref=e587]: Pipe-based filtering.
+          - text: The agent pipes CLI output through shell tools (
+          - code [ref=e588]: "| grep"
+          - text: ","
+          - code [ref=e589]: "| head"
+          - text: ","
+          - code [ref=e590]: "| tail"
+          - text: ) to return only matching lines instead of full accessibility snapshots. This keeps per-turn token volume compact.
+        - listitem [ref=e591]:
+          - strong [ref=e592]: Combined operations.
+          - code [ref=e593]: open
+          - text: combines navigate + snapshot;
+          - code [ref=e594]: click --query
+          - text: returns the updated snapshot with search results automatically. This eliminates the separate
+          - code [ref=e595]: take_snapshot
+          - text: calls that MCP conditions require after every action.
+    - generic [ref=e596]:
+      - paragraph [ref=e597]: Finding 2
+      - heading "Code-writing pays a coordination tax." [level=4] [ref=e598]
+      - paragraph [ref=e599]:
+        - text: "Both code-writing conditions achieve near-perfect success:"
+        - code [ref=e600]: chrome-devtools-mcp-code
+        - text: at 100% and
+        - code [ref=e601]: dev-browser
+        - text: at 99%. MCP-code’s perfect reliability comes at $0.120/task and 6.4 turns — 1.6× AXI’s cost.
+        - code [ref=e602]: dev-browser
+        - text: is more competitive at $0.078 and 4.9 turns, occasionally beating AXI on multi-site tasks where script batching eliminates sequential navigation.
+      - paragraph [ref=e603]:
+        - text: "On"
+        - code [ref=e604]: multi_site_research
+        - text: ","
+        - code [ref=e605]: dev-browser
+        - text: ’s best run costs $0.059 (4 turns, 3 scripts) vs. AXI’s $0.090 (6 turns). Batching three site visits into three focused scripts avoids the per-navigation overhead of AXI’s sequential
+        - code [ref=e606]: open --query
+        - text: "pattern. The trade-off: when scripts fail, write-run-debug loops push costs higher —"
+        - code [ref=e607]: dev-browser
+        - text: ranges from $0.059 to $0.100 across the 5 runs (1.7× spread).
+    - generic [ref=e608]:
+      - paragraph [ref=e609]: Finding 3
+      - heading "MCP Compressor validates CLI-over-MCP." [level=4] [ref=e610]
+      - paragraph [ref=e611]:
+        - link "MCP Compressor" [ref=e612] [cursor=pointer]:
+          - /url: https://github.com/atlassian-labs/mcp-compressor/
+        - text: open sourced by Atlassian (100% success, $0.091/task, 7.6 turns) wraps any MCP server into a single CLI tool, converting each MCP tool into a Bash subcommand. This single change — CLI over MCP — eliminates schema overhead and enables shell composability (
+        - code [ref=e613]: "| grep"
+        - text: ","
+        - code [ref=e614]: "| head"
+        - text: ).
+      - paragraph [ref=e615]:
+        - text: "The remaining 23% gap to AXI ($0.091 vs. $0.074) comes from two sources: MCP Compressor still requires separate"
+        - code [ref=e616]: navigate-page
+        - text: +
+        - code [ref=e617]: take-snapshot
+        - text: calls where AXI’s
+        - code [ref=e618]: open
+        - text: returns both in one due to its ergonomic interface design.
+  - generic [ref=e619]:
+    - paragraph [ref=e620]: Case Studies
+    - heading "Trajectory analysis." [level=2] [ref=e621]
+    - 'heading "Case A: Specialized extraction — from 11 turns to 2" [level=3] [ref=e622]'
+    - paragraph [ref=e623]:
+      - code [ref=e624]: wikipedia_deep_extraction
+      - text: — Navigate to the Wikipedia list of Nobel laureates in Physics and report the winners for the 3 most recent years, including all co-laureates.
+    - generic [ref=e625]:
+      - generic [ref=e626]:
+        - paragraph [ref=e627]: chrome-devtools-axi — 2 turns · $0.047
+        - code [ref=e629]: "Call 1: $ chrome-devtools-axi tables \\ --url \"<nobel-physics-url>\" \\ 2>/dev/null | tail -100 → Structured table data: years, names, countries, and citations for all laureates. 2025, 2024, 2023 are the last rows. Done. Agent reads the output and responds with all co-laureates for 2023–2025. Total time: 7.9s."
+      - generic [ref=e630]:
+        - paragraph [ref=e631]: chrome-devtools-mcp-code — 11 turns · $0.194
+        - code [ref=e633]: "Turn 1: Write + run get_nobel.ts → Navigate and dump the raw snapshot. Turns 2–4: Write + run probing scripts → Identify the recent-year rows and inspect the table structure. Turns 5–10: Refine extraction logic → Track rowspans, filter non-person links, and verify co-laureates. Turn 11: Final extraction succeeds. Total time: 58.6s."
+    - paragraph [ref=e634]:
+      - text: AXI’s
+      - code [ref=e635]: tables --url
+      - text: "command navigates, extracts, and structures table data in a single operation. The MCP-code agent follows a fundamentally different path: discover tool interfaces, read type signatures, write TypeScript, inspect the rendered table, and refine extraction logic for continuation rows — 11 turns and multiple script iterations to arrive at the same answer. Across all 5 runs, MCP-code costs $0.103–$0.194 (4–11 turns) vs. AXI’s consistent $0.047 (2 turns)."
+    - separator [ref=e636]
+    - 'heading "Case B: Combined operations still beat a 7-turn script loop" [level=3] [ref=e637]'
+    - paragraph [ref=e638]:
+      - code [ref=e639]: wikipedia_search_click
+      - text: — Go to Wikipedia, search for “Turing Award”, and report who the first recipient was.
+    - generic [ref=e640]:
+      - generic [ref=e641]:
+        - paragraph [ref=e642]: chrome-devtools-axi — 5 turns · $0.086
+        - code [ref=e644]: "Call 1: $ chrome-devtools-axi navigate --url <url> → error: \"Unknown command: navigate\" help[1]: Run `--help` to see commands Call 2: $ chrome-devtools-axi --help → Tips: \"Prefer open <url> --query\" \"fill @<uid> --submit fills and submits in one step.\" Call 3: $ chrome-devtools-axi open \\ \"<wikipedia-main-page>\" \\ --query \"search\" → Navigate + filter to search field. Agent sees @1_11. Call 4: $ chrome-devtools-axi fill @1_11 \\ \"Turing Award\" --submit → Fill + submit + wait + snapshot in one command. Article returned. \"First recipient: Alan Perlis.\""
+      - generic [ref=e645]:
+        - paragraph [ref=e646]: chrome-devtools-mcp-code — 7 turns · $0.132
+        - code [ref=e648]: "Turns 1–2: Write + run script → Navigate to Wikipedia and capture the main-page snapshot. Turn 3: Write follow-up script → First attempt fails after guessing the wrong wrapper export name. Turns 4–6: Read generated exports, rewrite with click() + pressKey(), and rerun the search sequence. Turn 7: Final extraction. The Turing Award article states the first recipient was Alan Perlis."
+    - paragraph [ref=e649]:
+      - text: The critical command is
+      - code [ref=e650]: fill @1_11 "Turing Award" --submit
+      - text: . This single invocation fills the search box, submits the form, waits for the results page, and returns the snapshot — four operations in one step. The MCP-code agent still has to orchestrate these as separate wrapper calls (
+      - code [ref=e651]: click()
+      - text: ","
+      - code [ref=e652]: typeText()
+      - text: ","
+      - code [ref=e653]: pressKey()
+      - text: ","
+      - code [ref=e654]: takeSnapshot()
+      - text: ), and it spent extra turns confirming the generated export names before the sequence ran cleanly. Across the rerun, the task ranged from $0.132 to $0.316 (7–18 turns). This is
+      - strong [ref=e655]: Principle 4 (pre-computed aggregates)
+      - text: "applied to actions: the tool does the multi-step work so the agent doesn’t have to."
+    - separator [ref=e656]
+    - 'heading "Case C: Query filtering eliminates the snapshot–search cycle" [level=3] [ref=e657]'
+    - paragraph [ref=e658]:
+      - code [ref=e659]: wikipedia_infobox_hop
+      - text: — Find the developer of Python from its infobox, then follow the link and report when the Python Software Foundation was founded.
+    - generic [ref=e660]:
+      - generic [ref=e661]:
+        - paragraph [ref=e662]: chrome-devtools-axi — 5 turns · $0.082
+        - code [ref=e664]: "Call 1: $ chrome-devtools-axi navigate --url <url> → error: \"Unknown command: navigate\" help[1]: Run `--help` to see commands Call 2: --help Call 3: $ chrome-devtools-axi open \\ \"<python-wiki-url>\" \\ --query \"stable release developer\" → Navigate + filter snapshot to matching lines. Agent sees developer and relevant links. Call 4: $ chrome-devtools-axi click @1_161 \\ --query \"founded formed\" → Click PSF link + search result page in one command. Found \"June 2001\". Done."
+      - generic [ref=e665]:
+        - paragraph [ref=e666]: agent-browser — 7 turns · $0.164
+        - code [ref=e668]: "Call 1: --help → Discover available commands. Call 2: open + wait 2000 + snapshot → Full snapshot of Python page. Agent manually scans for infobox. Call 3: click + wait 2000 + snapshot → Click link. Wait for load. Take full snapshot of new page. Call 4: get url → Verify navigation succeeded. Call 5: find text \"Python Software Foundation\" click + wait + get url → Retry click with text match. Call 6: eval document.querySelector → DOM query to extract link URL. Call 7: open + wait 2000 + snapshot → Navigate to PSF page. Full snapshot. Manual scan. Done."
+    - paragraph [ref=e669]:
+      - text: AXI’s
+      - code [ref=e670]: "--query"
+      - text: flag turns every command into a filtered view.
+      - code [ref=e671]: open --query "stable release developer"
+      - text: returns only the matching lines from the snapshot instead of the full Wikipedia page.
+      - code [ref=e672]: click @id --query "founded formed"
+      - text: clicks the link
+      - emphasis [ref=e673]: and
+      - text: searches the resulting page in one step. The agent-browser condition has no equivalent — every action requires a separate
+      - code [ref=e674]: wait
+      - text: +
+      - code [ref=e675]: snapshot
+      - text: cycle, plus verification steps (
+      - code [ref=e676]: get url
+      - text: ","
+      - code [ref=e677]: eval
+      - text: ) to confirm the action worked. This is
+      - strong [ref=e678]: Principle 9 (contextual disclosure)
+      - text: ": the tool returns targeted, relevant output after each action instead of dumping the full page state."
+  - generic [ref=e679]:
+    - paragraph [ref=e680]: Limitations
+    - heading "Caveats." [level=2] [ref=e681]
+    - list [ref=e682]:
+      - listitem [ref=e683]:
+        - strong [ref=e684]: Public websites only.
+        - text: All tasks target public sites (Wikipedia, GitHub, example.com). Results may vary on authenticated or dynamic web applications.
+      - listitem [ref=e685]:
+        - strong [ref=e686]: Single agent model.
+        - text: Only Claude Sonnet 4.6 is evaluated. Other models may exhibit different sensitivities to output format.
+      - listitem [ref=e687]:
+        - strong [ref=e688]: Read-only tasks.
+        - text: The benchmark includes only read and navigation operations. Form submissions and complex interactions introduce additional challenges.
+      - listitem [ref=e689]:
+        - strong [ref=e690]: LLM judge.
+        - text: Task success is determined by an LLM judge, which may introduce scoring biases.
+      - listitem [ref=e691]:
+        - strong [ref=e692]: Domain-specific implementation.
+        - text: While the AXI principles are domain-general, this evaluation focuses on browser automation. The
+        - link "GitHub benchmark" [ref=e693] [cursor=pointer]:
+          - /url: https://github.com/kunchenguid/axi/blob/main/bench-github/published-results/STUDY.md
+        - text: provides cross-domain validation.
+  - generic [ref=e694]:
+    - paragraph [ref=e695]: Implication
+    - heading "The answer is [principled design], not protocol choice." [level=2] [ref=e696]
+    - paragraph [ref=e697]: "The debate between CLI and MCP as agent-tool interfaces misses the deeper question: what design principles make any interface effective for agents? This evaluation shows that a principled CLI design (AXI) leads both raw CLI and MCP on every metric — success, cost, duration, and turns."
+    - paragraph [ref=e698]:
+      - text: "In browser automation, AXI achieves 100% reliability at $0.074/task and 4.5 turns, compared to $0.088 and 4.8 turns for raw CLI and $0.100 and 6.2 turns for MCP. The primary mechanism is specialized commands: AXI’s"
+      - code [ref=e699]: tables --url
+      - text: reduces extraction tasks to a single 2-turn interaction, while combined operations (
+      - code [ref=e700]: open
+      - text: ","
+      - code [ref=e701]: click --query
+      - text: ) eliminate the separate snapshot calls that MCP conditions require. Shell composability (
+      - code [ref=e702]: "| grep"
+      - text: ","
+      - code [ref=e703]: "| tail"
+      - text: ) keeps per-turn token volume compact.
+    - paragraph [ref=e704]: "A separate GitHub benchmark validates the same pattern: AXI at 100% success and $0.050/task vs. 86% and $0.054 for CLI, and 82–87% and $0.101–$0.148 for MCP. The 10 AXI principles provide a concrete, testable framework for designing agent-ergonomic interfaces that are both reliable and cost-efficient."
+  - contentinfo [ref=e705]:
+    - paragraph [ref=e706]: References
+    - list [ref=e707]:
+      - listitem [ref=e708]:
+        - link "Anthropic. Model Context Protocol specification." [ref=e709] [cursor=pointer]:
+          - /url: https://modelcontextprotocol.io
+        - text: Technical report, 2024.
+      - listitem [ref=e710]:
+        - link "H. Mao and R. Pradhan. “MCP vs CLI is the wrong fight.”" [ref=e711] [cursor=pointer]:
+          - /url: https://smithery.ai/blog/mcp-vs-cli-is-the-wrong-fight
+        - text: Smithery Blog, March 2026.
+      - listitem [ref=e712]:
+        - 'link "A. Jones and C. Kelly. “Code execution with MCP: Building more efficient agents.”" [ref=e713] [cursor=pointer]':
+          - /url: https://www.anthropic.com/engineering/code-execution-with-mcp
+        - text: Anthropic Engineering Blog, November 2025.
+      - listitem [ref=e714]:
+        - 'link "K. Varda and S. Pai. “Code Mode: The better way to use MCP.”" [ref=e715] [cursor=pointer]':
+          - /url: https://blog.cloudflare.com/code-mode/
+        - text: Cloudflare Blog, September 2025.
+      - listitem [ref=e716]:
+        - 'link "K. Chen. “AXI Benchmark Study: Agent Interface Comparison (GitHub).”" [ref=e717] [cursor=pointer]':
+          - /url: https://github.com/kunchenguid/axi/blob/main/bench-github/published-results/STUDY.md
+        - text: 425-run benchmark comparing gh-axi, gh CLI, and GitHub MCP, 2026.
+    - paragraph [ref=e718]:
+      - link "GitHub Repo" [ref=e719] [cursor=pointer]:
+        - /url: https://github.com/kunchenguid/axi
+      - text: ·
+      - link "Kun Chen" [ref=e720] [cursor=pointer]:
+        - /url: https://x.com/kunchenguid
+      - text: Presents

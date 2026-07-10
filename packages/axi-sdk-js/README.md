@@ -126,6 +126,8 @@ Most AXI authors should not need these directly.
 | `PortableHookCommandContext`                                  | Context for resolving portable hook commands                                                                               |
 | `shouldInstallHooksForNodeAxiExecPath()`                      | Check whether an executable path is safe for hook installation                                                             |
 
+The capability APIs are exported from the package root and are also available through the `axi-sdk-js/capability-policy` and `axi-sdk-js/capability-hooks` subpath exports.
+
 ### Session Hook Setup
 
 `runAxiCli()` does not install hooks during normal CLI execution.

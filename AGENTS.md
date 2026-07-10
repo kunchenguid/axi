@@ -6,7 +6,7 @@ This file provides guidance to AI agents when working with code in this reposito
 
 AXI (Agent eXperience Interface) defines 10 ergonomic principles for building CLI tools that AI agents use via shell execution. This repo contains:
 
-- **`packages/axi-sdk-js/`** — Shared Node.js SDK every `*-axi` CLI builds on. `runAxiCli()` provides built-in commands for all tools: `--help`, `-v`/`--version`, and `update` (self-update). `update` is a reserved command name; a tool may shadow it by registering its own handler.
+- **`packages/axi-sdk-js/`** — Shared Node.js SDK every `*-axi` CLI builds on. `runAxiCli()` provides built-in commands for all tools: `--help`, `-v`/`--version`, and `update` (self-update). `update` is a reserved command name; a tool may shadow it by registering its own handler. The SDK also ships the `axi-capability-hook` executable and `installCapabilityHooks()` for harness-side capability policy enforcement; see the "Capability Policy Hooks" section of `packages/axi-sdk-js/README.md`.
 - **`bench-github/`** — Benchmark harness that compares gh-axi vs gh CLI vs GitHub MCP across 17 agent tasks, graded by an LLM judge.
 - **`bench-browser/`** — Benchmark harness that compares browser automation tools (agent-browser, pinchtab, chrome-devtools-mcp) across 16 browsing tasks.
 - **`.agents/skills/axi/SKILL.md`** — The AXI skill definition (installable via `npx skills add kunchenguid/axi`).
@@ -66,6 +66,7 @@ How it works:
 2. The `axi-sdk-js-release-please` workflow opens or updates a release PR titled `chore(main): release axi-sdk-js <version>`.
    That PR is the only place the version in `packages/axi-sdk-js/package.json` may change, and the only place `packages/axi-sdk-js/CHANGELOG.md` and `.release-please-manifest.json` may change.
    Never hand-edit those files; the `Guard generated files` check specifically fails PRs that modify the generated changelog or manifest outside release-please.
+   The release PR also rewrites the version strings between the `x-release-please-start-version`/`x-release-please-end` markers in `packages/axi-sdk-js/README.md` (registered as an `extra-files` generic updater in `release-please-config.json`); the rest of that README stays hand-edited.
 3. **Publishing is a maintainer action: merge the open release-please PR.**
    That merge creates the git tag and GitHub release, after which the same workflow runs `format:check`, `lint`, `build`, `test`, then `npm publish --access public --provenance` (OIDC provenance via `id-token: write`, no static npm token in the repo).
 4. Verify with `npm view axi-sdk-js version` and confirm the published `dist/` carries the new code (for example `npm pack axi-sdk-js@<version>` then grep the extracted `dist/`).

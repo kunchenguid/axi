@@ -223,4 +223,42 @@ describe("capability policy public package boundary", () => {
     expect(sdk.installClaudeCapabilityHooks).toBeTypeOf("function");
     expect(sdk.runCapabilityHookProcess).toBeTypeOf("function");
   });
+
+  it("keeps the independent hook install exactly versioned through Release Please", () => {
+    const readme = readFileSync(
+      new URL("../README.md", import.meta.url),
+      "utf8",
+    );
+    const releaseConfig = JSON.parse(
+      readFileSync(
+        new URL("../../../release-please-config.json", import.meta.url),
+        "utf8",
+      ),
+    );
+    const installBlock = readme.match(
+      /<!-- x-release-please-start-version -->([\s\S]*?)<!-- x-release-please-end -->/,
+    )?.[1];
+
+    expect(
+      releaseConfig.packages["packages/axi-sdk-js"]["extra-files"],
+    ).toContainEqual({
+      type: "generic",
+      path: "packages/axi-sdk-js/README.md",
+    });
+    expect(installBlock).toBeDefined();
+    const packageVersion = installBlock?.match(
+      /npm install[^\n]*axi-sdk-js@(\d+\.\d+\.\d+)/,
+    )?.[1];
+    const prefixVersion = installBlock?.match(
+      /\/opt\/axi-sdk-js\/(\d+\.\d+\.\d+)/,
+    )?.[1];
+    expect(packageVersion).toMatch(/^\d+\.\d+\.\d+$/);
+    expect(prefixVersion).toBe(packageVersion);
+    expect(installBlock).toContain(
+      `/opt/axi-sdk-js/${packageVersion}/node_modules/.bin/axi-capability-hook`,
+    );
+    expect(installBlock).not.toMatch(
+      /(?:^|["'`\s])axi-capability-hook (?:session-start|pre-tool-use)/m,
+    );
+  });
 });

@@ -180,7 +180,7 @@ Capability policy hooks let a harness verify an AXI's authored capability manife
 The v1 runtime reads four local paths and performs no network requests:
 
 - an authored capability manifest that declares the AXI binary, route matches, effects, reached systems, scopes, and the two supported derivations (`http-method` and `flag-presence`);
-- a local policy with `schemaVersion: 1`, `engine: "builtin"`, manifest and publisher pins, per-effect decisions, per-method passthrough decisions, and optional deny-only path rules;
+- a local policy with `schemaVersion: 1`, `engine: "builtin"`, manifest and publisher pins, per-effect decisions, per-method passthrough decisions, and optional per-method path allowlists;
 - a publisher identity document containing the OIDC issuer and project path admitted by the organization;
 - an append-only JSONL evidence path outside the agent workspace.
 
@@ -214,22 +214,35 @@ A v1 policy has this shape:
     "paths": [
       {
         "method": "GET",
-        "pattern": "projects/*/access_tokens",
-        "decision": "deny"
+        "pattern": "projects/*/issues",
+        "decision": "allow"
       }
     ]
   }
 }
 ```
 
+The method map is evaluated first and cannot be widened by a path rule. When a method has path rules, those rules are an allowlist-style narrowing: only matching literal/`*` patterns are allowed and every non-matching path is denied. A method without path rules keeps its method-map decision.
+
 The harness owns the policy file and pins it through its normal deployment controls. The policy pins the canonical SHA-256 of the installed manifest and the admitted publisher identity tuple. Every evidence record carries both the verified manifest SHA-256 and the canonical policy SHA-256, so a collector can identify the exact claims and policy used for a decision. Admission-time provenance verification remains separate from the offline runtime check.
 
 ### Install the hooks
 
-Install the SDK independently in the harness environment so `axi-capability-hook` resolves without relying on the policed AXI package. The following commands use fixed local files and are suitable for generated Claude Code hook configuration:
+Install the expected SDK release independently under a dedicated, versioned harness prefix. The hook commands use the resulting absolute executable path; they never resolve the enforcement code from `PATH` or from the policed AXI package.
+
+<!-- x-release-please-start-version -->
+
+```sh
+npm install --prefix /opt/axi-sdk-js/0.1.9 --no-save --ignore-scripts --omit=dev axi-sdk-js@0.1.9
+```
+
+The following setup module imports that exact independent installation and writes fixed local artifact paths into every hook command:
 
 ```ts
-import { installCapabilityHooks } from "axi-sdk-js";
+import { installCapabilityHooks } from "file:///opt/axi-sdk-js/0.1.9/node_modules/axi-sdk-js/dist/index.js";
+
+const capabilityHook =
+  "/opt/axi-sdk-js/0.1.9/node_modules/.bin/axi-capability-hook";
 
 const common = [
   "--manifest /etc/axi/gl-axi/capabilities.json",
@@ -243,29 +256,33 @@ const common = [
 installCapabilityHooks({
   spec: {
     marker: "gl-axi-capability-policy",
-    sessionStartCommand: `axi-capability-hook session-start ${common}`,
-    preToolUseCommand: `axi-capability-hook pre-tool-use ${common}`,
+    sessionStartCommand: `${capabilityHook} session-start ${common}`,
+    preToolUseCommand: `${capabilityHook} pre-tool-use ${common}`,
   },
 });
 ```
 
-Installation is repeat-safe and preserves foreign configuration. Claude Code receives both the SessionStart integrity check and a Bash `PreToolUse` policy hook. Codex and OpenCode receive SessionStart integrity context. Codex and OpenCode do not currently expose compatible per-tool enforcement hooks, so v1 does not claim per-invocation enforcement on those harnesses; use their OS sandbox or other harness controls for execution policy.
+Installation is repeat-safe and preserves foreign configuration. Claude Code receives both the SessionStart integrity check and a Bash `PreToolUse` policy hook. Codex and OpenCode receive the SessionStart integrity check. Across Claude Code, Codex, and OpenCode, a failed SessionStart integrity check aborts startup: the native Claude Code and Codex hooks exit nonzero, and the OpenCode session transform rejects instead of adding advisory context. Only a verified manifest, policy, identity, and writable evidence path allow startup to continue.
+
+Codex and OpenCode do not currently expose compatible per-tool enforcement hooks, so v1 does not claim per-invocation enforcement on those harnesses; use their OS sandbox or other harness controls for execution policy. Claude Code is the only v1 harness with `PreToolUse` enforcement.
 
 The executable also supports equals-form flags:
 
 ```sh
-axi-capability-hook pre-tool-use \
+/opt/axi-sdk-js/0.1.9/node_modules/.bin/axi-capability-hook pre-tool-use \
   --manifest=/etc/axi/gl-axi/capabilities.json \
   --policy=/etc/axi/gl-axi/policy.json \
   --identity=/etc/axi/gl-axi/identity.json \
   --evidence=/var/log/axi/gl-axi-decisions.jsonl
 ```
 
+<!-- x-release-please-end -->
+
 Claude supplies one hook event as JSON on stdin. The executable writes one Claude hook response as JSON on stdout. Missing modes, paths, values, or unsupported flags return a structured `INVALID_USAGE` error on stderr and exit 2 before hook input is read.
 
 ### Decisions and evidence
 
-`PreToolUse` resolves only a simple standalone AXI command. Unknown routes, guarded routes, undecomposable or compound shell commands that mention the AXI, unsupported schema versions, invalid or missing documents, manifest hash mismatches, publisher identity mismatches, and policy denials all fail closed. Passthrough path rules can only narrow the per-method decision; they cannot grant a method the policy denies. GraphQL is treated as a mutation.
+`PreToolUse` resolves only a simple standalone AXI command. Unknown routes, guarded routes, undecomposable or compound shell commands that mention the AXI, unsupported schema versions, invalid or missing documents, manifest hash mismatches, publisher identity mismatches, and policy denials all fail closed. Passthrough path allowlists can only narrow the per-method decision; they cannot grant a method the policy denies. GraphQL is treated as a mutation.
 
 The evidence file is written before an allowed AXI command can execute. An unwritable evidence file produces an `EVIDENCE_UNWRITABLE` denial. Each JSONL decision contains:
 

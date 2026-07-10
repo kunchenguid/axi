@@ -342,6 +342,45 @@ process.stdout.write(JSON.stringify({ hookSpecificOutput: { hookEventName: "Sess
     });
   });
 
+  it("aborts the OpenCode system transform when integrity output is invalid", async () => {
+    const home = mkdtempSync(join(tmpdir(), "axi-opencode-integrity-fail-"));
+    tempDirs.push(home);
+    const commandPath = join(home, "axi-capability-hook");
+    writeFileSync(
+      commandPath,
+      '#!/usr/bin/env node\nprocess.stdout.write("{}");\n',
+    );
+    chmodSync(commandPath, 0o755);
+    installCapabilityHooks({
+      homeDir: home,
+      spec: {
+        marker: "axi-capability-hook",
+        sessionStartCommand: commandPath,
+        preToolUseCommand: `${commandPath} pre-tool-use`,
+      },
+    });
+    const pluginPath = join(
+      home,
+      ".config",
+      "opencode",
+      "plugins",
+      "axi-axi-capability-hook-integrity.js",
+    );
+    const pluginModule = await import(pathToFileURL(pluginPath).href);
+    const plugin = await pluginModule.AxiAxiCapabilityHookIntegrityPlugin({
+      directory: home,
+    });
+    const output = { system: [] as string[] };
+
+    await expect(
+      plugin["experimental.chat.system.transform"](
+        { sessionID: "session-failed" },
+        output,
+      ),
+    ).rejects.toThrow("INTEGRITY_HOOK_INVALID_OUTPUT");
+    expect(output.system).toEqual([]);
+  });
+
   it("does not overwrite a foreign OpenCode plugin at the managed target", () => {
     const home = mkdtempSync(join(tmpdir(), "axi-opencode-foreign-"));
     tempDirs.push(home);
@@ -473,6 +512,18 @@ describe("runClaudeCapabilityPreToolUse", () => {
     ],
     ["unknown routes", "gl-axi-fixture surprise", "ROUTE_UNKNOWN", null],
     [
+      "absolute executable paths",
+      "/opt/sdk/bin/gl-axi-fixture issue list",
+      "COMMAND_NOT_STANDALONE",
+      null,
+    ],
+    [
+      "npx package execution",
+      "npx gl-axi-fixture issue list",
+      "COMMAND_NOT_STANDALONE",
+      null,
+    ],
+    [
       "policy-denied effects",
       "gl-axi-fixture issue close 42",
       "EFFECT_DENIED",
@@ -494,10 +545,28 @@ describe("runClaudeCapabilityPreToolUse", () => {
       `POLICY_DENIED: ${reason}`,
     );
     expect(output.hookSpecificOutput?.permissionDecisionReason).toContain(
-      "Invoke gl-axi as a standalone command.",
+      "Invoke gl-axi-fixture as a standalone command.",
     );
     const record = JSON.parse(readFileSync(paths.evidencePath, "utf8").trim());
     expect(record).toMatchObject({ decision: "deny", reason, routeKey });
+  });
+
+  it("keeps typed policy error detail in the permission reason and a stable evidence code", () => {
+    const paths = capabilityFixture();
+    const output = runClaudeCapabilityPreToolUse(
+      {
+        tool_name: "Bash",
+        tool_input: { command: "gl-axi-fixture surprise" },
+      },
+      paths,
+    );
+
+    expect(output.hookSpecificOutput?.permissionDecisionReason).toContain(
+      "Invocation does not match a declared capability route.",
+    );
+    expect(
+      JSON.parse(readFileSync(paths.evidencePath, "utf8").trim()),
+    ).toMatchObject({ reason: "ROUTE_UNKNOWN" });
   });
 
   it("denies a manifest pin mismatch", () => {
@@ -648,5 +717,26 @@ describe("runCapabilityHookProcess", () => {
         permissionDecision: "allow",
       },
     });
+  });
+
+  it("returns nonzero when SessionStart integrity fails", () => {
+    const paths = capabilityFixture();
+    const policy = JSON.parse(readFileSync(paths.policyPath, "utf8"));
+    policy.pins.manifestSha256 = "0".repeat(64);
+    writeFileSync(paths.policyPath, JSON.stringify(policy));
+    let stdout = "";
+
+    const exitCode = runCapabilityHookProcess("session-start", paths, {
+      readStdin: () => JSON.stringify({ hook_event_name: "SessionStart" }),
+      writeStdout: (text) => {
+        stdout += text;
+      },
+    });
+
+    expect(exitCode).toBe(2);
+    expect(JSON.parse(stdout).hookSpecificOutput.additionalContext).toContain(
+      "gl-axi-fixture",
+    );
+    expect(stdout).not.toContain("Invoke gl-axi as");
   });
 });

@@ -209,7 +209,7 @@ const command = ${JSON.stringify(spec.sessionStartCommand)};
 const timeoutMs = ${JSON.stringify(timeoutMs)};
 
 function runIntegrityCheck(cwd, sessionID) {
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
     const child = spawn(command, [], {
       cwd: typeof cwd === "string" && cwd.length > 0 ? cwd : process.cwd(),
       env: process.env,
@@ -225,31 +225,38 @@ function runIntegrityCheck(cwd, sessionID) {
       clearTimeout(timer);
       resolve(context);
     };
+    const fail = (code, detail) => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timer);
+      reject(new Error("POLICY_DENIED: " + code + ": " + detail));
+    };
     const timer = setTimeout(() => {
       child.kill("SIGTERM");
-      finish("POLICY_DENIED: INTEGRITY_HOOK_TIMEOUT. No AXI invocation is trusted for this session.");
+      fail("INTEGRITY_HOOK_TIMEOUT", "integrity command exceeded " + timeoutMs + "ms");
     }, timeoutMs);
     child.stdout.setEncoding("utf8");
     child.stderr.setEncoding("utf8");
     child.stdout.on("data", (chunk) => { stdout += chunk; });
     child.stderr.on("data", (chunk) => { stderr += chunk; });
     child.on("error", (error) => {
-      finish("POLICY_DENIED: INTEGRITY_HOOK_FAILED: " + error.message + ". No AXI invocation is trusted for this session.");
+      fail("INTEGRITY_HOOK_FAILED", error.message);
     });
     child.on("close", (code) => {
       if (code !== 0) {
         const detail = (stderr || stdout || "exit " + code).trim();
-        finish("POLICY_DENIED: INTEGRITY_HOOK_FAILED: " + detail + ". No AXI invocation is trusted for this session.");
+        fail("INTEGRITY_HOOK_FAILED", detail);
         return;
       }
       try {
         const output = JSON.parse(stdout);
         const context = output?.hookSpecificOutput?.additionalContext;
         if (typeof context !== "string" || context.length === 0) throw new Error("missing additionalContext");
+        if (context.startsWith("POLICY_DENIED:")) throw new Error(context);
         finish(context);
       } catch (error) {
         const detail = error instanceof Error ? error.message : String(error);
-        finish("POLICY_DENIED: INTEGRITY_HOOK_INVALID_OUTPUT: " + detail + ". No AXI invocation is trusted for this session.");
+        fail("INTEGRITY_HOOK_INVALID_OUTPUT", detail);
       }
     });
     child.stdin.end(JSON.stringify({
@@ -456,8 +463,19 @@ function loadVerifiedBundle(
   };
 }
 
-function commandName(token: string): string {
-  return token.replaceAll("\\", "/").split("/").pop() ?? token;
+function trustedToolBin(
+  options: CapabilityHookRuntimeOptions,
+): string | undefined {
+  if (options.toolBin) return options.toolBin;
+  try {
+    return loadVerifiedBundle(options).manifest.tool.bin;
+  } catch {
+    return undefined;
+  }
+}
+
+function toolBinLabel(options: CapabilityHookRuntimeOptions): string {
+  return trustedToolBin(options) ?? "the configured AXI";
 }
 
 function commandMentionsTool(command: string, bin: string): boolean {
@@ -542,31 +560,23 @@ function tokenizeToolInvocation(
   if (!tokens || tokens.length === 0) {
     return { reason: "COMMAND_UNDECOMPOSABLE" };
   }
-  if (commandName(tokens[0] ?? "") === bin) {
+  if (tokens[0] === bin) {
     return { argv: tokens.slice(1) };
-  }
-
-  if (["npx", "npx.cmd"].includes(commandName(tokens[0] ?? "").toLowerCase())) {
-    let index = 1;
-    while (
-      ["--yes", "-y", "--no-install", "--quiet"].includes(tokens[index] ?? "")
-    ) {
-      index++;
-    }
-    const packageSpec = tokens[index] ?? "";
-    if (packageSpec === bin || packageSpec.startsWith(`${bin}@`)) {
-      return { argv: tokens.slice(index + 1) };
-    }
   }
 
   return { reason: "COMMAND_NOT_STANDALONE" };
 }
 
-function policyDeniedReason(reason: string): string {
+function policyDeniedReason(
+  reason: string,
+  toolBin: string,
+  message?: string,
+): string {
   return [
     `POLICY_DENIED: ${reason}.`,
+    ...(message ? [`message: ${message}`] : []),
     "help:",
-    "  - Invoke gl-axi as a standalone command.",
+    `  - Invoke ${toolBin} as a standalone command.`,
     "  - Use only routes and effects allowed by the pinned capability policy.",
   ].join("\n");
 }
@@ -586,7 +596,7 @@ function permissionOutput(
 
 function appendEvidence(
   options: CapabilityHookRuntimeOptions,
-  record: Record<string, unknown>,
+  record: CapabilityEvidenceRecord,
 ): boolean {
   try {
     appendFileSync(options.evidencePath, `${JSON.stringify(record)}\n`, {
@@ -599,28 +609,49 @@ function appendEvidence(
   }
 }
 
-function makeEvidenceRecord(
+interface CapabilityEvidenceRecord {
+  timestamp: string;
+  hookVersion: string;
+  hookEventName: "PreToolUse" | "SessionStart";
+  toolInputSha256: string;
+  routeKey: string | null;
+  declaredEffect: ResolvedCapabilityInvocation["declaredEffect"] | null;
+  effect: ResolvedCapabilityInvocation["effect"] | null;
+  decision: "allow" | "deny";
+  reason: string | null;
+  manifestSha256: string | null;
+  manifestSchemaVersion: unknown;
+  policySha256: string | null;
+  policySchemaVersion: unknown;
+}
+
+interface EvidenceRecordInput {
+  hookEventName: CapabilityEvidenceRecord["hookEventName"];
+  toolInput: unknown;
+  context: LoadedEvidenceContext;
+  decision: CapabilityEvidenceRecord["decision"];
+  reason: string | null;
+  resolution?: Partial<ResolvedCapabilityInvocation>;
+}
+
+function buildEvidenceRecord(
   options: CapabilityHookRuntimeOptions,
-  toolInput: unknown,
-  context: LoadedEvidenceContext,
-  decision: "allow" | "deny",
-  reason: string | null,
-  resolution?: Partial<ResolvedCapabilityInvocation>,
-): Record<string, unknown> {
+  input: EvidenceRecordInput,
+): CapabilityEvidenceRecord {
   return {
     timestamp: options.now?.() ?? new Date().toISOString(),
     hookVersion: options.hookVersion ?? "1",
-    hookEventName: "PreToolUse",
-    toolInputSha256: canonicalSha256(toolInput),
-    routeKey: resolution?.routeKey ?? null,
-    declaredEffect: resolution?.declaredEffect ?? null,
-    effect: resolution?.effect ?? null,
-    decision,
-    reason,
-    manifestSha256: context.manifestSha256,
-    manifestSchemaVersion: context.manifestSchemaVersion,
-    policySha256: context.policySha256,
-    policySchemaVersion: context.policySchemaVersion,
+    hookEventName: input.hookEventName,
+    toolInputSha256: canonicalSha256(input.toolInput),
+    routeKey: input.resolution?.routeKey ?? null,
+    declaredEffect: input.resolution?.declaredEffect ?? null,
+    effect: input.resolution?.effect ?? null,
+    decision: input.decision,
+    reason: input.reason,
+    manifestSha256: input.context.manifestSha256,
+    manifestSchemaVersion: input.context.manifestSchemaVersion,
+    policySha256: input.context.policySha256,
+    policySchemaVersion: input.context.policySchemaVersion,
   };
 }
 
@@ -649,8 +680,18 @@ export function runClaudeCapabilityPreToolUse(
       options,
     );
   }
-  const bin = options.toolBin ?? "gl-axi";
-  if (!commandMentionsTool(command, bin)) {
+  let bundleFromBinResolution: VerifiedBundle | undefined;
+  let binResolutionError: unknown;
+  let bin = options.toolBin;
+  if (!bin) {
+    try {
+      bundleFromBinResolution = loadVerifiedBundle(options);
+      bin = bundleFromBinResolution.manifest.tool.bin;
+    } catch (error) {
+      binResolutionError = error;
+    }
+  }
+  if (bin && !commandMentionsTool(command, bin)) {
     return {};
   }
 
@@ -658,40 +699,64 @@ export function runClaudeCapabilityPreToolUse(
   let resolution: ResolvedCapabilityInvocation | undefined;
   let decision: "allow" | "deny";
   let reason: string | null;
+  let denialMessage: string | undefined;
 
   try {
+    if (!bin) {
+      if (binResolutionError) throw binResolutionError;
+      throw new CapabilityPolicyError(
+        "TOOL_BIN_UNVERIFIED",
+        "The policed executable name cannot be trusted; provide a configured toolBin or restore the pinned local artifacts.",
+      );
+    }
     const invocation = tokenizeToolInvocation(command, bin);
     if (!invocation.argv) {
       throw new CapabilityPolicyError(
         invocation.reason ?? "COMMAND_UNDECOMPOSABLE",
-        "The shell command is not one standalone AXI invocation.",
+        `The shell command must be one plain standalone invocation whose exact command token is ${bin}.`,
       );
     }
-    const bundle = loadVerifiedBundle(options);
+    const bundle = bundleFromBinResolution ?? loadVerifiedBundle(options);
     context.manifestSha256 = bundle.manifestSha256;
     context.policySha256 = bundle.policySha256;
     resolution = resolveCapabilityInvocation(bundle.manifest, invocation.argv);
     const evaluated = evaluateCapabilityPolicy(bundle.policy, resolution);
     decision = evaluated.decision;
     reason = evaluated.reason ?? null;
+    if (decision === "deny") {
+      denialMessage = `Pinned capability policy denies ${resolution.routeKey} (${resolution.effect}).`;
+    }
   } catch (error) {
     reason =
       error instanceof CapabilityPolicyError
         ? error.code
         : "CAPABILITY_HOOK_ERROR";
+    denialMessage =
+      error instanceof CapabilityPolicyError
+        ? error.message
+        : error instanceof Error
+          ? error.message
+          : String(error);
     decision = "deny";
   }
 
-  const record = makeEvidenceRecord(
-    options,
-    event.tool_input,
+  const record = buildEvidenceRecord(options, {
+    hookEventName: "PreToolUse",
+    toolInput: event.tool_input,
     context,
     decision,
     reason,
     resolution,
-  );
+  });
   if (!appendEvidence(options, record)) {
-    return permissionOutput("deny", policyDeniedReason("EVIDENCE_UNWRITABLE"));
+    return permissionOutput(
+      "deny",
+      policyDeniedReason(
+        "EVIDENCE_UNWRITABLE",
+        bin ?? toolBinLabel(options),
+        "The evidence log could not be appended, so no decision can take effect.",
+      ),
+    );
   }
 
   if (decision === "allow" && resolution) {
@@ -702,18 +767,28 @@ export function runClaudeCapabilityPreToolUse(
   }
   return permissionOutput(
     "deny",
-    policyDeniedReason(reason ?? "POLICY_DENIED"),
+    policyDeniedReason(
+      reason ?? "POLICY_DENIED",
+      bin ?? toolBinLabel(options),
+      denialMessage,
+    ),
   );
 }
 
-export function runCapabilitySessionStart(
+interface CapabilitySessionStartResult {
+  output: ClaudeHookOutput;
+  allowed: boolean;
+}
+
+function evaluateCapabilitySessionStart(
   input: unknown,
   options: CapabilityHookRuntimeOptions,
-): ClaudeHookOutput {
+): CapabilitySessionStartResult {
   const context = evidenceContext(options);
   let decision: "allow" | "deny" = "deny";
   let reason: string | null = null;
-  let toolName = options.toolBin ?? "gl-axi";
+  let denialMessage: string | undefined;
+  let toolName = toolBinLabel(options);
 
   try {
     const bundle = loadVerifiedBundle(options);
@@ -726,39 +801,53 @@ export function runCapabilitySessionStart(
       error instanceof CapabilityPolicyError
         ? error.code
         : "CAPABILITY_HOOK_ERROR";
+    denialMessage =
+      error instanceof CapabilityPolicyError
+        ? error.message
+        : error instanceof Error
+          ? error.message
+          : String(error);
   }
 
-  const record = {
-    timestamp: options.now?.() ?? new Date().toISOString(),
-    hookVersion: options.hookVersion ?? "1",
+  const record = buildEvidenceRecord(options, {
     hookEventName: "SessionStart",
-    toolInputSha256: canonicalSha256(input),
-    routeKey: null,
-    declaredEffect: null,
-    effect: null,
+    toolInput: input,
+    context,
     decision,
     reason,
-    manifestSha256: context.manifestSha256,
-    manifestSchemaVersion: context.manifestSchemaVersion,
-    policySha256: context.policySha256,
-    policySchemaVersion: context.policySchemaVersion,
-  };
+  });
 
   if (!appendEvidence(options, record)) {
     decision = "deny";
     reason = "EVIDENCE_UNWRITABLE";
+    denialMessage =
+      "The evidence log could not be appended, so integrity cannot be established.";
   }
 
   const additionalContext =
     decision === "allow"
       ? `AXI capability integrity verified for ${toolName} (manifest ${context.manifestSha256}).`
-      : `${policyDeniedReason(reason ?? "INTEGRITY_CHECK_FAILED")} No ${toolName} invocation will be allowed.`;
+      : `${policyDeniedReason(
+          reason ?? "INTEGRITY_CHECK_FAILED",
+          toolName,
+          denialMessage,
+        )} No ${toolName} invocation will be allowed.`;
   return {
-    hookSpecificOutput: {
-      hookEventName: "SessionStart",
-      additionalContext,
+    allowed: decision === "allow",
+    output: {
+      hookSpecificOutput: {
+        hookEventName: "SessionStart",
+        additionalContext,
+      },
     },
   };
+}
+
+export function runCapabilitySessionStart(
+  input: unknown,
+  options: CapabilityHookRuntimeOptions,
+): ClaudeHookOutput {
+  return evaluateCapabilitySessionStart(input, options).output;
 }
 
 function malformedHookInputOutput(
@@ -768,30 +857,30 @@ function malformedHookInputOutput(
 ): ClaudeHookOutput {
   const context = evidenceContext(options);
   let reason = "HOOK_INPUT_INVALID";
-  const record = {
-    timestamp: options.now?.() ?? new Date().toISOString(),
-    hookVersion: options.hookVersion ?? "1",
+  const record = buildEvidenceRecord(options, {
     hookEventName: mode === "pre-tool-use" ? "PreToolUse" : "SessionStart",
-    toolInputSha256: canonicalSha256(rawInput),
-    routeKey: null,
-    declaredEffect: null,
-    effect: null,
+    toolInput: rawInput,
+    context,
     decision: "deny",
     reason,
-    manifestSha256: context.manifestSha256,
-    manifestSchemaVersion: context.manifestSchemaVersion,
-    policySha256: context.policySha256,
-    policySchemaVersion: context.policySchemaVersion,
-  };
+  });
   if (!appendEvidence(options, record)) reason = "EVIDENCE_UNWRITABLE";
+  const toolName = toolBinLabel(options);
+  const detail =
+    reason === "EVIDENCE_UNWRITABLE"
+      ? "The evidence log could not be appended, so no decision can take effect."
+      : "Hook input did not match the required event schema.";
 
   if (mode === "pre-tool-use") {
-    return permissionOutput("deny", policyDeniedReason(reason));
+    return permissionOutput(
+      "deny",
+      policyDeniedReason(reason, toolName, detail),
+    );
   }
   return {
     hookSpecificOutput: {
       hookEventName: "SessionStart",
-      additionalContext: `${policyDeniedReason(reason)} No gl-axi invocation will be allowed.`,
+      additionalContext: `${policyDeniedReason(reason, toolName, detail)} No ${toolName} invocation will be allowed.`,
     },
   };
 }
@@ -803,18 +892,23 @@ export function runCapabilityHookProcess(
 ): number {
   const rawInput = io.readStdin?.() ?? readFileSync(0, "utf8");
   let output: ClaudeHookOutput;
+  let exitCode = 0;
   try {
     const input = JSON.parse(rawInput) as unknown;
-    output =
-      mode === "pre-tool-use"
-        ? runClaudeCapabilityPreToolUse(input, options)
-        : runCapabilitySessionStart(input, options);
+    if (mode === "pre-tool-use") {
+      output = runClaudeCapabilityPreToolUse(input, options);
+    } else {
+      const result = evaluateCapabilitySessionStart(input, options);
+      output = result.output;
+      exitCode = result.allowed ? 0 : 2;
+    }
   } catch {
     output = malformedHookInputOutput(mode, rawInput, options);
+    if (mode === "session-start") exitCode = 2;
   }
 
   const serialized = `${JSON.stringify(output)}\n`;
   if (io.writeStdout) io.writeStdout(serialized);
   else process.stdout.write(serialized);
-  return 0;
+  return exitCode;
 }

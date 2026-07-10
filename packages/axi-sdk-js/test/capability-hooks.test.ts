@@ -653,6 +653,135 @@ describe("runClaudeCapabilityPreToolUse", () => {
   });
 
   it.each([
+    [
+      "escaped executable with a command chain",
+      "g\\l-axi-fixture issue list && echo done",
+    ],
+    [
+      "quote-split executable with a statement",
+      "g''l-axi-fixture issue list; echo done",
+    ],
+    [
+      "quote-split executable in a pipeline",
+      'printf done | g""l-axi-fixture issue list',
+    ],
+    [
+      "quote-split executable before a variable expansion",
+      "g''l-axi-fixture issue list && echo $HOME",
+    ],
+    [
+      "escaped executable before a shell comment",
+      "g\\l-axi-fixture issue list && # explain\necho done",
+    ],
+    [
+      "version-qualified npx target after a command chain",
+      "true && npx g''l-axi-fixture@1.2.3 issue list",
+    ],
+    [
+      "version-qualified npx target after a newline",
+      "true\nnpx g\\l-axi-fixture@1.2.3 issue list",
+    ],
+    [
+      "version-qualified npx target inside backticks",
+      "true && echo `npx g''l-axi-fixture@1.2.3 issue list`",
+    ],
+  ])("denies a compound command containing an %s", (_name, command) => {
+    const paths = capabilityFixture();
+    const output = runClaudeCapabilityPreToolUse(
+      { tool_name: "Bash", tool_input: { command } },
+      paths,
+    );
+
+    expect(output.hookSpecificOutput?.permissionDecision).toBe("deny");
+    expect(output.hookSpecificOutput?.permissionDecisionReason).toContain(
+      "POLICY_DENIED: COMMAND_UNDECOMPOSABLE",
+    );
+    expect(
+      JSON.parse(readFileSync(paths.evidencePath, "utf8").trim()),
+    ).toMatchObject({ decision: "deny", reason: "COMMAND_UNDECOMPOSABLE" });
+  });
+
+  it("has no opinion on an unrelated compound command", () => {
+    const paths = capabilityFixture();
+    expect(
+      runClaudeCapabilityPreToolUse(
+        {
+          tool_name: "Bash",
+          tool_input: { command: "git status --short && printf done" },
+        },
+        paths,
+      ),
+    ).toEqual({});
+    expect(existsSync(paths.evidencePath)).toBe(false);
+  });
+
+  it("has no opinion when a compound command only assigns an obfuscated bin name as data", () => {
+    const paths = capabilityFixture();
+    expect(
+      runClaudeCapabilityPreToolUse(
+        {
+          tool_name: "Bash",
+          tool_input: {
+            command:
+              "TOOL_NAME=g''l-axi-fixture git status --short && printf done",
+          },
+        },
+        paths,
+      ),
+    ).toEqual({});
+    expect(existsSync(paths.evidencePath)).toBe(false);
+  });
+
+  it("has no opinion when unsupported syntax follows a protected bin name used only as data", () => {
+    const paths = capabilityFixture();
+    expect(
+      runClaudeCapabilityPreToolUse(
+        {
+          tool_name: "Bash",
+          tool_input: {
+            command:
+              "TOOL_NAME=gl-axi-fixture git status --short && echo $HOME",
+          },
+        },
+        paths,
+      ),
+    ).toEqual({});
+    expect(existsSync(paths.evidencePath)).toBe(false);
+  });
+
+  it("has no opinion when a similarly named shell parameter is used as data", () => {
+    const paths = capabilityFixture();
+    expect(
+      runClaudeCapabilityPreToolUse(
+        {
+          tool_name: "Bash",
+          tool_input: {
+            command: "echo $gl-axi-fixture && printf done",
+          },
+        },
+        paths,
+      ),
+    ).toEqual({});
+    expect(existsSync(paths.evidencePath)).toBe(false);
+  });
+
+  it("has no opinion when a positional shell parameter prefixes bin-shaped data", () => {
+    const paths = capabilityFixture();
+    expect(
+      runClaudeCapabilityPreToolUse(
+        {
+          tool_name: "Bash",
+          tool_input: {
+            command: "echo $1gl-axi-fixture && printf done",
+          },
+        },
+        paths,
+      ),
+    ).toEqual({});
+    expect(existsSync(paths.evidencePath)).toBe(false);
+  });
+
+  it.each([
     ["escaped wrapper", "env g\\l-axi-fixture issue list"],
     ["quote-split wrapper", "command g''l-axi-fixture issue list"],
     ["assignment prefix", "TOKEN=value gl-axi-fixture issue list"],

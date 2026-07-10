@@ -499,13 +499,6 @@ function toolBinLabel(options: CapabilityHookRuntimeOptions): string {
   return trustedToolBin(options) ?? "the configured AXI";
 }
 
-function commandMentionsTool(command: string, bin: string): boolean {
-  const escaped = bin.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-  return new RegExp(
-    `(^|[^A-Za-z0-9._-])${escaped}(?:@[^\\s'"]+)?(?=$|[^A-Za-z0-9._-])`,
-  ).test(command);
-}
-
 function tokenResolvesProtectedBin(token: string, bin: string): boolean {
   if (token === bin) return true;
   const normalized = token.replaceAll("\\", "/");
@@ -532,11 +525,79 @@ function npxTargetsProtectedBin(tokens: string[], bin: string): boolean {
   });
 }
 
-function tokenizeSimpleShell(command: string): string[] | undefined {
+function tokensTargetProtectedBin(
+  tokens: string[],
+  bin: string,
+  commandStarts: number[] = [0],
+): boolean {
+  if (tokens.some((token) => tokenEmbedsProtectedBin(token, bin))) return true;
+  const starts = [...new Set(commandStarts)];
+  return starts.some((start, index) =>
+    npxTargetsProtectedBin(
+      tokens.slice(start, starts[index + 1] ?? tokens.length),
+      bin,
+    ),
+  );
+}
+
+function shellParameterEnd(command: string, dollarIndex: number): number {
+  const next = command[dollarIndex + 1];
+  if (next === undefined || next === "(") return dollarIndex;
+  if (next === "{") {
+    const closingBrace = command.indexOf("}", dollarIndex + 2);
+    return closingBrace === -1 ? command.length - 1 : closingBrace;
+  }
+  if (/[A-Za-z_]/.test(next)) {
+    let end = dollarIndex + 1;
+    while (/[A-Za-z0-9_]/.test(command[end + 1] ?? "")) end++;
+    return end;
+  }
+  return /[0-9@*#?$!-]/.test(next) ? dollarIndex + 1 : dollarIndex;
+}
+
+const DYNAMIC_SHELL_FRAGMENT = "\0";
+
+function tokenizeStaticShell(
+  command: string,
+  mode: "detection",
+  commandStarts?: number[],
+): string[];
+function tokenizeStaticShell(
+  command: string,
+  mode: "invocation",
+): string[] | undefined;
+function tokenizeStaticShell(
+  command: string,
+  mode: "invocation" | "detection",
+  commandStarts?: number[],
+): string[] | undefined {
   const tokens: string[] = [];
   let token = "";
   let quote: "single" | "double" | undefined;
   let tokenStarted = false;
+
+  const finishToken = (): void => {
+    if (!tokenStarted) return;
+    tokens.push(token);
+    token = "";
+    tokenStarted = false;
+  };
+
+  const markCommandStart = (): void => {
+    finishToken();
+    if (
+      commandStarts &&
+      commandStarts[commandStarts.length - 1] !== tokens.length
+    ) {
+      commandStarts.push(tokens.length);
+    }
+  };
+
+  const markDynamicFragment = (): void => {
+    finishToken();
+    token = DYNAMIC_SHELL_FRAGMENT;
+    tokenStarted = true;
+  };
 
   for (let index = 0; index < command.length; index++) {
     const char = command[index] ?? "";
@@ -551,23 +612,37 @@ function tokenizeSimpleShell(command: string): string[] | undefined {
         quote = undefined;
       } else if (char === "\\") {
         const next = command[++index];
-        if (next === undefined) return undefined;
+        if (next === undefined) {
+          if (mode === "invocation") return undefined;
+          token += "\\";
+          tokenStarted = true;
+          break;
+        }
         if (["$", "`", '"', "\\"].includes(next)) token += next;
         else if (next !== "\n") token += `\\${next}`;
+      } else if (char === "$" || char === "`") {
+        if (mode === "invocation") return undefined;
+        if (char === "$") {
+          markDynamicFragment();
+          index = shellParameterEnd(command, index);
+        } else {
+          markCommandStart();
+        }
+        continue;
       } else {
-        if (char === "$" || char === "`") return undefined;
         token += char;
       }
       tokenStarted = true;
       continue;
     }
 
+    if (char === "\n" || char === "\r") {
+      if (mode === "invocation") return undefined;
+      markCommandStart();
+      continue;
+    }
     if (/\s/.test(char)) {
-      if (tokenStarted) {
-        tokens.push(token);
-        token = "";
-        tokenStarted = false;
-      }
+      finishToken();
       continue;
     }
     if (char === "'") {
@@ -582,21 +657,76 @@ function tokenizeSimpleShell(command: string): string[] | undefined {
     }
     if (char === "\\") {
       const next = command[++index];
-      if (next === undefined) return undefined;
+      if (next === undefined) {
+        if (mode === "invocation") return undefined;
+        token += "\\";
+        tokenStarted = true;
+        break;
+      }
       token += next;
       tokenStarted = true;
       continue;
     }
-    if (";&|<>\n\r`()$".includes(char)) return undefined;
-    if ("*?[]{}".includes(char)) return undefined;
-    if (char === "#" && !tokenStarted) return undefined;
+    if (";&|()".includes(char)) {
+      if (mode === "invocation") return undefined;
+      markCommandStart();
+      continue;
+    }
+    if ("<>".includes(char)) {
+      if (mode === "invocation") return undefined;
+      finishToken();
+      continue;
+    }
+    if (char === "$") {
+      if (mode === "invocation") return undefined;
+      markDynamicFragment();
+      index = shellParameterEnd(command, index);
+      continue;
+    }
+    if (char === "`") {
+      if (mode === "invocation") return undefined;
+      markCommandStart();
+      continue;
+    }
+    if ("()".includes(char) || "*?[]{}".includes(char)) {
+      if (mode === "invocation") return undefined;
+      finishToken();
+      continue;
+    }
+    if (char === "#" && !tokenStarted) {
+      if (mode === "invocation") return undefined;
+      const newline = command.indexOf("\n", index);
+      if (newline === -1) break;
+      markCommandStart();
+      index = newline;
+      continue;
+    }
     token += char;
     tokenStarted = true;
   }
 
-  if (quote) return undefined;
-  if (tokenStarted) tokens.push(token);
+  if (quote && mode === "invocation") return undefined;
+  finishToken();
   return tokens;
+}
+
+function tokenizeSimpleShell(command: string): string[] | undefined {
+  return tokenizeStaticShell(command, "invocation");
+}
+
+interface CompoundShellTokens {
+  tokens: string[];
+  commandStarts: number[];
+}
+
+function tokenizeCompoundShellForDetection(
+  command: string,
+): CompoundShellTokens {
+  const commandStarts = [0];
+  return {
+    tokens: tokenizeStaticShell(command, "detection", commandStarts),
+    commandStarts,
+  };
 }
 
 function tokenizeToolInvocation(
@@ -739,14 +869,15 @@ export function runClaudeCapabilityPreToolUse(
     }
   }
   if (bin) {
-    const rawMention = commandMentionsTool(command, bin);
     const tokens = tokenizeSimpleShell(command);
     if (!tokens) {
-      if (!rawMention) return {};
-    } else if (
-      !tokens.some((token) => tokenEmbedsProtectedBin(token, bin)) &&
-      !npxTargetsProtectedBin(tokens, bin)
-    ) {
+      const compound = tokenizeCompoundShellForDetection(command);
+      if (
+        !tokensTargetProtectedBin(compound.tokens, bin, compound.commandStarts)
+      ) {
+        return {};
+      }
+    } else if (!tokensTargetProtectedBin(tokens, bin)) {
       return {};
     }
   }

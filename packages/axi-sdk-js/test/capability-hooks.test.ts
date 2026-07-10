@@ -1,4 +1,5 @@
 import {
+  chmodSync,
   copyFileSync,
   existsSync,
   mkdirSync,
@@ -10,16 +11,22 @@ import {
 } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { fileURLToPath, pathToFileURL } from "node:url";
 import { afterEach, describe, expect, it } from "vitest";
 import {
   computeClaudeCapabilityHookUpdate,
+  computeCapabilitySessionStartHookUpdate,
   installClaudeCapabilityHooks,
+  installCapabilityHooks,
   runCapabilitySessionStart,
   runCapabilityHookProcess,
   runClaudeCapabilityPreToolUse,
 } from "../src/capability-hooks.js";
 
 const tempDirs: string[] = [];
+const glAxiFixtureRoot = fileURLToPath(
+  new URL("./fixtures/gl-axi-v1/", import.meta.url),
+);
 
 afterEach(() => {
   for (const dir of tempDirs.splice(0)) {
@@ -126,6 +133,51 @@ describe("computeClaudeCapabilityHookUpdate", () => {
   });
 });
 
+describe("computeCapabilitySessionStartHookUpdate", () => {
+  it("adds only integrity SessionStart while preserving foreign Codex events", () => {
+    const [updated, changed] = computeCapabilitySessionStartHookUpdate(
+      {
+        hooks: {
+          PreToolUse: [
+            {
+              matcher: "Bash",
+              hooks: [{ type: "command", command: "/foreign/pre-tool" }],
+            },
+          ],
+        },
+      },
+      {
+        marker: "axi-capability-hook",
+        sessionStartCommand:
+          "axi-capability-hook session-start --manifest /pins/capabilities.json",
+        preToolUseCommand:
+          "axi-capability-hook pre-tool-use --manifest /pins/capabilities.json",
+      },
+    );
+
+    expect(changed).toBe(true);
+    expect(updated.hooks?.PreToolUse).toEqual([
+      {
+        matcher: "Bash",
+        hooks: [{ type: "command", command: "/foreign/pre-tool" }],
+      },
+    ]);
+    expect(updated.hooks?.SessionStart).toEqual([
+      {
+        matcher: "",
+        hooks: [
+          {
+            type: "command",
+            command:
+              "axi-capability-hook session-start --manifest /pins/capabilities.json",
+            timeout: 10,
+          },
+        ],
+      },
+    ]);
+  });
+});
+
 describe("installClaudeCapabilityHooks", () => {
   it("updates Claude user settings and leaves a repeated install untouched", () => {
     const home = mkdtempSync(join(tmpdir(), "axi-capability-hooks-"));
@@ -167,6 +219,162 @@ describe("installClaudeCapabilityHooks", () => {
   });
 });
 
+describe("installCapabilityHooks", () => {
+  it("installs integrity on all harnesses and PreToolUse only on Claude repeat-safely", () => {
+    const home = mkdtempSync(join(tmpdir(), "axi-all-capability-hooks-"));
+    tempDirs.push(home);
+    mkdirSync(join(home, ".codex"), { recursive: true });
+    writeFileSync(
+      join(home, ".codex", "hooks.json"),
+      JSON.stringify({
+        hooks: {
+          PreToolUse: [
+            {
+              matcher: "Bash",
+              hooks: [{ type: "command", command: "/foreign/codex-hook" }],
+            },
+          ],
+        },
+      }),
+    );
+    writeFileSync(join(home, ".codex", "config.toml"), "[model]\nname = 'x'\n");
+
+    const options = {
+      homeDir: home,
+      spec: {
+        marker: "axi-capability-hook",
+        sessionStartCommand:
+          "axi-capability-hook session-start --manifest /pins/capabilities.json --policy /pins/policy.json --identity /pins/identity.json --evidence /logs/decisions.jsonl",
+        preToolUseCommand:
+          "axi-capability-hook pre-tool-use --manifest /pins/capabilities.json --policy /pins/policy.json --identity /pins/identity.json --evidence /logs/decisions.jsonl",
+      },
+    };
+
+    expect(installCapabilityHooks(options)).toBe(true);
+    const claude = readFileSync(join(home, ".claude", "settings.json"), "utf8");
+    const codex = readFileSync(join(home, ".codex", "hooks.json"), "utf8");
+    const codexConfig = readFileSync(
+      join(home, ".codex", "config.toml"),
+      "utf8",
+    );
+    const pluginPath = join(
+      home,
+      ".config",
+      "opencode",
+      "plugins",
+      "axi-axi-capability-hook-integrity.js",
+    );
+    const plugin = readFileSync(pluginPath, "utf8");
+    const mtimes = [
+      join(home, ".claude", "settings.json"),
+      join(home, ".codex", "hooks.json"),
+      join(home, ".codex", "config.toml"),
+      pluginPath,
+    ].map((path) => statSync(path).mtimeMs);
+
+    expect(claude).toContain("session-start");
+    expect(claude).toContain("pre-tool-use");
+    expect(codex).toContain("/foreign/codex-hook");
+    expect(codex).toContain("session-start");
+    expect(codex.match(/pre-tool-use/g)).toBeNull();
+    expect(codexConfig).toContain("[model]\nname = 'x'");
+    expect(codexConfig).toContain("[features]\nhooks = true");
+    expect(plugin).toContain("axi-sdk-js managed capability integrity plugin");
+    expect(plugin).toContain(JSON.stringify(options.spec.sessionStartCommand));
+
+    expect(installCapabilityHooks(options)).toBe(false);
+    expect(
+      [
+        join(home, ".claude", "settings.json"),
+        join(home, ".codex", "hooks.json"),
+        join(home, ".codex", "config.toml"),
+        pluginPath,
+      ].map((path) => statSync(path).mtimeMs),
+    ).toEqual(mtimes);
+  });
+
+  it("runs the independently installed integrity command from the OpenCode session plugin", async () => {
+    const home = mkdtempSync(join(tmpdir(), "axi-opencode-integrity-"));
+    tempDirs.push(home);
+    const receivedPath = join(home, "received.json");
+    const commandPath = join(home, "axi-capability-hook");
+    writeFileSync(
+      commandPath,
+      `#!/usr/bin/env node
+import { readFileSync, writeFileSync } from "node:fs";
+const input = readFileSync(0, "utf8");
+writeFileSync(${JSON.stringify(receivedPath)}, input);
+process.stdout.write(JSON.stringify({ hookSpecificOutput: { hookEventName: "SessionStart", additionalContext: "integrity verified from external SDK" } }));
+`,
+    );
+    chmodSync(commandPath, 0o755);
+    installCapabilityHooks({
+      homeDir: home,
+      spec: {
+        marker: "axi-capability-hook",
+        sessionStartCommand: commandPath,
+        preToolUseCommand: `${commandPath} pre-tool-use`,
+      },
+    });
+
+    const pluginPath = join(
+      home,
+      ".config",
+      "opencode",
+      "plugins",
+      "axi-axi-capability-hook-integrity.js",
+    );
+    const pluginModule = await import(pathToFileURL(pluginPath).href);
+    const plugin = await pluginModule.AxiAxiCapabilityHookIntegrityPlugin({
+      directory: home,
+    });
+    const output = { system: [] as string[] };
+    await plugin["experimental.chat.system.transform"](
+      { sessionID: "session-42" },
+      output,
+    );
+
+    expect(output.system).toEqual(["integrity verified from external SDK"]);
+    expect(JSON.parse(readFileSync(receivedPath, "utf8"))).toMatchObject({
+      hook_event_name: "SessionStart",
+      source: "startup",
+      session_id: "session-42",
+    });
+  });
+
+  it("does not overwrite a foreign OpenCode plugin at the managed target", () => {
+    const home = mkdtempSync(join(tmpdir(), "axi-opencode-foreign-"));
+    tempDirs.push(home);
+    const pluginPath = join(
+      home,
+      ".config",
+      "opencode",
+      "plugins",
+      "axi-axi-capability-hook-integrity.js",
+    );
+    mkdirSync(join(pluginPath, ".."), { recursive: true });
+    writeFileSync(pluginPath, "// maintained by operator\n");
+    const errors: string[] = [];
+
+    installCapabilityHooks({
+      homeDir: home,
+      spec: {
+        marker: "axi-capability-hook",
+        sessionStartCommand: "axi-capability-hook session-start",
+        preToolUseCommand: "axi-capability-hook pre-tool-use",
+      },
+      onError: (message) => errors.push(message),
+    });
+
+    expect(readFileSync(pluginPath, "utf8")).toBe(
+      "// maintained by operator\n",
+    );
+    expect(errors).toEqual([
+      `${pluginPath}: refusing to overwrite unmanaged OpenCode plugin`,
+    ]);
+  });
+});
+
 function capabilityFixture() {
   const root = mkdtempSync(join(tmpdir(), "axi-capability-runtime-"));
   tempDirs.push(root);
@@ -174,11 +382,8 @@ function capabilityFixture() {
   const identityPath = join(root, "identity.json");
   const policyPath = join(root, "policy.json");
   const evidencePath = join(root, "evidence.jsonl");
-  copyFileSync(
-    "/home/mgibs/workspace/gl-axi/fixtures/capabilities/manifest.valid.json",
-    manifestPath,
-  );
-  copyFileSync("/home/mgibs/workspace/gl-axi/identity.json", identityPath);
+  copyFileSync(join(glAxiFixtureRoot, "manifest.valid.json"), manifestPath);
+  copyFileSync(join(glAxiFixtureRoot, "identity.json"), identityPath);
   writeFileSync(
     policyPath,
     JSON.stringify({

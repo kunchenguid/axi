@@ -1,0 +1,155 @@
+{
+  "schemaVersion": 1,
+  "tool": {
+    "name": "gl-axi-fixture",
+    "bin": "gl-axi-fixture"
+  },
+  "routes": [
+    {
+      "match": {
+        "tokens": [],
+        "rest": "flags-only"
+      },
+      "effect": "read",
+      "reaches": ["gitlab"],
+      "scopes": ["read_api"],
+      "aliasOf": ["dashboard"],
+      "x-test": {
+        "argv": [],
+        "variants": [["-R", "group/project"]]
+      }
+    },
+    {
+      "match": {
+        "tokens": ["--help"]
+      },
+      "effect": "none",
+      "reaches": [],
+      "scopes": [],
+      "x-test": {
+        "argv": ["--help"]
+      }
+    },
+    {
+      "match": {
+        "tokens": ["dashboard"]
+      },
+      "effect": "read",
+      "reaches": ["gitlab"],
+      "scopes": ["read_api"],
+      "x-test": {
+        "argv": ["dashboard"]
+      }
+    },
+    {
+      "match": {
+        "tokens": ["issue", "list"]
+      },
+      "effect": "read",
+      "reaches": ["gitlab"],
+      "scopes": ["read_api"],
+      "x-test": {
+        "argv": ["issue", "list"]
+      }
+    },
+    {
+      "match": {
+        "tokens": ["issue"],
+        "rest": "flags-only"
+      },
+      "effect": "read",
+      "reaches": ["gitlab"],
+      "scopes": ["read_api"],
+      "aliasOf": ["issue", "list"],
+      "x-test": {
+        "argv": ["issue", "--limit", "1"]
+      }
+    },
+    {
+      "match": {
+        "tokens": ["issue", "close"]
+      },
+      "effect": "mutate",
+      "reaches": ["gitlab"],
+      "scopes": ["api"],
+      "x-test": {
+        "argv": ["issue", "close", "42"]
+      }
+    },
+    {
+      "match": {
+        "tokens": ["api"]
+      },
+      "effect": "passthrough",
+      "reaches": ["gitlab"],
+      "scopes": ["api"],
+      "derivation": {
+        "kind": "http-method",
+        "methodFlags": ["-X", "--method"],
+        "valueFlags": [
+          "-R",
+          "--repo",
+          "-F",
+          "--field",
+          "-f",
+          "--raw-field",
+          "-H",
+          "--header"
+        ],
+        "allowPositionalMethod": true,
+        "methods": ["GET", "POST", "PUT", "PATCH", "DELETE", "HEAD"],
+        "default": "GET",
+        "readMethods": ["GET", "HEAD"],
+        "alwaysMutateEndpoints": ["graphql"]
+      },
+      "x-test": {
+        "argv": ["api", "projects"],
+        "variants": [
+          ["api", "POST", "projects"],
+          ["api", "graphql"]
+        ]
+      }
+    },
+    {
+      "match": {
+        "tokens": ["setup", "hooks"]
+      },
+      "effect": "mutate",
+      "reaches": ["harness-config"],
+      "scopes": [],
+      "derivation": {
+        "kind": "flag-presence",
+        "flags": ["--apply", "--uninstall"],
+        "present": "mutate",
+        "absent": "read"
+      },
+      "x-test": {
+        "argv": ["setup", "hooks"],
+        "variants": [["setup", "hooks", "--apply"]]
+      }
+    },
+    {
+      "match": {
+        "tokens": ["repo", "delete"]
+      },
+      "effect": "none",
+      "reaches": [],
+      "scopes": [],
+      "guard": true,
+      "x-test": {
+        "argv": ["repo", "delete", "fixture"]
+      }
+    },
+    {
+      "match": {
+        "tokens": ["mr", "checkout"]
+      },
+      "effect": "mutate",
+      "reaches": ["gitlab", "filesystem"],
+      "scopes": ["read_api", "read_repository"],
+      "x-test": {
+        "argv": ["mr", "checkout", "7"]
+      }
+    }
+  ]
+}

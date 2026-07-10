@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "publisher": {
+    "oidcIssuer": "https://gitlab.com",
+    "projectPath": "axi-tooling/gl-axi"
+  },
+  "lineage": {
+    "epoch": 1,
+    "firstTrustedPublishedVersion": "0.1.1",
+    "endorsements": []
+  },
+  "x-history": {
+    "event": "npm-account-to-organization-migration",
+    "attested": false,
+    "description": "The npm account-to-organization migration predates trusted-publishing attestations and is documented history, not part of the signed lineage."
+  }
+}

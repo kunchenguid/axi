@@ -96,6 +96,11 @@ community:
     author: thatdudealso
     domain: Docker
     description: "Discover, build, run, debug, publish, inspect, and clean up Docker apps through safe token-efficient CLI workflows."
+  - name: dynamodb-axi
+    url: https://github.com/thatdudealso/dynamodb-axi
+    author: thatdudealso
+    domain: DynamoDB
+    description: "Discover, inspect, query, scan, create, update, back up, restore, export, import, and safely operate DynamoDB tables through token-efficient CLI workflows."
   - name: pg-axi
     url: https://github.com/thatdudealso/pg-axi
     author: thatdudealso

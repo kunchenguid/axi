@@ -101,6 +101,11 @@ community:
     author: thatdudealso
     domain: PostgreSQL
     description: "Discover, create, inspect, query, back up, restore, and maintain PostgreSQL databases through safe token-efficient CLI workflows."
+  - name: elasticsearch-axi
+    url: https://github.com/thatdudealso/elasticsearch-axi
+    author: thatdudealso
+    domain: Elasticsearch
+    description: "Discover, inspect, query, index, map, snapshot, restore, diagnose, and operate Elasticsearch clusters through safe token-efficient CLI workflows."
   - name: kubernetes-axi
     url: https://github.com/thatdudealso/kubernetes-axi
     author: thatdudealso

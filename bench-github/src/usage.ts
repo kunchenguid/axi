@@ -21,30 +21,40 @@ interface ModelPricing {
   output: number; // $/1M output tokens
 }
 
-type ClaudeFamily = "opus" | "sonnet" | "haiku";
+type ClaudeFamily = "fable" | "mythos" | "opus" | "sonnet" | "haiku";
 
-/** Ordered so the longest / most specific family name is tested first. */
-const CLAUDE_FAMILIES: ClaudeFamily[] = ["sonnet", "haiku", "opus"];
+const CLAUDE_FAMILIES: ClaudeFamily[] = [
+  "fable",
+  "mythos",
+  "sonnet",
+  "haiku",
+  "opus",
+];
 
 /**
  * Claude pricing in USD per 1M tokens, keyed by model family.
  *
- * Anthropic prices per family tier, not per point release, so resolving by
- * family means any Claude model — bare aliases (`sonnet`), dated ids
- * (`claude-haiku-4-5-20251001`), undated ones (`claude-opus-4-5`), future
- * point releases, and vendor-prefixed ids
- * (`us.anthropic.claude-sonnet-4-5-v1:0`) — gets priced. An exact-id table
+ * Anthropic prices per family tier, so resolving by family means any Claude
+ * model — bare aliases (`sonnet`), dated ids (`claude-haiku-4-5-20251001`),
+ * undated ones (`claude-opus-4-8`), future point releases, and vendor-prefixed
+ * ids (`us.anthropic.claude-sonnet-4-5-v1:0`) — gets priced. An exact-id table
  * silently priced every model it had not heard of at $0.
+ *
+ * The current rate for each family is used; pre-4.5 Opus (which billed at
+ * $15/$75) is therefore under-priced. Cached input is 0.1x uncached input.
  *
  * Source: https://www.anthropic.com/pricing (as of March 2026)
  */
 const CLAUDE_PRICING_PER_1M: Record<ClaudeFamily, ModelPricing> = {
+  // ── Claude Fable / Mythos family ───────────────────────────────
+  fable: { input: 10.0, input_cached: 1.0, output: 50.0 },
+  mythos: { input: 10.0, input_cached: 1.0, output: 50.0 },
   // ── Claude Sonnet family ───────────────────────────────────────
   sonnet: { input: 3.0, input_cached: 0.3, output: 15.0 },
   // ── Claude Haiku family ────────────────────────────────────────
-  haiku: { input: 0.8, input_cached: 0.08, output: 4.0 },
+  haiku: { input: 1.0, input_cached: 0.1, output: 5.0 },
   // ── Claude Opus family ─────────────────────────────────────────
-  opus: { input: 15.0, input_cached: 1.5, output: 75.0 },
+  opus: { input: 5.0, input_cached: 0.5, output: 25.0 },
 };
 
 const PRICING_PER_1M: Record<string, ModelPricing> = {
@@ -189,6 +199,22 @@ function resolveClaudeFamily(model: string): ClaudeFamily | undefined {
   return CLAUDE_FAMILIES.find((family) => id.includes(family));
 }
 
+/**
+ * A run with usage but no resolvable pricing reports $0, which is
+ * indistinguishable from a free run. Make it loud instead of silent.
+ */
+function warnUnpriced(
+  model: string | undefined,
+  inputTokens: number,
+  outputTokens: number,
+): void {
+  console.warn(
+    `[usage] no pricing for model ${model ?? "(unset)"}; reporting $0 for a ` +
+      `run that used ${inputTokens} input / ${outputTokens} output tokens. ` +
+      `Add the model's family to CLAUDE_PRICING_PER_1M.`,
+  );
+}
+
 function getClaudePricing(model: string): ModelPricing | undefined {
   const family = resolveClaudeFamily(model);
   if (!family) return undefined;
@@ -305,6 +331,8 @@ export function parseClaudeJsonl(
         inputTokensCacheCreation * pricing.input * 1.25 +
         inputTokensCached * pricing.input_cached +
         outputTokens * pricing.output;
+    } else {
+      warnUnpriced(opts.model, inputTokens, outputTokens);
     }
   }
 

@@ -1,4 +1,4 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import { parseClaudeJsonl } from "../src/usage.js";
 
 /**
@@ -24,6 +24,7 @@ const costOf = (model: string) =>
     .total_cost_usd;
 
 describe("Claude model pricing", () => {
+  const fableIds = ["fable", "claude-fable-5", "claude-mythos-5"];
   const sonnetIds = [
     "sonnet",
     "claude-sonnet-4-5",
@@ -32,37 +33,54 @@ describe("Claude model pricing", () => {
     "claude-sonnet-5",
     "us.anthropic.claude-sonnet-4-5-v1:0",
   ];
-  const opusIds = ["opus", "claude-opus-4-5", "claude-opus-4-6"];
+  const opusIds = [
+    "opus",
+    "claude-opus-4-5",
+    "claude-opus-4-6",
+    "claude-opus-4-8",
+  ];
   const haikuIds = ["haiku", "claude-haiku-4-5", "claude-haiku-4-5-20251001"];
 
-  for (const model of [...sonnetIds, ...opusIds, ...haikuIds]) {
+  for (const model of [...fableIds, ...sonnetIds, ...opusIds, ...haikuIds]) {
     it(`prices a result-less run for ${model}`, () => {
       expect(costOf(model)).toBeGreaterThan(0);
     });
   }
 
   it("prices every id in a family identically", () => {
+    expect(new Set(fableIds.map(costOf)).size).toBe(1);
     expect(new Set(sonnetIds.map(costOf)).size).toBe(1);
     expect(new Set(opusIds.map(costOf)).size).toBe(1);
     expect(new Set(haikuIds.map(costOf)).size).toBe(1);
   });
 
-  it("orders the family price tiers opus > sonnet > haiku", () => {
-    expect(costOf("claude-opus-4-5")).toBeGreaterThan(
-      costOf("claude-sonnet-4-5"),
+  it("orders the family price tiers fable > opus > sonnet > haiku", () => {
+    expect(costOf("claude-fable-5")).toBeGreaterThan(costOf("claude-opus-4-8"));
+    expect(costOf("claude-opus-4-8")).toBeGreaterThan(
+      costOf("claude-sonnet-4-6"),
     );
-    expect(costOf("claude-sonnet-4-5")).toBeGreaterThan(
+    expect(costOf("claude-sonnet-4-6")).toBeGreaterThan(
       costOf("claude-haiku-4-5"),
     );
     expect(costOf("claude-haiku-4-5")).toBeGreaterThan(0);
   });
 
-  it("computes the published per-1M rate", () => {
-    // 1M uncached input + 1M output at $3 / $15 per 1M.
-    expect(costOf("claude-sonnet-4-6")).toBeCloseTo(18.0, 6);
+  it("computes the published per-1M rate for each family", () => {
+    // 1M uncached input + 1M output at the family's published rate.
+    expect(costOf("claude-fable-5")).toBeCloseTo(60.0, 6); // $10 / $50
+    expect(costOf("claude-opus-4-8")).toBeCloseTo(30.0, 6); // $5 / $25
+    expect(costOf("claude-sonnet-4-6")).toBeCloseTo(18.0, 6); // $3 / $15
+    expect(costOf("claude-haiku-4-5")).toBeCloseTo(6.0, 6); // $1 / $5
   });
 
-  it("leaves non-Claude models unpriced", () => {
-    expect(costOf("gpt-5.4")).toBe(0);
+  it("warns instead of silently reporting $0 for an unpriceable model", () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    try {
+      expect(costOf("gpt-5.4")).toBe(0);
+      expect(warn).toHaveBeenCalledOnce();
+      expect(String(warn.mock.calls[0][0])).toContain("gpt-5.4");
+    } finally {
+      warn.mockRestore();
+    }
   });
 });

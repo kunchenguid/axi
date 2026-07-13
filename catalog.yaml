@@ -26,6 +26,11 @@ official:
     description: "Reports local Claude, Codex, Cursor, Copilot, and Grok quota/usage windows for routing-aware agents - data-only and local-first."
 
 community:
+  - name: jj-axi
+    url: https://github.com/aivv73/jj-axi
+    author: aivv73
+    domain: Version control
+    description: "Inspect and reshape Jujutsu history through deterministic, non-interactive commands with compact TOON output and operation-aware undo."
   - name: npm-axi
     url: https://github.com/SSBrouhard/npm-axi
     author: SSBrouhard

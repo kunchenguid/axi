@@ -10,8 +10,7 @@
 import type { UsageMetrics } from "./types.js";
 
 /**
- * Per-model pricing in USD per 1M tokens.
- * Source: https://openai.com/api/pricing/ (as of March 2026)
+ * Pricing in USD per 1M tokens.
  *
  * Stored as $/1M for readability; converted to $/token at lookup time.
  */
@@ -23,6 +22,7 @@ interface ModelPricing {
 
 type ClaudeFamily = "fable" | "mythos" | "opus" | "sonnet" | "haiku";
 
+/** Families a model id is matched against, in order; the first match wins. */
 const CLAUDE_FAMILIES: ClaudeFamily[] = [
   "fable",
   "mythos",
@@ -57,6 +57,10 @@ const CLAUDE_PRICING_PER_1M: Record<ClaudeFamily, ModelPricing> = {
   opus: { input: 5.0, input_cached: 0.5, output: 25.0 },
 };
 
+/**
+ * Per-model (exact id) pricing for the Codex/OpenAI models.
+ * Source: https://openai.com/api/pricing/ (as of March 2026)
+ */
 const PRICING_PER_1M: Record<string, ModelPricing> = {
   // ── GPT-5.x family ────────────────────────────────────────────
   "gpt-5.4": { input: 2.5, input_cached: 0.25, output: 15.0 },

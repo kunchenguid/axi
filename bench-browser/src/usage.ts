@@ -20,6 +20,7 @@ interface ModelPricing {
 
 type ClaudeFamily = "fable" | "mythos" | "opus" | "sonnet" | "haiku";
 
+/** Families a model id is matched against, in order; the first match wins. */
 const CLAUDE_FAMILIES: ClaudeFamily[] = [
   "fable",
   "mythos",

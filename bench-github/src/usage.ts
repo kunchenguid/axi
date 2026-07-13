@@ -21,17 +21,30 @@ interface ModelPricing {
   output: number; // $/1M output tokens
 }
 
-const CLAUDE_PRICING_PER_1M: Record<string, ModelPricing> = {
+type ClaudeFamily = "opus" | "sonnet" | "haiku";
+
+/** Ordered so the longest / most specific family name is tested first. */
+const CLAUDE_FAMILIES: ClaudeFamily[] = ["sonnet", "haiku", "opus"];
+
+/**
+ * Claude pricing in USD per 1M tokens, keyed by model family.
+ *
+ * Anthropic prices per family tier, not per point release, so resolving by
+ * family means any Claude model — bare aliases (`sonnet`), dated ids
+ * (`claude-haiku-4-5-20251001`), undated ones (`claude-opus-4-5`), future
+ * point releases, and vendor-prefixed ids
+ * (`us.anthropic.claude-sonnet-4-5-v1:0`) — gets priced. An exact-id table
+ * silently priced every model it had not heard of at $0.
+ *
+ * Source: https://www.anthropic.com/pricing (as of March 2026)
+ */
+const CLAUDE_PRICING_PER_1M: Record<ClaudeFamily, ModelPricing> = {
   // ── Claude Sonnet family ───────────────────────────────────────
-  "claude-sonnet-4-6": { input: 3.0, input_cached: 0.3, output: 15.0 },
-  "claude-sonnet-4-5-20250514": { input: 3.0, input_cached: 0.3, output: 15.0 },
   sonnet: { input: 3.0, input_cached: 0.3, output: 15.0 },
-  // ── Claude Opus family ─────────────────────────────────────────
-  "claude-opus-4-6": { input: 15.0, input_cached: 1.5, output: 75.0 },
-  opus: { input: 15.0, input_cached: 1.5, output: 75.0 },
   // ── Claude Haiku family ────────────────────────────────────────
-  "claude-haiku-4-5-20251001": { input: 0.8, input_cached: 0.08, output: 4.0 },
   haiku: { input: 0.8, input_cached: 0.08, output: 4.0 },
+  // ── Claude Opus family ─────────────────────────────────────────
+  opus: { input: 15.0, input_cached: 1.5, output: 75.0 },
 };
 
 const PRICING_PER_1M: Record<string, ModelPricing> = {
@@ -170,9 +183,16 @@ export function parseCodexJsonl(
   };
 }
 
+/** Map a Claude model id onto its pricing family, or undefined if it is not one. */
+function resolveClaudeFamily(model: string): ClaudeFamily | undefined {
+  const id = model.toLowerCase();
+  return CLAUDE_FAMILIES.find((family) => id.includes(family));
+}
+
 function getClaudePricing(model: string): ModelPricing | undefined {
-  const entry = CLAUDE_PRICING_PER_1M[model];
-  if (!entry) return undefined;
+  const family = resolveClaudeFamily(model);
+  if (!family) return undefined;
+  const entry = CLAUDE_PRICING_PER_1M[family];
   return {
     input: entry.input / 1e6,
     input_cached: entry.input_cached / 1e6,

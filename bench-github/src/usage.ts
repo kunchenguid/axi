@@ -200,7 +200,9 @@ export function parseCodexJsonl(
 /** Map a Claude model id onto its pricing family, or undefined if it is not one. */
 function resolveClaudeFamily(model: string): ClaudeFamily | undefined {
   const id = model.toLowerCase();
-  return CLAUDE_FAMILIES.find((family) => id.includes(family));
+  return CLAUDE_FAMILIES.find(
+    (family) => id === family || id.includes(`claude-${family}`),
+  );
 }
 
 /**

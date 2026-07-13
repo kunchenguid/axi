@@ -44,6 +44,12 @@ Evaluated across 425 runs (17 tasks × 5 conditions × 5 repeats) using Claude S
 | GitHub MCP + ToolSearch | 82%      | $0.147     | 41.1s        | 8         |
 | MCP + Code Mode         | 84%      | $0.101     | 43.4s        | 7         |
 
+Claude Sonnet 4.6 is the model the published runs used, not a limit of the
+harness. Both benchmarks take `--model`, which is passed straight through to
+the agent CLI, so any Claude model works — for example
+`--model claude-opus-4-6`. Results for other models are simply not published
+here, and they may respond differently to output format.
+
 ## Quick Start
 
 Reference AXI implementations:

@@ -44,6 +44,12 @@ Evaluated across 425 runs (17 tasks × 5 conditions × 5 repeats) using Claude S
 | GitHub MCP + ToolSearch | 82%      | $0.147     | 41.1s        | 8         |
 | MCP + Code Mode         | 84%      | $0.101     | 43.4s        | 7         |
 
+Claude Sonnet 4.6 is the model the published runs used, not a limit of the
+harness. Both benchmarks take `--model`, which is passed straight through to
+the agent CLI, so any Claude model works — for example
+`--model claude-opus-4-6`. Results for other models are simply not published
+here, and they may respond differently to output format.
+
 ## Quick Start
 
 Reference AXI implementations:
@@ -66,13 +72,16 @@ Use `gh-axi` for GitHub and `chrome-devtools-axi` for browser automation.
 
 ## The 10 Principles
 
-These principles define what makes a CLI tool "an AXI":
+These principles define what makes a CLI tool "an AXI".
+The table below is generated from [`principles.yaml`](principles.yaml); the full specification of each principle lives in the [AXI skill](.agents/skills/axi/SKILL.md).
+
+<!-- generated:principles:start -->
 
 | #   | Principle                          | Summary                                                                                     |
 | --- | ---------------------------------- | ------------------------------------------------------------------------------------------- |
 | 1   | **Token-efficient output**         | Use [TOON](https://toonformat.dev/) format for ~40% token savings over JSON                 |
-| 2   | **Minimal default schemas**        | 3–4 fields per list item, not 10                                                            |
-| 3   | **Content truncation**             | Truncate large text with size hints and `--full` escape hatch                               |
+| 2   | **Minimal default schemas**        | 3–4 fields per list item, not 10+                                                           |
+| 3   | **Content truncation**             | Truncate large text with size hints and a `--full` escape hatch                             |
 | 4   | **Pre-computed aggregates**        | Include aggregated counts and statuses that eliminate round trips                           |
 | 5   | **Definitive empty states**        | Explicit "0 results" rather than ambiguous empty output                                     |
 | 6   | **Structured errors & exit codes** | Idempotent mutations, structured errors, no interactive prompts, fail loud on unknown flags |
@@ -81,35 +90,59 @@ These principles define what makes a CLI tool "an AXI":
 | 9   | **Contextual disclosure**          | Include next-step suggestions after each output                                             |
 | 10  | **Consistent way to get help**     | Concise per-subcommand reference when agents need it                                        |
 
+<!-- generated:principles:end -->
+
 ## AXI Catalog
+
+The catalog tables below are generated from [`catalog.yaml`](catalog.yaml) - see [CONTRIBUTING.md](CONTRIBUTING.md) to add your AXI.
 
 ### Official
 
 Reference implementations maintained by the AXI project, validating the principles across different domains:
+
+<!-- generated:catalog-official:start -->
 
 | AXI                                                                         | Domain             | What it does                                                                                                                      |
 | --------------------------------------------------------------------------- | ------------------ | --------------------------------------------------------------------------------------------------------------------------------- |
 | [`gh-axi`](https://github.com/kunchenguid/gh-axi)                           | GitHub             | Issues, PRs, workflow runs, releases, and more. Wraps the official `gh` CLI with agent-ergonomic output.                          |
 | [`chrome-devtools-axi`](https://github.com/kunchenguid/chrome-devtools-axi) | Browser automation | Navigate, click, fill, and extract with combined operations and query filtering. Wraps chrome-devtools-mcp.                       |
 | [`lavish-axi`](https://github.com/kunchenguid/lavish-axi)                   | Human review       | Turns agent-generated HTML artifacts into collaborative review surfaces - annotate, comment, and send feedback back to the agent. |
+| [`quota-axi`](https://github.com/kunchenguid/quota-axi)                     | Quota / usage      | Reports local Claude, Codex, Cursor, Copilot, and Grok quota/usage windows for routing-aware agents - data-only and local-first.  |
+
+<!-- generated:catalog-official:end -->
 
 ### Community
 
 AXIs built and maintained by the community:
 
-| AXI                                                                                                | Author             | Domain           | What it does                                                                                                                       |
-| -------------------------------------------------------------------------------------------------- | ------------------ | ---------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
-| [`npm-axi`](https://github.com/SSBrouhard/npm-axi)                                                 | SSBrouhard         | npm              | Search and inspect npm registry packages, versions, dependencies, README previews, and downloads with token-efficient output.      |
-| [`sqlite-axi`](https://github.com/SSBrouhard/sqlite-axi)                                           | SSBrouhard         | SQLite           | Inspect schemas, sample rows, and run capped read-only SQLite queries with token-efficient TOON output.                            |
-| [`slack-axi`](https://github.com/JarvusInnovations/slack-axi)                                      | Jarvus Innovations | Slack            | Read, search, sweep, and safely draft Slack messages with token-efficient output.                                                  |
-| [`gws-axi`](https://github.com/JarvusInnovations/gws-axi)                                          | Jarvus Innovations | Google Workspace | Gmail, Calendar, Docs, Drive, and Slides behind one command, with multi-account write-safety - drafts mail, never sends.           |
-| [`harvest-axi`](https://github.com/JarvusInnovations/harvest-axi)                                  | Jarvus Innovations | Time tracking    | Review, log, and edit Harvest time entries by period - for yourself, your team, a project, or a client.                            |
-| [`specops`](https://github.com/JarvusInnovations/specops)                                          | Jarvus Innovations | Spec-driven dev  | Spec-driven development for agents - and a demo of shipping an AXI embedded in a skill, not a standalone npm executable.           |
-| [`gitsheets-axi`](https://github.com/JarvusInnovations/gitsheets/tree/main/packages/gitsheets-axi) | Jarvus Innovations | Git-backed data  | Read and mutate git-backed record sheets over the shell - TOON output, idempotent commits.                                         |
-| [`metabase-axi`](https://github.com/JarvusInnovations/metabase-axi)                                | Jarvus Innovations | Analytics / BI   | Query, explore, and export from Metabase over the shell - SQL/MBQL, saved questions, schema introspection, full-data export.       |
-| [`otter-axi`](https://github.com/JarvusInnovations/otter-axi)                                      | Jarvus Innovations | Meetings         | Find and pull Otter.ai meeting transcripts from the shell - wraps Otter.ai's hosted MCP server as a scriptable, headless CLI.      |
-| [`notion-axi`](https://github.com/maximebrmd/notion-axi)                                           | maximebrmd         | Notion           | Search, read, create, and update Notion pages and databases over the shell - token-efficient TOON output, PAT or integration auth. |
-| [`clickup-axi`](https://github.com/JanSuthacheeva/clickup-axi)                                     | JanSuthacheeva     | ClickUp          | List your open tasks, view a task with its newest comments inline, and change task status - truncation-aware, TOON-style output.   |
+<!-- generated:catalog-community:start -->
+
+| AXI                                                                                                | Author             | Domain           | What it does                                                                                                                                                 |
+| -------------------------------------------------------------------------------------------------- | ------------------ | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| [`jj-axi`](https://github.com/aivv73/jj-axi)                                                       | aivv73             | Version control  | Inspect and reshape Jujutsu history through deterministic, non-interactive commands with compact TOON output and operation-aware undo.                       |
+| [`npm-axi`](https://github.com/SSBrouhard/npm-axi)                                                 | SSBrouhard         | npm              | Search and inspect npm registry packages, versions, dependencies, README previews, and downloads with token-efficient output.                                |
+| [`sqlite-axi`](https://github.com/SSBrouhard/sqlite-axi)                                           | SSBrouhard         | SQLite           | Inspect schemas, sample rows, and run capped read-only SQLite queries with token-efficient TOON output.                                                      |
+| [`slack-axi`](https://github.com/JarvusInnovations/slack-axi)                                      | Jarvus Innovations | Slack            | Read, search, sweep, and safely draft Slack messages with token-efficient output.                                                                            |
+| [`gws-axi`](https://github.com/JarvusInnovations/gws-axi)                                          | Jarvus Innovations | Google Workspace | Gmail, Calendar, Docs, Drive, and Slides behind one command, with multi-account write-safety - drafts mail, never sends.                                     |
+| [`harvest-axi`](https://github.com/JarvusInnovations/harvest-axi)                                  | Jarvus Innovations | Time tracking    | Review, log, and edit Harvest time entries by period - for yourself, your team, a project, or a client.                                                      |
+| [`specops`](https://github.com/JarvusInnovations/specops)                                          | Jarvus Innovations | Spec-driven dev  | Spec-driven development for agents - and a demo of shipping an AXI embedded in a skill, not a standalone npm executable.                                     |
+| [`gitsheets-axi`](https://github.com/JarvusInnovations/gitsheets/tree/main/packages/gitsheets-axi) | Jarvus Innovations | Git-backed data  | Read and mutate git-backed record sheets over the shell - TOON output, idempotent commits.                                                                   |
+| [`metabase-axi`](https://github.com/JarvusInnovations/metabase-axi)                                | Jarvus Innovations | Analytics / BI   | Query, explore, and export from Metabase over the shell - SQL/MBQL, saved questions, schema introspection, full-data export.                                 |
+| [`otter-axi`](https://github.com/JarvusInnovations/otter-axi)                                      | Jarvus Innovations | Meetings         | Find and pull Otter.ai meeting transcripts from the shell - wraps Otter.ai's hosted MCP server as a scriptable, headless CLI.                                |
+| [`notion-axi`](https://github.com/maximebrmd/notion-axi)                                           | maximebrmd         | Notion           | Search, read, create, and update Notion pages and databases over the shell - token-efficient TOON output, PAT or integration auth.                           |
+| [`clickup-axi`](https://github.com/JanSuthacheeva/clickup-axi)                                     | JanSuthacheeva     | ClickUp          | List your open tasks, view a task with its newest comments inline, and change task status - truncation-aware, TOON-style output.                             |
+| [`databricks-axi`](https://github.com/p33ves/databricks-axi)                                       | p33ves             | Databricks       | Run Databricks jobs, watch runs, and pull failure logs inline over the official databricks CLI - more domains coming soon.                                   |
+| [`aws-axi`](https://github.com/thatdudealso/aws-axi)                                               | thatdudealso       | AWS              | Discover, plan, provision, deploy, and inspect AWS services for hosting web, backend, database, and AI workloads through safe token-efficient CLI workflows. |
+| [`docker-axi`](https://github.com/thatdudealso/docker-axi)                                         | thatdudealso       | Docker           | Discover, build, run, debug, publish, inspect, and clean up Docker apps through safe token-efficient CLI workflows.                                          |
+| [`dynamodb-axi`](https://github.com/thatdudealso/dynamodb-axi)                                     | thatdudealso       | DynamoDB         | Discover, inspect, query, scan, create, update, back up, restore, export, import, and safely operate DynamoDB tables through token-efficient CLI workflows.  |
+| [`pg-axi`](https://github.com/thatdudealso/pg-axi)                                                 | thatdudealso       | PostgreSQL       | Discover, create, inspect, query, back up, restore, and maintain PostgreSQL databases through safe token-efficient CLI workflows.                            |
+| [`mongodb-axi`](https://github.com/thatdudealso/mongodb-axi)                                       | thatdudealso       | MongoDB          | Discover, create, inspect, query, export, import, maintain, and diagnose MongoDB databases through safe token-efficient CLI workflows.                       |
+| [`elasticsearch-axi`](https://github.com/thatdudealso/elasticsearch-axi)                           | thatdudealso       | Elasticsearch    | Discover, inspect, query, index, map, snapshot, restore, diagnose, and operate Elasticsearch clusters through safe token-efficient CLI workflows.            |
+| [`kubernetes-axi`](https://github.com/thatdudealso/kubernetes-axi)                                 | thatdudealso       | Kubernetes       | Discover, inspect, deploy, debug, scale, roll out, expose, and clean up Kubernetes workloads through safe token-efficient CLI workflows.                     |
+| [`redis-axi`](https://github.com/thatdudealso/redis-axi)                                           | thatdudealso       | Redis            | Discover, inspect, query, export, import, maintain, and diagnose Redis databases through safe token-efficient CLI workflows.                                 |
+| [`celery-axi`](https://github.com/thatdudealso/celery-axi)                                         | thatdudealso       | Celery           | Discover, inspect, run, debug, monitor, schedule, control, and safely operate Celery task queues through token-efficient CLI workflows.                      |
+
+<!-- generated:catalog-community:end -->
 
 Built an AXI? Follow the [contributor workflow](CONTRIBUTING.md) to add it to this list.
 

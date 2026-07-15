@@ -33,6 +33,17 @@ Release-please PRs are exempt because they are the only place those files should
 
 See the [no-mistakes quick start](https://kunchenguid.github.io/no-mistakes/start-here/quick-start/) for the full first-run walkthrough.
 
+## Adding your AXI to the catalog
+
+The catalog has one source of truth: [`catalog.yaml`](catalog.yaml).
+The tables in README.md and on [axi.md](https://axi.md) are generated from it.
+
+1. Add one entry for your AXI to the `community` list in `catalog.yaml`.
+2. Run `pnpm run docs:gen` to regenerate README.md and docs/index.html.
+3. Commit all three files and open your PR through the workflow above.
+
+Do not hand-edit the generated table regions (marked with `generated:...` comments); the `docs-check` CI job fails on drift.
+
 ## Repo conventions
 
 - AXI is a pnpm monorepo for the AXI docs, benchmark harnesses, installable agent skills, and the `axi-sdk-js` package.

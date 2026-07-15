@@ -83,3 +83,13 @@ Because the release PR carries the version bump, a downstream `*-axi` tool only 
 
 - Packages use ES modules (`"type": "module"`) with TypeScript targeting ES2022/Node16.
 - Tests are colocated in `test/` directories mirroring `src/` structure and use vitest.
+- The AXI catalog and principle summaries are single-sourced from `catalog.yaml` and `principles.yaml`.
+  `pnpm run docs:gen` rewrites the marked `generated:...` regions of README.md and docs/index.html; never hand-edit those regions.
+  The `docs-check` workflow runs `pnpm run docs:check` and fails on drift, including when `.agents/skills/axi/SKILL.md` section headings stop matching the canonical principle titles.
+
+## Maintaining this file
+
+Keep this file for knowledge useful to almost every future agent session in this project.
+Do not repeat what the codebase already shows; point to the authoritative file or command instead.
+Prefer rewriting or pruning existing entries over appending new ones.
+When updating this file, preserve this bar for all agents and keep entries concise.

@@ -12,7 +12,10 @@ export default defineConfig(
   tseslint.configs.recommended,
   eslintConfigPrettier,
   {
-    files: ["packages/axi-sdk-js/**/*.{js,cjs,mjs,ts,cts,mts}"],
+    files: [
+      "packages/axi-sdk-js/**/*.{js,cjs,mjs,ts,cts,mts}",
+      "scripts/**/*.mjs",
+    ],
     languageOptions: {
       globals: {
         ...globals.node,

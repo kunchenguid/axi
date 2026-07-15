@@ -26,6 +26,9 @@ importers:
       typescript-eslint:
         specifier: ^8.46.2
         version: 8.58.0(eslint@10.1.0)(typescript@5.9.3)
+      yaml:
+        specifier: ^2.8.4
+        version: 2.8.4
 
   bench-browser:
     dependencies:

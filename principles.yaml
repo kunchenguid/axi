@@ -1,0 +1,41 @@
+# Single source of truth for the AXI principle numbers, titles, and one-line
+# summaries.
+#
+# `pnpm run docs:gen` renders these into the README.md principles table and the
+# docs/index.html summary list; CI (`pnpm run docs:check`) fails on drift.
+# The full specification of each principle lives in .agents/skills/axi/SKILL.md
+# (the installable AXI skill), whose section headings must start with the
+# titles below - the drift check enforces that too.
+#
+# Summaries support `inline code` and [markdown links](https://example.com).
+
+- number: 1
+  title: Token-efficient output
+  summary: "Use [TOON](https://toonformat.dev/) format for ~40% token savings over JSON"
+- number: 2
+  title: Minimal default schemas
+  summary: "3–4 fields per list item, not 10+"
+- number: 3
+  title: Content truncation
+  summary: "Truncate large text with size hints and a `--full` escape hatch"
+- number: 4
+  title: Pre-computed aggregates
+  summary: "Include aggregated counts and statuses that eliminate round trips"
+- number: 5
+  title: Definitive empty states
+  summary: 'Explicit "0 results" rather than ambiguous empty output'
+- number: 6
+  title: Structured errors & exit codes
+  summary: "Idempotent mutations, structured errors, no interactive prompts, fail loud on unknown flags"
+- number: 7
+  title: Ambient context
+  summary: "Install opt-in session integrations first, then offer an on-demand skill"
+- number: 8
+  title: Content first
+  summary: "Running with no arguments shows live data, not help text"
+- number: 9
+  title: Contextual disclosure
+  summary: "Include next-step suggestions after each output"
+- number: 10
+  title: Consistent way to get help
+  summary: "Concise per-subcommand reference when agents need it"

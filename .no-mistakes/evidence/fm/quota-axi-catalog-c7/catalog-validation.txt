@@ -1,0 +1,8 @@
+README catalog validation passed.
+Changed files: README.md
+README numstat: 1 insertion, 0 deletions
+Official table rows: gh-axi, chrome-devtools-axi, lavish-axi, quota-axi
+Published package: quota-axi@0.1.5
+Published description: AXI CLI that reports local agent-provider quota windows without routing or mutation
+Published README confirms: local Claude/Codex/Cursor/GitHub Copilot/Grok quota windows; data-only; local-first; first-party provider endpoints only.
+Rendered artifact: official-catalog-render.html

@@ -4,7 +4,10 @@
   "packageManager": "pnpm@11.1.1",
   "type": "module",
   "scripts": {
-    "lint": "eslint packages/axi-sdk-js/src packages/axi-sdk-js/test eslint.config.mjs",
+    "docs:gen": "node scripts/generate-docs.mjs",
+    "docs:check": "node scripts/generate-docs.mjs --check",
+    "docs:test": "node --test scripts/generate-docs.test.mjs",
+    "lint": "eslint packages/axi-sdk-js/src packages/axi-sdk-js/test eslint.config.mjs scripts",
     "format": "prettier --write \"packages/axi-sdk-js/**/*.{ts,js,mjs,cjs,json,md}\" \".github/workflows/axi-sdk-js-*.yml\" \"release-please-config.json\" \".release-please-manifest.json\"",
     "format:check": "prettier --check \"packages/axi-sdk-js/**/*.{ts,js,mjs,cjs,json,md}\" \".github/workflows/axi-sdk-js-*.yml\" \"release-please-config.json\" \".release-please-manifest.json\""
   },
@@ -14,6 +17,7 @@
     "eslint-config-prettier": "^10.1.8",
     "globals": "^17.4.0",
     "prettier": "^3.6.2",
-    "typescript-eslint": "^8.46.2"
+    "typescript-eslint": "^8.46.2",
+    "yaml": "^2.8.4"
   }
 }

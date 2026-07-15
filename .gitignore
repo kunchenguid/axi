@@ -25,3 +25,9 @@ docs/social/rendered/
 .DS_Store
 
 .gnhf/runs/
+
+# Playwright MCP session artifacts
+.playwright-mcp/
+
+# npm lock file (this project uses pnpm)
+package-lock.json

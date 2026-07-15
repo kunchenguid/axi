@@ -1,0 +1,138 @@
+# Single source of truth for the AXI catalog.
+#
+# To add your AXI: append an entry below, run `pnpm run docs:gen`, and commit
+# this file together with the regenerated README.md and docs/index.html.
+# CI (`pnpm run docs:check`) fails if the rendered tables drift from this file.
+#
+# Descriptions support `inline code` and [markdown links](https://example.com);
+# keep them to one sentence or two short clauses.
+
+official:
+  - name: gh-axi
+    url: https://github.com/kunchenguid/gh-axi
+    domain: GitHub
+    description: "Issues, PRs, workflow runs, releases, and more. Wraps the official `gh` CLI with agent-ergonomic output."
+  - name: chrome-devtools-axi
+    url: https://github.com/kunchenguid/chrome-devtools-axi
+    domain: Browser automation
+    description: "Navigate, click, fill, and extract with combined operations and query filtering. Wraps chrome-devtools-mcp."
+  - name: lavish-axi
+    url: https://github.com/kunchenguid/lavish-axi
+    domain: Human review
+    description: "Turns agent-generated HTML artifacts into collaborative review surfaces - annotate, comment, and send feedback back to the agent."
+  - name: quota-axi
+    url: https://github.com/kunchenguid/quota-axi
+    domain: Quota / usage
+    description: "Reports local Claude, Codex, Cursor, Copilot, and Grok quota/usage windows for routing-aware agents - data-only and local-first."
+
+community:
+  - name: jj-axi
+    url: https://github.com/aivv73/jj-axi
+    author: aivv73
+    domain: Version control
+    description: "Inspect and reshape Jujutsu history through deterministic, non-interactive commands with compact TOON output and operation-aware undo."
+  - name: npm-axi
+    url: https://github.com/SSBrouhard/npm-axi
+    author: SSBrouhard
+    domain: npm
+    description: "Search and inspect npm registry packages, versions, dependencies, README previews, and downloads with token-efficient output."
+  - name: sqlite-axi
+    url: https://github.com/SSBrouhard/sqlite-axi
+    author: SSBrouhard
+    domain: SQLite
+    description: "Inspect schemas, sample rows, and run capped read-only SQLite queries with token-efficient TOON output."
+  - name: slack-axi
+    url: https://github.com/JarvusInnovations/slack-axi
+    author: Jarvus Innovations
+    domain: Slack
+    description: "Read, search, sweep, and safely draft Slack messages with token-efficient output."
+  - name: gws-axi
+    url: https://github.com/JarvusInnovations/gws-axi
+    author: Jarvus Innovations
+    domain: Google Workspace
+    description: "Gmail, Calendar, Docs, Drive, and Slides behind one command, with multi-account write-safety - drafts mail, never sends."
+  - name: harvest-axi
+    url: https://github.com/JarvusInnovations/harvest-axi
+    author: Jarvus Innovations
+    domain: Time tracking
+    description: "Review, log, and edit Harvest time entries by period - for yourself, your team, a project, or a client."
+  - name: specops
+    url: https://github.com/JarvusInnovations/specops
+    author: Jarvus Innovations
+    domain: Spec-driven dev
+    description: "Spec-driven development for agents - and a demo of shipping an AXI embedded in a skill, not a standalone npm executable."
+  - name: gitsheets-axi
+    url: https://github.com/JarvusInnovations/gitsheets/tree/main/packages/gitsheets-axi
+    author: Jarvus Innovations
+    domain: Git-backed data
+    description: "Read and mutate git-backed record sheets over the shell - TOON output, idempotent commits."
+  - name: metabase-axi
+    url: https://github.com/JarvusInnovations/metabase-axi
+    author: Jarvus Innovations
+    domain: Analytics / BI
+    description: "Query, explore, and export from Metabase over the shell - SQL/MBQL, saved questions, schema introspection, full-data export."
+  - name: otter-axi
+    url: https://github.com/JarvusInnovations/otter-axi
+    author: Jarvus Innovations
+    domain: Meetings
+    description: "Find and pull Otter.ai meeting transcripts from the shell - wraps Otter.ai's hosted MCP server as a scriptable, headless CLI."
+  - name: notion-axi
+    url: https://github.com/maximebrmd/notion-axi
+    author: maximebrmd
+    domain: Notion
+    description: "Search, read, create, and update Notion pages and databases over the shell - token-efficient TOON output, PAT or integration auth."
+  - name: clickup-axi
+    url: https://github.com/JanSuthacheeva/clickup-axi
+    author: JanSuthacheeva
+    domain: ClickUp
+    description: "List your open tasks, view a task with its newest comments inline, and change task status - truncation-aware, TOON-style output."
+  - name: databricks-axi
+    url: https://github.com/p33ves/databricks-axi
+    author: p33ves
+    domain: Databricks
+    description: "Run Databricks jobs, watch runs, and pull failure logs inline over the official databricks CLI - more domains coming soon."
+  - name: aws-axi
+    url: https://github.com/thatdudealso/aws-axi
+    author: thatdudealso
+    domain: AWS
+    description: "Discover, plan, provision, deploy, and inspect AWS services for hosting web, backend, database, and AI workloads through safe token-efficient CLI workflows."
+  - name: docker-axi
+    url: https://github.com/thatdudealso/docker-axi
+    author: thatdudealso
+    domain: Docker
+    description: "Discover, build, run, debug, publish, inspect, and clean up Docker apps through safe token-efficient CLI workflows."
+  - name: dynamodb-axi
+    url: https://github.com/thatdudealso/dynamodb-axi
+    author: thatdudealso
+    domain: DynamoDB
+    description: "Discover, inspect, query, scan, create, update, back up, restore, export, import, and safely operate DynamoDB tables through token-efficient CLI workflows."
+  - name: pg-axi
+    url: https://github.com/thatdudealso/pg-axi
+    author: thatdudealso
+    domain: PostgreSQL
+    description: "Discover, create, inspect, query, back up, restore, and maintain PostgreSQL databases through safe token-efficient CLI workflows."
+  - name: mongodb-axi
+    url: https://github.com/thatdudealso/mongodb-axi
+    author: thatdudealso
+    domain: MongoDB
+    description: "Discover, create, inspect, query, export, import, maintain, and diagnose MongoDB databases through safe token-efficient CLI workflows."
+  - name: elasticsearch-axi
+    url: https://github.com/thatdudealso/elasticsearch-axi
+    author: thatdudealso
+    domain: Elasticsearch
+    description: "Discover, inspect, query, index, map, snapshot, restore, diagnose, and operate Elasticsearch clusters through safe token-efficient CLI workflows."
+  - name: kubernetes-axi
+    url: https://github.com/thatdudealso/kubernetes-axi
+    author: thatdudealso
+    domain: Kubernetes
+    description: "Discover, inspect, deploy, debug, scale, roll out, expose, and clean up Kubernetes workloads through safe token-efficient CLI workflows."
+  - name: redis-axi
+    url: https://github.com/thatdudealso/redis-axi
+    author: thatdudealso
+    domain: Redis
+    description: "Discover, inspect, query, export, import, maintain, and diagnose Redis databases through safe token-efficient CLI workflows."
+  - name: celery-axi
+    url: https://github.com/thatdudealso/celery-axi
+    author: thatdudealso
+    domain: Celery
+    description: "Discover, inspect, run, debug, monitor, schedule, control, and safely operate Celery task queues through token-efficient CLI workflows."

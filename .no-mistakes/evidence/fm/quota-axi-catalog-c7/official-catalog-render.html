@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>README Official AXI Catalog Evidence</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --border: #d0d7de;
+        --text: #1f2328;
+        --muted: #59636e;
+        --bg: #ffffff;
+        --head: #f6f8fa;
+        --accent: #0969da;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        padding: 40px;
+        background: #f6f8fa;
+        color: var(--text);
+        font:
+          16px/1.5 -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          sans-serif;
+      }
+      main {
+        max-width: 1280px;
+        margin: 0 auto;
+        background: var(--bg);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 32px;
+        box-shadow: 0 8px 24px rgba(140, 149, 159, 0.18);
+      }
+      h1 {
+        margin: 0 0 8px;
+        font-size: 32px;
+        line-height: 1.25;
+      }
+      h2 {
+        margin: 28px 0 8px;
+        font-size: 24px;
+      }
+      p {
+        margin: 0 0 16px;
+        color: var(--muted);
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        table-layout: fixed;
+        margin-top: 16px;
+      }
+      th,
+      td {
+        border: 1px solid var(--border);
+        padding: 9px 12px;
+        vertical-align: top;
+        text-align: left;
+      }
+      th {
+        background: var(--head);
+        font-weight: 600;
+      }
+      th:nth-child(1),
+      td:nth-child(1) {
+        width: 34%;
+      }
+      th:nth-child(2),
+      td:nth-child(2) {
+        width: 18%;
+      }
+      th:nth-child(3),
+      td:nth-child(3) {
+        width: 48%;
+      }
+      tr[data-tool="quota-axi"] {
+        background: #f0f7ff;
+        outline: 2px solid #0969da;
+        outline-offset: -2px;
+      }
+      a {
+        color: var(--accent);
+        text-decoration: none;
+      }
+      code {
+        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        font-size: 0.95em;
+        background: rgba(175, 184, 193, 0.2);
+        border-radius: 6px;
+        padding: 0.12em 0.35em;
+      }
+      .note {
+        display: inline-flex;
+        gap: 8px;
+        align-items: center;
+        margin: 12px 0 0;
+        padding: 8px 10px;
+        border: 1px solid #54aeff;
+        border-radius: 6px;
+        background: #ddf4ff;
+        color: #24292f;
+        font-size: 14px;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>README Official AXI Catalog</h1>
+      <p>
+        Rendered from README.md at 734edcd5f537af87de51af511e78e93fcaa7a031. The
+        highlighted row is the only catalog addition in this change.
+      </p>
+      <h2>Official</h2>
+      <p>
+        Reference implementations maintained by the AXI project, validating the
+        principles across different domains:
+      </p>
+      <table aria-label="Official AXI Catalog">
+        <thead>
+          <tr>
+            <th>AXI</th>
+            <th>Domain</th>
+            <th>What it does</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+              <a href="https://github.com/kunchenguid/gh-axi"
+                ><code>gh-axi</code></a
+              >
+            </td>
+            <td>GitHub</td>
+            <td>
+              Issues, PRs, workflow runs, releases, and more. Wraps the official
+              <code>gh</code> CLI with agent-ergonomic output.
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <a href="https://github.com/kunchenguid/chrome-devtools-axi"
+                ><code>chrome-devtools-axi</code></a
+              >
+            </td>
+            <td>Browser automation</td>
+            <td>
+              Navigate, click, fill, and extract with combined operations and
+              query filtering. Wraps chrome-devtools-mcp.
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <a href="https://github.com/kunchenguid/lavish-axi"
+                ><code>lavish-axi</code></a
+              >
+            </td>
+            <td>Human review</td>
+            <td>
+              Turns agent-generated HTML artifacts into collaborative review
+              surfaces - annotate, comment, and send feedback back to the agent.
+            </td>
+          </tr>
+          <tr data-tool="quota-axi">
+            <td>
+              <a href="https://github.com/kunchenguid/quota-axi"
+                ><code>quota-axi</code></a
+              >
+            </td>
+            <td>Quota / usage</td>
+            <td>
+              Reports local Claude, Codex, Cursor, Copilot, and Grok quota/usage
+              windows for routing-aware agents - data-only and local-first.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="note">
+        Verified: README-only diff, Official table placement, provider list,
+        domain label, data-only/local-first wording, no Community or Quick Start
+        changes.
+      </div>
+    </main>
+  </body>
+</html>

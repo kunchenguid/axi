@@ -1,0 +1,46 @@
+name: docs-check
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - catalog.yaml
+      - principles.yaml
+      - README.md
+      - docs/index.html
+      - .agents/skills/axi/SKILL.md
+      - scripts/**
+      - .prettierrc
+      - package.json
+      - pnpm-lock.yaml
+      - .github/workflows/docs-check.yml
+  pull_request:
+    branches: [main]
+    paths:
+      - catalog.yaml
+      - principles.yaml
+      - README.md
+      - docs/index.html
+      - .agents/skills/axi/SKILL.md
+      - scripts/**
+      - .prettierrc
+      - package.json
+      - pnpm-lock.yaml
+      - .github/workflows/docs-check.yml
+
+jobs:
+  drift:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm run docs:test
+      - run: pnpm run docs:check

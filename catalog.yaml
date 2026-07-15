@@ -26,6 +26,11 @@ official:
     description: "Reports local Claude, Codex, Cursor, Copilot, and Grok quota/usage windows for routing-aware agents - data-only and local-first."
 
 community:
+  - name: codex-axi
+    url: https://github.com/kyler505/codex-axi
+    author: kyler505
+    domain: Codex orchestration
+    description: "Start, observe, steer, interrupt, and resume Codex threads with deterministic worker control, compact TOON output, and opt-in ambient integrations. Alpha; targets Codex 0.144.x."
   - name: jj-axi
     url: https://github.com/aivv73/jj-axi
     author: aivv73

@@ -143,6 +143,7 @@ AXIs built and maintained by the community:
 | [`celery-axi`](https://github.com/thatdudealso/celery-axi)                                         | thatdudealso       | Celery                | Discover, inspect, run, debug, monitor, schedule, control, and safely operate Celery task queues through token-efficient CLI workflows.                      |
 | [`cyber-mux`](https://github.com/cyberuni/cyber-mux)                                               | unional            | Terminal multiplexers | Open, send, read, focus, and close terminal panes across tmux, herdr, and WezTerm through one detection-driven contract with token-efficient output.         |
 | [`oracle-axi`](https://github.com/thatdudealso/oracle-axi)                                         | thatdudealso       | Oracle Database       | Discover, create, inspect, query, export, import, maintain, and diagnose Oracle databases through safe token-efficient CLI workflows.                        |
+| [`glab-axi`](https://github.com/karotkriss/glab-axi)                                               | karotkriss         | GitLab                | Issues, merge requests, CI/CD pipelines, variables and secrets, releases, and raw API access. Wraps the official glab CLI with agent-ergonomic TOON output.  |
 
 <!-- generated:catalog-community:end -->
 

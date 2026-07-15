@@ -447,15 +447,21 @@ describe("runAxiCli subprocess integration", () => {
         new URL("./fixtures/version-bin.mjs", import.meta.url),
       );
       const viteNodePath = fileURLToPath(
-        new URL("../node_modules/.bin/vite-node", import.meta.url),
+        new URL(
+          `../node_modules/.bin/vite-node${process.platform === "win32" ? ".cmd" : ""}`,
+          import.meta.url,
+        ),
       );
-      const { stdout, stderr } = await execFileAsync(
-        viteNodePath,
-        [fixturePath, flag],
-        {
-          cwd: new URL("..", import.meta.url),
-        },
-      );
+      const command = process.platform === "win32" ? "cmd.exe" : viteNodePath;
+      const args =
+        process.platform === "win32"
+          ? ["/d", "/s", "/c", viteNodePath, fixturePath, flag]
+          : [fixturePath, flag];
+      const { stdout, stderr } = await execFileAsync(command, args, {
+        cwd: new URL("..", import.meta.url),
+        shell: false,
+        windowsHide: true,
+      });
 
       expect(stdout).toBe("9.9.9\n");
       expect(stderr).toBe("");

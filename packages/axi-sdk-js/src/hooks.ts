@@ -238,11 +238,13 @@ const timeoutMs = ${JSON.stringify(timeoutSeconds * 1000)};
 
 function runAxiHomeView(cwd) {
   return new Promise((resolve) => {
-    const child = spawn(command, [], {
+    const invocation = commandInvocation(command);
+    const child = spawn(invocation.file, invocation.args, {
       cwd: directoryOrFallback(cwd),
       env: process.env,
-      shell: false,
+      shell: invocation.shell,
       stdio: ["ignore", "pipe", "pipe"],
+      windowsHide: true,
     });
 
     let stdout = "";
@@ -282,6 +284,14 @@ function runAxiHomeView(cwd) {
       resolve("error: " + marker + " ambient context failed: " + message);
     });
   });
+}
+
+function commandInvocation(command) {
+  if (/\\.(?:cjs|js|mjs)$/i.test(command)) {
+    return { file: process.execPath, args: [command], shell: false };
+  }
+  const shell = process.platform === "win32" && !/\\.(?:com|exe)$/i.test(command);
+  return { file: command, args: [], shell };
 }
 
 function directoryOrFallback(directory) {
@@ -393,6 +403,10 @@ export function resolvePortableHookCommand(
   }
 
   return execPath;
+}
+
+function isUnsafeWindowsNodeEntrypoint(command: string): boolean {
+  return process.platform === "win32" && /\.(?:cjs|js|mjs)$/i.test(command);
 }
 
 const NPM_SHIM_SCRIPT_PATTERNS = [
@@ -563,6 +577,18 @@ export function installSessionStartHooks(
     marker,
     buildDefaultPortableCommandContext(),
   );
+
+  // Windows associates raw JavaScript files with user-configured apps, so a
+  // SessionStart hook must never expose one as an executable command. The
+  // generated OpenCode plugin would use Node safely internally, but Claude and
+  // Codex receive this string directly. Fail closed until the npm command shim
+  // can be resolved instead of writing a command that an agent might copy.
+  if (isUnsafeWindowsNodeEntrypoint(command)) {
+    options.onError?.(
+      `${marker}: skipped hook setup because no named command or .cmd shim resolves to ${execPath}`,
+    );
+    return;
+  }
 
   const home = options.homeDir ?? homedir();
   const jsonTargets = [

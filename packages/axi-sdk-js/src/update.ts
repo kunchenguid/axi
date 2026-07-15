@@ -460,7 +460,7 @@ function packageManagerExecutable(
   return command;
 }
 
-function shouldUseWindowsPackageManagerShell(
+function shouldUseWindowsPackageManagerCommandShim(
   command: string,
   platform: NodeJS.Platform,
 ): boolean {
@@ -470,18 +470,38 @@ function shouldUseWindowsPackageManagerShell(
   );
 }
 
+function packageManagerInvocation(
+  command: string,
+  args: string[],
+  platform: NodeJS.Platform,
+): { command: string; args: string[] } {
+  const executable = packageManagerExecutable(command, platform);
+  if (shouldUseWindowsPackageManagerCommandShim(command, platform)) {
+    return {
+      command: "cmd.exe",
+      args: ["/d", "/s", "/c", executable, ...args],
+    };
+  }
+  return { command: executable, args };
+}
+
 async function npmViewVersion(
   packageName: string,
   platform: NodeJS.Platform = process.platform,
 ): Promise<string | null> {
   try {
-    const command = packageManagerExecutable("npm", platform);
-    const { stdout } = await execFileAsync(
-      command,
+    const invocation = packageManagerInvocation(
+      "npm",
       ["view", packageName, "version"],
+      platform,
+    );
+    const { stdout } = await execFileAsync(
+      invocation.command,
+      invocation.args,
       {
         timeout: 20_000,
-        shell: shouldUseWindowsPackageManagerShell("npm", platform),
+        shell: false,
+        windowsHide: true,
       },
     );
     const version = stdout.trim();
@@ -651,14 +671,16 @@ async function defaultRunInstall(
 
   return new Promise<InstallResult>((resolve) => {
     const [command, ...args] = argv;
-    const child = spawn(
-      packageManagerExecutable(command, context.platform),
+    const invocation = packageManagerInvocation(
+      command,
       args,
-      {
-        stdio: ["ignore", "pipe", "pipe"],
-        shell: shouldUseWindowsPackageManagerShell(command, context.platform),
-      },
+      context.platform,
     );
+    const child = spawn(invocation.command, invocation.args, {
+      stdio: ["ignore", "pipe", "pipe"],
+      shell: false,
+      windowsHide: true,
+    });
     child.stdout?.on("data", (chunk: string | Buffer) => {
       process.stderr.write(chunk);
     });

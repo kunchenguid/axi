@@ -10,7 +10,7 @@ import {
   writeFileSync,
 } from "node:fs";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { delimiter, join, normalize, relative } from "node:path";
 import { pathToFileURL } from "node:url";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import {
@@ -21,6 +21,34 @@ import {
   resolvePortableHookCommand,
   shouldInstallHooksForNodeAxiExecPath,
 } from "../src/hooks.js";
+
+function putNpmCommandOnPath(
+  root: string,
+  command: string,
+  execFile: string,
+): void {
+  const binDir = join(root, "path-bin");
+  const windowsTarget = relative(binDir, execFile).replaceAll("/", "\\");
+  const posixTarget = relative(binDir, execFile).replaceAll("\\", "/");
+  mkdirSync(binDir, { recursive: true });
+  writeFileSync(
+    join(binDir, `${command}.cmd`),
+    ["@ECHO off", `node "%~dp0\\${windowsTarget}" %*`].join("\r\n"),
+    "utf-8",
+  );
+  const posixShim = join(binDir, command);
+  writeFileSync(
+    posixShim,
+    [
+      "#!/bin/sh",
+      'basedir=$(dirname "$0")',
+      `exec node "$basedir/${posixTarget}" "$@"`,
+    ].join("\n"),
+    "utf-8",
+  );
+  chmodSync(posixShim, 0o755);
+  process.env.PATH = [binDir, process.env.PATH].filter(Boolean).join(delimiter);
+}
 
 describe("computeSessionStartHookUpdate", () => {
   it("installs a managed hook when no hooks exist", () => {
@@ -203,11 +231,22 @@ describe("computeCodexConfigUpdate", () => {
 });
 
 describe("resolvePortableHookCommand", () => {
-  const makeContext = (mapping: Record<string, string>) => ({
-    pathEntries: ["/usr/local/bin", "/opt/homebrew/bin"],
-    pathExtensions: [""],
-    resolveRealPath: (p: string) => mapping[p],
-  });
+  const makeContext = (mapping: Record<string, string>) => {
+    const normalizedMapping = Object.fromEntries(
+      Object.entries(mapping).map(([path, target]) => [
+        normalize(path),
+        normalize(target),
+      ]),
+    );
+    return {
+      pathEntries: [
+        normalize("/usr/local/bin"),
+        normalize("/opt/homebrew/bin"),
+      ],
+      pathExtensions: [""],
+      resolveRealPath: (p: string) => normalizedMapping[normalize(p)],
+    };
+  };
 
   it("returns the plain binary name when PATH resolves to the same file", () => {
     const exec = "/opt/homebrew/lib/node_modules/gh-axi/dist/bin/gh-axi.js";
@@ -273,14 +312,14 @@ describe("resolvePortableHookCommand", () => {
 
   it("tries multiple path extensions", () => {
     const exec = "/real/gh-axi.js";
+    const mapping = {
+      [normalize(exec)]: normalize(exec),
+      [normalize("/usr/local/bin/gh-axi.CMD")]: normalize(exec),
+    };
     const context = {
-      pathEntries: ["/usr/local/bin"],
+      pathEntries: [normalize("/usr/local/bin")],
       pathExtensions: ["", ".EXE", ".CMD"],
-      resolveRealPath: (p: string) =>
-        ({
-          [exec]: exec,
-          "/usr/local/bin/gh-axi.CMD": exec,
-        })[p],
+      resolveRealPath: (p: string) => mapping[normalize(p)],
     };
 
     expect(
@@ -359,9 +398,11 @@ describe("extractNpmShimScriptPath", () => {
   it("reads the script reference from a Windows .cmd shim", () => {
     const shim = [
       "@ECHO off",
+      "GOTO start",
+      ":find_dp0",
       "SETLOCAL",
-      "SET dp0=%~dp0",
-      '"%_prog%"  "%dp0%\\node_modules\\gh-axi\\dist\\bin\\gh-axi.js" %*',
+      "CALL :find_dp0",
+      'endLocal & goto #_undefined_# 2>NUL || title %COMSPEC% & "%_prog%"  "%dp0%\\node_modules\\gh-axi\\dist\\bin\\gh-axi.js" %*',
     ].join("\r\n");
 
     expect(extractNpmShimScriptPath(shim)).toBe(
@@ -433,6 +474,7 @@ describe("installSessionStartHooks (portable command)", () => {
 
     const execFile = join(pkgBin, "gh-axi.js");
     writeFileSync(execFile, "// stub\n", "utf-8");
+    putNpmCommandOnPath(tmp, "gh-axi", execFile);
     process.argv = ["node", execFile];
 
     installSessionStartHooks({ homeDir: home });
@@ -440,7 +482,7 @@ describe("installSessionStartHooks (portable command)", () => {
     const settings = JSON.parse(
       readFileSync(join(home, ".claude", "settings.json"), "utf-8"),
     );
-    expect(settings.hooks.SessionStart[0].hooks[0].command).toBe(execFile);
+    expect(settings.hooks.SessionStart[0].hooks[0].command).toBe("gh-axi");
     expect(settings.hooks.SessionStart[0].hooks[0].timeout).toBe(10);
   });
 
@@ -471,32 +513,35 @@ describe("installSessionStartHooks (portable command)", () => {
     expect(existsSync(join(home, ".claude", "settings.json"))).toBe(false);
   });
 
-  it("writes the plain binary name when a PATH symlink points at the exec file", () => {
-    const home = join(tmp, "home");
-    const pkgBin = join(tmp, "pkg", "dist", "bin");
-    const pathDir = join(tmp, "path-bin");
-    mkdirSync(home, { recursive: true });
-    mkdirSync(pkgBin, { recursive: true });
-    mkdirSync(pathDir, { recursive: true });
+  it.skipIf(process.platform === "win32")(
+    "writes the plain binary name when a PATH symlink points at the exec file",
+    () => {
+      const home = join(tmp, "home");
+      const pkgBin = join(tmp, "pkg", "dist", "bin");
+      const pathDir = join(tmp, "path-bin");
+      mkdirSync(home, { recursive: true });
+      mkdirSync(pkgBin, { recursive: true });
+      mkdirSync(pathDir, { recursive: true });
 
-    const execFile = join(pkgBin, "gh-axi.js");
-    writeFileSync(execFile, "// stub\n", "utf-8");
-    symlinkSync(execFile, join(pathDir, "gh-axi"));
+      const execFile = join(pkgBin, "gh-axi.js");
+      writeFileSync(execFile, "// stub\n", "utf-8");
+      symlinkSync(execFile, join(pathDir, "gh-axi"));
 
-    process.env.PATH = pathDir;
+      process.env.PATH = pathDir;
 
-    installSessionStartHooks({
-      marker: "gh-axi",
-      execPath: execFile,
-      binaryNames: ["gh-axi"],
-      homeDir: home,
-    });
+      installSessionStartHooks({
+        marker: "gh-axi",
+        execPath: execFile,
+        binaryNames: ["gh-axi"],
+        homeDir: home,
+      });
 
-    const settings = JSON.parse(
-      readFileSync(join(home, ".claude", "settings.json"), "utf-8"),
-    );
-    expect(settings.hooks.SessionStart[0].hooks[0].command).toBe("gh-axi");
-  });
+      const settings = JSON.parse(
+        readFileSync(join(home, ".claude", "settings.json"), "utf-8"),
+      );
+      expect(settings.hooks.SessionStart[0].hooks[0].command).toBe("gh-axi");
+    },
+  );
 
   it("writes the plain binary name when a PATH npm wrapper shim targets the exec file", () => {
     const home = join(tmp, "home");
@@ -535,72 +580,141 @@ describe("installSessionStartHooks (portable command)", () => {
     expect(settings.hooks.SessionStart[0].hooks[0].command).toBe("gh-axi");
   });
 
-  it("keeps the absolute exec path when the binary is not on PATH", () => {
-    const home = join(tmp, "home");
-    const pkgBin = join(tmp, "pkg", "dist", "bin");
-    const pathDir = join(tmp, "path-bin");
-    mkdirSync(home, { recursive: true });
-    mkdirSync(pkgBin, { recursive: true });
-    mkdirSync(pathDir, { recursive: true });
+  it.skipIf(process.platform !== "win32")(
+    "writes a named command for real npm .cmd shims in every generated integration",
+    () => {
+      const home = join(tmp, "home");
+      const pathDir = join(tmp, "path-bin");
+      const pkgBin = join(pathDir, "node_modules", "gh-axi", "dist", "bin");
+      mkdirSync(home, { recursive: true });
+      mkdirSync(pkgBin, { recursive: true });
 
-    const execFile = join(pkgBin, "gh-axi.js");
-    writeFileSync(execFile, "// stub\n", "utf-8");
+      const execFile = join(pkgBin, "gh-axi.js");
+      writeFileSync(execFile, "// fixture\n", "utf-8");
+      writeFileSync(
+        join(pathDir, "gh-axi.cmd"),
+        [
+          "@ECHO off",
+          "GOTO start",
+          ":find_dp0",
+          "SET dp0=%~dp0",
+          "EXIT /b",
+          ":start",
+          "SETLOCAL",
+          "CALL :find_dp0",
+          'endLocal & goto #_undefined_# 2>NUL || title %COMSPEC% & "%_prog%"  "%dp0%\\node_modules\\gh-axi\\dist\\bin\\gh-axi.js" %*',
+        ].join("\r\n"),
+        "utf-8",
+      );
+      process.env.PATH = pathDir;
 
-    process.env.PATH = pathDir;
+      installSessionStartHooks({
+        marker: "gh-axi",
+        execPath: execFile,
+        binaryNames: ["gh-axi"],
+        homeDir: home,
+      });
 
-    installSessionStartHooks({
-      marker: "gh-axi",
-      execPath: execFile,
-      binaryNames: ["gh-axi"],
-      homeDir: home,
-    });
+      const claude = JSON.parse(
+        readFileSync(join(home, ".claude", "settings.json"), "utf-8"),
+      );
+      const codex = JSON.parse(
+        readFileSync(join(home, ".codex", "hooks.json"), "utf-8"),
+      );
+      const openCode = readFileSync(
+        join(home, ".config", "opencode", "plugins", "axi-gh-axi.js"),
+        "utf-8",
+      );
 
-    const settings = JSON.parse(
-      readFileSync(join(home, ".claude", "settings.json"), "utf-8"),
-    );
-    expect(settings.hooks.SessionStart[0].hooks[0].command).toBe(execFile);
-  });
+      expect(claude.hooks.SessionStart[0].hooks[0].command).toBe("gh-axi");
+      expect(codex.hooks.SessionStart[0].hooks[0].command).toBe("gh-axi");
+      expect(openCode).toContain('const command = "gh-axi";');
+      expect(openCode).not.toContain(execFile);
+    },
+  );
 
-  it("keeps the absolute exec path when PATH resolves to a different binary", () => {
-    const home = join(tmp, "home");
-    const pkgBin = join(tmp, "pkg", "dist", "bin");
-    const otherBin = join(tmp, "other", "dist", "bin");
-    const pathDir = join(tmp, "path-bin");
-    mkdirSync(home, { recursive: true });
-    mkdirSync(pkgBin, { recursive: true });
-    mkdirSync(otherBin, { recursive: true });
-    mkdirSync(pathDir, { recursive: true });
+  it.skipIf(process.platform !== "win32")(
+    "fails closed instead of writing raw Node entrypoints when no named command is on PATH",
+    () => {
+      const home = join(tmp, "home");
+      const pkgBin = join(tmp, "pkg", "dist", "bin");
+      const pathDir = join(tmp, "path-bin");
+      mkdirSync(home, { recursive: true });
+      mkdirSync(pkgBin, { recursive: true });
+      mkdirSync(pathDir, { recursive: true });
 
-    const execFile = join(pkgBin, "gh-axi.js");
-    const otherFile = join(otherBin, "gh-axi.js");
-    writeFileSync(execFile, "// stub\n", "utf-8");
-    writeFileSync(otherFile, "// other\n", "utf-8");
-    symlinkSync(otherFile, join(pathDir, "gh-axi"));
+      const execFile = join(pkgBin, "gh-axi.js");
+      writeFileSync(execFile, "// stub\n", "utf-8");
 
-    process.env.PATH = pathDir;
+      process.env.PATH = pathDir;
 
-    installSessionStartHooks({
-      marker: "gh-axi",
-      execPath: execFile,
-      binaryNames: ["gh-axi"],
-      homeDir: home,
-    });
+      installSessionStartHooks({
+        marker: "gh-axi",
+        execPath: execFile,
+        binaryNames: ["gh-axi"],
+        homeDir: home,
+      });
 
-    const settings = JSON.parse(
-      readFileSync(join(home, ".claude", "settings.json"), "utf-8"),
-    );
-    expect(settings.hooks.SessionStart[0].hooks[0].command).toBe(execFile);
-  });
+      expect(existsSync(join(home, ".claude", "settings.json"))).toBe(false);
+      expect(existsSync(join(home, ".codex", "hooks.json"))).toBe(false);
+      expect(
+        existsSync(
+          join(home, ".config", "opencode", "plugins", "axi-gh-axi.js"),
+        ),
+      ).toBe(false);
+    },
+  );
+
+  it.skipIf(process.platform === "win32")(
+    "keeps the absolute exec path when PATH resolves to a different binary",
+    () => {
+      const home = join(tmp, "home");
+      const pkgBin = join(tmp, "pkg", "dist", "bin");
+      const otherBin = join(tmp, "other", "dist", "bin");
+      const pathDir = join(tmp, "path-bin");
+      mkdirSync(home, { recursive: true });
+      mkdirSync(pkgBin, { recursive: true });
+      mkdirSync(otherBin, { recursive: true });
+      mkdirSync(pathDir, { recursive: true });
+
+      const execFile = join(pkgBin, "gh-axi.js");
+      const otherFile = join(otherBin, "gh-axi.js");
+      writeFileSync(execFile, "// stub\n", "utf-8");
+      writeFileSync(otherFile, "// other\n", "utf-8");
+      symlinkSync(otherFile, join(pathDir, "gh-axi"));
+
+      process.env.PATH = pathDir;
+
+      installSessionStartHooks({
+        marker: "gh-axi",
+        execPath: execFile,
+        binaryNames: ["gh-axi"],
+        homeDir: home,
+      });
+
+      const settings = JSON.parse(
+        readFileSync(join(home, ".claude", "settings.json"), "utf-8"),
+      );
+      expect(settings.hooks.SessionStart[0].hooks[0].command).toBe(execFile);
+    },
+  );
 });
 
 describe("installSessionStartHooks (OpenCode plugin)", () => {
   let tmp: string;
+  let originalPath: string | undefined;
 
   beforeEach(() => {
     tmp = mkdtempSync(join(tmpdir(), "axi-sdk-js-opencode-"));
+    originalPath = process.env.PATH;
   });
 
   afterEach(() => {
+    if (originalPath === undefined) {
+      delete process.env.PATH;
+    } else {
+      process.env.PATH = originalPath;
+    }
     rmSync(tmp, { recursive: true, force: true });
   });
 
@@ -613,6 +727,7 @@ describe("installSessionStartHooks (OpenCode plugin)", () => {
     const execFile = join(tmp, "pkg", "dist", "bin", "gh-axi.js");
     mkdirSync(join(tmp, "pkg", "dist", "bin"), { recursive: true });
     writeFileSync(execFile, "// stub\n", "utf-8");
+    putNpmCommandOnPath(tmp, "gh-axi", execFile);
 
     installSessionStartHooks({
       marker: "gh-axi",
@@ -626,9 +741,11 @@ describe("installSessionStartHooks (OpenCode plugin)", () => {
     expect(plugin).toContain("experimental.chat.system.transform");
     expect(plugin).toContain("## AXI ambient context: gh-axi");
     expect(plugin).toContain('ambientHeader + "\\n" + homeView');
-    expect(plugin).toContain(JSON.stringify(execFile));
-    expect(plugin).toContain("spawn(command, [],");
+    expect(plugin).toContain('const command = "gh-axi";');
+    expect(plugin).not.toContain(execFile);
+    expect(plugin).toContain("spawn(invocation.file, invocation.args,");
     expect(plugin).toContain("cwd: directory");
+    expect(plugin).toContain("windowsHide: true");
     expect(plugin).not.toContain("tool:");
   });
 
@@ -644,6 +761,7 @@ describe("installSessionStartHooks (OpenCode plugin)", () => {
       "utf-8",
     );
     chmodSync(execFile, 0o755);
+    putNpmCommandOnPath(tmp, "gh-axi", execFile);
 
     installSessionStartHooks({
       marker: "gh-axi",
@@ -676,6 +794,7 @@ describe("installSessionStartHooks (OpenCode plugin)", () => {
     mkdirSync(join(tmp, "new", "dist", "bin"), { recursive: true });
     writeFileSync(oldExec, "// old\n", "utf-8");
     writeFileSync(newExec, "// new\n", "utf-8");
+    putNpmCommandOnPath(tmp, "gh-axi", oldExec);
 
     installSessionStartHooks({
       marker: "gh-axi",
@@ -683,6 +802,7 @@ describe("installSessionStartHooks (OpenCode plugin)", () => {
       binaryNames: ["gh-axi"],
       homeDir: home,
     });
+    putNpmCommandOnPath(tmp, "gh-axi", newExec);
     installSessionStartHooks({
       marker: "gh-axi",
       execPath: newExec,
@@ -691,8 +811,9 @@ describe("installSessionStartHooks (OpenCode plugin)", () => {
     });
 
     const plugin = readFileSync(pluginPath(home), "utf-8");
-    expect(plugin).toContain(JSON.stringify(newExec));
-    expect(plugin).not.toContain(JSON.stringify(oldExec));
+    expect(plugin).toContain('const command = "gh-axi";');
+    expect(plugin).not.toContain(oldExec);
+    expect(plugin).not.toContain(newExec);
   });
 
   it("does not overwrite an unmarked OpenCode plugin file", () => {
@@ -707,10 +828,14 @@ describe("installSessionStartHooks (OpenCode plugin)", () => {
       "utf-8",
     );
     const errors: string[] = [];
+    const execFile = join(tmp, "pkg", "dist", "bin", "gh-axi.js");
+    mkdirSync(join(tmp, "pkg", "dist", "bin"), { recursive: true });
+    writeFileSync(execFile, "// stub\n", "utf-8");
+    putNpmCommandOnPath(tmp, "gh-axi", execFile);
 
     installSessionStartHooks({
       marker: "gh-axi",
-      execPath: join(tmp, "pkg", "dist", "bin", "gh-axi.js"),
+      execPath: execFile,
       binaryNames: ["gh-axi"],
       homeDir: home,
       onError: (message) => errors.push(message),

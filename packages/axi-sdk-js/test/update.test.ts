@@ -1,4 +1,5 @@
 import { EventEmitter } from "node:events";
+import { normalize } from "node:path";
 import { describe, expect, it, vi } from "vitest";
 import { AxiError } from "../src/errors.js";
 import {
@@ -74,13 +75,18 @@ describe("isUpdateAvailable", () => {
 });
 
 function fakeFs(files: Record<string, string>): IdentityFs {
+  const normalizedFiles = Object.fromEntries(
+    Object.entries(files).map(([path, content]) => [normalize(path), content]),
+  );
   return {
-    existsSync: (path) => Object.prototype.hasOwnProperty.call(files, path),
+    existsSync: (path) =>
+      Object.prototype.hasOwnProperty.call(normalizedFiles, normalize(path)),
     readFileSync: (path) => {
-      if (!Object.prototype.hasOwnProperty.call(files, path)) {
+      const normalized = normalize(path);
+      if (!Object.prototype.hasOwnProperty.call(normalizedFiles, normalized)) {
         throw new Error(`ENOENT: ${path}`);
       }
-      return files[path];
+      return normalizedFiles[normalized];
     },
   };
 }
@@ -814,12 +820,13 @@ describe("default install runner", () => {
         }),
         env: {},
         fetchLatest: async () => "1.3.0",
+        platform: "linux",
       });
 
       expect(spawn).toHaveBeenCalledWith(
         "npm",
         ["install", "-g", "gh-axi@latest"],
-        { stdio: ["ignore", "pipe", "pipe"], shell: false },
+        { stdio: ["ignore", "pipe", "pipe"], shell: false, windowsHide: true },
       );
       expect(stdout.write).toHaveBeenCalledWith(
         "running: npm install -g gh-axi@latest\n",
@@ -894,15 +901,15 @@ describe("default install runner", () => {
 
       expect(spawn).toHaveBeenNthCalledWith(
         1,
-        "npm.cmd",
-        ["install", "-g", "gh-axi@latest"],
-        { stdio: ["ignore", "pipe", "pipe"], shell: true },
+        "cmd.exe",
+        ["/d", "/s", "/c", "npm.cmd", "install", "-g", "gh-axi@latest"],
+        { stdio: ["ignore", "pipe", "pipe"], shell: false, windowsHide: true },
       );
       expect(spawn).toHaveBeenNthCalledWith(
         2,
-        "pnpm.cmd",
-        ["add", "-g", "gh-axi@latest"],
-        { stdio: ["ignore", "pipe", "pipe"], shell: true },
+        "cmd.exe",
+        ["/d", "/s", "/c", "pnpm.cmd", "add", "-g", "gh-axi@latest"],
+        { stdio: ["ignore", "pipe", "pipe"], shell: false, windowsHide: true },
       );
     } finally {
       vi.doUnmock("node:child_process");

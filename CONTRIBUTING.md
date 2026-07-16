@@ -1,37 +1,28 @@
 # Contributing
 
 Thanks for wanting to contribute.
-One rule up front:
-
-**Human-authored pull requests targeting `main` must be raised through [`no-mistakes`](https://github.com/kunchenguid/no-mistakes).**
-We require this to reduce the maintainer's burden of reviewing and merging contributions.
-
-`no-mistakes` puts a local git proxy in front of your real remote.
-Pushing through it runs an AI-driven review/test/build pipeline in an isolated worktree, forwards the push to the configured target only after every check passes, and opens a clean PR automatically.
-Fork-based contributions require no-mistakes **v1.30.1** or newer.
-
-A GitHub Actions check (`Require no-mistakes`) runs on PRs targeting `main` and fails if the body is missing the deterministic signature that no-mistakes writes.
-The release and dependency bots are exempt so their automation keeps working, but regular contributor PRs without the signature will not be reviewed or merged.
+Pull requests targeting `main` are validated by repository-owned GitHub Actions.
+The `Repo-native PR validation` workflow installs the pinned dependencies and runs
+the docs, lint, build, and test commands declared by this repository. Contributors
+do not need a separate local proxy or third-party promotion tool to open a PR.
 
 A second GitHub Actions check (`Guard generated files`) fails PRs that hand-edit release-please-generated files.
 Release-please PRs are exempt because they are the only place those files should change.
 
 ## Workflow
 
-1. Fork the repo, then clone the parent repo or set your local `origin` back to the parent repo (`git@github.com:kunchenguid/axi.git`).
+1. Fork the repo, then clone your fork and add this repository as the upstream remote.
 2. Create a branch and make your changes.
-3. Initialize or refresh the gate with your fork as the push target: `no-mistakes init --fork-url git@github.com:<you>/axi.git`.
-4. Commit your changes.
-5. Push through the gate instead of pushing to `origin`:
+3. Commit your changes.
+4. Run the relevant repository-native checks listed below.
+5. Push your branch to your fork:
 
    ```sh
-   git push no-mistakes
+   git push origin HEAD
    ```
 
-6. Run `no-mistakes` to attach to the pipeline, watch findings, and auto-fix or review as needed.
-7. Once the pipeline passes, it pushes your branch to your fork and opens the PR against this repo for you.
-
-See the [no-mistakes quick start](https://kunchenguid.github.io/no-mistakes/start-here/quick-start/) for the full first-run walkthrough.
+6. Open a pull request against this repository's `main` branch and wait for the
+   repository-owned checks to pass.
 
 ## Adding your AXI to the catalog
 

@@ -14,7 +14,7 @@ import { execSync, type ExecSyncOptionsWithStringEncoding } from "node:child_pro
 import { existsSync, mkdirSync, readFileSync, writeFileSync, appendFileSync, rmSync } from "node:fs";
 import { join, resolve } from "node:path";
 
-import type { RunSpec, RunResult, ConditionDef, TaskDef, AgentBackend } from "./types.js";
+import type { RunSpec, RunResult, ConditionDef, TaskDef, AgentBackend, McpCompressorConfig } from "./types.js";
 import { parseCodexJsonl, parseClaudeJsonl } from "./usage.js";
 import { grade } from "./grader.js";
 
@@ -22,6 +22,29 @@ import { grade } from "./grader.js";
 const BENCH_ROOT = resolve(import.meta.dirname, "..");
 const RESULTS_DIR = join(BENCH_ROOT, "results");
 const REPO_URL = "https://github.com/openclaw/openclaw.git";
+
+export function buildMcpCompressorConfig(config: McpCompressorConfig, ghToken: string) {
+  const args = [
+    "mcp-compressor",
+    "https://api.githubcopilot.com/mcp/",
+    "-H",
+    `Authorization=Bearer ${ghToken}`,
+    "-c",
+    config.level,
+  ];
+
+  if (config.server_name) args.push("--server-name", config.server_name);
+  if (config.cli_mode) args.push("--cli-mode");
+
+  return {
+    mcpServers: {
+      "compressed-github": {
+        command: "uvx",
+        args,
+      },
+    },
+  };
+}
 
 export function runOne(
   spec: RunSpec,
@@ -197,6 +220,13 @@ function runAgent(
         // Disable ToolSearch so MCP tools are loaded upfront into context
         mcpArgs.push("--disallowedTools", "ToolSearch");
       }
+    } else if (condition.mcp_compressor) {
+      const mcpConfigPath = join(artifactDir, ".mcp-config.json");
+      writeFileSync(
+        mcpConfigPath,
+        JSON.stringify(buildMcpCompressorConfig(condition.mcp_compressor, process.env.GH_TOKEN!)),
+      );
+      mcpArgs.push("--mcp-config", mcpConfigPath, "--disallowedTools", "ToolSearch");
     }
 
     cmd = [

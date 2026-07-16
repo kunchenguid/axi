@@ -99,8 +99,8 @@ async function cmdRun(argv: string[]): Promise<void> {
     process.exit(1);
   }
 
-  if (agent === "codex" && conditionId === "mcp-with-toolsearch") {
-    console.error("Condition mcp-with-toolsearch is not supported with Codex (ToolSearch is Claude-specific). Use mcp-no-toolsearch instead.");
+  if (agent === "codex" && (conditionId === "mcp-with-toolsearch" || conditionId.startsWith("mcp-compressed-"))) {
+    console.error(`Condition ${conditionId} is Claude-specific and is not supported with Codex.`);
     process.exit(1);
   }
 
@@ -140,9 +140,11 @@ async function cmdMatrix(argv: string[]): Promise<void> {
     ? conditionFilter.split(",")
     : [...conditions.keys()];
 
-  // ToolSearch is Claude-specific; skip the condition for Codex
+  // ToolSearch and mcp-compressor conditions are Claude-specific.
   if (agent === "codex") {
-    conditionIds = conditionIds.filter((id) => id !== "mcp-with-toolsearch");
+    conditionIds = conditionIds.filter(
+      (id) => id !== "mcp-with-toolsearch" && !id.startsWith("mcp-compressed-"),
+    );
   }
 
   let taskIds = taskFilter

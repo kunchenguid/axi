@@ -11,8 +11,10 @@ bench/ITERATIONS.md
 bench-github/results/
 bench-browser/results/
 
-# Published benchmark results (tracked)
+# Published benchmark results (tracked, excluding reproducible workspaces and token-bearing configs)
 !bench/published-results/
+bench-github/published-results/**/workspace/
+bench-github/published-results/**/.mcp-config.json
 
 # Blog draft (not version-controlled)
 docs/blog.md

@@ -136,3 +136,8 @@ community:
     author: thatdudealso
     domain: Celery
     description: "Discover, inspect, run, debug, monitor, schedule, control, and safely operate Celery task queues through token-efficient CLI workflows."
+  - name: cyber-mux
+    url: https://github.com/cyberuni/cyber-mux
+    author: unional
+    domain: Terminal multiplexers
+    description: "Open, send, read, focus, and close terminal panes across tmux, herdr, and WezTerm through one detection-driven contract with token-efficient output."

@@ -24,6 +24,10 @@ official:
     url: https://github.com/kunchenguid/quota-axi
     domain: Quota / usage
     description: "Reports local Claude, Codex, Cursor, Copilot, and Grok quota/usage windows for routing-aware agents - data-only and local-first."
+  - name: tasks-axi
+    url: https://github.com/kunchenguid/tasks-axi
+    domain: Tasks / backlog
+    description: "Manages task backlogs with pluggable backends, dependency-aware ready queries, structured holds, and token-efficient TOON output."
 
 community:
   - name: jj-axi

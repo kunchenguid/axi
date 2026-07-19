@@ -108,7 +108,6 @@ Reference implementations maintained by the AXI project, validating the principl
 | [`chrome-devtools-axi`](https://github.com/kunchenguid/chrome-devtools-axi) | Browser automation | Navigate, click, fill, and extract with combined operations and query filtering. Wraps chrome-devtools-mcp.                       |
 | [`lavish-axi`](https://github.com/kunchenguid/lavish-axi)                   | Human review       | Turns agent-generated HTML artifacts into collaborative review surfaces - annotate, comment, and send feedback back to the agent. |
 | [`quota-axi`](https://github.com/kunchenguid/quota-axi)                     | Quota / usage      | Reports local Claude, Codex, Cursor, Copilot, and Grok quota/usage windows for routing-aware agents - data-only and local-first.  |
-| [`tasks-axi`](https://github.com/kunchenguid/tasks-axi)                     | Tasks / backlog    | Manages task backlogs with pluggable backends, dependency-aware ready queries, structured holds, and token-efficient TOON output. |
 
 <!-- generated:catalog-official:end -->
 
@@ -142,6 +141,7 @@ AXIs built and maintained by the community:
 | [`kubernetes-axi`](https://github.com/thatdudealso/kubernetes-axi)                                 | thatdudealso       | Kubernetes       | Discover, inspect, deploy, debug, scale, roll out, expose, and clean up Kubernetes workloads through safe token-efficient CLI workflows.                     |
 | [`redis-axi`](https://github.com/thatdudealso/redis-axi)                                           | thatdudealso       | Redis            | Discover, inspect, query, export, import, maintain, and diagnose Redis databases through safe token-efficient CLI workflows.                                 |
 | [`celery-axi`](https://github.com/thatdudealso/celery-axi)                                         | thatdudealso       | Celery           | Discover, inspect, run, debug, monitor, schedule, control, and safely operate Celery task queues through token-efficient CLI workflows.                      |
+| [`tasks-axi`](https://github.com/kunchenguid/tasks-axi)                                            | kunchenguid        | Tasks / backlog  | Manages task backlogs with a Markdown backend, dependency-aware ready queries, structured holds, and token-efficient TOON output.                            |
 
 <!-- generated:catalog-community:end -->
 

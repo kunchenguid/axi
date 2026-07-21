@@ -46,7 +46,7 @@ Evaluated across 425 runs (17 tasks × 5 conditions × 5 repeats) using Claude S
 
 Claude Sonnet 4.6 is the model the published runs used, not a limit of the
 harness. Both benchmarks take `--model`, which is passed straight through to
-the agent CLI, so any Claude model works — for example
+the agent CLI, so any Claude model works - for example
 `--model claude-opus-4-6`. Results for other models are simply not published
 here, and they may respond differently to output format.
 

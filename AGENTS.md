@@ -79,6 +79,9 @@ Because the release PR carries the version bump, a downstream `*-axi` tool only 
 - The AXI catalog and principle summaries are single-sourced from `catalog.yaml` and `principles.yaml`.
   `pnpm run docs:gen` rewrites the marked `generated:...` regions of README.md and docs/index.html; never hand-edit those regions.
   The `docs-check` workflow runs `pnpm run docs:check` and fails on drift, including when `.agents/skills/axi/SKILL.md` section headings stop matching the canonical principle titles.
+  The catalog markers sit inside `<tbody>`, so the surrounding `<table>`/`<thead>` markup in docs/index.html is hand-editable and generator-safe.
+- docs/index.html carries the site's page-local CSS in one inline `<style>` block; the site otherwise loads the shared `kunchenguid-design-system` stylesheet, which this repo does not own.
+  Anything scoped to the two catalog tables uses their `.table-catalog` class - not `.card .table-wrap .table`, which also matches the benchmark Results table.
 
 ## Maintaining this file
 

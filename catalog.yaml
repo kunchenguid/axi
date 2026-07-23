@@ -151,3 +151,13 @@ community:
     author: karotkriss
     domain: GitLab
     description: "Issues, merge requests, CI/CD pipelines, variables and secrets, releases, and raw API access. Wraps the official glab CLI with agent-ergonomic TOON output."
+  - name: jira-axi
+    url: https://github.com/emilchristensen/atlassian-axi/tree/main/packages/jira-axi
+    author: emilchristensen
+    domain: Issue tracking
+    description: "Create, search, transition, and comment on Jira work items, boards, and sprints through Atlassian's acli with token-efficient TOON output and idempotent mutations."
+  - name: confluence-axi
+    url: https://github.com/emilchristensen/atlassian-axi/tree/main/packages/confluence-axi
+    author: emilchristensen
+    domain: Documentation
+    description: "Read and write Confluence Cloud pages and spaces directly over the REST API with token-efficient TOON output and OAuth 3LO or API-token auth."

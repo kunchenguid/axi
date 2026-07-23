@@ -151,3 +151,8 @@ community:
     author: karotkriss
     domain: GitLab
     description: "Issues, merge requests, CI/CD pipelines, variables and secrets, releases, and raw API access. Wraps the official glab CLI with agent-ergonomic TOON output."
+  - name: axi-axi
+    url: https://github.com/CodyEngel/axi-axi
+    author: CodyEngel
+    domain: AXI authoring
+    description: "Scaffold a compliant AXI, read the 10 principles in token-tuned slices, and run read-only compliance checks against a candidate CLI."

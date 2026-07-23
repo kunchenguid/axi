@@ -18,6 +18,7 @@ import {
   computeSessionStartHookUpdate,
   extractNpmShimScriptPath,
   installSessionStartHooks,
+  isVersionManagerPathEntry,
   resolvePortableHookCommand,
   shouldInstallHooksForNodeAxiExecPath,
 } from "../src/hooks.js";
@@ -336,6 +337,76 @@ describe("resolvePortableHookCommand", () => {
     expect(
       resolvePortableHookCommand(exec, ["gh-axi"], "gh-axi", context),
     ).toBe(exec);
+  });
+
+  it("returns the absolute exec path when the binary only resolves via nvm", () => {
+    // Reproduces the reported bug: `gh-axi setup hooks` run from an
+    // interactive shell where nvm has put its bin dir on PATH. The bare name
+    // resolves now, but the hook later runs under `/bin/sh` without nvm.
+    const exec = "/home/me/.nvm/versions/node/v20.11.1/bin/gh-axi";
+    const context = {
+      pathEntries: ["/home/me/.nvm/versions/node/v20.11.1/bin"],
+      pathExtensions: [""],
+      resolveRealPath: (p: string) =>
+        ({
+          [exec]: exec,
+          "/home/me/.nvm/versions/node/v20.11.1/bin/gh-axi": exec,
+        })[p],
+    };
+
+    expect(
+      resolvePortableHookCommand(exec, ["gh-axi"], "gh-axi", context),
+    ).toBe(exec);
+  });
+
+  it("prefers a stable PATH dir over a version-manager dir for the same binary", () => {
+    const exec = "/usr/local/lib/node_modules/gh-axi/dist/bin/gh-axi.js";
+    const context = {
+      // nvm dir comes first but must be skipped in favor of /usr/local/bin.
+      pathEntries: [
+        "/home/me/.nvm/versions/node/v20.11.1/bin",
+        "/usr/local/bin",
+      ],
+      pathExtensions: [""],
+      resolveRealPath: (p: string) =>
+        ({
+          [exec]: exec,
+          "/home/me/.nvm/versions/node/v20.11.1/bin/gh-axi": exec,
+          "/usr/local/bin/gh-axi": exec,
+        })[p],
+    };
+
+    expect(
+      resolvePortableHookCommand(exec, ["gh-axi"], "gh-axi", context),
+    ).toBe("gh-axi");
+  });
+});
+
+describe("isVersionManagerPathEntry", () => {
+  it("flags version-manager bin directories", () => {
+    for (const dir of [
+      "/home/me/.nvm/versions/node/v20.11.1/bin",
+      "/home/me/.nvs/node/20.11.1/x64/bin",
+      "/home/me/.fnm/node-versions/v20.11.1/installation/bin",
+      "/home/me/Library/Application Support/fnm_multishells/1234_567/bin",
+      "/home/me/.asdf/shims",
+      "/home/me/.volta/bin",
+      "/home/me/.nodenv/shims",
+    ]) {
+      expect(isVersionManagerPathEntry(dir)).toBe(true);
+    }
+  });
+
+  it("does not flag stable system directories", () => {
+    for (const dir of [
+      "/usr/local/bin",
+      "/opt/homebrew/bin",
+      "/usr/bin",
+      "/home/me/.local/bin",
+      "C:\\Program Files\\nodejs",
+    ]) {
+      expect(isVersionManagerPathEntry(dir)).toBe(false);
+    }
   });
 });
 

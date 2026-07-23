@@ -353,6 +353,31 @@ function installOpenCodeAmbientPlugin(
   }
 }
 
+// Node version managers add their active bin directory to PATH from
+// interactive shell startup files (~/.zshrc, ~/.bashrc, fnm/asdf hooks).
+// Agent SessionStart hooks, however, run under a NON-interactive shell
+// (Claude Code spawns `/bin/sh -c "<command>"`) that never sources those
+// files. A bare binary name that resolves via one of these directories at
+// install time therefore becomes "command not found" when the hook later
+// fires. Detect such directories so the caller falls back to the absolute
+// exec path, which does not depend on PATH.
+const VERSION_MANAGER_PATH_SEGMENTS = new Set([
+  ".nvm", // nvm
+  ".nvs", // nvs
+  ".fnm", // fnm (install / some layouts)
+  "fnm_multishells", // fnm (per-shell PATH entry — the common case)
+  ".asdf", // asdf
+  ".volta", // Volta
+  ".nodenv", // nodenv
+]);
+
+export function isVersionManagerPathEntry(dir: string): boolean {
+  return dir
+    .replaceAll("\\", "/")
+    .split("/")
+    .some((segment) => VERSION_MANAGER_PATH_SEGMENTS.has(segment));
+}
+
 export function resolvePortableHookCommand(
   execPath: string,
   binaryNames: string[],
@@ -374,6 +399,9 @@ export function resolvePortableHookCommand(
     }
     for (const dir of context.pathEntries) {
       if (!dir) continue;
+      // Skip version-manager bin dirs: the bare name resolves here now but
+      // won't be on PATH when the hook runs in a non-interactive shell.
+      if (isVersionManagerPathEntry(dir)) continue;
       for (const ext of context.pathExtensions) {
         const candidate = join(dir, `${name}${ext}`);
         const resolvedCandidate = context.resolveRealPath(candidate);

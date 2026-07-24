@@ -151,3 +151,8 @@ community:
     author: karotkriss
     domain: GitLab
     description: "Issues, merge requests, CI/CD pipelines, variables and secrets, releases, and raw API access. Wraps the official glab CLI with agent-ergonomic TOON output."
+  - name: cargo-axi
+    url: https://github.com/AG9898/cargo-axi
+    author: AG9898
+    domain: Rust / Cargo
+    description: "Inspect Rust workspaces and run safe `check` or Clippy validation with compact TOON output and opt-in session context."

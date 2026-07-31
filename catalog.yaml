@@ -151,3 +151,8 @@ community:
     author: karotkriss
     domain: GitLab
     description: "Issues, merge requests, CI/CD pipelines, variables and secrets, releases, and raw API access. Wraps the official glab CLI with agent-ergonomic TOON output."
+  - name: acli-axi
+    url: https://github.com/mathieu-neron/acli-axi
+    author: mathieu-neron
+    domain: Jira
+    description: "Search, view, create, and edit Jira work items and inspect board sprints. Wraps the Atlassian CLI (`acli`) with token-efficient TOON output and true totals."

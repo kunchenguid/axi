@@ -169,6 +169,9 @@ async function runHandler<TContext>(
   isHomeView: boolean,
 ): Promise<void> {
   try {
+    // Context resolution stays inside this boundary so a failing `resolveContext`
+    // reports through the same structured-error contract as the handler itself,
+    // and still only runs for views that actually need a context.
     const context = await options.resolveContext?.(contextInput);
     const output = await handler(args, context);
     stdout.write(`${renderCommandOutput(output, options, isHomeView)}\n`);

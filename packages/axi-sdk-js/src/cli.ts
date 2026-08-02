@@ -40,7 +40,7 @@ export interface AxiCliOptions<TContext = undefined> {
   commands: Record<string, AxiCliCommand<TContext>>;
   home: AxiCliCommand<TContext>;
   getCommandHelp?: (command: string) => string | null | undefined;
-  initialize?: () => void;
+  initialize?: () => MaybePromise<void>;
   resolveContext?: (input: AxiResolveContextInput) => MaybePromise<TContext>;
   stdout?: { write: (chunk: string) => unknown };
   renderUnknownCommand?: (command: string) => string;
@@ -77,7 +77,7 @@ export async function runAxiCli<TContext = undefined>(
   const stdout = options.stdout ?? process.stdout;
 
   try {
-    options.initialize?.();
+    await options.initialize?.();
   } catch (error) {
     writeFormattedError(error, stdout, options);
     return;

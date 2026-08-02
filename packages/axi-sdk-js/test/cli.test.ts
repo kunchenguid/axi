@@ -38,7 +38,7 @@ import { AxiError } from "../src/errors.js";
 const execFileAsync = promisify(execFile);
 
 async function runErrorBoundaryFixture(
-  phase: "initialize" | "resolveContext",
+  phase: "initialize" | "initialize-async" | "resolveContext",
   errorKind: "axi" | "generic",
   view: "home" | "command",
 ): Promise<{ exitCode: number; stdout: string; stderr: string }> {
@@ -492,6 +492,19 @@ describe("runAxiCli subprocess integration", () => {
     async ({ errorKind, exitCode, stdout }) => {
       const result = await runErrorBoundaryFixture(
         "initialize",
+        errorKind,
+        "home",
+      );
+
+      expect(result).toEqual({ exitCode, stdout, stderr: "" });
+    },
+  );
+
+  it.each(failureCases)(
+    "formats $errorKind asynchronous initialize rejections on stdout",
+    async ({ errorKind, exitCode, stdout }) => {
+      const result = await runErrorBoundaryFixture(
+        "initialize-async",
         errorKind,
         "home",
       );

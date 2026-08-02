@@ -21,7 +21,11 @@ await runAxiCli({
       ? () => {
           throw fixtureError();
         }
-      : undefined,
+      : phase === "initialize-async"
+        ? async () => {
+            throw fixtureError();
+          }
+        : undefined,
   resolveContext:
     phase === "resolveContext"
       ? async () => {

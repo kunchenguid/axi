@@ -151,3 +151,8 @@ community:
     author: karotkriss
     domain: GitLab
     description: "Issues, merge requests, CI/CD pipelines, variables and secrets, releases, and raw API access. Wraps the official glab CLI with agent-ergonomic TOON output."
+  - name: forgejo-axi
+    url: https://github.com/escidmore/forgejo-axi
+    author: escidmore
+    domain: Forgejo
+    description: "Pull request lifecycle, issues, and raw API access for self-hosted Forgejo - non-interactive, reconciling mutations, with token-efficient TOON output."

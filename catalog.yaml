@@ -151,3 +151,8 @@ community:
     author: karotkriss
     domain: GitLab
     description: "Issues, merge requests, CI/CD pipelines, variables and secrets, releases, and raw API access. Wraps the official glab CLI with agent-ergonomic TOON output."
+  - name: pg-axi
+    url: https://github.com/Abdul-Rehman6/pg-axi
+    author: Abdul-Rehman6
+    domain: PostgreSQL
+    description: "Inspect schemas, run capped queries, and read query plans over the shell - token-efficient TOON output, partition-aware row counts."

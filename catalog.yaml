@@ -151,3 +151,8 @@ community:
     author: karotkriss
     domain: GitLab
     description: "Issues, merge requests, CI/CD pipelines, variables and secrets, releases, and raw API access. Wraps the official glab CLI with agent-ergonomic TOON output."
+  - name: pypi-axi
+    url: https://github.com/mstuart/pypi-axi
+    author: mstuart
+    domain: PyPI
+    description: "Inspect PyPI packages, versions, dependencies, and download stats with token-efficient TOON output — read-only, no auth required."

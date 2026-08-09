@@ -151,3 +151,8 @@ community:
     author: karotkriss
     domain: GitLab
     description: "Issues, merge requests, CI/CD pipelines, variables and secrets, releases, and raw API access. Wraps the official glab CLI with agent-ergonomic TOON output."
+  - name: ado-axi
+    url: https://github.com/dtabolich/ado-axi
+    author: dtabolich
+    domain: Azure DevOps
+    description: "Pull requests, branches, repositories, and pipeline runs. Wraps Azure CLI (`az devops` / `az repos`) with agent-ergonomic TOON output."

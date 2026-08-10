@@ -145,6 +145,7 @@ AXIs built and maintained by the community:
 | [`oracle-axi`](https://github.com/thatdudealso/oracle-axi)                                         | thatdudealso       | Oracle Database       | Discover, create, inspect, query, export, import, maintain, and diagnose Oracle databases through safe token-efficient CLI workflows.                                                              |
 | [`glab-axi`](https://github.com/karotkriss/glab-axi)                                               | karotkriss         | GitLab                | Issues, merge requests, CI/CD pipelines, variables and secrets, releases, and raw API access. Wraps the official glab CLI with agent-ergonomic TOON output.                                        |
 | [`comfy-cloud-axi`](https://github.com/intelligentrascal/comfy-cloud-axi)                          | intelligentrascal  | AI generation         | Generate images and videos, submit workflows, and manage Comfy Cloud jobs from the shell - wraps the Comfy Cloud MCP server with token-efficient TOON output and contextual next-step suggestions. |
+| [`mobbin-axi`](https://github.com/intelligentrascal/mobbin-axi)                                    | intelligentrascal  | UI/UX research        | Search real-world UI/UX patterns from production apps via Mobbin - wraps Mobbin's OAuth-gated MCP server as a scriptable, headless CLI with token-efficient TOON output.                           |
 
 <!-- generated:catalog-community:end -->
 

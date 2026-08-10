@@ -160,3 +160,12 @@ community:
       status: exception
       reviewed_revision: 3fd5796ee7cc8ef616449ef7bc24c65d6ad17e62
       exception: "Queue views currently interpret missing or malformed upstream queue responses as empty queues."
+  - name: mobbin-axi
+    url: https://github.com/intelligentrascal/mobbin-axi
+    author: intelligentrascal
+    domain: UI/UX research
+    description: "Search real-world UI/UX patterns from production apps via Mobbin - wraps Mobbin's OAuth-gated MCP server as a scriptable, headless CLI with token-efficient TOON output."
+    admission:
+      status: exception
+      reviewed_revision: 7821ab70df0a9ec6859990768c48c27ceb5d45e8
+      exception: "The legacy `--full` and `--json` flags are accepted without changing search output."

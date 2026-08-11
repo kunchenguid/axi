@@ -144,6 +144,7 @@ AXIs built and maintained by the community:
 | [`cyber-mux`](https://github.com/cyberuni/cyber-mux)                                               | unional            | Terminal multiplexers | Open, send, read, focus, and close terminal panes across tmux, herdr, and WezTerm through one detection-driven contract with token-efficient output.         |
 | [`oracle-axi`](https://github.com/thatdudealso/oracle-axi)                                         | thatdudealso       | Oracle Database       | Discover, create, inspect, query, export, import, maintain, and diagnose Oracle databases through safe token-efficient CLI workflows.                        |
 | [`glab-axi`](https://github.com/karotkriss/glab-axi)                                               | karotkriss         | GitLab                | Issues, merge requests, CI/CD pipelines, variables and secrets, releases, and raw API access. Wraps the official glab CLI with agent-ergonomic TOON output.  |
+| [`remarkable-axi`](https://github.com/JarvusInnovations/remarkable-axi)                            | themightychris     | E-ink tablets         | Send web articles as EPUBs, upload PDFs, and manage reMarkable Cloud files and folders. Talks to the cloud API directly, with no `rmapi` binary required.    |
 
 <!-- generated:catalog-community:end -->
 

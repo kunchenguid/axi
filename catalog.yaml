@@ -153,6 +153,6 @@ community:
     description: "Issues, merge requests, CI/CD pipelines, variables and secrets, releases, and raw API access. Wraps the official glab CLI with agent-ergonomic TOON output."
   - name: remarkable-axi
     url: https://github.com/JarvusInnovations/remarkable-axi
-    author: themightychris
+    author: Jarvus Innovations
     domain: E-ink tablets
-    description: "Send web articles as EPUBs, upload PDFs, and manage reMarkable Cloud files and folders. Talks to the cloud API directly, with no `rmapi` binary required."
+    description: "Manage content on your reMarkable tablet through the reMarkable cloud - browse and organize files, upload PDFs and EPUBs, and send web articles as reflowable EPUBs."

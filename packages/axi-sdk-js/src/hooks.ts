@@ -214,6 +214,7 @@ export function computeSessionStartHookRemoval(
 
   if (Array.isArray(hooks.SessionStart)) {
     const remainingGroups: HookGroup[] = [];
+    let sessionStartChanged = false;
     for (const group of hooks.SessionStart) {
       if (!Array.isArray(group.hooks)) {
         remainingGroups.push(group);
@@ -229,13 +230,14 @@ export function computeSessionStartHookRemoval(
         continue;
       }
 
-      changed = true;
+      sessionStartChanged = true;
       if (remainingHooks.length > 0) {
         remainingGroups.push({ ...group, hooks: remainingHooks });
       }
     }
 
-    if (changed) {
+    if (sessionStartChanged) {
+      changed = true;
       if (remainingGroups.length > 0) {
         hooks.SessionStart = remainingGroups;
       } else {

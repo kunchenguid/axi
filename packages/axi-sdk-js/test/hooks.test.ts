@@ -262,6 +262,22 @@ describe("computeSessionStartHookRemoval", () => {
       { type: "command", command: "/usr/local/bin/other" },
     ]);
   });
+
+  it("leaves SessionStart untouched when only a legacy entry is removed", () => {
+    const [updated, changed] = computeSessionStartHookRemoval(
+      {
+        hooks: {
+          session_start: [{ type: "command", command: "/old/path/gh-axi" }],
+          SessionStart: [],
+        },
+      },
+      "gh-axi",
+    );
+
+    expect(changed).toBe(true);
+    expect(updated.hooks?.session_start).toBeUndefined();
+    expect(updated.hooks?.SessionStart).toEqual([]);
+  });
 });
 
 describe("computeCodexConfigUpdate", () => {

@@ -3,6 +3,7 @@ import {
   mkdirSync,
   readFileSync,
   realpathSync,
+  rmSync,
   statSync,
   writeFileSync,
 } from "node:fs";
@@ -41,15 +42,58 @@ export interface NodeAxiExecPathPolicy {
   distEntrypoints?: string[];
 }
 
-export interface InstallSessionStartHooksOptions {
+/**
+ * `"user"` (the default) targets each agent's home-directory config, exactly
+ * as before scope support existed. `"project"` targets the equivalent
+ * per-repository config under `projectDir`, the way Claude Code natively
+ * supports `<repo>/.claude/settings.json`.
+ */
+export type SessionStartHookScope = "user" | "project";
+
+interface SessionStartHookScopeOptions {
+  homeDir?: string;
+  scope?: SessionStartHookScope;
+  projectDir?: string;
+}
+
+export interface InstallSessionStartHooksOptions extends SessionStartHookScopeOptions {
   marker?: string;
   execPath?: string;
   binaryNames?: string[];
   distEntrypoints?: string[];
   timeoutSeconds?: number;
-  homeDir?: string;
   shouldInstall?: (execPath: string) => boolean;
   onError?: (message: string) => void;
+}
+
+export interface SessionStartHookStatusOptions extends SessionStartHookScopeOptions {
+  marker?: string;
+  execPath?: string;
+}
+
+export interface UninstallSessionStartHooksOptions extends SessionStartHookScopeOptions {
+  marker?: string;
+  execPath?: string;
+  onError?: (message: string) => void;
+}
+
+export interface SessionStartHookAgentStatus {
+  installed: boolean;
+  path: string;
+}
+
+export interface SessionStartHookCodexStatus extends SessionStartHookAgentStatus {
+  /** Whether `[features].hooks = true` is set in the USER-level `config.toml`. */
+  userFeatureEnabled: boolean;
+  userFeaturePath: string;
+}
+
+export interface SessionStartHookStatus {
+  marker: string;
+  scope: SessionStartHookScope;
+  claude: SessionStartHookAgentStatus;
+  codex: SessionStartHookCodexStatus;
+  opencode: SessionStartHookAgentStatus;
 }
 
 const OPENCODE_PLUGIN_MANAGED_PREFIX = "axi-sdk-js managed opencode plugin:";
@@ -136,6 +180,75 @@ export function computeSessionStartHookUpdate(
   });
 
   return [updated, true];
+}
+
+export function computeSessionStartHookRemoval(
+  settings: HookSettings,
+  marker: string,
+): [HookSettings, boolean] {
+  if (!settings.hooks) {
+    return [settings, false];
+  }
+
+  const updated = structuredClone(settings);
+  const hooks = updated.hooks;
+  if (!hooks) {
+    return [settings, false];
+  }
+
+  let changed = false;
+
+  if (Array.isArray(hooks.session_start)) {
+    const remaining = hooks.session_start.filter(
+      (hook) => !isManagedHook(hook, marker),
+    );
+    if (remaining.length !== hooks.session_start.length) {
+      changed = true;
+      if (remaining.length === 0) {
+        delete hooks.session_start;
+      } else {
+        hooks.session_start = remaining;
+      }
+    }
+  }
+
+  if (Array.isArray(hooks.SessionStart)) {
+    const remainingGroups: HookGroup[] = [];
+    for (const group of hooks.SessionStart) {
+      if (!Array.isArray(group.hooks)) {
+        remainingGroups.push(group);
+        continue;
+      }
+
+      const remainingHooks = group.hooks.filter(
+        (hook) => !isManagedHook(hook, marker),
+      );
+
+      if (remainingHooks.length === group.hooks.length) {
+        remainingGroups.push(group);
+        continue;
+      }
+
+      changed = true;
+      if (remainingHooks.length > 0) {
+        remainingGroups.push({ ...group, hooks: remainingHooks });
+      }
+    }
+
+    if (changed) {
+      if (remainingGroups.length > 0) {
+        hooks.SessionStart = remainingGroups;
+      } else {
+        delete hooks.SessionStart;
+      }
+    }
+  }
+
+  if (Object.keys(hooks).length === 0) {
+    delete updated.hooks;
+  }
+
+  return changed ? [updated, true] : [settings, false];
 }
 
 export function computeCodexConfigUpdate(content: string): [string, boolean] {
@@ -310,20 +423,68 @@ export const ${exportName} = async ({ directory }) => {
 `;
 }
 
-function installOpenCodeAmbientPlugin(
+function openCodePluginFileName(marker: string): string {
+  return `axi-${sanitizeOpenCodePluginFilePart(marker)}.js`;
+}
+
+/**
+ * OpenCode loads local plugins from `~/.config/opencode/plugins/` (global)
+ * and, symmetrically, `<projectDir>/.opencode/plugins/` (project-level) -
+ * both directories are documented and loaded the same way, so project scope
+ * mirrors the global path 1:1. See https://opencode.ai/docs/plugins/.
+ */
+function openCodePluginDir(
+  scope: SessionStartHookScope,
   home: string,
+  root: string,
+): string {
+  return scope === "project"
+    ? join(root, ".opencode", "plugins")
+    : join(home, ".config", "opencode", "plugins");
+}
+
+interface ResolvedHookScopeTargets {
+  scope: SessionStartHookScope;
+  home: string;
+  root: string;
+  claudeSettingsPath: string;
+  codexHooksPath: string;
+  /** Always the USER-level config, even at project scope - repo-level Codex
+   * hooks still require the user-level `[features].hooks` feature flag. */
+  codexConfigPath: string;
+  openCodePluginPath: string;
+}
+
+function resolveHookScopeTargets(
+  marker: string,
+  options: SessionStartHookScopeOptions,
+): ResolvedHookScopeTargets {
+  const home = options.homeDir ?? homedir();
+  const scope = options.scope ?? "user";
+  const root =
+    scope === "project" ? resolve(options.projectDir ?? process.cwd()) : home;
+
+  return {
+    scope,
+    home,
+    root,
+    claudeSettingsPath: join(root, ".claude", "settings.json"),
+    codexHooksPath: join(root, ".codex", "hooks.json"),
+    codexConfigPath: join(home, ".codex", "config.toml"),
+    openCodePluginPath: join(
+      openCodePluginDir(scope, home, root),
+      openCodePluginFileName(marker),
+    ),
+  };
+}
+
+function installOpenCodeAmbientPlugin(
+  pluginPath: string,
   marker: string,
   command: string,
   timeoutSeconds: number,
   onError?: (message: string) => void,
 ): void {
-  const pluginPath = join(
-    home,
-    ".config",
-    "opencode",
-    "plugins",
-    `axi-${sanitizeOpenCodePluginFilePart(marker)}.js`,
-  );
   const managedMarker = `${OPENCODE_PLUGIN_MANAGED_PREFIX} ${marker}`;
   const next = buildOpenCodeAmbientPluginSource(
     marker,
@@ -564,15 +725,12 @@ export function installSessionStartHooks(
     buildDefaultPortableCommandContext(),
   );
 
-  const home = options.homeDir ?? homedir();
-  const jsonTargets = [
-    join(home, ".claude", "settings.json"),
-    join(home, ".codex", "hooks.json"),
-  ];
-  const codexConfigPath = join(home, ".codex", "config.toml");
+  const targets = resolveHookScopeTargets(marker, options);
+  const jsonTargets = [targets.claudeSettingsPath, targets.codexHooksPath];
+  const codexConfigPath = targets.codexConfigPath;
 
   installOpenCodeAmbientPlugin(
-    home,
+    targets.openCodePluginPath,
     marker,
     command,
     options.timeoutSeconds ?? 10,
@@ -613,5 +771,156 @@ export function installSessionStartHooks(
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
     options.onError?.(`${codexConfigPath}: ${message}`);
+  }
+}
+
+function resolveStatusMarker(
+  options: { marker?: string; execPath?: string },
+  callerName: string,
+): string {
+  const inferred = inferHookOptions(options.execPath ?? process.argv[1]);
+  const marker = options.marker ?? inferred?.marker;
+  if (!marker) {
+    throw new Error(
+      `${callerName}: unable to infer a hook marker from the current process; pass { marker } explicitly`,
+    );
+  }
+  return marker;
+}
+
+function hasManagedJsonHookEntry(path: string, marker: string): boolean {
+  if (!existsSync(path)) {
+    return false;
+  }
+
+  try {
+    const settings = JSON.parse(readFileSync(path, "utf-8")) as HookSettings;
+    const groups = settings.hooks?.SessionStart ?? [];
+    const inGroups = groups.some((group) =>
+      (group.hooks ?? []).some((hook) => isManagedHook(hook, marker)),
+    );
+    const legacy = settings.hooks?.session_start ?? [];
+    return inGroups || legacy.some((hook) => isManagedHook(hook, marker));
+  } catch {
+    return false;
+  }
+}
+
+function hasManagedOpenCodePlugin(path: string, marker: string): boolean {
+  if (!existsSync(path)) {
+    return false;
+  }
+
+  try {
+    return readFileSync(path, "utf-8").includes(
+      `${OPENCODE_PLUGIN_MANAGED_PREFIX} ${marker}`,
+    );
+  } catch {
+    return false;
+  }
+}
+
+function isCodexHooksFeatureEnabled(path: string): boolean {
+  if (!existsSync(path)) {
+    return false;
+  }
+
+  try {
+    // computeCodexConfigUpdate reports `changed: false` exactly when
+    // `hooks = true` is already set correctly, so a would-be no-op means the
+    // feature is already enabled.
+    const [, changed] = computeCodexConfigUpdate(readFileSync(path, "utf-8"));
+    return !changed;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Reports whether managed SessionStart hooks (Claude Code, Codex) and the
+ * OpenCode ambient plugin are installed for the given marker and scope.
+ * Performs no writes. Throws if the marker cannot be resolved from either
+ * `options.marker` or the current process's inferred identity.
+ */
+export function sessionStartHookStatus(
+  options: SessionStartHookStatusOptions = {},
+): SessionStartHookStatus {
+  const marker = resolveStatusMarker(options, "sessionStartHookStatus");
+  const targets = resolveHookScopeTargets(marker, options);
+
+  return {
+    marker,
+    scope: targets.scope,
+    claude: {
+      installed: hasManagedJsonHookEntry(targets.claudeSettingsPath, marker),
+      path: targets.claudeSettingsPath,
+    },
+    codex: {
+      installed: hasManagedJsonHookEntry(targets.codexHooksPath, marker),
+      path: targets.codexHooksPath,
+      userFeatureEnabled: isCodexHooksFeatureEnabled(targets.codexConfigPath),
+      userFeaturePath: targets.codexConfigPath,
+    },
+    opencode: {
+      installed: hasManagedOpenCodePlugin(targets.openCodePluginPath, marker),
+      path: targets.openCodePluginPath,
+    },
+  };
+}
+
+/**
+ * Removes only marker-matched managed hook entries at the given scope:
+ * the Claude Code and Codex SessionStart hook entries, and the OpenCode
+ * ambient plugin file (only when it still carries the managed marker).
+ * Unrelated hooks/groups and the Codex user-level `[features].hooks` flag
+ * (shared across every AXI installed for that user) are left untouched.
+ */
+export function uninstallSessionStartHooks(
+  options: UninstallSessionStartHooksOptions = {},
+): void {
+  const inferred = inferHookOptions(options.execPath ?? process.argv[1]);
+  const marker = options.marker ?? inferred?.marker;
+  if (!marker) {
+    return;
+  }
+
+  const targets = resolveHookScopeTargets(marker, options);
+
+  for (const target of [targets.claudeSettingsPath, targets.codexHooksPath]) {
+    try {
+      if (!existsSync(target)) {
+        continue;
+      }
+
+      const current = JSON.parse(readFileSync(target, "utf-8")) as HookSettings;
+      const [updated, changed] = computeSessionStartHookRemoval(
+        current,
+        marker,
+      );
+
+      if (changed) {
+        writeFileSync(target, `${JSON.stringify(updated, null, 2)}\n`, "utf-8");
+      }
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      options.onError?.(`${target}: ${message}`);
+    }
+  }
+
+  const pluginPath = targets.openCodePluginPath;
+  try {
+    if (existsSync(pluginPath)) {
+      const managedMarker = `${OPENCODE_PLUGIN_MANAGED_PREFIX} ${marker}`;
+      if (readFileSync(pluginPath, "utf-8").includes(managedMarker)) {
+        rmSync(pluginPath, { force: true });
+      } else {
+        options.onError?.(
+          `${pluginPath}: refusing to remove unmanaged OpenCode plugin`,
+        );
+      }
+    }
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    options.onError?.(`${pluginPath}: ${message}`);
   }
 }

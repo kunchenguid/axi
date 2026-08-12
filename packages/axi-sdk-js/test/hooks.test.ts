@@ -15,11 +15,14 @@ import { pathToFileURL } from "node:url";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import {
   computeCodexConfigUpdate,
+  computeSessionStartHookRemoval,
   computeSessionStartHookUpdate,
   extractNpmShimScriptPath,
   installSessionStartHooks,
   resolvePortableHookCommand,
+  sessionStartHookStatus,
   shouldInstallHooksForNodeAxiExecPath,
+  uninstallSessionStartHooks,
 } from "../src/hooks.js";
 
 describe("computeSessionStartHookUpdate", () => {
@@ -158,6 +161,106 @@ describe("computeSessionStartHookUpdate", () => {
 
     expect(changed).toBe(false);
     expect(updated).toBe(settings);
+  });
+});
+
+describe("computeSessionStartHookRemoval", () => {
+  it("is a no-op when there are no hooks at all", () => {
+    const settings = {};
+    const [updated, changed] = computeSessionStartHookRemoval(
+      settings,
+      "gh-axi",
+    );
+
+    expect(changed).toBe(false);
+    expect(updated).toBe(settings);
+  });
+
+  it("is a no-op when the marker is not present", () => {
+    const settings = {
+      hooks: {
+        SessionStart: [
+          {
+            matcher: "",
+            hooks: [{ type: "command", command: "/usr/local/bin/other" }],
+          },
+        ],
+      },
+    };
+
+    const [updated, changed] = computeSessionStartHookRemoval(
+      settings,
+      "gh-axi",
+    );
+
+    expect(changed).toBe(false);
+    expect(updated).toBe(settings);
+  });
+
+  it("removes a managed hook while preserving unrelated groups", () => {
+    const [updated, changed] = computeSessionStartHookRemoval(
+      {
+        hooks: {
+          SessionStart: [
+            {
+              matcher: "",
+              hooks: [{ type: "command", command: "/usr/local/bin/other" }],
+            },
+            {
+              matcher: "",
+              hooks: [{ type: "command", command: "/usr/local/bin/gh-axi" }],
+            },
+          ],
+        },
+      },
+      "gh-axi",
+    );
+
+    expect(changed).toBe(true);
+    expect(updated.hooks?.SessionStart).toEqual([
+      {
+        matcher: "",
+        hooks: [{ type: "command", command: "/usr/local/bin/other" }],
+      },
+    ]);
+  });
+
+  it("drops the hooks key entirely once the last managed entry is removed", () => {
+    const [updated, changed] = computeSessionStartHookRemoval(
+      {
+        hooks: {
+          SessionStart: [
+            {
+              matcher: "",
+              hooks: [{ type: "command", command: "/usr/local/bin/gh-axi" }],
+            },
+          ],
+        },
+      },
+      "gh-axi",
+    );
+
+    expect(changed).toBe(true);
+    expect(updated.hooks).toBeUndefined();
+  });
+
+  it("removes managed legacy codex session_start entries", () => {
+    const [updated, changed] = computeSessionStartHookRemoval(
+      {
+        hooks: {
+          session_start: [
+            { type: "command", command: "/old/path/gh-axi" },
+            { type: "command", command: "/usr/local/bin/other" },
+          ],
+        },
+      },
+      "gh-axi",
+    );
+
+    expect(changed).toBe(true);
+    expect(updated.hooks?.session_start).toEqual([
+      { type: "command", command: "/usr/local/bin/other" },
+    ]);
   });
 });
 
@@ -735,5 +838,242 @@ describe("installSessionStartHooks (OpenCode plugin)", () => {
     });
 
     expect(existsSync(pluginPath(home))).toBe(false);
+  });
+});
+
+describe("session hook scope (user vs project)", () => {
+  let tmp: string;
+  let home: string;
+  let projectDir: string;
+  let execFile: string;
+
+  function claudeSettingsPath(root: string) {
+    return join(root, ".claude", "settings.json");
+  }
+
+  function codexHooksPath(root: string) {
+    return join(root, ".codex", "hooks.json");
+  }
+
+  function openCodePluginPath(root: string, isProjectScope: boolean) {
+    return isProjectScope
+      ? join(root, ".opencode", "plugins", "axi-gh-axi.js")
+      : join(root, ".config", "opencode", "plugins", "axi-gh-axi.js");
+  }
+
+  beforeEach(() => {
+    tmp = mkdtempSync(join(tmpdir(), "axi-sdk-js-hook-scope-"));
+    home = join(tmp, "home");
+    projectDir = join(tmp, "project");
+    mkdirSync(home, { recursive: true });
+    mkdirSync(projectDir, { recursive: true });
+
+    const pkgBin = join(tmp, "pkg", "dist", "bin");
+    mkdirSync(pkgBin, { recursive: true });
+    execFile = join(pkgBin, "gh-axi.js");
+    writeFileSync(execFile, "// stub\n", "utf-8");
+  });
+
+  afterEach(() => {
+    rmSync(tmp, { recursive: true, force: true });
+  });
+
+  it("defaults to user scope: omitting `scope` only touches home paths, even when projectDir is passed", () => {
+    installSessionStartHooks({
+      marker: "gh-axi",
+      execPath: execFile,
+      homeDir: home,
+      projectDir,
+    });
+
+    expect(existsSync(claudeSettingsPath(home))).toBe(true);
+    expect(existsSync(codexHooksPath(home))).toBe(true);
+    expect(existsSync(openCodePluginPath(home, false))).toBe(true);
+
+    expect(existsSync(claudeSettingsPath(projectDir))).toBe(false);
+    expect(existsSync(codexHooksPath(projectDir))).toBe(false);
+    expect(existsSync(openCodePluginPath(projectDir, true))).toBe(false);
+
+    const status = sessionStartHookStatus({ marker: "gh-axi", homeDir: home });
+    expect(status.scope).toBe("user");
+    expect(status.claude.installed).toBe(true);
+    expect(status.codex.installed).toBe(true);
+    expect(status.opencode.installed).toBe(true);
+  });
+
+  it("installs project-scoped Claude/Codex hooks and an OpenCode plugin under projectDir, while the Codex feature flag stays at user scope", () => {
+    installSessionStartHooks({
+      marker: "gh-axi",
+      execPath: execFile,
+      homeDir: home,
+      scope: "project",
+      projectDir,
+    });
+
+    const claudeSettings = JSON.parse(
+      readFileSync(claudeSettingsPath(projectDir), "utf-8"),
+    );
+    expect(claudeSettings.hooks.SessionStart[0].hooks[0].command).toBe(
+      execFile,
+    );
+
+    const codexHooks = JSON.parse(
+      readFileSync(codexHooksPath(projectDir), "utf-8"),
+    );
+    expect(codexHooks.hooks.SessionStart[0].hooks[0].command).toBe(execFile);
+
+    expect(existsSync(openCodePluginPath(projectDir, true))).toBe(true);
+
+    // Never writes the user-scope hook files or plugin.
+    expect(existsSync(claudeSettingsPath(home))).toBe(false);
+    expect(existsSync(codexHooksPath(home))).toBe(false);
+    expect(existsSync(openCodePluginPath(home, false))).toBe(false);
+
+    // Repo-level Codex hooks still require the USER-level feature flag.
+    const codexConfig = readFileSync(
+      join(home, ".codex", "config.toml"),
+      "utf-8",
+    );
+    expect(codexConfig).toContain("hooks = true");
+  });
+
+  it("reports scope-accurate status, including the shared Codex user-level flag", () => {
+    installSessionStartHooks({
+      marker: "gh-axi",
+      execPath: execFile,
+      homeDir: home,
+      scope: "project",
+      projectDir,
+    });
+
+    const projectStatus = sessionStartHookStatus({
+      marker: "gh-axi",
+      homeDir: home,
+      scope: "project",
+      projectDir,
+    });
+    expect(projectStatus.scope).toBe("project");
+    expect(projectStatus.claude).toEqual({
+      installed: true,
+      path: claudeSettingsPath(projectDir),
+    });
+    expect(projectStatus.codex.installed).toBe(true);
+    expect(projectStatus.codex.path).toBe(codexHooksPath(projectDir));
+    expect(projectStatus.codex.userFeatureEnabled).toBe(true);
+    expect(projectStatus.codex.userFeaturePath).toBe(
+      join(home, ".codex", "config.toml"),
+    );
+    expect(projectStatus.opencode).toEqual({
+      installed: true,
+      path: openCodePluginPath(projectDir, true),
+    });
+
+    const userStatus = sessionStartHookStatus({
+      marker: "gh-axi",
+      homeDir: home,
+    });
+    expect(userStatus.scope).toBe("user");
+    expect(userStatus.claude.installed).toBe(false);
+    expect(userStatus.codex.installed).toBe(false);
+    expect(userStatus.opencode.installed).toBe(false);
+    // The feature flag is user-level and shared, so it reads enabled from
+    // either scope once the project-scoped install has ensured it.
+    expect(userStatus.codex.userFeatureEnabled).toBe(true);
+  });
+
+  it("uninstall removes only marker-matched entries at the requested scope", () => {
+    installSessionStartHooks({
+      marker: "gh-axi",
+      execPath: execFile,
+      homeDir: home,
+      scope: "user",
+    });
+    installSessionStartHooks({
+      marker: "gh-axi",
+      execPath: execFile,
+      homeDir: home,
+      scope: "project",
+      projectDir,
+    });
+
+    uninstallSessionStartHooks({
+      marker: "gh-axi",
+      homeDir: home,
+      scope: "project",
+      projectDir,
+    });
+
+    const projectSettings = JSON.parse(
+      readFileSync(claudeSettingsPath(projectDir), "utf-8"),
+    );
+    expect(projectSettings.hooks).toBeUndefined();
+    expect(existsSync(openCodePluginPath(projectDir, true))).toBe(false);
+
+    // The user-scope install is untouched.
+    const userSettings = JSON.parse(
+      readFileSync(claudeSettingsPath(home), "utf-8"),
+    );
+    expect(userSettings.hooks.SessionStart[0].hooks[0].command).toBe(execFile);
+    expect(existsSync(openCodePluginPath(home, false))).toBe(true);
+
+    // Uninstall never touches the shared user-level Codex feature flag.
+    const codexConfig = readFileSync(
+      join(home, ".codex", "config.toml"),
+      "utf-8",
+    );
+    expect(codexConfig).toContain("hooks = true");
+
+    const projectStatus = sessionStartHookStatus({
+      marker: "gh-axi",
+      homeDir: home,
+      scope: "project",
+      projectDir,
+    });
+    expect(projectStatus.claude.installed).toBe(false);
+    expect(projectStatus.codex.installed).toBe(false);
+    expect(projectStatus.opencode.installed).toBe(false);
+  });
+
+  it("uninstall does not remove an unmanaged project-scope OpenCode plugin", () => {
+    const target = openCodePluginPath(projectDir, true);
+    mkdirSync(join(projectDir, ".opencode", "plugins"), { recursive: true });
+    writeFileSync(
+      target,
+      "export const UserPlugin = async () => ({})\n",
+      "utf-8",
+    );
+    const errors: string[] = [];
+
+    uninstallSessionStartHooks({
+      marker: "gh-axi",
+      homeDir: home,
+      scope: "project",
+      projectDir,
+      onError: (message) => errors.push(message),
+    });
+
+    expect(readFileSync(target, "utf-8")).toBe(
+      "export const UserPlugin = async () => ({})\n",
+    );
+    expect(errors[0]).toContain("refusing to remove unmanaged OpenCode plugin");
+  });
+
+  it("throws from sessionStartHookStatus when the hook marker cannot be inferred", () => {
+    expect(() =>
+      sessionStartHookStatus({
+        execPath: join(tmp, "random", "script.mjs"),
+        homeDir: home,
+      }),
+    ).toThrow(/unable to infer/);
+  });
+
+  it("is a no-op from uninstallSessionStartHooks when the hook marker cannot be inferred", () => {
+    expect(() =>
+      uninstallSessionStartHooks({
+        execPath: join(tmp, "random", "script.mjs"),
+        homeDir: home,
+      }),
+    ).not.toThrow();
+    expect(existsSync(claudeSettingsPath(home))).toBe(false);
   });
 });

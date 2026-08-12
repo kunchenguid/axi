@@ -179,3 +179,8 @@ community:
       status: exception
       reviewed_revision: 8eda65af7d760efe45907ad3368d3164abe3062e
       exception: "The published 0.1.3 package reports version 0.1.1; search-command --help is rejected; empty-content MCP responses can become successful `0 results`; sections ignores --platform; control commands lack per-command flag sets; and legacy --full and --json flags are no-ops."
+  - name: calendly-axi
+    url: https://github.com/JarvusInnovations/calendly-axi
+    author: Jarvus Innovations
+    domain: Scheduling
+    description: "The Calendly booking loop from the shell - see what's scheduled, mint single-use booking links, book directly, cancel, and manage event types, availability, and webhooks."

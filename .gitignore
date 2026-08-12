@@ -31,3 +31,4 @@ docs/social/rendered/
 
 # npm lock file (this project uses pnpm)
 package-lock.json
+.no-mistakes/evidence/

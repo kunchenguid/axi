@@ -151,3 +151,8 @@ community:
     author: karotkriss
     domain: GitLab
     description: "Issues, merge requests, CI/CD pipelines, variables and secrets, releases, and raw API access. Wraps the official glab CLI with agent-ergonomic TOON output."
+  - name: obsidian-axi
+    url: https://github.com/AndersHoffmann/obsidian-axi
+    author: AndersHoffmann
+    domain: Obsidian
+    description: "Read, search, create, update, organize, and link Obsidian notes from the filesystem - compact TOON output, atomic writes, no plugin or server."

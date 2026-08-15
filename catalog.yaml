@@ -155,11 +155,7 @@ community:
     url: https://github.com/intelligentrascal/comfy-cloud-axi
     author: intelligentrascal
     domain: AI generation
-    description: "Generate images and videos, submit workflows, and manage Comfy Cloud jobs from the shell - wraps the Comfy Cloud MCP server with token-efficient TOON output and contextual next-step suggestions."
-    admission:
-      status: exception
-      reviewed_revision: 3fd5796ee7cc8ef616449ef7bc24c65d6ad17e62
-      exception: "Queue views currently interpret missing or malformed upstream queue responses as empty queues."
+    description: "Generate images, video, and audio via 22 partner models (FLUX, DALL-E, Kling, Veo, ElevenLabs, and more). Submit ComfyUI workflows and templates, track jobs, estimate credits before generating, search nodes, and report usage — wraps the Comfy Cloud MCP server with 18 commands and token-efficient TOON output."
   - name: mobbin-axi
     url: https://github.com/intelligentrascal/mobbin-axi
     author: intelligentrascal

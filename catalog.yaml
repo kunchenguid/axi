@@ -158,8 +158,8 @@ community:
     description: "Generate images, video, and audio via 22 partner models, submit ComfyUI workflows and templates, track jobs, estimate credits before generating, search nodes, and report usage — wraps the Comfy Cloud MCP server with token-efficient TOON output."
     admission:
       status: exception
-      reviewed_revision: 2b81c698da3b5e9cb8edd6f8e8f695a2767833a8
-      exception: "The published 0.1.5 package reports version 0.1.4, so --version and update --check use a stale installed-version baseline."
+      reviewed_revision: 17eb5fa071b08a6e80ff7a1a6a3486220a215e54
+      exception: "The published 0.1.6 package reports version 0.1.4, and command-aware flag validation remains incomplete outside generate, job, and models; mutating workflow, batch, templates, upload, and setup commands can still ignore trailing flags."
   - name: mobbin-axi
     url: https://github.com/intelligentrascal/mobbin-axi
     author: intelligentrascal
@@ -167,5 +167,5 @@ community:
     description: "Search real-world UI/UX patterns from production apps via Mobbin - wraps Mobbin's OAuth-gated MCP server as a scriptable, headless CLI with token-efficient TOON output."
     admission:
       status: exception
-      reviewed_revision: 052360aee469a9c85d013bc797027cc5858a392a
-      exception: "The legacy --full and --json flags are no-ops; per-command --help is rejected instead of showing help; sections accepts and ignores --platform; and the published 0.1.2 package reports version 0.1.1."
+      reviewed_revision: d6b01e2765164ed7c0952d9788fa93bf14e5012a
+      exception: "The published 0.1.3 package reports version 0.1.1; search-command --help is rejected; sections ignores --platform; control commands still lack per-command flag sets; and legacy --full and --json flags are no-ops."

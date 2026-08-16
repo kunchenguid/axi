@@ -158,8 +158,8 @@ community:
     description: "Generate images, video, and audio via 22 partner models, submit ComfyUI workflows and templates, track jobs, estimate credits before generating, search nodes, and report usage — wraps the Comfy Cloud MCP server with token-efficient TOON output."
     admission:
       status: exception
-      reviewed_revision: 17eb5fa071b08a6e80ff7a1a6a3486220a215e54
-      exception: "The published 0.1.6 package reports version 0.1.4; command-aware flag validation remains incomplete: `generate ... --confirm --type` silently defaults to image before the MCP call, `job chain <id> --dry-run` passes NaN as the output index, and mutating workflow, batch, templates, upload, and setup commands can ignore trailing flags."
+      reviewed_revision: 0f5b75eb201512604c87f6d75f4234bb685e0879
+      exception: "The published 0.1.6 package reports version 0.1.4; `generate ... --confirm --type` defaults to image and `job chain <id> --dry-run` passes NaN before MCP calls; nodes and saved workflows report empty results for `{}` responses; paid `workflow run` and `templates run` ignore surplus positionals; and other mutating commands can ignore trailing flags."
   - name: mobbin-axi
     url: https://github.com/intelligentrascal/mobbin-axi
     author: intelligentrascal
@@ -167,5 +167,5 @@ community:
     description: "Search real-world UI/UX patterns from production apps via Mobbin - wraps Mobbin's OAuth-gated MCP server as a scriptable, headless CLI with token-efficient TOON output."
     admission:
       status: exception
-      reviewed_revision: d6b01e2765164ed7c0952d9788fa93bf14e5012a
-      exception: "The published 0.1.3 package reports version 0.1.1; search-command --help is rejected; `setup --help` and `setup hooks --help` throw Unknown setup action; `auth status --help` executes status; sections ignores --platform; control commands lack per-command flag sets; and legacy --full and --json flags are no-ops."
+      reviewed_revision: 8eda65af7d760efe45907ad3368d3164abe3062e
+      exception: "The published 0.1.3 package reports version 0.1.1; search-command --help is rejected; empty-content MCP responses can become successful `0 results`; sections ignores --platform; control commands lack per-command flag sets; and legacy --full and --json flags are no-ops."

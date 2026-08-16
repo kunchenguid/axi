@@ -155,7 +155,7 @@ community:
     url: https://github.com/intelligentrascal/comfy-cloud-axi
     author: intelligentrascal
     domain: AI generation
-    description: "Generate images, video, and audio via 22 partner models (FLUX, DALL-E, Kling, Veo, ElevenLabs, and more). Submit ComfyUI workflows and templates, track jobs, estimate credits before generating, search nodes, and report usage — wraps the Comfy Cloud MCP server with 18 commands and token-efficient TOON output."
+    description: "Generate images, video, and audio via 22 partner models, submit ComfyUI workflows and templates, track jobs, estimate credits before generating, search nodes, and report usage — wraps the Comfy Cloud MCP server with token-efficient TOON output."
   - name: mobbin-axi
     url: https://github.com/intelligentrascal/mobbin-axi
     author: intelligentrascal

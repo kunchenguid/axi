@@ -156,6 +156,9 @@ community:
     author: intelligentrascal
     domain: AI generation
     description: "Generate images, video, and audio via 22 partner models, submit ComfyUI workflows and templates, track jobs, estimate credits before generating, search nodes, and report usage — wraps the Comfy Cloud MCP server with token-efficient TOON output."
+    admission:
+      status: admitted
+      reviewed_revision: 02ed13370b236e8240556c4dda6bf585a1d095cb
   - name: mobbin-axi
     url: https://github.com/intelligentrascal/mobbin-axi
     author: intelligentrascal
@@ -163,5 +166,5 @@ community:
     description: "Search real-world UI/UX patterns from production apps via Mobbin - wraps Mobbin's OAuth-gated MCP server as a scriptable, headless CLI with token-efficient TOON output."
     admission:
       status: exception
-      reviewed_revision: 7821ab70df0a9ec6859990768c48c27ceb5d45e8
-      exception: "The legacy `--full` and `--json` flags are accepted without changing search output."
+      reviewed_revision: 19464f258fbe87066e8e3e57a942f645c27cd724
+      exception: "The legacy --full and --json flags are accepted as no-ops without changing search output. All other flag-validation gaps (--type, --limit, empty query) are fixed in this revision."

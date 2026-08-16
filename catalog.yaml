@@ -159,7 +159,7 @@ community:
     admission:
       status: exception
       reviewed_revision: 17eb5fa071b08a6e80ff7a1a6a3486220a215e54
-      exception: "The published 0.1.6 package reports version 0.1.4, and command-aware flag validation remains incomplete outside generate, job, and models; mutating workflow, batch, templates, upload, and setup commands can still ignore trailing flags."
+      exception: "The published 0.1.6 package reports version 0.1.4; command-aware flag validation remains incomplete: `generate ... --confirm --type` silently defaults to image before the MCP call, `job chain <id> --dry-run` passes NaN as the output index, and mutating workflow, batch, templates, upload, and setup commands can ignore trailing flags."
   - name: mobbin-axi
     url: https://github.com/intelligentrascal/mobbin-axi
     author: intelligentrascal
@@ -168,4 +168,4 @@ community:
     admission:
       status: exception
       reviewed_revision: d6b01e2765164ed7c0952d9788fa93bf14e5012a
-      exception: "The published 0.1.3 package reports version 0.1.1; search-command --help is rejected; sections ignores --platform; control commands still lack per-command flag sets; and legacy --full and --json flags are no-ops."
+      exception: "The published 0.1.3 package reports version 0.1.1; search-command --help is rejected; `setup --help` and `setup hooks --help` throw Unknown setup action; `auth status --help` executes status; sections ignores --platform; control commands lack per-command flag sets; and legacy --full and --json flags are no-ops."

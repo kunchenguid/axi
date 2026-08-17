@@ -144,6 +144,7 @@ AXIs built and maintained by the community:
 | [`cyber-mux`](https://github.com/cyberuni/cyber-mux)                                               | unional            | Terminal multiplexers | Open, send, read, focus, and close terminal panes across tmux, herdr, and WezTerm through one detection-driven contract with token-efficient output.         |
 | [`oracle-axi`](https://github.com/thatdudealso/oracle-axi)                                         | thatdudealso       | Oracle Database       | Discover, create, inspect, query, export, import, maintain, and diagnose Oracle databases through safe token-efficient CLI workflows.                        |
 | [`glab-axi`](https://github.com/karotkriss/glab-axi)                                               | karotkriss         | GitLab                | Issues, merge requests, CI/CD pipelines, variables and secrets, releases, and raw API access. Wraps the official glab CLI with agent-ergonomic TOON output.  |
+| [`reactive-axi`](https://github.com/adeeshsharma/reactive-axi)                                     | adeeshsharma       | UI review             | Click any element in your live React, Vue, or Svelte dev server and resolve it to the exact source file and line before it reaches your agent.               |
 
 <!-- generated:catalog-community:end -->
 

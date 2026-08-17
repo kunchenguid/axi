@@ -151,3 +151,8 @@ community:
     author: karotkriss
     domain: GitLab
     description: "Issues, merge requests, CI/CD pipelines, variables and secrets, releases, and raw API access. Wraps the official glab CLI with agent-ergonomic TOON output."
+  - name: reactive-axi
+    url: https://github.com/adeeshsharma/reactive-axi
+    author: adeeshsharma
+    domain: UI review
+    description: "Click any element in your live React, Vue, or Svelte dev server and resolve it to the exact source file and line before it reaches your agent."

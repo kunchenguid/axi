@@ -151,3 +151,8 @@ community:
     author: karotkriss
     domain: GitLab
     description: "Issues, merge requests, CI/CD pipelines, variables and secrets, releases, and raw API access. Wraps the official glab CLI with agent-ergonomic TOON output."
+  - name: safa
+    url: https://github.com/juju-w/safa
+    author: juju-w
+    domain: Secure infrastructure access
+    description: "Let AI agents diagnose registered servers, databases, and infrastructure without ever receiving a reusable credential - TOON output, allow-listed read-only actions, and macOS user-presence approval."

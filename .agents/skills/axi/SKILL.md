@@ -180,7 +180,7 @@ help[2]:
 
 - **Claude Code**: use native hooks in `~/.claude/settings.json` or project `.claude/settings.json`. Prefer `SessionStart` to inject compact context via stdout
 - **Codex**: use native hooks in `~/.codex/hooks.json` or `<repo>/.codex/hooks.json`, and ensure `[features].hooks = true` in `config.toml`. Prefer `SessionStart` for ambient context via stdout
-- **OpenCode**: use a managed plugin in `~/.config/opencode/plugins/`. Prefer ambient system-context injection for the home view rather than adding a custom tool
+- **OpenCode**: use a managed plugin in `~/.config/opencode/plugins/` or `<repo>/.opencode/plugins/`. Prefer ambient system-context injection for the home view rather than adding a custom tool
 
 **Also ship an installable skill (secondary recommendation):**
 

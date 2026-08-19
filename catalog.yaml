@@ -179,3 +179,8 @@ community:
       status: exception
       reviewed_revision: 8eda65af7d760efe45907ad3368d3164abe3062e
       exception: "The published 0.1.3 package reports version 0.1.1; search-command --help is rejected; empty-content MCP responses can become successful `0 results`; sections ignores --platform; control commands lack per-command flag sets; and legacy --full and --json flags are no-ops."
+  - name: forgejo-axi
+    url: https://github.com/escidmore/forgejo-axi
+    author: escidmore
+    domain: Forgejo
+    description: "Pull request lifecycle, issues and content history, Actions runs, labels, and raw API v1 access on a Forgejo host - expected-head merges with merged-state proof, and check evaluation against the pull request's own head SHA."

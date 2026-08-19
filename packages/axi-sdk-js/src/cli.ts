@@ -40,7 +40,7 @@ export interface AxiCliOptions<TContext = undefined> {
   commands: Record<string, AxiCliCommand<TContext>>;
   home: AxiCliCommand<TContext>;
   getCommandHelp?: (command: string) => string | null | undefined;
-  initialize?: () => void;
+  initialize?: () => MaybePromise<void>;
   resolveContext?: (input: AxiResolveContextInput) => MaybePromise<TContext>;
   stdout?: { write: (chunk: string) => unknown };
   renderUnknownCommand?: (command: string) => string;
@@ -74,9 +74,15 @@ function defaultUnknownCommand(command: string): string {
 export async function runAxiCli<TContext = undefined>(
   options: AxiCliOptions<TContext>,
 ): Promise<void> {
-  options.initialize?.();
-
   const stdout = options.stdout ?? process.stdout;
+
+  try {
+    await options.initialize?.();
+  } catch (error) {
+    writeFormattedError(error, stdout, options);
+    return;
+  }
+
   const argv = options.argv ?? process.argv.slice(2);
 
   if (argv.length === 1 && argv[0] === "--help") {
@@ -108,11 +114,14 @@ export async function runAxiCli<TContext = undefined>(
 
   const command = argv[0];
   if (!command) {
-    const context = await options.resolveContext?.({
-      command: undefined,
-      args: [],
-    });
-    await runHandler(options.home, [], context, stdout, options, true);
+    await runHandler(
+      options.home,
+      [],
+      { command: undefined, args: [] },
+      stdout,
+      options,
+      true,
+    );
     return;
   }
 
@@ -148,25 +157,26 @@ export async function runAxiCli<TContext = undefined>(
     return;
   }
 
-  const context = await options.resolveContext?.({ command, args });
-  await runHandler(handler, args, context, stdout, options, false);
+  await runHandler(handler, args, { command, args }, stdout, options, false);
 }
 
 async function runHandler<TContext>(
   handler: AxiCliCommand<TContext>,
   args: string[],
-  context: TContext | undefined,
+  contextInput: AxiResolveContextInput,
   stdout: { write: (chunk: string) => unknown },
   options: AxiCliOptions<TContext>,
   isHomeView: boolean,
 ): Promise<void> {
   try {
+    // Context resolution stays inside this boundary so a failing `resolveContext`
+    // reports through the same structured-error contract as the handler itself,
+    // and still only runs for views that actually need a context.
+    const context = await options.resolveContext?.(contextInput);
     const output = await handler(args, context);
     stdout.write(`${renderCommandOutput(output, options, isHomeView)}\n`);
   } catch (error) {
-    const formatted = (options.formatError ?? defaultFormatError)(error);
-    stdout.write(formatted.output);
-    process.exitCode = formatted.exitCode;
+    writeFormattedError(error, stdout, options);
   }
 }
 
@@ -189,10 +199,18 @@ async function runBuiltinUpdate<TContext>(
     });
     stdout.write(`${renderOutput(output)}\n`);
   } catch (error) {
-    const formatted = (options.formatError ?? defaultFormatError)(error);
-    stdout.write(formatted.output);
-    process.exitCode = formatted.exitCode;
+    writeFormattedError(error, stdout, options);
   }
+}
+
+function writeFormattedError<TContext>(
+  error: unknown,
+  stdout: { write: (chunk: string) => unknown },
+  options: AxiCliOptions<TContext>,
+): void {
+  const formatted = (options.formatError ?? defaultFormatError)(error);
+  stdout.write(formatted.output);
+  process.exitCode = formatted.exitCode;
 }
 
 function resolveBinName(): string {

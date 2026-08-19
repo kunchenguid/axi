@@ -121,6 +121,8 @@ Most AXI authors should not need these directly.
 | `detectInstallMethod()`, `planUpgrade()` | Inspect an entrypoint path and map it to the upgrade command the built-in updater would use     |
 | `compareSemver()`, `isUpdateAvailable()` | Semver helpers used by the updater, including prerelease ordering                               |
 | `installSessionStartHooks()`             | Install or repair Claude Code hooks, Codex hooks, and OpenCode ambient context plugins directly |
+| `sessionStartHookStatus()`               | Report install status for Claude Code, Codex, and OpenCode at a given scope, without writing    |
+| `uninstallSessionStartHooks()`           | Remove marker-matched managed hooks/plugin at a given scope, without touching unrelated entries |
 | `resolvePortableHookCommand()`           | Resolve a hook command to a safe binary name or absolute path                                   |
 | `PortableHookCommandContext`             | Context for resolving portable hook commands                                                    |
 | `shouldInstallHooksForNodeAxiExecPath()` | Check whether an executable path is safe for hook installation                                  |
@@ -163,6 +165,42 @@ await installSessionStartHooks({
 ```
 
 Claude Code and Codex receive native `SessionStart` hooks, while OpenCode receives a managed plugin in `~/.config/opencode/plugins/` that injects the AXI home view as ambient model context.
+
+### Hook Scope: User vs Project
+
+By default, `installSessionStartHooks()` and its `sessionStartHookStatus()` / `uninstallSessionStartHooks()` counterparts target **user scope**: each agent's home-directory config (`~/.claude/settings.json`, `~/.codex/hooks.json`, `~/.config/opencode/plugins/`). Pass `scope: "project"` (and optionally `projectDir`, which defaults to `process.cwd()`) to target the equivalent **per-repository** config instead:
+
+```ts
+await installSessionStartHooks({ scope: "project" });
+```
+
+| Agent         | User scope (default)                 | Project scope (`scope: "project"`)   |
+| ------------- | ------------------------------------ | ------------------------------------ |
+| Claude Code   | `~/.claude/settings.json`            | `<projectDir>/.claude/settings.json` |
+| Codex hooks   | `~/.codex/hooks.json`                | `<projectDir>/.codex/hooks.json`     |
+| Codex feature | `~/.codex/config.toml` (always here) | `~/.codex/config.toml` (always here) |
+| OpenCode      | `~/.config/opencode/plugins/`        | `<projectDir>/.opencode/plugins/`    |
+
+The Codex `[features].hooks = true` feature flag is always ensured in the **user-level** `config.toml`, even when installing at project scope - Codex only honors repo-level hooks once that user-level flag is on, so project-scope install still writes it, and `sessionStartHookStatus()` reports it back as `codex.userFeatureEnabled` / `codex.userFeaturePath` regardless of the scope you asked about. Uninstalling never touches that flag, since it is shared across every AXI a user has installed hooks for.
+
+Omitting `scope` (or passing `scope: "user"`) reproduces the exact pre-scope behavior - `projectDir` is ignored in that case.
+
+```ts
+import {
+  installSessionStartHooks,
+  sessionStartHookStatus,
+  uninstallSessionStartHooks,
+} from "axi-sdk-js";
+
+await installSessionStartHooks({ scope: "project" });
+
+const status = sessionStartHookStatus({ scope: "project" });
+// { marker, scope: "project", claude: { installed, path }, codex: { installed, path, userFeatureEnabled, userFeaturePath }, opencode: { installed, path } }
+
+await uninstallSessionStartHooks({ scope: "project" });
+```
+
+`sessionStartHookStatus()` performs no writes and throws if the hook marker can't be resolved from `options.marker` or inferred from the current process. `uninstallSessionStartHooks()` mirrors `installSessionStartHooks()`'s permissive default and silently no-ops in that case, and it only ever removes entries whose command contains the managed marker - unrelated hooks, groups, and unmanaged OpenCode plugin files are left alone (the latter reported via `onError`, same as install's overwrite protection).
 
 ### Hook Command Portability
 

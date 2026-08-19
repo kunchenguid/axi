@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.1.11](https://github.com/kunchenguid/axi/compare/axi-sdk-js-v0.1.10...axi-sdk-js-v0.1.11) (2026-08-19)
+
+
+### Features
+
+* **sdk:** project-scope session-start hook install, status, and uninstall ([#140](https://github.com/kunchenguid/axi/issues/140)) ([b7dbc13](https://github.com/kunchenguid/axi/commit/b7dbc1324ce637f08835ce5c45783a24287511f2))
+
+
+### Bug Fixes
+
+* **axi-sdk-js:** route initialize and resolveContext failures through the AXI error contract ([#122](https://github.com/kunchenguid/axi/issues/122)) ([fb27ce9](https://github.com/kunchenguid/axi/commit/fb27ce96128d63bc26b6664f74f9bf98a03dfcf2))
+
 ## [0.1.10](https://github.com/kunchenguid/axi/compare/axi-sdk-js-v0.1.9...axi-sdk-js-v0.1.10) (2026-08-06)
 
 

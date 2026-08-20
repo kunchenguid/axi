@@ -37,6 +37,39 @@ import { AxiError } from "../src/errors.js";
 
 const execFileAsync = promisify(execFile);
 
+async function runErrorBoundaryFixture(
+  phase: "initialize" | "initialize-async" | "resolveContext",
+  errorKind: "axi" | "generic",
+  view: "home" | "command",
+): Promise<{ exitCode: number; stdout: string; stderr: string }> {
+  const fixturePath = fileURLToPath(
+    new URL("./fixtures/error-boundary-bin.mjs", import.meta.url),
+  );
+  const viteNodePath = fileURLToPath(
+    new URL("../node_modules/.bin/vite-node", import.meta.url),
+  );
+
+  try {
+    const { stdout, stderr } = await execFileAsync(
+      viteNodePath,
+      [fixturePath, phase, errorKind, view],
+      { cwd: new URL("..", import.meta.url) },
+    );
+    return { exitCode: 0, stdout, stderr };
+  } catch (error) {
+    const result = error as Error & {
+      code: number;
+      stdout: string;
+      stderr: string;
+    };
+    return {
+      exitCode: result.code,
+      stdout: result.stdout,
+      stderr: result.stderr,
+    };
+  }
+}
+
 describe("runAxiCli", () => {
   const originalArgv = [...process.argv];
   const stdout = { write: vi.fn(() => true) };
@@ -440,6 +473,72 @@ describe("runAxiCli", () => {
 });
 
 describe("runAxiCli subprocess integration", () => {
+  const failureCases = [
+    {
+      errorKind: "axi" as const,
+      exitCode: 2,
+      stdout:
+        "error: Invalid fixture request\ncode: VALIDATION_ERROR\nhelp[1]: Run `fixture --help`\n",
+    },
+    {
+      errorKind: "generic" as const,
+      exitCode: 1,
+      stdout: "error: Dependency exploded\ncode: UNKNOWN\n",
+    },
+  ];
+
+  it.each(failureCases)(
+    "formats $errorKind initialize failures on stdout",
+    async ({ errorKind, exitCode, stdout }) => {
+      const result = await runErrorBoundaryFixture(
+        "initialize",
+        errorKind,
+        "home",
+      );
+
+      expect(result).toEqual({ exitCode, stdout, stderr: "" });
+    },
+  );
+
+  it.each(failureCases)(
+    "formats $errorKind asynchronous initialize rejections on stdout",
+    async ({ errorKind, exitCode, stdout }) => {
+      const result = await runErrorBoundaryFixture(
+        "initialize-async",
+        errorKind,
+        "home",
+      );
+
+      expect(result).toEqual({ exitCode, stdout, stderr: "" });
+    },
+  );
+
+  it.each(failureCases)(
+    "formats $errorKind resolveContext failures for home on stdout",
+    async ({ errorKind, exitCode, stdout }) => {
+      const result = await runErrorBoundaryFixture(
+        "resolveContext",
+        errorKind,
+        "home",
+      );
+
+      expect(result).toEqual({ exitCode, stdout, stderr: "" });
+    },
+  );
+
+  it.each(failureCases)(
+    "formats $errorKind resolveContext failures for commands on stdout",
+    async ({ errorKind, exitCode, stdout }) => {
+      const result = await runErrorBoundaryFixture(
+        "resolveContext",
+        errorKind,
+        "command",
+      );
+
+      expect(result).toEqual({ exitCode, stdout, stderr: "" });
+    },
+  );
+
   it.each(["--version", "-v", "-V"])(
     "prints version from a real entrypoint for bare %s",
     async (flag) => {

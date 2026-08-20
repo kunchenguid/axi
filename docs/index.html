@@ -112,6 +112,108 @@
         width: 1rem;
         height: 1rem;
       }
+
+      /* Responsive fixes. Each breakpoint is a measured number:
+           48rem / 768px  the site's own existing breakpoint; both catalogs
+           62rem / 992px  above it the chart bar track is >=136px unaided
+           72rem / 1152px where the container hits its max-width and the
+                          longest command finally clears the copy button */
+
+      /* A grid item's automatic minimum size is its min-content width, so a
+         .card was forced open to the widest unwrappable <pre> line and the
+         page scrolled instead of the code block. */
+      .grid > * {
+        min-width: 0;
+      }
+
+      /* .chart-label (16rem) + .chart-value (3.5rem) + gaps are unshrinkable,
+         leaving the bar track 0px at 320. Put the label on its own line. */
+      @media (max-width: 62rem) {
+        .chart-rows {
+          gap: 0.625rem;
+        }
+        .chart-row {
+          flex-wrap: wrap;
+          row-gap: 0.125rem;
+        }
+        .chart-label {
+          width: 100%;
+          text-align: left;
+        }
+      }
+
+      /* .btn-copy is absolutely positioned over a horizontally scrolling
+         <pre>, so padding the code cannot clear it - the text scrolls
+         underneath. Reserve a band above the code and use the room for a
+         44px hit area. */
+      @media (max-width: 72rem) {
+        .copyable {
+          padding-top: 3.25rem;
+        }
+        .btn-copy {
+          top: 0.5rem;
+          right: 0.5rem;
+          width: 44px;
+          height: 44px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+      }
+
+      /* Both catalogs are wide tables whose Description column sat off-view
+         with no affordance that anything was hidden. Stack each row as a card
+         so the description is readable, and give both the same shape so they
+         read as one component.
+
+         Scoped by .table-catalog, which is on those two tables only. Not by
+         .card .table-wrap .table: the Results table matches that too, and
+         stacking it would destroy the column-to-column numeric reading that
+         is the entire point of it.
+
+         Column-count agnostic: first cell is the name, last cell is the
+         description, everything between is the metadata line. That covers the
+         official table's 3 columns and the community table's 4 with one rule
+         set instead of two near-copies. */
+      @media (max-width: 48rem) {
+        .table.table-catalog,
+        .table.table-catalog tbody,
+        .table.table-catalog tr,
+        .table.table-catalog td {
+          display: block;
+        }
+        .table.table-catalog thead {
+          display: none;
+        }
+        .table.table-catalog tr {
+          padding: 0.75rem 0;
+          border-bottom: var(--border-width) solid var(--color-border);
+        }
+        .table.table-catalog tr:last-child {
+          border-bottom: none;
+        }
+        .table.table-catalog td {
+          padding: 0;
+          border-bottom: none;
+        }
+        .table.table-catalog td:not(:first-child):not(:last-child) {
+          display: inline;
+          font-size: var(--text-xs);
+          color: var(--color-text-muted);
+        }
+        /* "by " only where an Author cell exists: 2nd cell of four. */
+        .table.table-catalog td:nth-child(2):nth-last-child(3)::before {
+          content: "by ";
+        }
+        /* "·" only between metadata cells, so it never leads the official
+           table's line, which is a domain alone. */
+        .table.table-catalog td:nth-child(n + 3):not(:last-child)::before {
+          content: " \00b7  ";
+        }
+        .table.table-catalog td:last-child {
+          margin-top: 0.25rem;
+        }
+      }
     </style>
   </head>
   <body>
@@ -287,7 +389,7 @@
         <div class="card mt-xl">
           <p class="section-label">Official</p>
           <div class="table-wrap">
-            <table class="table">
+            <table class="table table-catalog">
               <thead>
                 <tr>
                   <th>AXI</th>
@@ -356,7 +458,7 @@
         <div class="card mt-md">
           <p class="section-label">Community</p>
           <div class="table-wrap">
-            <table class="table">
+            <table class="table table-catalog">
               <thead>
                 <tr>
                   <th>AXI</th>
@@ -709,6 +811,81 @@
                     Issues, merge requests, CI/CD pipelines, variables and
                     secrets, releases, and raw API access. Wraps the official
                     glab CLI with agent-ergonomic TOON output.
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+
+                    <a href="https://github.com/adeeshsharma/reactive-axi"
+                      ><code>reactive-axi</code></a
+                    >
+                  </td>
+                  <td>adeeshsharma</td>
+                  <td>UI review</td>
+                  <td>
+                    Click any element in your live React, Vue, or Svelte dev
+                    server and resolve it to the exact source file and line
+                    before it reaches your agent.
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <a href="https://github.com/AndersHoffmann/obsidian-axi"
+                      ><code>obsidian-axi</code></a
+                    >
+                  </td>
+                  <td>AndersHoffmann</td>
+                  <td>Obsidian</td>
+                  <td>
+                    Read, search, create, update, organize, and link Obsidian
+                    notes from the filesystem - compact TOON output, atomic
+                    writes, no plugin or server.
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <a
+                      href="https://github.com/intelligentrascal/comfy-cloud-axi"
+                      ><code>comfy-cloud-axi</code></a
+                    >
+                  </td>
+                  <td>intelligentrascal</td>
+                  <td>AI generation</td>
+                  <td>
+                    Generate images, video, and audio via 22 partner models,
+                    submit ComfyUI workflows and templates, track jobs, estimate
+                    credits before generating, search nodes, and report usage
+                    &mdash; wraps the Comfy Cloud MCP server with
+                    token-efficient TOON output.
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <a href="https://github.com/intelligentrascal/mobbin-axi"
+                      ><code>mobbin-axi</code></a
+                    >
+                  </td>
+                  <td>intelligentrascal</td>
+                  <td>UI/UX research</td>
+                  <td>
+                    Search real-world UI/UX patterns from production apps via
+                    Mobbin - wraps Mobbin's OAuth-gated MCP server as a
+                    scriptable, headless CLI with token-efficient TOON output.
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <a href="https://github.com/JarvusInnovations/calendly-axi"
+                      ><code>calendly-axi</code></a
+                    >
+                  </td>
+                  <td>Jarvus Innovations</td>
+                  <td>Scheduling</td>
+                  <td>
+                    The Calendly booking loop from the shell - see what's
+                    scheduled, mint single-use booking links, book directly,
+                    cancel, and manage event types, availability, and webhooks.
+
                   </td>
                 </tr>
                 <tr>
@@ -1084,7 +1261,7 @@ AVAILABLE COMMANDS
           </div>
           <div class="card">
             <p class="section-label">AXI: no-args shows live state</p>
-            <pre><code>$ gh-axi issue
+            <pre><code>$ gh-axi issue list
 bin: ~/.local/bin/gh-axi
 description: Browse and manage GitHub issues for the current repository
 count: 14 of 8771 total

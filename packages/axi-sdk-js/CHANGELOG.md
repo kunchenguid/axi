@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.10](https://github.com/kunchenguid/axi/compare/axi-sdk-js-v0.1.9...axi-sdk-js-v0.1.10) (2026-08-06)
+
+
+### Features
+
+* **axi-sdk-js:** add dependency-free version fast path ([#124](https://github.com/kunchenguid/axi/issues/124)) ([0802fa8](https://github.com/kunchenguid/axi/commit/0802fa8563e1c744b93464ad6dd5ef3facd7ee6d))
+
 ## [0.1.9](https://github.com/kunchenguid/axi/compare/axi-sdk-js-v0.1.8...axi-sdk-js-v0.1.9) (2026-07-01)
 
 

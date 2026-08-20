@@ -7,6 +7,7 @@ This file provides guidance to AI agents when working with code in this reposito
 AXI (Agent eXperience Interface) defines 10 ergonomic principles for building CLI tools that AI agents use via shell execution. This repo contains:
 
 - **`packages/axi-sdk-js/`** — Shared Node.js SDK every `*-axi` CLI builds on. `runAxiCli()` provides built-in commands for all tools: `--help`, `-v`/`--version`, and `update` (self-update). `update` is a reserved command name; a tool may shadow it by registering its own handler.
+  The package also exposes a second, dependency-free subpath, `axi-sdk-js/fast-path` (`src/fast-path.ts`), so a tool's `bin/` can answer `--version` before dynamically importing its heavy command graph. It must stay import-free and flag/output-identical to the version handling in `runAxiCli`; `test/fast-path.test.ts` guards both.
 - **`bench-github/`** — Benchmark harness that compares gh-axi vs gh CLI vs GitHub MCP across 17 agent tasks, graded by an LLM judge.
 - **`bench-browser/`** — Benchmark harness that compares browser automation tools (agent-browser, pinchtab, chrome-devtools-mcp) across 16 browsing tasks.
 - **`.agents/skills/axi/SKILL.md`** — The AXI skill definition (installable via `npx skills add kunchenguid/axi`).

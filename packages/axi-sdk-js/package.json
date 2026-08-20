@@ -1,6 +1,6 @@
 {
   "name": "axi-sdk-js",
-  "version": "0.1.9",
+  "version": "0.1.10",
   "description": "Shared Node.js primitives for building AXI CLIs",
   "type": "module",
   "repository": {
@@ -22,6 +22,10 @@
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
+    },
+    "./fast-path": {
+      "types": "./dist/fast-path.d.ts",
+      "import": "./dist/fast-path.js"
     }
   },
   "files": [

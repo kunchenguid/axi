@@ -180,7 +180,7 @@ help[2]:
 
 - **Claude Code**: use native hooks in `~/.claude/settings.json` or project `.claude/settings.json`. Prefer `SessionStart` to inject compact context via stdout
 - **Codex**: use native hooks in `~/.codex/hooks.json` or `<repo>/.codex/hooks.json`, and ensure `[features].hooks = true` in `config.toml`. Prefer `SessionStart` for ambient context via stdout
-- **OpenCode**: use a managed plugin in `~/.config/opencode/plugins/`. Prefer ambient system-context injection for the home view rather than adding a custom tool
+- **OpenCode**: use a managed plugin in `~/.config/opencode/plugins/` or `<repo>/.opencode/plugins/`. Prefer ambient system-context injection for the home view rather than adding a custom tool
 
 **Also ship an installable skill (secondary recommendation):**
 
@@ -245,3 +245,29 @@ description: Manage project tasks in the current workspace
 ```
 
 Every subcommand should support `--help` with a concise, complete reference: available flags with defaults, required arguments, and 2-3 usage examples. Keep it focused on the requested subcommand — don't dump the entire CLI's manual.
+
+### Identify yourself instantly: the `--version` fast path
+
+`-v`, `-V`, and `--version` must all print the bare version and exit 0. Agents and their harnesses probe `--version` constantly - to confirm a tool is installed, to check whether a fix has shipped, to decide whether to suggest `update`. That makes latency an ergonomics property, not just a perf tweak: a probe that takes 80 ms is 80 ms of every session start, paid before any useful work happens.
+
+The trap is ESM static imports. If `bin/<tool>.js` statically imports the module that builds the command graph, every dependency in that graph is fully evaluated _before_ the version check runs. One heavy import anywhere in the tree - an SDK, a server framework - is then paid on every `--version`.
+
+Answer the version before the graph loads: keep the version in a leaf module that imports only node builtins, and defer the real CLI to a dynamic `import()`.
+
+```js
+#!/usr/bin/env node
+import { tryFastPath } from "axi-sdk-js/fast-path";
+import { VERSION } from "../src/version.js"; // leaf module - node builtins only
+
+if (!tryFastPath(process.argv.slice(2), { version: VERSION })) {
+  const { main } = await import("../src/cli.js"); // heavy graph loads only here
+  await main();
+}
+```
+
+`axi-sdk-js/fast-path` is a dedicated subpath export that imports nothing at all, so pulling it in never drags in `runAxiCli` or its dependencies. `tryFastPath` handles only a bare, single-argument version flag and returns `false` for everything else, so all other argv - including version flags in trailing positions - falls through to `runAxiCli`, which stays the single owner of the general case. Its accepted flags and output are identical to the SDK's own version handling, so adopting it changes nothing an agent can observe except the latency.
+
+Two things keep this honest:
+
+- The version must come from a **leaf** module. If `VERSION` is defined inside `cli.ts`, importing it re-pulls the whole graph and the fast path buys nothing.
+- Guard it with a test that measures the version path against the `node -e "console.log(1)"` floor measured in the same process, rather than an absolute millisecond budget that goes flaky across machines.

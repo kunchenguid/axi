@@ -151,6 +151,64 @@ community:
     author: karotkriss
     domain: GitLab
     description: "Issues, merge requests, CI/CD pipelines, variables and secrets, releases, and raw API access. Wraps the official glab CLI with agent-ergonomic TOON output."
+  - name: reactive-axi
+    url: https://github.com/adeeshsharma/reactive-axi
+    author: adeeshsharma
+    domain: UI review
+    description: "Click any element in your live React, Vue, or Svelte dev server and resolve it to the exact source file and line before it reaches your agent."
+  - name: obsidian-axi
+    url: https://github.com/AndersHoffmann/obsidian-axi
+    author: AndersHoffmann
+    domain: Obsidian
+    description: "Read, search, create, update, organize, and link Obsidian notes from the filesystem - compact TOON output, atomic writes, no plugin or server."
+  - name: comfy-cloud-axi
+    url: https://github.com/intelligentrascal/comfy-cloud-axi
+    author: intelligentrascal
+    domain: AI generation
+    description: "Generate images, video, and audio via 22 partner models, submit ComfyUI workflows and templates, track jobs, estimate credits before generating, search nodes, and report usage — wraps the Comfy Cloud MCP server with token-efficient TOON output."
+    admission:
+      status: exception
+      reviewed_revision: 0f5b75eb201512604c87f6d75f4234bb685e0879
+      exception: "The published 0.1.6 package reports version 0.1.4; `generate ... --confirm --type` defaults to image and `job chain <id> --dry-run` passes NaN before MCP calls; nodes and saved workflows report empty results for `{}` responses; paid `workflow run` and `templates run` ignore surplus positionals; and other mutating commands can ignore trailing flags."
+  - name: mobbin-axi
+    url: https://github.com/intelligentrascal/mobbin-axi
+    author: intelligentrascal
+    domain: UI/UX research
+    description: "Search real-world UI/UX patterns from production apps via Mobbin - wraps Mobbin's OAuth-gated MCP server as a scriptable, headless CLI with token-efficient TOON output."
+    admission:
+      status: exception
+      reviewed_revision: 8eda65af7d760efe45907ad3368d3164abe3062e
+      exception: "The published 0.1.3 package reports version 0.1.1; search-command --help is rejected; empty-content MCP responses can become successful `0 results`; sections ignores --platform; control commands lack per-command flag sets; and legacy --full and --json flags are no-ops."
+  - name: calendly-axi
+    url: https://github.com/JarvusInnovations/calendly-axi
+    author: Jarvus Innovations
+    domain: Scheduling
+    description: "The Calendly booking loop from the shell - see what's scheduled, mint single-use booking links, book directly, cancel, and manage event types, availability, and webhooks."
+  - name: remarkable-axi
+    url: https://github.com/JarvusInnovations/remarkable-axi
+    author: Jarvus Innovations
+    domain: E-ink tablets
+    description: "Manage content on your reMarkable tablet through the reMarkable cloud - browse and organize files, upload PDFs and EPUBs, and send web articles as reflowable EPUBs."
+  - name: ado-axi
+    url: https://github.com/dtabolich/ado-axi
+    author: dtabolich
+    domain: Azure DevOps
+    description: "Pull requests, branches, repositories, and pipeline runs. Wraps Azure CLI (`az devops` / `az repos`) with agent-ergonomic TOON output."
+  - name: supabase-axi
+    url: https://github.com/laizhenyoong/supabase-axi
+    author: laizhenyoong
+    domain: Supabase
+    description: "Inspect schemas, run SQL, and audit RLS, indexes, and logs across Supabase projects. Wraps the Supabase Management API."
+  - name: homebrew-axi
+    url: https://github.com/mstuart/homebrew-axi
+    author: mstuart
+    domain: Homebrew
+    description: "Inspect Homebrew formulae, casks, and installed packages — versions, dependencies, outdated status, and install stats — with token-efficient TOON output; read-only, never mutates."
+  - name: pypi-axi
+    url: https://github.com/mstuart/pypi-axi
+    author: mstuart
+    domain: PyPI
+    description: "Inspect PyPI packages, versions, dependencies, and download stats with token-efficient TOON output — read-only, no auth required."
   - name: cargo-axi
     url: https://github.com/AG9898/cargo-axi
     author: AG9898

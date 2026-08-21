@@ -211,6 +211,13 @@ community:
         - src/commands/pr.ts
         - src/commands/pipeline.ts
         - src/commands/ref.ts
+        - src/commands/api.ts
+        - src/commands/config.ts
+        - src/lib/client.ts
+      source_observations:
+        - "src/commands/api.ts validates API method, path, host, query, body, content type, and raw-response options before calling the shared request client."
+        - "src/commands/config.ts lists configured profiles and initializes named profiles with organization, optional project, and az or PAT authentication settings."
+        - "src/lib/client.ts constructs encoded Azure DevOps request URLs, resolves credentials, and translates network and HTTP failures into AxiError responses."
   - name: supabase-axi
     url: https://github.com/laizhenyoong/supabase-axi
     author: laizhenyoong

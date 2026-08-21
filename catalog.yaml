@@ -194,6 +194,11 @@ community:
     author: dtabolich
     domain: Azure DevOps
     description: "Pull requests, branches, repositories, and pipeline runs. Wraps Azure CLI (`az devops` / `az repos`) with agent-ergonomic TOON output."
+  - name: ado-axi
+    url: https://github.com/jeffreyhaen/ado-axi
+    author: jeffreyhaen
+    domain: Azure DevOps
+    description: "Work items, pull requests, Git refs, pipelines, and raw Azure DevOps REST calls with safe mutations, profiles, and token-efficient TOON output."
   - name: supabase-axi
     url: https://github.com/laizhenyoong/supabase-axi
     author: laizhenyoong

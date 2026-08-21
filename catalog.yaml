@@ -199,6 +199,18 @@ community:
     author: jeffreyhaen
     domain: Azure DevOps
     description: "Work items, pull requests, Git refs, pipelines, and raw Azure DevOps REST calls with safe mutations, profiles, and token-efficient TOON output."
+    admission:
+      status: admitted
+      reviewed_revision: 5b997626c17a7798f8aea4ff31613e97886a3cc1
+      reviewed_components:
+        - src/bin/ado-axi.ts
+        - src/lib/args.ts
+        - src/lib/format.ts
+        - src/commands/home.ts
+        - src/commands/workItem.ts
+        - src/commands/pr.ts
+        - src/commands/pipeline.ts
+        - src/commands/ref.ts
   - name: supabase-axi
     url: https://github.com/laizhenyoong/supabase-axi
     author: laizhenyoong

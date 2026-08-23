@@ -263,3 +263,9 @@ community:
     author: emilchristensen
     domain: Documentation
     description: "Read and write Confluence Cloud pages and spaces directly over the REST API with token-efficient TOON output and OAuth 3LO or API-token auth."
+  - name: az-axi
+    url: https://github.com/masyanru/az-axi
+    author: masyanru
+    domain: Azure
+    description: "Discover, inspect, query, and safely mutate Azure through token-efficient CLI workflows over every az module."
+

@@ -268,4 +268,3 @@ community:
     author: masyanru
     domain: Azure
     description: "Discover, inspect, query, and safely mutate Azure through token-efficient CLI workflows over every az module."
-

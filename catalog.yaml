@@ -268,3 +268,8 @@ community:
     author: masyanru
     domain: Azure
     description: "Discover, inspect, query, and safely mutate Azure through token-efficient CLI workflows over every az module."
+  - name: mssql-axi
+    url: https://github.com/jeffreyhaen/mssql-axi
+    author: jeffreyhaen
+    domain: Microsoft SQL Server / Azure SQL
+    description: "Inspect schemas, sample rows, run capped read-only queries and showplans over the native ODBC driver - mutations double-gated with dry-run by default, TOON output."

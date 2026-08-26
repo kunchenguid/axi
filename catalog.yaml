@@ -101,6 +101,11 @@ community:
     author: thatdudealso
     domain: Docker
     description: "Discover, build, run, debug, publish, inspect, and clean up Docker apps through safe token-efficient CLI workflows."
+  - name: doctl-axi
+    url: https://github.com/batamire/doctl-axi
+    author: batamire
+    domain: DigitalOcean
+    description: "Agent-ergonomic CLI for DigitalOcean — one AXI wrapping doctl → TOON, replacing 21 MCPs."
   - name: dynamodb-axi
     url: https://github.com/thatdudealso/dynamodb-axi
     author: thatdudealso

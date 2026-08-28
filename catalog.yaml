@@ -278,3 +278,8 @@ community:
     author: jeffreyhaen
     domain: Microsoft SQL Server / Azure SQL
     description: "Inspect schemas, sample rows, run capped read-only queries and showplans over the native ODBC driver - mutations double-gated with dry-run by default, TOON output."
+  - name: superbee
+    url: https://github.com/Holaxis-ai/superbee
+    author: Holaxis
+    domain: Agent knowledge infrastructure
+    description: "Turns what agents know into durable, domain-shaped infrastructure through local OKF bundles with declared schemas, exact queries, conflict-safe writes, and portable Views."

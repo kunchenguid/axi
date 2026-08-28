@@ -278,6 +278,19 @@ community:
     author: jeffreyhaen
     domain: Microsoft SQL Server / Azure SQL
     description: "Inspect schemas, sample rows, run capped read-only queries and showplans over the native ODBC driver - mutations double-gated with dry-run by default, TOON output."
+  # Admission review (independent source review per VISION.md): inspected
+  # Holaxis-ai/superbee at release v0.1.3, commit
+  # f4e1c37349627030f8201ff52028f71a9c92570a. Direct source observations:
+  # packages/cli/AXI-CONTRACT.md pins the agent-facing interaction contract;
+  # src/output.ts renders TOON by default with a compact --json escape hatch;
+  # src/errors.ts maps typed failures to stable error codes on the capped
+  # 0/1/2/4/5/6 exit taxonomy with structured error envelopes; src/commands/
+  # list.ts bounds repeated rows and reports count/shown with a --limit 0
+  # escape; src/commands/doc/common.ts gates doc update/delete behind
+  # --expected-version compare-and-swap and keeps delete idempotent; and
+  # src/commands/home.ts serves a zero-arg live orientation view. Verdict:
+  # the source-defined interface and behavior at that revision satisfy the
+  # applicable AXI principles; admitted.
   - name: superbee
     url: https://github.com/Holaxis-ai/superbee
     author: Holaxis

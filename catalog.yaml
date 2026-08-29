@@ -296,3 +296,13 @@ community:
     author: Holaxis
     domain: Agent knowledge infrastructure
     description: "Turns what agents know into durable, domain-shaped infrastructure through local OKF bundles with declared schemas, exact queries, conflict-safe writes, and portable Views."
+  - name: ha-axi
+    url: https://github.com/dmealing/ha-axi
+    author: dmealing
+    domain: Home Assistant
+    description: "Administer the entity and area registries that only Home Assistant's WebSocket API exposes, and make service calls that explain their refusals - token-efficient TOON output."
+  - name: plex-axi
+    url: https://github.com/dmealing/plex-axi
+    author: dmealing
+    domain: Plex
+    description: "Structured per-field search and diagnosis across a Plex music library, ending at a `plex://` identifier - playback is left to whatever already owns the speakers."

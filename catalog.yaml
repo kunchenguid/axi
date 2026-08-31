@@ -301,3 +301,8 @@ community:
     author: ardaatahan
     domain: Design / Figma
     description: "Inspect Figma files, export nodes to PNG/SVG/PDF, and read styles, components, and comments - summarizes huge files instead of dumping raw JSON."
+  - name: trello-axi
+    url: https://github.com/enzodevs/trello-axi
+    author: enzodevs
+    domain: Project management
+    description: "Create, search, update, move, comment on, and archive Trello cards through the REST API with compact TOON output, complete pagination, idempotent mutations, and non-interactive batch workflows."

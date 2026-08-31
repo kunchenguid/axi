@@ -306,3 +306,8 @@ community:
     author: enzodevs
     domain: Project management
     description: "Create, search, update, move, comment on, and archive Trello cards through the REST API with compact TOON output, complete pagination, idempotent mutations, and non-interactive batch workflows."
+  - name: railway-axi
+    url: https://github.com/simkimsia/railway-axi
+    author: simkimsia
+    domain: Railway
+    description: "List projects and inspect linked project status, environments, and services. Wraps the Railway CLI with agent-ergonomic TOON output and structured errors."

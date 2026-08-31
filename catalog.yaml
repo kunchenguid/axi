@@ -311,22 +311,3 @@ community:
     author: simkimsia
     domain: Railway
     description: "List projects and inspect linked project status, environments, and services. Wraps the Railway CLI with agent-ergonomic TOON output and structured errors."
-    admission:
-      status: admitted
-      reviewed_revision: fe3f568b0f4b009b584fd3079064fdcdf9f7e3eb
-      reviewed_components:
-        - bin/railway-axi.ts
-        - src/cli.ts
-        - src/args.ts
-        - src/railway.ts
-        - src/errors.ts
-        - src/toon.ts
-        - src/commands/home.ts
-        - src/commands/list.ts
-        - src/commands/status.ts
-        - src/commands/whoami.ts
-      source_observations:
-        - "src/cli.ts registers home, list, status, and whoami on axi-sdk-js runAxiCli with top-level and per-command help, and a formatError hook that emits TOON `error`/`code`/`help` fields with exit code 2 for validation errors and 1 otherwise."
-        - "src/railway.ts invokes the railway CLI via execFile (no shell), parses `--json` output, and maps a missing binary to a RAILWAY_NOT_INSTALLED error carrying install suggestions."
-        - "src/errors.ts translates raw railway stderr into structured AUTH, NOT_LINKED, and NOT_FOUND codes with actionable retry suggestions, falling back to the first stderr line as UNKNOWN."
-        - "src/args.ts rejects any unrecognized argument or flag by name with a VALIDATION_ERROR before any railway call, and src/commands/list.ts and status.ts render project, workspace, environment, and service data as compact TOON."

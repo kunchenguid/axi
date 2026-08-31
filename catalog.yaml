@@ -296,3 +296,14 @@ community:
     author: Holaxis
     domain: Agent knowledge infrastructure
     description: "Turns what agents know into durable, domain-shaped infrastructure through local OKF bundles with declared schemas, exact queries, conflict-safe writes, and portable Views."
+  # Admission review (independent source review): inspected enzodevs/trello-axi
+  # at commit 9869035. The review verified bounded and paginated reads, exact
+  # name resolution, idempotent ensure/move/archive mutations, compact TOON and
+  # JSON output, structured exit codes, non-interactive batching, and atomic
+  # mode-0600 credential storage. Ruff, ty, 23 tests, package builds, and a live
+  # Trello API smoke test passed; no release-blocking findings remained.
+  - name: trello-axi
+    url: https://github.com/enzodevs/trello-axi
+    author: enzodevs
+    domain: Project management
+    description: "Create, search, update, move, comment on, and archive Trello cards through the REST API with compact TOON output, complete pagination, idempotent mutations, and non-interactive batch workflows."

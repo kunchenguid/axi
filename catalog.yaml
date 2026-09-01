@@ -311,3 +311,8 @@ community:
     author: simkimsia
     domain: Railway
     description: "List projects and inspect linked project status, environments, and services. Wraps the Railway CLI with agent-ergonomic TOON output and structured errors."
+  - name: netlify-axi
+    url: https://github.com/simkimsia/netlify-axi
+    author: simkimsia
+    domain: Netlify
+    description: "List sites and inspect the linked site's status and the logged-in account. Wraps the Netlify CLI with agent-ergonomic TOON output and structured errors."

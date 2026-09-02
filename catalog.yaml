@@ -336,3 +336,8 @@ community:
     author: ardaatahan
     domain: Deployment / Vercel
     description: "Deploy and inspect Vercel deployments, projects, domains, DNS, environment variables, and teams through the official Vercel CLI, with explicit confirmation gates for production and infrastructure changes."
+  - name: cloudflare-axi
+    url: https://github.com/simkimsia/cloudflare-axi
+    author: simkimsia
+    domain: Cloudflare
+    description: "Inspect the current Worker's deployments, Pages projects, KV namespaces, and the logged-in account. Wraps the Cloudflare CLI (wrangler) with agent-ergonomic TOON output and structured errors."

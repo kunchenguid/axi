@@ -65,7 +65,9 @@ describe("parseClaudeJsonl", () => {
     expect(result.output_tokens).toBe(500);
     expect(result.command_count).toBe(1);
     expect(result.error_count).toBe(0);
-    expect(result.command_log).toEqual(["agent-browser navigate https://example.com"]);
+    expect(result.command_log).toEqual([
+      "agent-browser navigate https://example.com",
+    ]);
     expect(result.reasoning_tokens).toBe(0);
   });
 
@@ -160,7 +162,7 @@ describe("parseClaudeJsonl", () => {
     expect(result.total_cost_usd).toBe(0.05);
   });
 
-  it("uses point-release pricing or rejects an unpriced result-less run", () => {
+  it("uses point-release pricing or rejects an unpriced run", () => {
     const raw = JSON.stringify({
       type: "assistant",
       message: { usage: { input_tokens: 1_000_000, output_tokens: 1_000_000 } },
@@ -172,5 +174,11 @@ describe("parseClaudeJsonl", () => {
     expect(() => parseClaudeJsonl(raw, { model: "claude-fable-5" })).toThrow(
       'No pricing configured for Claude model "claude-fable-5"',
     );
+    expect(() =>
+      parseClaudeJsonl(
+        JSON.stringify({ type: "result", usage: { input_tokens: 1_000_000 } }),
+        { model: "claude-fable-5" },
+      ),
+    ).toThrow('No pricing configured for Claude model "claude-fable-5"');
   });
 });

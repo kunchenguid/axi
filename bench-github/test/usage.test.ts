@@ -2,7 +2,12 @@ import { describe, it, expect } from "vitest";
 import { parseCodexJsonl, parseClaudeJsonl } from "../src/usage.js";
 
 /** OpenAI API format: nested input_tokens_details.cached_tokens */
-const turnEvent = (input: number, output: number, reasoning: number, cached = 0) =>
+const turnEvent = (
+  input: number,
+  output: number,
+  reasoning: number,
+  cached = 0,
+) =>
   JSON.stringify({
     type: "turn.completed",
     usage: {
@@ -76,11 +81,9 @@ describe("parseCodexJsonl", () => {
   });
 
   it("skips malformed JSON lines", () => {
-    const raw = [
-      "not valid json",
-      turnEvent(100, 50, 10),
-      "{broken",
-    ].join("\n");
+    const raw = ["not valid json", turnEvent(100, 50, 10), "{broken"].join(
+      "\n",
+    );
 
     const result = parseCodexJsonl(raw);
     expect(result.turn_count).toBe(1);
@@ -246,7 +249,7 @@ describe("parseClaudeJsonl", () => {
     expect(result.total_cost_usd).toBe(0.05);
   });
 
-  it("uses point-release pricing or rejects an unpriced result-less run", () => {
+  it("uses point-release pricing or rejects an unpriced run", () => {
     const raw = JSON.stringify({
       type: "assistant",
       message: { usage: { input_tokens: 1_000_000, output_tokens: 1_000_000 } },
@@ -258,6 +261,13 @@ describe("parseClaudeJsonl", () => {
     expect(() => parseClaudeJsonl(raw, { model: "claude-fable-5" })).toThrow(
       'No pricing configured for Claude model "claude-fable-5"',
     );
+    const rawWithoutCost = JSON.stringify({
+      type: "result",
+      usage: { input_tokens: 1_000_000 },
+    });
+    expect(() =>
+      parseClaudeJsonl(rawWithoutCost, { model: "claude-fable-5" }),
+    ).toThrow('No pricing configured for Claude model "claude-fable-5"');
   });
 
   it("uses reported cost regardless of model", () => {

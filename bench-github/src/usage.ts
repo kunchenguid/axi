@@ -204,8 +204,7 @@ export function parseClaudeJsonl(
   let inputTokensCached = 0;
   let inputTokensCacheCreation = 0;
   let outputTokens = 0;
-  let reportedCost = 0;
-  let hasResult = false;
+  let reportedCost: number | undefined;
   let turnCount = 0;
   let commandCount = 0;
   let errorCount = 0;
@@ -241,8 +240,9 @@ export function parseClaudeJsonl(
 
     // Result event: contains aggregated usage and cost
     if (entry.type === "result") {
-      hasResult = true;
-      reportedCost = Number(entry.total_cost_usd ?? 0);
+      if (entry.total_cost_usd != null) {
+        reportedCost = Number(entry.total_cost_usd);
+      }
       turnCount = Number(entry.num_turns ?? 0);
 
       if (!wallClockSeconds && entry.duration_ms) {
@@ -280,10 +280,10 @@ export function parseClaudeJsonl(
 
   const inputTokensUncached = inputTokens - inputTokensCached;
 
-  // Use Claude's reported cost when available. When the result event is missing
-  // (agent crashed), compute from tokens. Cache creation is priced at 1.25× base.
-  let totalCost = reportedCost;
-  if (!hasResult && inputTokens > 0) {
+  // Use Claude's reported cost when available. When it is absent, compute from
+  // tokens. Cache creation is priced at 1.25× base.
+  let totalCost = reportedCost ?? 0;
+  if (reportedCost === undefined && inputTokens > 0) {
     const pricing = getClaudePricing(opts.model);
     const baseInputTokens = inputTokensUncached - inputTokensCacheCreation;
     totalCost =

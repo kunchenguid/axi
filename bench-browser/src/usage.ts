@@ -34,7 +34,7 @@ const CLAUDE_PRICING_PER_1M: Record<string, ModelPricing> = {
   haiku: HAIKU_4_5_PRICING,
 };
 
-function getClaudePricing(model?: string): ModelPricing {
+function getClaudePricing(model: string | undefined): ModelPricing {
   const entry = model ? CLAUDE_PRICING_PER_1M[model] : undefined;
   if (!entry) {
     const description = model
@@ -67,7 +67,7 @@ export function parseClaudeJsonl(
   let inputTokensCacheCreation = 0;
   let outputTokens = 0;
   let reportedCost = 0;
-  let resultSeen = false;
+  let hasReportedCost = false;
   let turnCount = 0;
   let commandCount = 0;
   let errorCount = 0;
@@ -129,8 +129,10 @@ export function parseClaudeJsonl(
 
     // Result event: contains aggregated usage and cost
     if (entry.type === "result") {
-      resultSeen = true;
-      reportedCost = Number(entry.total_cost_usd ?? 0);
+      if (entry.total_cost_usd != null) {
+        reportedCost = Number(entry.total_cost_usd);
+        hasReportedCost = true;
+      }
       turnCount = Number(entry.num_turns ?? 0);
 
       if (!wallClockSeconds && entry.duration_ms) {
@@ -165,10 +167,10 @@ export function parseClaudeJsonl(
 
   const inputTokensUncached = inputTokens - inputTokensCached;
 
-  // Use Claude's reported cost when available. When the result event is missing
-  // (agent crashed), compute from tokens.
+  // Use Claude's reported cost when available. When it is absent, compute from
+  // tokens.
   let totalCost = reportedCost;
-  if (!resultSeen && inputTokens > 0) {
+  if (!hasReportedCost && inputTokens > 0) {
     const pricing = getClaudePricing(opts.model);
     totalCost =
       (inputTokensUncached - inputTokensCacheCreation) * pricing.input +

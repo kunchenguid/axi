@@ -2,7 +2,12 @@ import { describe, it, expect } from "vitest";
 import { parseCodexJsonl, parseClaudeJsonl } from "../src/usage.js";
 
 /** OpenAI API format: nested input_tokens_details.cached_tokens */
-const turnEvent = (input: number, output: number, reasoning: number, cached = 0) =>
+const turnEvent = (
+  input: number,
+  output: number,
+  reasoning: number,
+  cached = 0,
+) =>
   JSON.stringify({
     type: "turn.completed",
     usage: {
@@ -76,11 +81,9 @@ describe("parseCodexJsonl", () => {
   });
 
   it("skips malformed JSON lines", () => {
-    const raw = [
-      "not valid json",
-      turnEvent(100, 50, 10),
-      "{broken",
-    ].join("\n");
+    const raw = ["not valid json", turnEvent(100, 50, 10), "{broken"].join(
+      "\n",
+    );
 
     const result = parseCodexJsonl(raw);
     expect(result.turn_count).toBe(1);
@@ -301,12 +304,14 @@ describe("parseClaudeJsonl", () => {
         },
       },
     ];
-    const raw = provisional.map(JSON.stringify).join("\n");
+    const raw = provisional.map((entry) => JSON.stringify(entry)).join("\n");
 
-    expect(parseClaudeJsonl(raw, { model: "claude-sonnet-4-6" })).toMatchObject({
-      input_tokens: 300,
-      output_tokens: 30,
-    });
+    expect(parseClaudeJsonl(raw, { model: "claude-sonnet-4-6" })).toMatchObject(
+      {
+        input_tokens: 300,
+        output_tokens: 30,
+      },
+    );
     expect(
       parseClaudeJsonl(
         `${raw}\n${claudeResult({
@@ -335,23 +340,26 @@ describe("parseClaudeJsonl", () => {
     ["claude-opus-4-7", 0.1176445],
     ["claude-opus-4-8", 0.1176445],
     ["claude-haiku-4-5-20251001", 0.0235289],
-  ])("prices a result-less %s run at its configured rate", (model, expected) => {
-    const raw = JSON.stringify({
-      type: "assistant",
-      message: {
-        usage: {
-          input_tokens: 15_474,
-          cache_read_input_tokens: 60_499,
-          output_tokens: 401,
+  ])(
+    "prices a result-less %s run at its configured rate",
+    (model, expected) => {
+      const raw = JSON.stringify({
+        type: "assistant",
+        message: {
+          usage: {
+            input_tokens: 15_474,
+            cache_read_input_tokens: 60_499,
+            output_tokens: 401,
+          },
         },
-      },
-    });
+      });
 
-    expect(parseClaudeJsonl(raw, { model }).total_cost_usd).toBeCloseTo(
-      expected,
-      6,
-    );
-  });
+      expect(parseClaudeJsonl(raw, { model }).total_cost_usd).toBeCloseTo(
+        expected,
+        6,
+      );
+    },
+  );
 
   it("charges unique web search requests outside US token pricing", () => {
     const event = {

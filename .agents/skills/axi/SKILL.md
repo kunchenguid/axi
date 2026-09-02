@@ -2,7 +2,7 @@
 name: axi
 description: >
   Agent eXperience Interface (AXI) — ergonomic standards for building CLI tools that agents
-  use via shell execution. Use when building, modifying, or reviewing any agent-facing CLI.
+  use via shell execution. Use when building, modifying, or reviewing any CLI tool.
 ---
 
 # Agent eXperience Interface (AXI)

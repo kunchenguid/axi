@@ -46,9 +46,7 @@ const CLAUDE_PRICING_PER_1M: Record<string, ModelPricing> = {
 function getClaudePricing(model: string | undefined): ModelPricing {
   const entry = model ? CLAUDE_PRICING_PER_1M[model] : undefined;
   if (!entry) {
-    const description = model
-      ? `Claude model \"${model}\"`
-      : "a Claude model id";
+    const description = model ? `Claude model "${model}"` : "a Claude model id";
     throw new Error(`No pricing configured for ${description}`);
   }
   return {
@@ -85,7 +83,8 @@ function parseClaudeUsage(usage: Record<string, unknown>) {
     inputTokensCacheCreation5m: cacheCreation5m,
     inputTokensCacheCreation1h: cacheCreation1h,
     outputTokens: Number(usage.output_tokens ?? 0),
-    inferenceGeo: typeof usage.inference_geo === "string" ? usage.inference_geo : "",
+    inferenceGeo:
+      typeof usage.inference_geo === "string" ? usage.inference_geo : "",
     webSearchRequests: Number(serverToolUse.web_search_requests ?? 0),
   };
 }
@@ -225,7 +224,7 @@ export function parseClaudeJsonl(
   const inputTokensUncached = inputTokens - inputTokensCached;
 
   // Use Claude's reported cost when available. When it is absent, compute from
-  // tokens.
+  // tokens and web-search requests.
   let totalCost = reportedCost;
   if (!hasReportedCost && (inputTokens > 0 || webSearchRequests > 0)) {
     const pricing = getClaudePricing(opts.model);

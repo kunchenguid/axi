@@ -341,3 +341,8 @@ community:
     author: simkimsia
     domain: Cloudflare
     description: "Inspect the current Worker's deployments, Pages projects, KV namespaces, and the logged-in account. Wraps the Cloudflare CLI (wrangler) with agent-ergonomic TOON output and structured errors."
+  - name: coolify-axi
+    url: https://github.com/radityasurya/coolify-axi
+    author: radityasurya
+    domain: Coolify
+    description: "Apps, databases, services, and deployments on self-hosted or cloud Coolify - name-based addressing, redacted secrets, and TOON output over the official coolify CLI."

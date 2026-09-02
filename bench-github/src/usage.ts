@@ -25,10 +25,21 @@ const CLAUDE_PRICING_PER_1M: Record<string, ModelPricing> = {
   // ── Claude Sonnet family ───────────────────────────────────────
   "claude-sonnet-4-6": { input: 3.0, input_cached: 0.3, output: 15.0 },
   "claude-sonnet-4-5-20250514": { input: 3.0, input_cached: 0.3, output: 15.0 },
+  "claude-sonnet-4-5-20250929": { input: 3.0, input_cached: 0.3, output: 15.0 },
   sonnet: { input: 3.0, input_cached: 0.3, output: 15.0 },
   // ── Claude Opus family ─────────────────────────────────────────
   "claude-opus-4-1": { input: 15.0, input_cached: 1.5, output: 75.0 },
+  "claude-opus-4-1-20250805": {
+    input: 15.0,
+    input_cached: 1.5,
+    output: 75.0,
+  },
   "claude-opus-4-5": { input: 5.0, input_cached: 0.5, output: 25.0 },
+  "claude-opus-4-5-20251101": {
+    input: 5.0,
+    input_cached: 0.5,
+    output: 25.0,
+  },
   "claude-opus-4-6": { input: 5.0, input_cached: 0.5, output: 25.0 },
   "claude-opus-4-7": { input: 5.0, input_cached: 0.5, output: 25.0 },
   "claude-opus-4-8": { input: 5.0, input_cached: 0.5, output: 25.0 },
@@ -185,6 +196,31 @@ function getClaudePricing(model?: string): ModelPricing {
   };
 }
 
+function parseClaudeUsage(usage: Record<string, unknown>) {
+  const baseInput = Number(usage.input_tokens ?? 0);
+  const cacheCreation = Number(usage.cache_creation_input_tokens ?? 0);
+  const cacheRead = Number(usage.cache_read_input_tokens ?? 0);
+  const cacheCreationDetails = (usage.cache_creation ?? {}) as Record<
+    string,
+    unknown
+  >;
+  const cacheCreation1h = Number(
+    cacheCreationDetails.ephemeral_1h_input_tokens ?? 0,
+  );
+  const cacheCreation5m = Number(
+    cacheCreationDetails.ephemeral_5m_input_tokens ??
+      cacheCreation - cacheCreation1h,
+  );
+
+  return {
+    inputTokens: baseInput + cacheCreation + cacheRead,
+    inputTokensCached: cacheRead,
+    inputTokensCacheCreation5m: cacheCreation5m,
+    inputTokensCacheCreation1h: cacheCreation1h,
+    outputTokens: Number(usage.output_tokens ?? 0),
+  };
+}
+
 /**
  * Parse Claude CLI `--output-format stream-json` JSONL output into usage metrics.
  *
@@ -202,7 +238,8 @@ export function parseClaudeJsonl(
 
   let inputTokens = 0;
   let inputTokensCached = 0;
-  let inputTokensCacheCreation = 0;
+  let inputTokensCacheCreation5m = 0;
+  let inputTokensCacheCreation1h = 0;
   let outputTokens = 0;
   let reportedCost: number | undefined;
   let turnCount = 0;
@@ -210,6 +247,8 @@ export function parseClaudeJsonl(
   let errorCount = 0;
   let wallClockSeconds = opts.wallClockSeconds ?? 0;
   const commandLog: string[] = [];
+  const assistantMessageIds = new Set<string>();
+  let hasResultUsage = false;
 
   for (const line of lines) {
     let entry: Record<string, unknown>;
@@ -249,31 +288,35 @@ export function parseClaudeJsonl(
         wallClockSeconds = Number(entry.duration_ms) / 1000;
       }
 
-      const usage = (entry.usage ?? {}) as Record<string, unknown>;
-      const baseInput = Number(usage.input_tokens ?? 0);
-      const cacheCreation = Number(usage.cache_creation_input_tokens ?? 0);
-      const cacheRead = Number(usage.cache_read_input_tokens ?? 0);
-      inputTokens = baseInput + cacheCreation + cacheRead;
-      inputTokensCached = cacheRead;
-      inputTokensCacheCreation = cacheCreation;
-      outputTokens = Number(usage.output_tokens ?? 0);
+      const usage = parseClaudeUsage(
+        (entry.usage ?? {}) as Record<string, unknown>,
+      );
+      inputTokens = usage.inputTokens;
+      inputTokensCached = usage.inputTokensCached;
+      inputTokensCacheCreation5m = usage.inputTokensCacheCreation5m;
+      inputTokensCacheCreation1h = usage.inputTokensCacheCreation1h;
+      outputTokens = usage.outputTokens;
+      hasResultUsage = true;
     }
 
     // Assistant message events also carry per-message usage
     if (entry.type === "assistant") {
       const msg = (entry.message ?? {}) as Record<string, unknown>;
-      const usage = (msg.usage ?? {}) as Record<string, unknown>;
-      // Accumulate if result event hasn't provided totals.
-      // Claude's usage.input_tokens is only the non-cached, non-cache-creation
-      // portion — total input = input_tokens + cache_creation + cache_read.
-      if (usage.input_tokens && !inputTokens) {
-        const base = Number(usage.input_tokens ?? 0);
-        const creation = Number(usage.cache_creation_input_tokens ?? 0);
-        const read = Number(usage.cache_read_input_tokens ?? 0);
-        inputTokens += base + creation + read;
-        outputTokens += Number(usage.output_tokens ?? 0);
-        inputTokensCached += read;
-        inputTokensCacheCreation += creation;
+      const messageId = typeof msg.id === "string" ? msg.id : undefined;
+      const usage = parseClaudeUsage(
+        (msg.usage ?? {}) as Record<string, unknown>,
+      );
+      if (
+        !hasResultUsage &&
+        usage.inputTokens + usage.outputTokens > 0 &&
+        (!messageId || !assistantMessageIds.has(messageId))
+      ) {
+        if (messageId) assistantMessageIds.add(messageId);
+        inputTokens += usage.inputTokens;
+        outputTokens += usage.outputTokens;
+        inputTokensCached += usage.inputTokensCached;
+        inputTokensCacheCreation5m += usage.inputTokensCacheCreation5m;
+        inputTokensCacheCreation1h += usage.inputTokensCacheCreation1h;
       }
     }
   }
@@ -281,14 +324,18 @@ export function parseClaudeJsonl(
   const inputTokensUncached = inputTokens - inputTokensCached;
 
   // Use Claude's reported cost when available. When it is absent, compute from
-  // tokens. Cache creation is priced at 1.25× base.
+  // tokens.
   let totalCost = reportedCost ?? 0;
   if (reportedCost === undefined && inputTokens > 0) {
     const pricing = getClaudePricing(opts.model);
-    const baseInputTokens = inputTokensUncached - inputTokensCacheCreation;
+    const baseInputTokens =
+      inputTokensUncached -
+      inputTokensCacheCreation5m -
+      inputTokensCacheCreation1h;
     totalCost =
       baseInputTokens * pricing.input +
-      inputTokensCacheCreation * pricing.input * 1.25 +
+      inputTokensCacheCreation5m * pricing.input * 1.25 +
+      inputTokensCacheCreation1h * pricing.input * 2 +
       inputTokensCached * pricing.input_cached +
       outputTokens * pricing.output;
   }

@@ -273,13 +273,60 @@ describe("parseClaudeJsonl", () => {
     ).toThrow('No pricing configured for Claude model "claude-fable-5"');
   });
 
+  it("accumulates provisional assistant usage by message id", () => {
+    const provisional = [
+      {
+        type: "assistant",
+        message: {
+          id: "msg-1",
+          usage: { input_tokens: 100, output_tokens: 10 },
+        },
+      },
+      {
+        type: "assistant",
+        message: {
+          id: "msg-1",
+          usage: { input_tokens: 100, output_tokens: 10 },
+        },
+      },
+      {
+        type: "assistant",
+        message: {
+          id: "msg-2",
+          usage: { input_tokens: 200, output_tokens: 20 },
+        },
+      },
+    ];
+    const raw = provisional.map(JSON.stringify).join("\n");
+
+    expect(parseClaudeJsonl(raw, { model: "claude-sonnet-4-6" })).toMatchObject({
+      input_tokens: 300,
+      output_tokens: 30,
+    });
+    expect(
+      parseClaudeJsonl(
+        `${raw}\n${claudeResult({
+          numTurns: 2,
+          costUsd: 0.01,
+          durationMs: 100,
+          inputTokens: 7,
+          outputTokens: 3,
+        })}`,
+        { model: "claude-sonnet-4-6" },
+      ),
+    ).toMatchObject({ input_tokens: 7, output_tokens: 3 });
+  });
+
   // token mix from a published agent-browser run: 15474 uncached input,
   // 60499 cache-read, 401 output tokens
   it.each([
     ["claude-sonnet-4-6", 0.0705867],
     ["claude-sonnet-4-5-20250514", 0.0705867],
+    ["claude-sonnet-4-5-20250929", 0.0705867],
     ["claude-opus-4-1", 0.3529335],
+    ["claude-opus-4-1-20250805", 0.3529335],
     ["claude-opus-4-5", 0.1176445],
+    ["claude-opus-4-5-20251101", 0.1176445],
     ["claude-opus-4-6", 0.1176445],
     ["claude-opus-4-7", 0.1176445],
     ["claude-opus-4-8", 0.1176445],
@@ -302,27 +349,29 @@ describe("parseClaudeJsonl", () => {
     );
   });
 
-  it("prices cache creation at 1.25x the input rate", () => {
+  it("prices cache creation by duration", () => {
     const raw = JSON.stringify({
       type: "assistant",
       message: {
         usage: {
           input_tokens: 1_000,
           cache_creation_input_tokens: 2_000,
+          cache_creation: {
+            ephemeral_5m_input_tokens: 1_000,
+            ephemeral_1h_input_tokens: 1_000,
+          },
           cache_read_input_tokens: 3_000,
           output_tokens: 500,
         },
       },
     });
 
-    // sonnet: 1000×3 + 2000×3×1.25 + 3000×0.3 + 500×15 = 18900 per 1M = $0.0189
     expect(
       parseClaudeJsonl(raw, { model: "claude-sonnet-4-6" }).total_cost_usd,
-    ).toBeCloseTo(0.0189, 6);
-    // opus 4.5: 1000×5 + 2000×5×1.25 + 3000×0.5 + 500×25 = 31500 per 1M = $0.0315
+    ).toBeCloseTo(0.02115, 6);
     expect(
       parseClaudeJsonl(raw, { model: "claude-opus-4-5" }).total_cost_usd,
-    ).toBeCloseTo(0.0315, 6);
+    ).toBeCloseTo(0.03525, 6);
   });
 
   it("uses reported cost regardless of model", () => {

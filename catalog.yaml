@@ -341,32 +341,24 @@ community:
     author: simkimsia
     domain: Cloudflare
     description: "Inspect the current Worker's deployments, Pages projects, KV namespaces, and the logged-in account. Wraps the Cloudflare CLI (wrangler) with agent-ergonomic TOON output and structured errors."
-  # Pinned for the independent admission review VISION.md requires. This entry
-  # carries NO admission verdict: the contributor cannot supply one, since
-  # VISION.md excludes contributor assertions and contributor-provided
-  # verification as sufficient evidence. The verdict is left to an independent
-  # reviewer, and this comment neither asserts nor implies admission.
-  #
-  # To make that review cheap, the package is pinned at release v0.1.1, commit
-  # 513e9bb2d9addf35135c9fcdd8d7f57ce0de4a43, and the components bearing on the
-  # applicable principles are: src/cli.js (runAxiCli dispatch; the no-args home
-  # view returns live resource state rather than help text); src/args.js
-  # (node:util parseArgs in strict mode; ERR_PARSE_ARGS_UNKNOWN_OPTION becomes a
-  # VALIDATION_ERROR naming the subcommand's valid flags, which the SDK maps to
-  # exit 2, other AxiErrors to exit 1); src/coolify.js (execFile wrapper over the
-  # official `coolify` binary; ENOENT becomes MISSING_DEPENDENCY; auth failures
-  # become AUTH_ERROR; the wrapped CLI's update banner is stripped from stderr
-  # before error translation; redact()/redactValue() mask secret-named fields
-  # and, via URL_CREDENTIALS, passwords embedded in connection URLs, with
-  # --reveal forwarding --show-sensitive; resolveResource() raises rather than
-  # guessing on an ambiguous name); src/commands/app.js (DETAIL_FIELDS allow-list
-  # projection; LOG_LIMIT truncation with a --full escape hatch; start/stop
-  # return `unchanged: true` at exit 0 when already in the target state).
-  #
-  # These are contributor-provided pointers for a reviewer, not evidence of
-  # admission, and should be verified against the pinned source.
   - name: coolify-axi
     url: https://github.com/radityasurya/coolify-axi
     author: radityasurya
     domain: Coolify
     description: "Apps, databases, services, and deployments on self-hosted or cloud Coolify - name-based addressing, redacted secrets, and TOON output over the official coolify CLI."
+    admission:
+      status: exception
+      reviewed_revision: 513e9bb2d9addf35135c9fcdd8d7f57ce0de4a43
+      reviewed_components:
+        - bin/coolify-axi.js
+        - src/cli.js
+        - src/args.js
+        - src/coolify.js
+        - src/commands/app.js
+        - src/commands/db.js
+      source_observations:
+        - "src/cli.js passes a `home` handler to runAxiCli that fetches `resource list` and returns counts, a state rollup, and per-resource state, so a no-argument run emits live data rather than the static TOON help in TOP_HELP."
+        - "src/args.js parses each subcommand with node:util parseArgs in strict mode and converts ERR_PARSE_ARGS_UNKNOWN_OPTION into an AxiError with code VALIDATION_ERROR whose suggestion names that subcommand's valid flags."
+        - "src/coolify.js runs the `coolify` binary through execFile and translates failures into AxiError codes MISSING_DEPENDENCY (ENOENT), AUTH_ERROR, NOT_FOUND, and COOLIFY_ERROR after dropping the wrapped CLI's update banner from stderr; redact()/redactValue() replace secret-named fields and the password segment matched by URL_CREDENTIALS in connection URLs unless --reveal is passed; resolveResource() raises VALIDATION_ERROR listing candidate uuids when a name matches more than one resource."
+        - "src/commands/app.js projects `app get` through the DETAIL_FIELDS allow-list, truncates `app logs` to the last LOG_LIMIT (4000) characters with a size hint and a --full escape hatch, and returns `unchanged: true` without calling the wrapped CLI when start or stop targets a resource already in that state."
+      exception: "`db get <name|uuid>` in src/commands/db.js returns a normal result payload reading `no database named <name>` for a lookup miss, so the process exits 0; the equivalent miss for applications, services, and servers goes through resolveResource() in src/coolify.js and raises a NOT_FOUND AxiError."

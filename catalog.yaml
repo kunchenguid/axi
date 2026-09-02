@@ -341,6 +341,28 @@ community:
     author: simkimsia
     domain: Cloudflare
     description: "Inspect the current Worker's deployments, Pages projects, KV namespaces, and the logged-in account. Wraps the Cloudflare CLI (wrangler) with agent-ergonomic TOON output and structured errors."
+  # Admission review (independent source review per VISION.md): inspected
+  # radityasurya/coolify-axi at release v0.1.1, commit
+  # 513e9bb2d9addf35135c9fcdd8d7f57ce0de4a43. Direct source observations:
+  # src/cli.js dispatches through runAxiCli from axi-sdk-js and its no-args
+  # home view returns live resource state rather than help text; src/args.js
+  # parses with node:util parseArgs in strict mode and converts
+  # ERR_PARSE_ARGS_UNKNOWN_OPTION into an AxiError with code VALIDATION_ERROR
+  # that names the subcommand's valid flags inline, which the SDK maps to
+  # exit 2 while other AxiErrors exit 1; src/coolify.js wraps the official
+  # `coolify` binary via execFile, converts ENOENT into a structured
+  # MISSING_DEPENDENCY error, maps auth failures to AUTH_ERROR, and strips
+  # the wrapped CLI's update banner from stderr before error translation so
+  # it never reaches stdout; redact()/redactValue() mask secret-named fields
+  # and, via URL_CREDENTIALS, passwords embedded in connection URLs, with
+  # --reveal forwarding --show-sensitive to the wrapped CLI;
+  # resolveResource() accepts a name or uuid and raises rather than guessing
+  # when a name is ambiguous; src/commands/app.js projects responses through
+  # a DETAIL_FIELDS allow-list, truncates logs at LOG_LIMIT with a size hint
+  # and a --full escape hatch, and returns `unchanged: true` at exit 0 when
+  # start/stop is called on a resource already in the target state.
+  # Verdict: the source-defined interface and behavior at that release
+  # satisfy the applicable AXI principles; admitted.
   - name: coolify-axi
     url: https://github.com/radityasurya/coolify-axi
     author: radityasurya

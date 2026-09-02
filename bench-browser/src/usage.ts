@@ -29,9 +29,9 @@ const CLAUDE_PRICING_PER_1M: Record<string, ModelPricing> = {
   "claude-opus-4-1": OPUS_4_1_PRICING,
   "claude-opus-4-5": OPUS_4_5_PRICING,
   "claude-opus-4-6": OPUS_4_5_PRICING,
-  opus: OPUS_4_5_PRICING,
+  "claude-opus-4-7": OPUS_4_5_PRICING,
+  "claude-opus-4-8": OPUS_4_5_PRICING,
   "claude-haiku-4-5-20251001": HAIKU_4_5_PRICING,
-  haiku: HAIKU_4_5_PRICING,
 };
 
 function getClaudePricing(model: string | undefined): ModelPricing {

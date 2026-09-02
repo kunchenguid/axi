@@ -30,10 +30,10 @@ const CLAUDE_PRICING_PER_1M: Record<string, ModelPricing> = {
   "claude-opus-4-1": { input: 15.0, input_cached: 1.5, output: 75.0 },
   "claude-opus-4-5": { input: 5.0, input_cached: 0.5, output: 25.0 },
   "claude-opus-4-6": { input: 5.0, input_cached: 0.5, output: 25.0 },
-  opus: { input: 5.0, input_cached: 0.5, output: 25.0 },
+  "claude-opus-4-7": { input: 5.0, input_cached: 0.5, output: 25.0 },
+  "claude-opus-4-8": { input: 5.0, input_cached: 0.5, output: 25.0 },
   // ── Claude Haiku family ────────────────────────────────────────
   "claude-haiku-4-5-20251001": { input: 1.0, input_cached: 0.1, output: 5.0 },
-  haiku: { input: 1.0, input_cached: 0.1, output: 5.0 },
 };
 
 const PRICING_PER_1M: Record<string, ModelPricing> = {

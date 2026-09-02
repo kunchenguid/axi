@@ -255,6 +255,12 @@ describe("parseClaudeJsonl", () => {
     expect(
       parseClaudeJsonl(raw, { model: "claude-opus-4-5" }).total_cost_usd,
     ).toBeCloseTo(30);
+    expect(
+      parseClaudeJsonl(raw, { model: "claude-opus-4-1" }).total_cost_usd,
+    ).toBeCloseTo(90);
+    expect(() => parseClaudeJsonl(raw, { model: "opus" })).toThrow(
+      'No pricing configured for Claude model "opus"',
+    );
     expect(() => parseClaudeJsonl(raw, { model: "claude-fable-5" })).toThrow(
       'No pricing configured for Claude model "claude-fable-5"',
     );

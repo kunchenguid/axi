@@ -24,6 +24,7 @@ const claudeResult = (opts: {
   cacheRead?: number;
   cacheCreation?: number;
   inferenceGeo?: string;
+  webSearchRequests?: number;
 }) =>
   JSON.stringify({
     type: "result",
@@ -39,6 +40,7 @@ const claudeResult = (opts: {
       cache_read_input_tokens: opts.cacheRead ?? 0,
       cache_creation_input_tokens: opts.cacheCreation ?? 0,
       inference_geo: opts.inferenceGeo,
+      server_tool_use: { web_search_requests: opts.webSearchRequests ?? 0 },
     },
   });
 
@@ -130,6 +132,7 @@ describe("parseClaudeJsonl", () => {
       outputTokens: 200,
       cacheRead: 400,
       inferenceGeo: "us",
+      webSearchRequests: 1,
     });
 
     const result = parseClaudeJsonl(raw, { model: "claude-sonnet-4-6" });
@@ -263,6 +266,25 @@ describe("parseClaudeJsonl", () => {
       expected,
       6,
     );
+  });
+
+  it("charges unique web search requests outside US token pricing", () => {
+    const event = {
+      type: "assistant",
+      message: {
+        id: "msg-1",
+        usage: {
+          input_tokens: 1_000_000,
+          inference_geo: "us",
+          server_tool_use: { web_search_requests: 1 },
+        },
+      },
+    };
+    const raw = [event, event].map((entry) => JSON.stringify(entry)).join("\n");
+
+    expect(
+      parseClaudeJsonl(raw, { model: "claude-sonnet-4-6" }).total_cost_usd,
+    ).toBeCloseTo(3.31, 6);
   });
 
   it.each([

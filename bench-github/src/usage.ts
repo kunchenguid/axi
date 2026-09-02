@@ -233,6 +233,10 @@ function parseClaudeUsage(usage: Record<string, unknown>) {
     cacheCreationDetails.ephemeral_5m_input_tokens ??
       cacheCreation - cacheCreation1h,
   );
+  const serverToolUse = (usage.server_tool_use ?? {}) as Record<
+    string,
+    unknown
+  >;
 
   return {
     inputTokens: baseInput + cacheCreation + cacheRead,
@@ -241,6 +245,7 @@ function parseClaudeUsage(usage: Record<string, unknown>) {
     inputTokensCacheCreation1h: cacheCreation1h,
     outputTokens: Number(usage.output_tokens ?? 0),
     inferenceGeo: typeof usage.inference_geo === "string" ? usage.inference_geo : "",
+    webSearchRequests: Number(serverToolUse.web_search_requests ?? 0),
   };
 }
 
@@ -273,6 +278,7 @@ export function parseClaudeJsonl(
   const assistantMessageIds = new Set<string>();
   let hasResultUsage = false;
   let inferenceGeo = "";
+  let webSearchRequests = 0;
 
   for (const line of lines) {
     let entry: Record<string, unknown>;
@@ -321,6 +327,7 @@ export function parseClaudeJsonl(
       inputTokensCacheCreation1h = usage.inputTokensCacheCreation1h;
       outputTokens = usage.outputTokens;
       inferenceGeo = usage.inferenceGeo;
+      webSearchRequests = usage.webSearchRequests;
       hasResultUsage = true;
     }
 
@@ -333,7 +340,7 @@ export function parseClaudeJsonl(
       );
       if (
         !hasResultUsage &&
-        usage.inputTokens + usage.outputTokens > 0 &&
+        usage.inputTokens + usage.outputTokens + usage.webSearchRequests > 0 &&
         (!messageId || !assistantMessageIds.has(messageId))
       ) {
         if (messageId) assistantMessageIds.add(messageId);
@@ -343,6 +350,7 @@ export function parseClaudeJsonl(
         inputTokensCacheCreation5m += usage.inputTokensCacheCreation5m;
         inputTokensCacheCreation1h += usage.inputTokensCacheCreation1h;
         if (usage.inferenceGeo === "us") inferenceGeo = "us";
+        webSearchRequests += usage.webSearchRequests;
       }
     }
   }
@@ -352,7 +360,10 @@ export function parseClaudeJsonl(
   // Use Claude's reported cost when available. When it is absent, compute from
   // tokens.
   let totalCost = reportedCost ?? 0;
-  if (reportedCost === undefined && inputTokens > 0) {
+  if (
+    reportedCost === undefined &&
+    (inputTokens > 0 || webSearchRequests > 0)
+  ) {
     const pricing = getClaudePricing(opts.model);
     const geoMultiplier =
       inferenceGeo === "us" && pricing.supportsUsInference ? 1.1 : 1;
@@ -366,7 +377,8 @@ export function parseClaudeJsonl(
         inputTokensCacheCreation1h * pricing.input * 2 +
         inputTokensCached * pricing.input_cached +
         outputTokens * pricing.output) *
-      geoMultiplier;
+        geoMultiplier +
+      webSearchRequests * 0.01;
   }
 
   return {

@@ -18,19 +18,30 @@ interface ModelPricing {
   output: number; // $/1M output tokens
 }
 
+const OPUS_4_1_PRICING = { input: 15.0, input_cached: 1.5, output: 75.0 };
+const OPUS_4_5_PRICING = { input: 5.0, input_cached: 0.5, output: 25.0 };
+const HAIKU_4_5_PRICING = { input: 1.0, input_cached: 0.1, output: 5.0 };
+
 const CLAUDE_PRICING_PER_1M: Record<string, ModelPricing> = {
   "claude-sonnet-4-6": { input: 3.0, input_cached: 0.3, output: 15.0 },
   "claude-sonnet-4-5-20250514": { input: 3.0, input_cached: 0.3, output: 15.0 },
   sonnet: { input: 3.0, input_cached: 0.3, output: 15.0 },
-  "claude-opus-4-6": { input: 15.0, input_cached: 1.5, output: 75.0 },
-  opus: { input: 15.0, input_cached: 1.5, output: 75.0 },
-  "claude-haiku-4-5-20251001": { input: 0.8, input_cached: 0.08, output: 4.0 },
-  haiku: { input: 0.8, input_cached: 0.08, output: 4.0 },
+  "claude-opus-4-1": OPUS_4_1_PRICING,
+  "claude-opus-4-5": OPUS_4_5_PRICING,
+  "claude-opus-4-6": OPUS_4_5_PRICING,
+  opus: OPUS_4_5_PRICING,
+  "claude-haiku-4-5-20251001": HAIKU_4_5_PRICING,
+  haiku: HAIKU_4_5_PRICING,
 };
 
-function getClaudePricing(model: string): ModelPricing | undefined {
-  const entry = CLAUDE_PRICING_PER_1M[model];
-  if (!entry) return undefined;
+function getClaudePricing(model?: string): ModelPricing {
+  const entry = model ? CLAUDE_PRICING_PER_1M[model] : undefined;
+  if (!entry) {
+    const description = model
+      ? `Claude model \"${model}\"`
+      : "a Claude model id";
+    throw new Error(`No pricing configured for ${description}`);
+  }
   return {
     input: entry.input / 1e6,
     input_cached: entry.input_cached / 1e6,
@@ -56,6 +67,7 @@ export function parseClaudeJsonl(
   let inputTokensCacheCreation = 0;
   let outputTokens = 0;
   let reportedCost = 0;
+  let resultSeen = false;
   let turnCount = 0;
   let commandCount = 0;
   let errorCount = 0;
@@ -117,6 +129,7 @@ export function parseClaudeJsonl(
 
     // Result event: contains aggregated usage and cost
     if (entry.type === "result") {
+      resultSeen = true;
       reportedCost = Number(entry.total_cost_usd ?? 0);
       turnCount = Number(entry.num_turns ?? 0);
 
@@ -155,16 +168,13 @@ export function parseClaudeJsonl(
   // Use Claude's reported cost when available. When the result event is missing
   // (agent crashed), compute from tokens.
   let totalCost = reportedCost;
-  if (!totalCost && inputTokens > 0) {
-    const pricing = opts.model ? getClaudePricing(opts.model) : undefined;
-    if (pricing) {
-      const baseInputTokens = inputTokensUncached - inputTokensCacheCreation;
-      totalCost =
-        baseInputTokens * pricing.input +
-        inputTokensCacheCreation * pricing.input * 1.25 +
-        inputTokensCached * pricing.input_cached +
-        outputTokens * pricing.output;
-    }
+  if (!resultSeen && inputTokens > 0) {
+    const pricing = getClaudePricing(opts.model);
+    totalCost =
+      (inputTokensUncached - inputTokensCacheCreation) * pricing.input +
+      inputTokensCacheCreation * pricing.input * 1.25 +
+      inputTokensCached * pricing.input_cached +
+      outputTokens * pricing.output;
   }
 
   return {

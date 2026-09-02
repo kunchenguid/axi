@@ -159,4 +159,18 @@ describe("parseClaudeJsonl", () => {
     const result = parseClaudeJsonl(raw, { model: "unknown-claude-model" });
     expect(result.total_cost_usd).toBe(0.05);
   });
+
+  it("uses point-release pricing or rejects an unpriced result-less run", () => {
+    const raw = JSON.stringify({
+      type: "assistant",
+      message: { usage: { input_tokens: 1_000_000, output_tokens: 1_000_000 } },
+    });
+
+    expect(
+      parseClaudeJsonl(raw, { model: "claude-opus-4-5" }).total_cost_usd,
+    ).toBeCloseTo(30);
+    expect(() => parseClaudeJsonl(raw, { model: "claude-fable-5" })).toThrow(
+      'No pricing configured for Claude model "claude-fable-5"',
+    );
+  });
 });

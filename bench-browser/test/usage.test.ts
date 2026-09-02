@@ -65,9 +65,7 @@ describe("parseClaudeJsonl", () => {
     expect(result.output_tokens).toBe(500);
     expect(result.command_count).toBe(1);
     expect(result.error_count).toBe(0);
-    expect(result.command_log).toEqual([
-      "agent-browser navigate https://example.com",
-    ]);
+    expect(result.command_log).toEqual(["agent-browser navigate https://example.com"]);
     expect(result.reasoning_tokens).toBe(0);
   });
 

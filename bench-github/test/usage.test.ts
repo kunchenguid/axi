@@ -140,6 +140,7 @@ const claudeResult = (opts: {
   outputTokens: number;
   cacheRead?: number;
   cacheCreation?: number;
+  inferenceGeo?: string;
 }) =>
   JSON.stringify({
     type: "result",
@@ -154,6 +155,7 @@ const claudeResult = (opts: {
       output_tokens: opts.outputTokens,
       cache_read_input_tokens: opts.cacheRead ?? 0,
       cache_creation_input_tokens: opts.cacheCreation ?? 0,
+      inference_geo: opts.inferenceGeo,
     },
   });
 
@@ -349,6 +351,39 @@ describe("parseClaudeJsonl", () => {
     );
   });
 
+  it.each([
+    ["claude-sonnet-4-6", 30.855],
+    ["claude-opus-4-6", 51.425],
+    ["claude-opus-4-7", 51.425],
+    ["claude-opus-4-8", 51.425],
+    ["claude-sonnet-4-5-20250929", 28.05],
+    ["claude-opus-4-5", 46.75],
+    ["claude-opus-4-1", 140.25],
+    ["claude-haiku-4-5-20251001", 9.35],
+  ])("prices US inference for %s", (model, expected) => {
+    const raw = JSON.stringify({
+      type: "assistant",
+      message: {
+        usage: {
+          input_tokens: 1_000_000,
+          cache_creation_input_tokens: 2_000_000,
+          cache_creation: {
+            ephemeral_5m_input_tokens: 1_000_000,
+            ephemeral_1h_input_tokens: 1_000_000,
+          },
+          cache_read_input_tokens: 1_000_000,
+          output_tokens: 1_000_000,
+          inference_geo: "us",
+        },
+      },
+    });
+
+    expect(parseClaudeJsonl(raw, { model }).total_cost_usd).toBeCloseTo(
+      expected,
+      6,
+    );
+  });
+
   it("prices cache creation by duration", () => {
     const raw = JSON.stringify({
       type: "assistant",
@@ -382,9 +417,10 @@ describe("parseClaudeJsonl", () => {
       inputTokens: 1000,
       outputTokens: 200,
       cacheRead: 400,
+      inferenceGeo: "us",
     });
 
-    const result = parseClaudeJsonl(raw, { model: "haiku" });
+    const result = parseClaudeJsonl(raw, { model: "claude-sonnet-4-6" });
 
     // Claude always uses reported cost (accounts for cache creation pricing)
     expect(result.total_cost_usd).toBe(0.05);

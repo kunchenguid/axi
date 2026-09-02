@@ -16,6 +16,7 @@ interface ModelPricing {
   input: number; // $/1M uncached input tokens
   input_cached: number; // $/1M cached input tokens
   output: number; // $/1M output tokens
+  supportsUsInference?: boolean;
 }
 
 const OPUS_4_1_PRICING = { input: 15.0, input_cached: 1.5, output: 75.0 };
@@ -23,7 +24,12 @@ const OPUS_4_5_PRICING = { input: 5.0, input_cached: 0.5, output: 25.0 };
 const HAIKU_4_5_PRICING = { input: 1.0, input_cached: 0.1, output: 5.0 };
 
 const CLAUDE_PRICING_PER_1M: Record<string, ModelPricing> = {
-  "claude-sonnet-4-6": { input: 3.0, input_cached: 0.3, output: 15.0 },
+  "claude-sonnet-4-6": {
+    input: 3.0,
+    input_cached: 0.3,
+    output: 15.0,
+    supportsUsInference: true,
+  },
   "claude-sonnet-4-5-20250514": { input: 3.0, input_cached: 0.3, output: 15.0 },
   "claude-sonnet-4-5-20250929": { input: 3.0, input_cached: 0.3, output: 15.0 },
   sonnet: { input: 3.0, input_cached: 0.3, output: 15.0 },
@@ -31,9 +37,9 @@ const CLAUDE_PRICING_PER_1M: Record<string, ModelPricing> = {
   "claude-opus-4-1-20250805": OPUS_4_1_PRICING,
   "claude-opus-4-5": OPUS_4_5_PRICING,
   "claude-opus-4-5-20251101": OPUS_4_5_PRICING,
-  "claude-opus-4-6": OPUS_4_5_PRICING,
-  "claude-opus-4-7": OPUS_4_5_PRICING,
-  "claude-opus-4-8": OPUS_4_5_PRICING,
+  "claude-opus-4-6": { ...OPUS_4_5_PRICING, supportsUsInference: true },
+  "claude-opus-4-7": { ...OPUS_4_5_PRICING, supportsUsInference: true },
+  "claude-opus-4-8": { ...OPUS_4_5_PRICING, supportsUsInference: true },
   "claude-haiku-4-5-20251001": HAIKU_4_5_PRICING,
 };
 
@@ -49,6 +55,7 @@ function getClaudePricing(model: string | undefined): ModelPricing {
     input: entry.input / 1e6,
     input_cached: entry.input_cached / 1e6,
     output: entry.output / 1e6,
+    supportsUsInference: entry.supportsUsInference,
   };
 }
 
@@ -74,6 +81,7 @@ function parseClaudeUsage(usage: Record<string, unknown>) {
     inputTokensCacheCreation5m: cacheCreation5m,
     inputTokensCacheCreation1h: cacheCreation1h,
     outputTokens: Number(usage.output_tokens ?? 0),
+    inferenceGeo: typeof usage.inference_geo === "string" ? usage.inference_geo : "",
   };
 }
 
@@ -104,6 +112,7 @@ export function parseClaudeJsonl(
   const commandLog: string[] = [];
   const assistantMessageIds = new Set<string>();
   let hasResultUsage = false;
+  let inferenceGeo = "";
 
   for (const line of lines) {
     let entry: Record<string, unknown>;
@@ -178,6 +187,7 @@ export function parseClaudeJsonl(
       inputTokensCacheCreation5m = usage.inputTokensCacheCreation5m;
       inputTokensCacheCreation1h = usage.inputTokensCacheCreation1h;
       outputTokens = usage.outputTokens;
+      inferenceGeo = usage.inferenceGeo;
       hasResultUsage = true;
     }
 
@@ -199,6 +209,7 @@ export function parseClaudeJsonl(
         inputTokensCached += usage.inputTokensCached;
         inputTokensCacheCreation5m += usage.inputTokensCacheCreation5m;
         inputTokensCacheCreation1h += usage.inputTokensCacheCreation1h;
+        if (usage.inferenceGeo === "us") inferenceGeo = "us";
       }
     }
   }
@@ -210,15 +221,18 @@ export function parseClaudeJsonl(
   let totalCost = reportedCost;
   if (!hasReportedCost && inputTokens > 0) {
     const pricing = getClaudePricing(opts.model);
+    const geoMultiplier =
+      inferenceGeo === "us" && pricing.supportsUsInference ? 1.1 : 1;
     totalCost =
-      (inputTokensUncached -
+      ((inputTokensUncached -
         inputTokensCacheCreation5m -
         inputTokensCacheCreation1h) *
         pricing.input +
-      inputTokensCacheCreation5m * pricing.input * 1.25 +
-      inputTokensCacheCreation1h * pricing.input * 2 +
-      inputTokensCached * pricing.input_cached +
-      outputTokens * pricing.output;
+        inputTokensCacheCreation5m * pricing.input * 1.25 +
+        inputTokensCacheCreation1h * pricing.input * 2 +
+        inputTokensCached * pricing.input_cached +
+        outputTokens * pricing.output) *
+      geoMultiplier;
   }
 
   return {

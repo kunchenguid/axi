@@ -381,3 +381,18 @@ community:
         - "src/output/errors.ts maps UsageError to exit 2 and AxiError to exit 1 on the documented 0/1/2 taxonomy; src/cli/args.ts throws UsageError on unknown flags with the valid flag set for that command; src/index.ts registers only allCommands from porkbun.ts."
         - "src/api.ts reads PORKBUN_API_KEY and PORKBUN_SECRET_KEY from the environment into X-API-Key / X-Secret-API-Key headers (never the request body) and attaches a fresh Idempotency-Key UUID on idempotent writes; src/commands/porkbun.ts ssl retrieve prints PEM component sizes by default and only emits the certificate material with --json."
       exception: "`dns create`, `forwarding create`, and `glue create` in src/commands/porkbun.ts print a change line then POST the mutation; they do not take --confirm or call gate()."
+  - name: wrangler-axi
+    url: https://github.com/masculinecache/wrangler-axi
+    author: masculinecache
+    domain: Cloudflare Wrangler
+    description: "Deploy Workers and Pages, manage KV namespaces, D1 databases, R2 buckets, and Worker secrets, and tail live logs with hard bounds - wraps the official Wrangler CLI with predictable TOON lists and structured errors."
+  - name: chezmoi-axi
+    url: https://github.com/masculinecache/chezmoi-axi
+    author: masculinecache
+    domain: Dotfiles
+    description: "List, diff, add, re-add, apply, verify, and sync chezmoi-managed dotfiles with compact TOON output - template-aware re-add verdicts, preview dry-runs, and idempotent operations."
+  - name: mem-axi
+    url: https://github.com/masculinecache/axi-memory
+    author: masculinecache
+    domain: Agent memory
+    description: "Durable cross-session agent memory as markdown + YAML frontmatter in a git repo - typed memories, priority-ranked search with L0 abstracts, OS-side dedup, and cross-machine sync."

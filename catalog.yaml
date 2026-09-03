@@ -386,13 +386,49 @@ community:
     author: masculinecache
     domain: Cloudflare Wrangler
     description: "Deploy Workers and Pages, manage KV namespaces, D1 databases, R2 buckets, and Worker secrets, and tail live logs with hard bounds - wraps the official Wrangler CLI with predictable TOON lists and structured errors."
+    admission:
+      status: exception
+      reviewed_revision: 67ff6c45e12f4bb71e42ee8b71d586480c0861be
+      reviewed_components:
+        - src/cli.ts
+        - src/commands/workers.ts
+        - src/args.ts
+        - src/util.ts
+        - src/wrangler.ts
+        - src/errors.ts
+        - bin/wrangler-axi.ts
+      source_observations:
+        - "src/cli.ts registers whoami, workers, secrets, kv, d1, r2, and pages areas and returns structured output plus exit codes without calling process.exit; src/commands/workers.ts bounds tail streams by --max-entries or --timeout and renders compact event summaries."
+        - "src/args.ts and src/util.ts validate flags and convert unknown areas, subcommands, and flags into AxiError VALIDATION_ERROR responses with corrective suggestions; src/wrangler.ts maps non-zero Wrangler results into structured errors and reports a missing Wrangler dependency explicitly."
+      exception: "Mutating commands do not provide an AXI-level --confirm gate; delete and similar operations only forward Wrangler's --force behavior as -f or -y."
   - name: chezmoi-axi
     url: https://github.com/masculinecache/chezmoi-axi
     author: masculinecache
     domain: Dotfiles
     description: "List, diff, add, re-add, apply, verify, and sync chezmoi-managed dotfiles with compact TOON output - template-aware re-add verdicts, preview dry-runs, and idempotent operations."
+    admission:
+      status: exception
+      reviewed_revision: ba1c969e1c92471c2fdfc82a6bfad70361fcf2d1
+      reviewed_components:
+        - chezmoi-axi
+      source_observations:
+        - "chezmoi-axi implements status, list, diff, add, re-add, apply, verify, sync, and commit as a single shell entrypoint with compact structured output, command-specific help, and exit 0/1/2 handling for success, runtime errors, and usage errors."
+        - "re-add uses chezmoi's verbose dry-run to distinguish changed, template-managed, and in-sync files; list caps output at 50 rows with --full, and sync adds branch protection, bounded log rotation, and a preview mode for headless operation."
+      exception: "apply and sync mutate the chezmoi state without an AXI-level --confirm gate; --preview provides a dry-run escape hatch."
   - name: mem-axi
     url: https://github.com/masculinecache/axi-memory
     author: masculinecache
     domain: Agent memory
     description: "Durable cross-session agent memory as markdown + YAML frontmatter in a git repo - typed memories, priority-ranked search with L0 abstracts, OS-side dedup, and cross-machine sync."
+    admission:
+      status: admitted
+      reviewed_revision: f6fd3d37079540efb168a189b7a81573b472fb31
+      reviewed_components:
+        - mem
+        - docs/design.md
+        - docs/integration.md
+        - docs/harnesses.md
+      source_observations:
+        - "mem stores typed markdown memories with YAML frontmatter under objects/<type>, supports init, add, update, merge, dedup, search, show, list, review, status, sync, and stats, and emits compact structured output with explicit empty states and exit 0/1/2 errors."
+        - "mem add refuses credential-like title or body content unless --force is supplied, while dedup is dry-run by default and search/list rank results by priority and freshness with --limit and --min-priority controls; sync bounds pull and push operations with a 30-second timeout."
+

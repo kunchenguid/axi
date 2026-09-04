@@ -201,3 +201,41 @@ test("community catalog lands fal-axi as documented admission exception", () => 
   assert.match(html, /Image \/ Video Generation/);
   assert.match(html, /--confirm gates on paid generates/);
 });
+
+test("community catalog lands canva-axi as documented admission exception", () => {
+  const catalog = parse(readFileSync(join(root, "catalog.yaml"), "utf8"));
+  const canva = catalog.community.find((entry) => entry.name === "canva-axi");
+  assert.ok(canva, "canva-axi must be present in catalog.community");
+  assert.equal(canva.author, "ardaatahan");
+  assert.equal(canva.domain, "Design / Canva");
+  assert.equal(canva.url, "https://github.com/ardaatahan/canva-axi");
+
+  assert.equal(canva.admission.status, "exception");
+  assert.equal(
+    canva.admission.reviewed_revision,
+    "2ed9911e00172c735814d871c139346bd505f37a",
+  );
+  assert.ok(
+    canva.admission.reviewed_components.includes("src/commands/home.ts"),
+    "reviewed_components must include home.ts for version probing",
+  );
+  assert.ok(
+    typeof canva.admission.exception === "string" &&
+      canva.admission.exception.length > 0,
+    "admission.exception must be present",
+  );
+
+  const markdown = mdCatalogTable([canva], true);
+  assert.match(
+    markdown,
+    /\[`canva-axi`\]\(https:\/\/github\.com\/ardaatahan\/canva-axi\)/,
+  );
+  assert.match(markdown, /Design \/ Canva/);
+  assert.match(markdown, /--confirm gates on mutating writes/);
+
+  const html = htmlCatalogRows([canva], true);
+  assert.match(html, /href="https:\/\/github\.com\/ardaatahan\/canva-axi"/);
+  assert.match(html, /<code>canva-axi<\/code>/);
+  assert.match(html, /Design \/ Canva/);
+  assert.match(html, /--confirm gates on mutating writes/);
+});

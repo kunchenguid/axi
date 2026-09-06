@@ -475,3 +475,8 @@ community:
         - "src/api/client.ts reads CANVA_ACCESS_TOKEN from the environment only via requireAccessToken(), enforces HTTPS-only BASE_CANVA_CONNECT_API_URL (default https://api.canva.com/rest), validates IDs before requests, and rejects non-HTTPS download URLs/redirects."
         - "src/output/errors.ts maps UsageError to exit 1 and RuntimeError to exit 2; src/cli/args.ts supports a `--` end-of-options terminator and rejects short flags; src/index.ts registers only allCommands from canva.ts plus home help."
       exception: "src/output/errors.ts maps UsageError to exit 1 and RuntimeError to exit 2, inverting AXI principle 6 (1=runtime, 2=usage); version probing only accepts `--version` via src/commands/home.ts and prints `canva-axi: <version>`, while `-v`/`-V` are rejected by short-flag handling in src/cli/args.ts instead of printing the bare version and exiting 0 (AXI principle 10)."
+  - name: ha-axi
+    url: https://github.com/batamire/ha-axi
+    author: batamire
+    domain: Home Assistant
+    description: "Inspect entities, call services behind safety gates, render templates, and read area/device registries over Home Assistant REST and WebSocket with token-efficient TOON output."

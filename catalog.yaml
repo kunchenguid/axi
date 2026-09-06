@@ -105,7 +105,7 @@ community:
     url: https://github.com/batamire/doctl-axi
     author: batamire
     domain: DigitalOcean
-    description: "Agent-ergonomic CLI for DigitalOcean — one AXI wrapping doctl → TOON, replacing 21 MCPs."
+    description: "Manage Droplets, Kubernetes, App Platform, databases, networking, and Spaces via doctl with token-efficient TOON output."
   - name: dynamodb-axi
     url: https://github.com/thatdudealso/dynamodb-axi
     author: thatdudealso

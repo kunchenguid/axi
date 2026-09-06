@@ -480,3 +480,21 @@ community:
     author: batamire
     domain: Home Assistant
     description: "Inspect entities, call services behind safety gates, render templates, and read area/device registries over Home Assistant REST and WebSocket with token-efficient TOON output."
+    admission:
+      status: exception
+      reviewed_revision: cad5c4532db19f9d6a2187082f136e2daccfa467
+      reviewed_components:
+        - src/cli.ts
+        - src/ha.ts
+        - src/service.ts
+        - src/safety.ts
+        - src/config.ts
+        - src/ws.ts
+        - src/bridge.ts
+        - src/bin/ha-axi.ts
+      source_observations:
+        - "src/cli.ts registers ping, entity, service, template, history, logbook, area, device, statistics, and setup through runAxiCli, and its formatError maps AxiError VALIDATION_ERROR/AUTH_MISSING to exit 2 and every other failure to exit 1 while emitting a structured TOON error object with corrective suggestions."
+        - "src/service.ts serviceCall refuses the gated domains from src/safety.ts (lock, alarm_control_panel, cover) before any network activity with no override, refuses bulk or non-concrete targets (--all, area, device, entity_id 'all', or no explicit target) unless --i-mean-all is passed, and --dry-run prints the exact request without sending anything."
+        - "src/ha.ts sends the token only via the Authorization header, retries GET requests once on 5xx while never retrying POST mutations, applies a 5s connect timeout plus a configurable request timeout, and scrub()s the token out of every error message; src/config.ts resolves flags > HASS_URL/HASS_TOKEN env > config profiles and warns when the profile file is group/world-readable."
+        - "src/ws.ts runs a stateless one-shot WebSocket bridge (connect, auth hello, one id-correlated request/response, close, hard deadline) requiring Node >=22's native WebSocket, used by src/bridge.ts for area/device registry and statistics reads; all output is TOON-encoded via @toon-format/toon."
+      exception: "`service call` performs mutations without an AXI-level --confirm flag; safety relies on hard-refused gated domains, bulk-target refusals with the explicit --i-mean-all override, and --dry-run, and a profile with `insecure = true` disables TLS verification with a stderr warning."

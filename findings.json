@@ -1,0 +1,4 @@
+{
+  "findings": [],
+  "summary": "Added bws-axi to community catalog across README.md, catalog.yaml, and docs/index.html; all generated docs in sync, lint and format checks pass."
+}

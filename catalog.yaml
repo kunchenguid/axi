@@ -480,6 +480,19 @@ community:
     author: masculinecache
     domain: Bitwarden Secrets Manager
     description: "Agent-ergonomic Bitwarden Secrets Manager CLI - TOON output, values redacted by default, project/key scoped listings."
+    admission:
+      status: exception
+      reviewed_revision: e3a122cf5e24790e93279760e3f32a2d552beb0b
+      reviewed_components:
+        - bin/bws-axi
+        - bin/common.mjs
+        - skill/SKILL.md
+        - package.json
+      source_observations:
+        - "Read-only Bitwarden Secrets Manager CLI: list projects/secrets, key-scoped listings; values redacted unless `--full` is passed; token goes via BWS_ACCESS_TOKEN env or BWS_TOKEN_FILE (never argv)."
+        - "Exit codes mapped correctly (0 success, 2 usage, 1 runtime), output is TOON-ish with values redacted by default."
+        - "Reviewed against the published npm tarball @masculinecache/bws-axi@1.0.1 (gitHead e3a122cf…, sha256 e8cbfab67f826a0cf3a6e977bffe248b931072d64fc200d9e255e326a3a4266)."
+      exception: "Missing `-v`/`-V` fast path — `--version` probing only via AXI principle 10: the CLI rejects the short hand and prints an error, no bare `bws-axi <version>` probing."
   - name: ha-axi
     url: https://github.com/batamire/ha-axi
     author: batamire

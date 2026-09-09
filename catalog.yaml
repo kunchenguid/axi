@@ -498,3 +498,8 @@ community:
         - "src/ha.ts sends the token only via the Authorization header, retries GET requests once on 5xx while never retrying POST mutations, applies a 5s connect timeout plus a configurable request timeout, and scrub()s the token out of every error message; src/config.ts resolves flags > HASS_URL/HASS_TOKEN env > config profiles and warns when the profile file is group/world-readable."
         - "src/ws.ts runs a stateless one-shot WebSocket bridge (connect, auth hello, one id-correlated request/response, close, hard deadline) requiring Node >=22's native WebSocket, used by src/bridge.ts for area/device registry and statistics reads; all output is TOON-encoded via @toon-format/toon."
       exception: "`service call` performs mutations without an AXI-level --confirm flag; safety relies on hard-refused gated domains, bulk-target refusals with the explicit --i-mean-all override, and --dry-run, and a profile with `insecure = true` disables TLS verification with a stderr warning."
+  - name: calcom-axi
+    url: https://github.com/simkimsia/calcom-axi
+    author: simkimsia
+    domain: Scheduling
+    description: "Read your Cal.com agenda, bookings and one booking's attendees and meeting link, event types, availability schedules, free slots for an event type, and the logged-in account. Wraps the Cal.com CLI (calcom) with agent-ergonomic TOON output and structured errors."

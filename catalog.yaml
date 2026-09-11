@@ -503,3 +503,8 @@ community:
     author: simkimsia
     domain: Scheduling
     description: "Read your Cal.com agenda, bookings and one booking's attendees and meeting link, event types, availability schedules, free slots for an event type, and the logged-in account. Wraps the Cal.com CLI (calcom) with agent-ergonomic TOON output and structured errors."
+  - name: screencast-axi
+    url: https://github.com/Valzon/screencast-axi
+    author: Valzon
+    domain: Screencasts
+    description: "Scaffold, rehearse, and record scripted Playwright walkthroughs of any website into mp4, webm, and a poster with a synthetic cursor and burnt-in captions - TOON output, structured errors, and a content-first status view via axi-sdk-js. Requires ffmpeg."

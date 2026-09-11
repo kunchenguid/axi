@@ -530,4 +530,23 @@ community:
     url: https://github.com/calebl/basecamp-axi
     author: calebl
     domain: Project management
-    description: "Projects, to-dos, cards, messages, comments, Campfire chat, people, search, and cross-project assignment reports. Wraps the official `basecamp` CLI with TOON output, pre-computed totals, idempotent mutations, and a `--confirm` gate on trash/archive."
+    description: "Projects, to-dos, cards, messages, comments, Campfire chat, people, search, and cross-project assignment reports. Wraps the official `basecamp` CLI with TOON output, pre-computed totals, idempotent mutations, and a `--confirm` gate on trash/archive/restore."
+    admission:
+      status: admitted
+      reviewed_revision: ef8d0ea4b549d3441cbd0286a7d7ae638d58c8a9
+      reviewed_components:
+        - bin/basecamp-axi.ts
+        - src/cli.ts
+        - src/basecamp.ts
+        - src/errors.ts
+        - src/args.ts
+        - src/toon.ts
+        - src/commands/home.ts
+        - src/commands/todo.ts
+        - src/commands/report.ts
+        - src/commands/recording.ts
+      source_observations:
+        - "bin/basecamp-axi.ts answers -v/--version through axi-sdk-js/fast-path before importing the command graph; src/cli.ts registers project, todo, todolist, card, message, comment, chat, people, search, report, recording, url, and setup through runAxiCli with per-command help text, and its formatError renders every failure as a TOON `error`/`code`/`help` block with the exit code from exitCodeForError."
+        - "src/basecamp.ts shells out to `basecamp <args> --json --no-hints --no-stats`, parses the JSON envelope, and src/errors.ts maps envelope codes and exit codes to AxiError codes (VALIDATION_ERROR, DEPENDENCY_MISSING, DEPENDENCY_OUTDATED, TOOL_DISABLED, NOT_FOUND, AUTH_REQUIRED, FORBIDDEN, RATE_LIMITED, NETWORK_ERROR, AMBIGUOUS, API_ERROR) with a corrective suggestion each; src/args.ts rejects unknown flags and extra positionals as VALIDATION_ERROR."
+        - "src/toon.ts encodes lists and details with @toon-format/toon, and countLine prints `count: N of T total` from the totals parsed in src/basecamp.ts; src/commands/home.ts is a content-first dashboard of assigned items with an overdue count and next-step help lines, degrading to a structured unavailable message when the CLI is missing or unauthenticated."
+        - "src/commands/todo.ts `done`/`reopen` read current state first and report `already done (no-op)` instead of re-mutating; src/commands/recording.ts gates trash, archive, and restore behind --confirm, printing a `would_change` preview with from/to status and the exact command to apply when the flag is absent, skipping items already in the target status, and emitting an undo hint after applying. No other command deletes or destroys data."

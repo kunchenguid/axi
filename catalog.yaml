@@ -526,3 +526,8 @@ community:
     author: Valzon
     domain: Screencasts
     description: "Scaffold, rehearse, and record scripted Playwright walkthroughs of any website into mp4, webm, and a poster with a synthetic cursor and burnt-in captions - TOON output, structured errors, and a content-first status view via axi-sdk-js. Requires ffmpeg."
+  - name: basecamp-axi
+    url: https://github.com/calebl/basecamp-axi
+    author: calebl
+    domain: Project management
+    description: "Projects, to-dos, cards, messages, comments, Campfire chat, people, search, and cross-project assignment reports. Wraps the official `basecamp` CLI with TOON output, pre-computed totals, idempotent mutations, and a `--confirm` gate on trash/archive."

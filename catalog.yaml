@@ -550,3 +550,27 @@ community:
         - "src/basecamp.ts shells out to `basecamp <args> --json --no-hints --no-stats`, parses the JSON envelope, and src/errors.ts maps envelope codes and exit codes to AxiError codes (VALIDATION_ERROR, DEPENDENCY_MISSING, DEPENDENCY_OUTDATED, TOOL_DISABLED, NOT_FOUND, AUTH_REQUIRED, FORBIDDEN, RATE_LIMITED, NETWORK_ERROR, AMBIGUOUS, API_ERROR) with a corrective suggestion each; src/args.ts rejects unknown flags and extra positionals as VALIDATION_ERROR."
         - "src/toon.ts encodes lists and details with @toon-format/toon, and countLine prints `count: N of T total` from the totals parsed in src/basecamp.ts; src/commands/home.ts is a content-first dashboard of assigned items with an overdue count and next-step help lines, degrading to a structured unavailable message when the CLI is missing or unauthenticated."
         - "src/commands/todo.ts `done`/`reopen` read current state first and report `already done (no-op)` instead of re-mutating; src/commands/recording.ts gates trash, archive, and restore behind --confirm, printing a `would_change` preview with from/to status and the exact command to apply when the flag is absent, skipping items already in the target status, and emitting an undo hint after applying. No other command deletes or destroys data."
+  - name: msgraph-axi
+    url: https://github.com/jeffreyhaen/msgraph-axi
+    author: jeffreyhaen
+    domain: Microsoft 365 / Outlook
+    description: "Read, search, draft, and send Outlook mail and manage calendars over the `m365` CLI - read-only by default, with TOON output and mutations behind `--execute`/`--confirm`."
+    admission:
+      status: admitted
+      reviewed_revision: cd31b17b1f2594b5a77f1738ec0f359eb5fb1555
+      reviewed_components:
+        - src/bin/msgraph-axi.ts
+        - src/main.ts
+        - src/toon.ts
+        - src/flags.ts
+        - src/backend.ts
+        - src/commands/home.ts
+        - src/commands/mail.ts
+        - src/commands/calendar.ts
+        - src/commands/mailflow.ts
+        - src/commands/raw.ts
+      source_observations:
+        - "src/bin/msgraph-axi.ts answers -v/--version and --help through axi-sdk-js/fast-path before importing the command graph, and src/main.ts registers auth, mail, calendar, user, and raw through runAxiCli with per-command help plus a `home` handler, so a bare run renders the content-first view instead of help text."
+        - "src/toon.ts caps cells at CELL_LIMIT = 200 with an ellipsis unless --full is passed, and each list command declares a token-efficient default schema (MAIL_LIST_DEFAULTS = id/from/subject/received, EVENT_DEFAULTS = id/subject/start/end) that `--fields a,b` extends; list results carry a `count` aggregate, a `truncated` marker, and `help[]` next-step lines, while src/commands/home.ts degrades to a signedIn: false object with sign-in help instead of throwing when unauthenticated."
+        - "src/flags.ts collects unknown --flags and raises VALIDATION_ERROR naming the subcommand's valid flags (observed at this revision: `mail list --bogus` prints a TOON error/code/help block and exits 2, and an unknown command exits 2); src/backend.ts spawns `m365` with stdin ignored so no agent-driven path can block on a prompt, and the single stdio: inherit call is the explicit `auth login` device-code flow."
+        - "Writes are gated consistently: src/commands/mail.ts `mail send`, src/commands/calendar.ts `calendar create`/`update`, and src/commands/mailflow.ts `mail draft` return a preview with `Run with --execute ...` help and never call `m365` without --execute; `mail delete`, `calendar cancel`, and `calendar delete` require an exact-match `--execute --confirm <id>`; src/commands/raw.ts applies the same --execute rule to raw POST/PUT/PATCH/DELETE."

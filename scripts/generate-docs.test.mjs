@@ -239,3 +239,39 @@ test("community catalog lands canva-axi as documented admission exception", () =
   assert.match(html, /Design \/ Canva/);
   assert.match(html, /--confirm gates on mutating writes/);
 });
+
+test("community catalog lands frontier-axi as documented admission exception", () => {
+  const catalog = parse(readFileSync(join(root, "catalog.yaml"), "utf8"));
+  const frontier = catalog.community.find((entry) => entry.name === "frontier-axi");
+  assert.ok(frontier, "frontier-axi must be present in catalog.community");
+  assert.equal(frontier.author, "oguzalp7");
+  assert.equal(frontier.domain, "Pre-flight SDLC & Cognitive Bridge");
+  assert.equal(frontier.url, "https://github.com/oguzalp7/frontier-axi");
+
+  assert.equal(frontier.admission.status, "exception");
+  assert.equal(
+    frontier.admission.reviewed_revision,
+    "6e17b3ec0895843c396c9c4c72e22252be99beb4",
+  );
+  assert.ok(
+    frontier.admission.reviewed_components.includes("bin/frontier-axi.ts"),
+    "reviewed_components must include bin/frontier-axi.ts",
+  );
+  assert.ok(
+    typeof frontier.admission.exception === "string" &&
+      frontier.admission.exception.length > 0,
+    "admission.exception must be present",
+  );
+
+  const markdown = mdCatalogTable([frontier], true);
+  assert.match(
+    markdown,
+    /\[`frontier-axi`\]\(https:\/\/github\.com\/oguzalp7\/frontier-axi\)/,
+  );
+  assert.match(markdown, /Pre-flight SDLC & Cognitive Bridge/);
+
+  const html = htmlCatalogRows([frontier], true);
+  assert.match(html, /href="https:\/\/github\.com\/oguzalp7\/frontier-axi"/);
+  assert.match(html, /<code>frontier-axi<\/code>/);
+  assert.match(html, /Pre-flight SDLC &amp; Cognitive Bridge/);
+});

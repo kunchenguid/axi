@@ -527,9 +527,9 @@ describe("runUpdate", () => {
   });
 
   it("runs the detected install method and reports old -> new", async () => {
-    const runInstall = vi.fn(
-      async (): Promise<InstallResult> => ({ ok: true }),
-    );
+    const runInstall = vi.fn(async (): Promise<InstallResult> => ({
+      ok: true,
+    }));
     const output = await runUpdate({
       ...baseDeps,
       args: [],
@@ -678,9 +678,9 @@ describe("runUpdate", () => {
   });
 
   it("reports the re-resolved Homebrew version after upgrade", async () => {
-    const runInstall = vi.fn(
-      async (): Promise<InstallResult> => ({ ok: true }),
-    );
+    const runInstall = vi.fn(async (): Promise<InstallResult> => ({
+      ok: true,
+    }));
     const realpath = vi
       .fn()
       .mockReturnValueOnce(

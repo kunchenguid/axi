@@ -574,3 +574,23 @@ community:
         - "src/toon.ts caps cells at CELL_LIMIT = 200 with an ellipsis unless --full is passed, and each list command declares a token-efficient default schema (MAIL_LIST_DEFAULTS = id/from/subject/received, EVENT_DEFAULTS = id/subject/start/end) that `--fields a,b` extends; list results carry a `count` aggregate, a `truncated` marker, and `help[]` next-step lines, while src/commands/home.ts degrades to a signedIn: false object with sign-in help instead of throwing when unauthenticated."
         - "src/flags.ts collects unknown --flags and raises VALIDATION_ERROR naming the subcommand's valid flags (observed at this revision: `mail list --bogus` prints a TOON error/code/help block and exits 2, and an unknown command exits 2); src/backend.ts spawns `m365` with stdin ignored so no agent-driven path can block on a prompt, and the single stdio: inherit call is the explicit `auth login` device-code flow."
         - "Writes are gated consistently: src/commands/mail.ts `mail send`, src/commands/calendar.ts `calendar create`/`update`, and src/commands/mailflow.ts `mail draft` return a preview with `Run with --execute ...` help and never call `m365` without --execute; `mail delete`, `calendar cancel`, and `calendar delete` require an exact-match `--execute --confirm <id>`; src/commands/raw.ts applies the same --execute rule to raw POST/PUT/PATCH/DELETE."
+  - name: frontier-axi
+    url: https://github.com/oguzalp7/frontier-axi
+    author: oguzalp7
+    domain: Pre-flight SDLC & Cognitive Bridge
+    description: "Stage ambiguous ideas and architectural inquiries until grilling settles them into tasks-axi tickets with token-efficient TOON output."
+    admission:
+      status: admitted
+      reviewed_revision: 6e17b3ec0895843c396c9c4c72e22252be99beb4
+      reviewed_components:
+        - bin/frontier-axi.ts
+        - src/cli.ts
+        - src/storage.ts
+        - src/toon.ts
+        - src/commands/home.ts
+        - src/commands/crud.ts
+        - src/commands/promote.ts
+      source_observations:
+        - "bin/frontier-axi.ts answers -v/--version and --help through axi-sdk-js/fast-path before importing the command graph; src/cli.ts registers add, list, show, update, question, done, cancel, reopen, and promote through runAxiCli with per-command help plus a content-first dashboard home handler."
+        - "src/toon.ts formats line-based TOON output using @toon-format/toon with progressive disclosure (--full) capping text at 80 characters by default, while renderDashboard provides an interactive active frontiers and open questions summary."
+        - "src/storage.ts maintains dual-view SSOT deterministically in .frontier.toml and live tables in frontier.md; src/commands/promote.ts blocks promotion if unresolved questions remain unless --force is specified, synthesizing What to build and Acceptance Criteria directly into tasks-axi add."

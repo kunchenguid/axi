@@ -580,7 +580,7 @@ community:
     domain: Pre-flight SDLC & Cognitive Bridge
     description: "Stage ambiguous ideas and architectural inquiries until grilling settles them into tasks-axi tickets with token-efficient TOON output."
     admission:
-      status: inconclusive
+      status: exception
       reviewed_revision: 6e17b3ec0895843c396c9c4c72e22252be99beb4
       reviewed_components:
         - bin/frontier-axi.ts
@@ -598,4 +598,4 @@ community:
         - "bin/frontier-axi.ts answers bare -v/-V/--version through axi-sdk-js/fast-path with leaf src/version.ts before dynamically importing the command graph; src/cli.ts registers add/list/show/update/question/promote/done/cancel/reopen via runAxiCli with content-first home."
         - "src/toon.ts encodes dashboard/list/show with @toon-format/toon; home summary carries active_frontiers/open_questions plus help[]; show accepts --full while truncate() caps body/reason/question text at 80 chars."
         - "src/args.ts requireNoUnknownFlags raises VALIDATION_ERROR on command paths; errors use axi-sdk-js exitCodeForError (VALIDATION_ERROR→2, else→1); add/done/cancel/reopen/promote are idempotent already-no-ops; promote blocks open questions unless --force and spawns tasks-axi via spawnSync argv (not shell)."
-      inconclusive_reason: "src/toon.ts truncate()/renderShow truncates body/reason/question text to 80 chars with '...' only — no total-size hint and no --full help line when truncated (AXI principle 3); src/toon.ts renderActiveList empty path emits encode({ active: [] }) without definitive zero-results text (AXI principle 5)."
+      exception: "src/toon.ts truncate()/renderShow truncates body/reason/question text to 80 chars with '...' only — no total-size hint and no --full help line when truncated (AXI principle 3); src/toon.ts renderActiveList empty path emits encode({ active: [] }) without definitive zero-results text (AXI principle 5)."

@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.12](https://github.com/kunchenguid/axi/compare/axi-sdk-js-v0.1.11...axi-sdk-js-v0.1.12) (2026-09-16)
+
+
+### Bug Fixes
+
+* **axi-sdk-js:** handle stdout EPIPE gracefully ([#199](https://github.com/kunchenguid/axi/issues/199)) ([b0a73b2](https://github.com/kunchenguid/axi/commit/b0a73b2657a341a96a276718fff6d2763b787a5a))
+
 ## [0.1.11](https://github.com/kunchenguid/axi/compare/axi-sdk-js-v0.1.10...axi-sdk-js-v0.1.11) (2026-08-19)
 
 

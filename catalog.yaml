@@ -729,6 +729,44 @@ community:
         - "src/rest.ts is the only network path: it reads CLOCKIFY_API_KEY from the environment (never accepted as a CLI flag, so it can't leak into shell history/process args), sends it as the x-api-key header, and raises AxiError with a distinct code for missing_api_key, api_unavailable, auth_failed (401/403), and generic api_error. No secrets appear in command output."
         - "src/commands/timer.ts, log.ts, report.ts, clients.ts, projects.ts, tasks.ts, and tags.ts each wrap one or a few Clockify REST/Reports API endpoints with thin flag parsing (project/task/tag IDs, ISO date/time, --range for reports) and return plain JSON objects for the SDK to encode; src/reports.ts computeDateRange resolves the named ranges (THIS_WEEK, LAST_MONTH, CUSTOM, etc.) using the cached weekStart so week boundaries match the user's real Clockify settings rather than assuming Monday."
         - "No mutating call is destructive beyond what Clockify's own API already allows an authenticated key to do (start/stop/log/patch time entries); there is no delete-workspace or bulk-destroy surface. An MIT LICENSE is present, and src/clockify-axi.test.ts exercises flag parsing and command routing."
+  - name: jev-axi
+    url: https://github.com/shiftynick/jev-axi
+    author: shiftynick
+    domain: AI judgments
+    description: "Offload snap judgments to TypeSafe's Jev model - pick, rate, check, rank, filter, semantic grep, diff review, log triage, and prompt-injection screening over files or stdin, with calibrated confidence bands and local usage/cost stats."
+    admission:
+      status: admitted
+      reviewed_revision: eff72694226d748ce0d1f080546a9cbfe1e41f2c
+      reviewed_components:
+        - bin/jev-axi.ts
+        - src/version.ts
+        - src/cli.ts
+        - src/args.ts
+        - src/errors.ts
+        - src/client.ts
+        - src/config.ts
+        - src/usage.ts
+        - src/bands.ts
+        - src/format.ts
+        - src/commands/common.ts
+        - src/commands/home.ts
+        - src/commands/table.ts
+        - src/commands/meta.ts
+        - src/commands/batch.ts
+        - src/commands/find.ts
+        - src/commands/guard.ts
+        - src/commands/diff.ts
+        - src/commands/stats.ts
+        - scripts/build-skill.ts
+        - skills/jev-axi/SKILL.md
+        - package.json
+        - LICENSE
+      source_observations:
+        - "bin/jev-axi.ts answers bare -v/-V/--version through axi-sdk-js/fast-path, importing VERSION from the leaf module src/version.ts, before dynamically importing src/cli.js; src/cli.ts dispatches every command through runAxiCli with getCommandHelp returning a per-command usage block with flags and examples, and a content-first home view (src/commands/home.ts) that reports API key presence, model, last-24h usage, cache size, and one line per command."
+        - "src/args.ts parseArgs validates each command against its own flag spec plus a small set of globals and throws a VALIDATION_ERROR AxiError (exit 2) naming the unknown flag and listing the command's valid flags inline; renamed flags get a targeted hint from a RENAMED map, value flags with no value and repeated single-value flags are also rejected."
+        - "src/cli.ts formatError renders errors as TOON on stdout with an indented help block; src/client.ts translates TypeSafe SDK errors (401, 422, 429, 529, max_tokens_exceeded, connection failures) into AxiError codes with actionable suggestions rather than leaking raw API bodies. The API key is read from TYPESAFE_API_KEY, ./.env, or the config file and is never accepted as a flag or written to output."
+        - "Output is TOON with minimal rows: src/commands/batch.ts and find.ts return ranked rows of 3-4 fields with counts like '5 shown of 35 items', pair every ranking with a separate yes/no existence question so empty results are definitive ('0 items above --min'), and emit next-step help only when relevant; src/commands/common.ts finish() appends a one-line usage summary (tokens, latency, model, estimated cost) and supports --json."
+        - "The tool performs no mutations beyond local files it owns: a response cache and a usage ledger under the XDG config/cache directories (src/config.ts, src/usage.ts), recipe scaffolding, and opt-in session hooks installed only by the explicit `setup hooks` command (src/commands/meta.ts). guard exits 3 on a block verdict so pipelines can gate on it. skills/jev-axi/SKILL.md is generated from src/commands/table.ts by scripts/build-skill.ts with a --check drift mode run in CI. MIT LICENSE is present."
   - name: linear-sdk-axi
     url: https://github.com/shiftynick/linear-sdk-axi
     author: shiftynick
@@ -760,3 +798,4 @@ community:
         - "src/errors.ts maps Linear SDK failures by HTTP status or message into AxiError codes AUTH_REQUIRED, FORBIDDEN, NOT_FOUND, RATE_LIMITED, and UNKNOWN with suggested next steps; src/args.ts assertNoUnknownFlags rejects unrecognized flags and empty flag values with VALIDATION_ERROR rather than silently dropping them."
         - "src/pagination.ts requires `--all` to be paired with an explicit `--max-items` bound and reports endCursor, hasNextPage, and capped state so list output never silently truncates."
         - "src/commands/issue.ts and project.ts gate every mutation behind `--dry-run` (prints the planned SDK mutation and input) and optional `--verify` (src/verification.ts re-reads and compares normalized intended versus observed state, failing on mismatch); update, close, and relation add/remove return explicit no-op results when already in the desired state. The only delete call is deleteIssueRelation - issues are closed, not deleted. An MIT LICENSE is present."
+

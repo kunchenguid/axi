@@ -729,3 +729,34 @@ community:
         - "src/rest.ts is the only network path: it reads CLOCKIFY_API_KEY from the environment (never accepted as a CLI flag, so it can't leak into shell history/process args), sends it as the x-api-key header, and raises AxiError with a distinct code for missing_api_key, api_unavailable, auth_failed (401/403), and generic api_error. No secrets appear in command output."
         - "src/commands/timer.ts, log.ts, report.ts, clients.ts, projects.ts, tasks.ts, and tags.ts each wrap one or a few Clockify REST/Reports API endpoints with thin flag parsing (project/task/tag IDs, ISO date/time, --range for reports) and return plain JSON objects for the SDK to encode; src/reports.ts computeDateRange resolves the named ranges (THIS_WEEK, LAST_MONTH, CUSTOM, etc.) using the cached weekStart so week boundaries match the user's real Clockify settings rather than assuming Monday."
         - "No mutating call is destructive beyond what Clockify's own API already allows an authenticated key to do (start/stop/log/patch time entries); there is no delete-workspace or bulk-destroy surface. An MIT LICENSE is present, and src/clockify-axi.test.ts exercises flag parsing and command routing."
+  - name: linear-sdk-axi
+    url: https://github.com/shiftynick/linear-sdk-axi
+    author: shiftynick
+    domain: Linear
+    description: "Issues, comments, relations, projects, project updates, cycles, labels, and teams over the official `@linear/sdk` - no MCP server, with dry-run, verified writes, bounded pagination, and TOON or JSON output."
+    admission:
+      status: admitted
+      reviewed_revision: d1981e87e3917db58ba4e27fbecc99001518b683
+      reviewed_components:
+        - bin/linear-sdk-axi.ts
+        - src/cli.ts
+        - src/args.ts
+        - src/auth.ts
+        - src/client.ts
+        - src/errors.ts
+        - src/json-output.ts
+        - src/pagination.ts
+        - src/toon.ts
+        - src/verification.ts
+        - src/commands/home.ts
+        - src/commands/issue.ts
+        - src/commands/project.ts
+        - src/commands/setup.ts
+        - package.json
+        - LICENSE
+      source_observations:
+        - "bin/linear-sdk-axi.ts answers bare version flags through axi-sdk-js/fast-path before dynamically importing src/cli.js; src/cli.ts routes a content-first dashboard home plus usage, issue, label, project, cycle, team, me, status/workflow, doctor, auth, and setup through runAxiCli, and wraps the SDK's TOON stdout in a versioned JSON envelope when `--output json` is passed."
+        - "src/client.ts constructs the official @linear/sdk LinearClient from LINEAR_API_KEY (taking precedence) or a stored OAuth access token and throws AUTH_REQUIRED otherwise; src/auth.ts implements Authorization Code + PKCE against a fixed 127.0.0.1 loopback redirect and writes tokens to ~/.config/linear-sdk-axi/oauth.json with 0600 permissions. Credentials are never accepted as CLI flags."
+        - "src/errors.ts maps Linear SDK failures by HTTP status or message into AxiError codes AUTH_REQUIRED, FORBIDDEN, NOT_FOUND, RATE_LIMITED, and UNKNOWN with suggested next steps; src/args.ts assertNoUnknownFlags rejects unrecognized flags and empty flag values with VALIDATION_ERROR rather than silently dropping them."
+        - "src/pagination.ts requires `--all` to be paired with an explicit `--max-items` bound and reports endCursor, hasNextPage, and capped state so list output never silently truncates."
+        - "src/commands/issue.ts and project.ts gate every mutation behind `--dry-run` (prints the planned SDK mutation and input) and optional `--verify` (src/verification.ts re-reads and compares normalized intended versus observed state, failing on mismatch); update, close, and relation add/remove return explicit no-op results when already in the desired state. The only delete call is deleteIssueRelation - issues are closed, not deleted. An MIT LICENSE is present."

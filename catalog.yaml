@@ -799,3 +799,241 @@ community:
         - "src/pagination.ts requires `--all` to be paired with an explicit `--max-items` bound and reports endCursor, hasNextPage, and capped state so list output never silently truncates."
         - "src/commands/issue.ts and project.ts gate every mutation behind `--dry-run` (prints the planned SDK mutation and input) and optional `--verify` (src/verification.ts re-reads and compares normalized intended versus observed state, failing on mismatch); update, close, and relation add/remove return explicit no-op results when already in the desired state. The only delete call is deleteIssueRelation - issues are closed, not deleted. An MIT LICENSE is present."
 
+  - name: asana-axi
+    url: https://github.com/brycehamrick/asana-axi
+    author: brycehamrick
+    domain: Project management
+    description: "Create, search, update, and complete Asana tasks, projects, sections, tags, workspaces, comments, and attachments over the Asana REST API - read-first defaults, idempotent mutations, and token-efficient TOON output."
+    admission:
+      status: exception
+      reviewed_revision: 6178bc15657339d7e1c41d805c7345a981ae5c02
+      reviewed_components:
+        - src/bin/asana-axi.ts
+        - src/cli.ts
+        - src/args.ts
+        - src/config.ts
+        - src/errors.ts
+        - src/asana.ts
+        - src/commands/home.ts
+        - src/commands/task.ts
+        - src/commands/setup.ts
+        - skills/asana-axi/SKILL.md
+        - package.json
+        - LICENSE
+      source_observations:
+        - "src/bin/asana-axi.ts answers bare -v/-V/--version through axi-sdk-js/fast-path before importing src/cli.js; src/cli.ts registers home, task, project, workspace, tag, me, and setup through runAxiCli with content-first home (src/commands/home.ts) that reports auth, my_tasks, and optional project counts."
+        - "src/args.ts is a strict parser: unknown flags and unknown subcommands raise AxiError VALIDATION_ERROR (exit 2) naming valid flags/subcommands; src/config.ts reads ASANA_ACCESS_TOKEN from the environment or ./.env (never as a CLI flag) and redacts the token from error text."
+        - "src/commands/setup.ts installs SessionStart hooks only via explicit `setup hooks` (Claude Code / Codex / OpenCode) using axi-sdk-js helpers; ordinary commands do not touch agent config. MIT LICENSE; runtime dependency axi-sdk-js only."
+        - "src/commands/task.ts gates only `task delete` behind --confirm; create, edit, complete, reopen, comment, attach, move, and tag mutations POST/PUT to the Asana REST API without an AXI-level confirmation gate."
+      exception: "src/commands/task.ts create/edit/complete/reopen/comment/attach/move and tag writes call the Asana REST API immediately without --confirm; only `task delete` requires --confirm."
+
+  - name: brevo-axi
+    url: https://github.com/brycehamrick/brevo-axi
+    author: brycehamrick
+    domain: Email marketing / Messaging
+    description: "Send and audit transactional email and SMS, manage campaigns, contacts, lists, attributes, CRM deals, companies, tasks, notes, senders, domains, and webhooks over the Brevo v3 REST API - sandbox-validated sends and `--confirm`-gated mutations with token-efficient TOON output."
+    admission:
+      status: admitted
+      reviewed_revision: c4734bb26af5f530eb6e2dc21db8fb03132ed5aa
+      reviewed_components:
+        - bin/brevo-axi.js
+        - src/index.ts
+        - src/lib/args.ts
+        - src/lib/env.ts
+        - src/lib/auth.ts
+        - src/lib/output.ts
+        - src/commands/home.ts
+        - src/commands/email.ts
+        - src/commands/sms.ts
+        - src/commands/setup.ts
+        - package.json
+        - LICENSE
+      source_observations:
+        - "src/index.ts dispatches through runAxiCli with tryFastPath version handling and a content-first home; src/lib/args.ts uses node:util parseArgs in strict mode and maps unknown options to VALIDATION_ERROR (exit 2) with the valid flag set; requireConfirm() refuses mutations until --confirm."
+        - "src/lib/env.ts and src/lib/auth.ts require BREVO_API_KEY from the environment (HTTPS-only API base, no embedded credentials); email send supports --sandbox validation without sending and still requires --confirm for live sends; SMS and CRM/contact/list/campaign/webhook writes are similarly gated."
+        - "src/commands/setup.ts installs opt-in SessionStart hooks only on explicit `setup hooks`; MIT LICENSE; runtime dependency axi-sdk-js."
+
+  - name: firecrawl-axi
+    url: https://github.com/brycehamrick/firecrawl-axi
+    author: brycehamrick
+    domain: Web data / Research
+    description: "Scrape, map, and crawl sites, search the web and research indexes, parse documents, run async research agents, and manage change monitors over the hosted Firecrawl MCP server - token-efficient TOON output."
+    admission:
+      status: admitted
+      reviewed_revision: 11784566466a761ce26c1d44a7594160dac13ffa
+      reviewed_components:
+        - bin/firecrawl-axi.js
+        - src/index.ts
+        - src/lib/args.ts
+        - src/lib/env.ts
+        - src/mcp/client.ts
+        - src/commands/home.ts
+        - src/commands/scrape.ts
+        - src/commands/crawl.ts
+        - src/commands/agent.ts
+        - src/commands/monitors.ts
+        - src/commands/setup.ts
+        - package.json
+        - LICENSE
+      source_observations:
+        - "src/index.ts uses runAxiCli with tryFastPath; src/lib/args.ts strict parseArgs maps unknown flags to VALIDATION_ERROR; src/mcp/client.ts talks to the hosted Firecrawl MCP over Streamable HTTP with FIRECRAWL_API_KEY (keyless covers search/scrape/parse within anonymous limits)."
+        - "Paid or unbounded work is gated: agent start and monitors create/update/delete/run require --confirm; crawl requires --limit or --confirm for unbounded crawls. Read-path scrape/search/map/parse do not require confirmation by design."
+        - "src/commands/setup.ts is opt-in SessionStart hooks only; TOON truncation with --full; MIT LICENSE; axi-sdk-js runtime dependency."
+
+  - name: n8n-axi
+    url: https://github.com/brycehamrick/n8n-axi
+    author: brycehamrick
+    domain: Workflow automation
+    description: "Search, inspect, run, test, publish, and archive n8n workflows; triage executions; and manage projects, folders, tags, data tables, and credentials over n8n's instance-level MCP server - validate-then-create authoring with `--confirm`-gated mutations."
+    admission:
+      status: exception
+      reviewed_revision: 07ba22ea76fa0a77d9c6182664b934b6c0629679
+      reviewed_components:
+        - bin/n8n-axi.js
+        - src/cli.ts
+        - src/cli/args.ts
+        - src/config.ts
+        - src/runtime.ts
+        - src/mcp/client.ts
+        - src/commands/home.ts
+        - src/commands/workflows.ts
+        - src/commands/setup.ts
+        - package.json
+        - LICENSE
+      source_observations:
+        - "src/cli.ts registers workflows/executions/projects/folders/tags/tables/credentials/build/setup through runAxiCli; src/cli/args.ts rejects unknown flags with VALIDATION_ERROR; src/runtime.ts requireConfirm gates mutations before network I/O."
+        - "src/config.ts reads N8N_MCP_URL and N8N_MCP_TOKEN from the environment only (HTTPS except loopback; no embedded URL credentials); src/commands/workflows.ts run/test/publish/unpublish/archive/restore and build create/update require --confirm."
+        - "src/commands/setup.ts installs opt-in SessionStart hooks; MIT LICENSE; axi-sdk-js dependency. Content-first home degrades to a structured unavailable object when the instance rejects credentials or is unreachable AFTER config resolves."
+      exception: "Unauthenticated no-args home calls createRuntime()/resolveConfig() first, so missing N8N_MCP_URL or N8N_MCP_TOKEN raises VALIDATION_ERROR exit 2 with setup help instead of an exit-0 structured auth:not-configured degrade."
+
+  - name: open-design-axi
+    url: https://github.com/brycehamrick/open-design-axi
+    author: brycehamrick
+    domain: Design
+    description: "Browse and operate OpenDesign projects, files, artifacts, and generation runs from the shell, with offline reads from the local data directory when the daemon is down - `--confirm`-gated project create/delete and generation runs."
+    admission:
+      status: exception
+      reviewed_revision: 4955e6f2eec9f78718ab3d6af6299d181070870c
+      reviewed_components:
+        - bin/open-design-axi.js
+        - src/cli.ts
+        - src/args.ts
+        - src/api.ts
+        - src/commands/shared.ts
+        - src/commands/home.ts
+        - src/commands/projects.ts
+        - src/commands/write.ts
+        - src/commands/run.ts
+        - src/commands/setup.ts
+        - package.json
+        - LICENSE
+      source_observations:
+        - "src/cli.ts dispatches through runAxiCli with tryFastPath; src/args.ts rejects unknown flags with VALIDATION_ERROR; projects create/delete, write, delete, and run start/cancel call requireConfirm() in src/commands/shared.ts before mutating the daemon or spending generation tokens."
+        - "Offline reads fall back to the local OpenDesign data directory when the daemon is down (src/offline.ts); setup hooks are opt-in via src/commands/setup.ts; MIT LICENSE; depends on axi-sdk-js and @toon-format/toon."
+      exception: "Missing --confirm throws AxiError code CONFIRM_REQUIRED, which axi-sdk-js maps to exit 1 rather than VALIDATION_ERROR exit 2 (principle 6 usage taxonomy)."
+
+  - name: playwright-axi
+    url: https://github.com/brycehamrick/playwright-axi
+    author: brycehamrick
+    domain: Browser automation
+    description: "Navigate, click, fill, and extract with combined operations, inline filtered snapshots, and TOON output. Wraps the `playwright` npm package's agent CLI."
+    admission:
+      status: exception
+      reviewed_revision: e1290d7ab10f5241a2b07706398d2833ae9e857e
+      reviewed_components:
+        - bin/playwright-axi.js
+        - src/index.ts
+        - src/args.ts
+        - src/registry.ts
+        - src/commands.ts
+        - src/engine.ts
+        - src/render.ts
+        - src/home.ts
+        - src/setup.ts
+        - package.json
+        - LICENSE
+      source_observations:
+        - "src/index.ts uses runAxiCli with a content-first home (src/home.ts) over the embedded playwright agent CLI; src/args.ts rejects unknown flags with VALIDATION_ERROR; src/commands.ts dispatches strictly from src/registry.ts and requires --confirm when a CommandSpec sets confirm:true (delete-data)."
+        - "src/engine.ts spawns the local playwright CLI with JSON envelopes; src/render.ts emits TOON with truncation and --query filtering; src/setup.ts installs opt-in SessionStart hooks; MIT LICENSE; depends on axi-sdk-js and playwright."
+      exception: "Only delete-data is confirm-gated in src/registry.ts; close, close-all, and kill-all terminate browser sessions without --confirm, and interaction commands (click/fill/open/…) mutate the live browser immediately by design."
+
+  - name: tally-axi
+    url: https://github.com/brycehamrick/tally-axi
+    author: brycehamrick
+    domain: Forms / Surveys
+    description: "Read Tally forms and submissions field-by-field and manage FORM_RESPONSE webhooks over the public Tally REST API - pre-computed counts, truncation with a `--full` escape hatch, and token-efficient TOON output."
+    admission:
+      status: exception
+      reviewed_revision: 5063f99552522768e65c20558e278d17a0074778
+      reviewed_components:
+        - bin/tally-axi.js
+        - src/index.ts
+        - src/lib/args.ts
+        - src/lib/env.ts
+        - src/tally/http.ts
+        - src/commands/home.ts
+        - src/commands/forms.ts
+        - src/commands/submissions.ts
+        - src/commands/webhooks.ts
+        - skills/tally-axi/SKILL.md
+        - package.json
+        - LICENSE
+      source_observations:
+        - "src/index.ts uses runAxiCli with tryFastPath; src/lib/args.ts strict parseArgs maps unknown flags to VALIDATION_ERROR and requireConfirm gates submissions delete and webhooks create/delete before network I/O."
+        - "src/lib/env.ts requires TALLY_API_KEY from the environment with HTTPS-only API base (no embedded credentials); keyless home degrades to a structured setup hint without network calls; TOON truncation with --full; MIT LICENSE; axi-sdk-js dependency."
+      exception: "No `setup hooks` (or other) ambient-context install command is present, so principle 7 opt-in session integrations are not offered via the CLI (skill packaging only)."
+
+  - name: walter-axi
+    url: https://github.com/brycehamrick/walter-axi
+    author: brycehamrick
+    domain: AI content editing
+    description: "Detect AI-generated patterns, humanize drafts with locked keywords, and batch QA content through the WalterWrites MCP server - `--confirm` gates on credit-consuming writes."
+    admission:
+      status: admitted
+      reviewed_revision: 7bf0f3b1df22b26aedbd56ac8cda9955fd1ea8f8
+      reviewed_components:
+        - bin/walter-axi.js
+        - src/cli.ts
+        - src/flags.ts
+        - src/walter/config.ts
+        - src/walter/oauth.ts
+        - src/walter/client.ts
+        - src/commands/home.ts
+        - src/commands/humanize.ts
+        - src/commands/batch.ts
+        - src/commands/pipeline.ts
+        - src/commands/setup.ts
+        - package.json
+        - LICENSE
+      source_observations:
+        - "src/cli.ts uses runAxiCli with tryFastPath; src/flags.ts rejects unknown flags with VALIDATION_ERROR naming the valid set; src/commands/shared.ts requireConfirm gates humanize, batch, and pipeline before credit-consuming WalterWrites MCP calls."
+        - "src/walter/config.ts stores OAuth tokens under XDG config with mkdir 0o700 and writeFile 0o600; WALTER_ACCESS_TOKEN env overrides stored tokens; credentials are never CLI flags."
+        - "src/commands/setup.ts installs opt-in SessionStart hooks; MIT LICENSE; depends on axi-sdk-js and @modelcontextprotocol/sdk."
+
+  - name: wordpress-axi
+    url: https://github.com/brycehamrick/wordpress-axi
+    author: brycehamrick
+    domain: CMS / WordPress
+    description: "Publish and moderate posts, pages, media, terms, comments, users, and settings, and inspect plugins and themes over the core WordPress REST API - new content defaults to draft, publication and deletion are `--confirm`-gated."
+    admission:
+      status: exception
+      reviewed_revision: edfe47eba5550895d1108991fad8c285f8b88ee9
+      reviewed_components:
+        - bin/wordpress-axi.js
+        - src/index.ts
+        - src/lib/args.ts
+        - src/lib/config.ts
+        - src/commands/home.ts
+        - src/commands/content.ts
+        - src/commands/comment.ts
+        - src/commands/media.ts
+        - src/commands/user.ts
+        - src/commands/setup.ts
+        - package.json
+        - LICENSE
+      source_observations:
+        - "src/index.ts uses runAxiCli with tryFastPath; src/lib/args.ts strict parseArgs maps unknown flags to VALIDATION_ERROR; me validates flags via parseFlags; unauthenticated/missing-config home degrades to a structured auth:not-configured view."
+        - "src/lib/config.ts reads WORDPRESS_URL plus WORDPRESS_APPLICATION_PASSWORD / username from the environment (HTTPS, no embedded URL credentials). New posts/pages default to draft; publish, delete, role changes, plugin/theme activation, and comment moderation require --confirm."
+        - "src/commands/setup.ts installs opt-in SessionStart hooks; MIT LICENSE; axi-sdk-js dependency."
+      exception: "comment create/reply and media upload POST to the WordPress REST API without --confirm (publication, deletion, and moderation remain confirm-gated; new posts/pages default to draft)."
+

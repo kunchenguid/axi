@@ -739,6 +739,7 @@ community:
       reviewed_revision: eff72694226d748ce0d1f080546a9cbfe1e41f2c
       reviewed_components:
         - bin/jev-axi.ts
+        - src/version.ts
         - src/cli.ts
         - src/args.ts
         - src/errors.ts

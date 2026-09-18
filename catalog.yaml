@@ -1042,3 +1042,32 @@ community:
     author: Meshery Authors
     domain: Meshery / cloud native
     description: "Agent-ergonomic wrapper around mesheryctl - token-efficient TOON list/view reporting, non-interactive execution, structured errors, and help[] next-step suggestions."
+    admission:
+      status: exception
+      reviewed_revision: 7c02bc8b24441d425ff90e3561f9ed3ed976ec3d
+      reviewed_components:
+        - bin/mesheryctl-axi.ts
+        - src/cli.ts
+        - src/args.ts
+        - src/commands/home.ts
+        - src/commands/connection.ts
+        - src/commands/component.ts
+        - src/commands/design.ts
+        - src/commands/model.ts
+        - src/commands/system.ts
+        - src/config.ts
+        - src/errors.ts
+        - src/mesheryctl.ts
+        - src/server.ts
+        - src/paths.ts
+        - src/suggestions.ts
+        - src/toon.ts
+        - src/contract.ts
+        - test/contract/mesheryctl.test.ts
+        - package.json
+        - LICENSE
+      source_observations:
+        - "bin/mesheryctl-axi.ts enters via src/cli.ts runAxiCli with tryFastPath; src/args.ts rejectUnknownFlags maps unknown flags per subcommand to VALIDATION_ERROR naming the offending flags and pointing at that subcommand's --help (tested in test/unknown-flags.test.ts)."
+        - "Read-only wrapper: list/view/status/content/context/home only, no mutating commands, so no --confirm gating applies; src/config.ts loads tokens from mesheryctl config.yaml/auth.json (MESHERY_CONFIG/MESHERYCTL_CONFIG/MESHERYCTL_BIN accept paths, never secrets); src/server.ts attaches the token as a cookie to Server API reads at the mesheryctl context endpoint (localhost fallback)."
+        - "Structured errors via AxiError codes (src/errors.ts) rendered with renderError help[n] blocks; TOON for reporting with raw YAML/JSON design/model content; src/contract.ts plus test/contract pin every spawned mesheryctl argv against a real binary in CI. Apache-2.0 LICENSE; axi-sdk-js dependency."
+      exception: "No setup (or other) ambient-context install command is present, so principle 7 opt-in session integrations are not offered via the CLI."

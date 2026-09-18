@@ -1064,6 +1064,7 @@ community:
         - src/toon.ts
         - src/contract.ts
         - test/contract/mesheryctl.test.ts
+        - test/unknown-flags.test.ts
         - package.json
         - LICENSE
       source_observations:

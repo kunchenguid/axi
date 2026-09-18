@@ -1037,3 +1037,8 @@ community:
         - "src/commands/setup.ts installs opt-in SessionStart hooks; MIT LICENSE; axi-sdk-js dependency."
       exception: "comment create/reply and media upload POST to the WordPress REST API without --confirm (publication, deletion, and moderation remain confirm-gated; new posts/pages default to draft)."
 
+  - name: mesheryctl-axi
+    url: https://github.com/meshery-extensions/mesheryctl-axi
+    author: Meshery Authors
+    domain: Meshery / cloud native
+    description: "Agent-ergonomic wrapper around mesheryctl - token-efficient TOON list/view reporting, non-interactive execution, structured errors, and help[] next-step suggestions."

@@ -275,3 +275,76 @@ test("community catalog lands frontier-axi as documented admission exception", (
   assert.match(html, /<code>frontier-axi<\/code>/);
   assert.match(html, /Pre-flight SDLC &amp; Cognitive Bridge/);
 });
+
+test("catalog renderers keep bracket pairs that are not links as literal text", () => {
+  const entry = {
+    name: "bracket-axi",
+    url: "https://example.com/bracket-axi",
+    author: "Example",
+    domain: "Testing",
+    description: "Emits help[] next-step suggestions and a [not a link] aside.",
+  };
+
+  assert.equal(
+    htmlInline("Emits help[] next-step suggestions."),
+    "Emits help[] next-step suggestions.",
+  );
+
+  const html = htmlCatalogRows([entry], true);
+  assert.match(
+    html,
+    /<td>Emits help\[\] next-step suggestions and a \[not a link\] aside\.<\/td>/,
+  );
+  assert.equal(html.match(/<a /g).length, 1, "only the AXI name cell may link");
+
+  const markdown = mdCatalogTable([entry], true);
+  assert.match(
+    markdown,
+    /\| Emits help\[\] next-step suggestions and a \[not a link\] aside\. \|/,
+  );
+});
+
+test("community catalog lands mesheryctl-axi with a pinned admission record", () => {
+  const catalog = parse(readFileSync(join(root, "catalog.yaml"), "utf8"));
+  const mesheryctl = catalog.community.find(
+    (entry) => entry.name === "mesheryctl-axi",
+  );
+  assert.ok(mesheryctl, "mesheryctl-axi must be present in catalog.community");
+  assert.equal(mesheryctl.author, "Meshery Authors");
+  assert.equal(mesheryctl.domain, "Meshery / cloud native");
+  assert.equal(
+    mesheryctl.url,
+    "https://github.com/meshery-extensions/mesheryctl-axi",
+  );
+
+  assert.equal(mesheryctl.admission.status, "exception");
+  assert.equal(
+    mesheryctl.admission.reviewed_revision,
+    "7c02bc8b24441d425ff90e3561f9ed3ed976ec3d",
+  );
+  assert.ok(
+    mesheryctl.admission.reviewed_components.includes("bin/mesheryctl-axi.ts"),
+    "reviewed_components must include bin/mesheryctl-axi.ts",
+  );
+  assert.ok(
+    typeof mesheryctl.admission.exception === "string" &&
+      mesheryctl.admission.exception.length > 0,
+    "admission.exception must be present",
+  );
+
+  const markdown = mdCatalogTable([mesheryctl], true);
+  assert.match(
+    markdown,
+    /\[`mesheryctl-axi`\]\(https:\/\/github\.com\/meshery-extensions\/mesheryctl-axi\)/,
+  );
+  assert.match(markdown, /Meshery \/ cloud native/);
+  assert.match(markdown, /help\[\] next-step suggestions/);
+
+  const html = htmlCatalogRows([mesheryctl], true);
+  assert.match(
+    html,
+    /href="https:\/\/github\.com\/meshery-extensions\/mesheryctl-axi"/,
+  );
+  assert.match(html, /<code>mesheryctl-axi<\/code>/);
+  assert.match(html, /help\[\] next-step suggestions/);
+});

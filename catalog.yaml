@@ -1072,3 +1072,25 @@ community:
         - "Read-only wrapper: list/view/status/content/context/home only, no mutating commands, so no --confirm gating applies; src/config.ts loads tokens from mesheryctl config.yaml/auth.json (MESHERY_CONFIG/MESHERYCTL_CONFIG/MESHERYCTL_BIN accept paths, never secrets); src/server.ts attaches the token as a cookie to Server API reads at the mesheryctl context endpoint (localhost fallback)."
         - "Structured errors via AxiError codes (src/errors.ts) rendered with renderError help[n] blocks; TOON for reporting with raw YAML/JSON design/model content; src/contract.ts plus test/contract pin every spawned mesheryctl argv against a real binary in CI. Apache-2.0 LICENSE; axi-sdk-js dependency."
       exception: "No setup (or other) ambient-context install command is present, so principle 7 opt-in session integrations are not offered via the CLI."
+  - name: plane-axi
+    url: https://github.com/radityasurya/plane-axi
+    author: radityasurya
+    domain: Project tracking
+    description: "Manage Plane projects, issues, states, priorities, and comments with sequence-ID addressing (`#110`), name-based project/state resolution, and idempotent close - for Plane Cloud or self-hosted Plane."
+    admission:
+      status: exception
+      reviewed_revision: 938475ad6ac60c101c93347185dabb0a998d3494
+      reviewed_components:
+        - bin/plane-axi.js
+        - lib/cli.js
+        - lib/version.js
+        - test/cli.test.js
+        - skills/plane-axi/SKILL.md
+        - package.json
+        - README.md
+      source_observations:
+        - "bin/plane-axi.js prints the bare version from the leaf lib/version.js module before dynamically importing lib/cli.js; lib/cli.js parses per-command flag sets with node:util parseArgs strict mode, so unknown flags exit 2 listing that command's valid flags inline."
+        - "Reads PLANE_API_KEY, PLANE_BASE_URL, PLANE_WORKSPACE_SLUG from the environment only; the key is sent as an X-API-Key header and never echoed; a 403 translates to a check-PLANE_API_KEY hint. Zero runtime dependencies (node:fetch and node:util only)."
+        - "TOON output throughout: list tables carry count totals computed across all pages before filtering; issue descriptions truncate at 500 chars with a --full escape hatch; comments load only with --comments; empty lists print explicit zero-result lines."
+        - "Mutations are narrow and declarative: issue create/update/close/comment only, and no delete command exists; priorities and sequence IDs are validated before any mutating API call; issue close is idempotent (an already-completed issue is a no-op with exit 0, though a separately requested --comment is still added, since commenting is separate intent)."
+      exception: "No setup (or other) ambient-context install command is present, so principle 7 opt-in session hooks are not offered via the CLI; the installable-skill half of principle 7 is covered by skills/plane-axi/SKILL.md."

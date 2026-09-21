@@ -271,3 +271,28 @@ Two things keep this honest:
 
 - The version must come from a **leaf** module. If `VERSION` is defined inside `cli.ts`, importing it re-pulls the whole graph and the fast path buys nothing.
 - Guard it with a test that measures the version path against the `node -e "console.log(1)"` floor measured in the same process, rather than an absolute millisecond budget that goes flaky across machines.
+
+## 11. Name-based addressing
+
+APIs speak in machine IDs: uuids, database keys, url-safe slugs. Users and agents
+speak in names: `LNKIN`, `#110`, `Todo`, `production`. The CLI is the translation
+layer. An agent forced to list, grep, and re-query for an ID before acting pays a
+round trip every time - and can still act on the wrong row.
+
+- Accept every identifier a human would plausibly type - the name, the short code,
+  the human-facing number (`110` or `#110`) - and resolve it to the machine ID
+  internally.
+- Where the backend has both instance names and semantic groups (`Todo` /
+  `unstarted`, `Done` / `completed`), accept both.
+- Validate the identifier before any mutating call (exit 2), not as a failed API
+  request after one.
+- An unknown name fails with the candidates and the listing command; an ambiguous
+  name stops and lists the matches - never a silent empty result, never a guess.
+
+```
+$ tasks close 42 --project acme
+task: #42 closed (Done)
+```
+
+One command. Not `tasks projects --json` to find the project uuid, `tasks list
+--json | jq` to find the issue uuid, then `tasks close --id <uuid>`.

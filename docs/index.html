@@ -9,7 +9,7 @@
     <meta property="og:title" content="AXI: Agent eXperience Interface" />
     <meta
       property="og:description"
-      content="10 design principles for agent-ergonomic CLI. 100% task success at the lowest cost — validated across two benchmarks and 915 runs."
+      content="11 design principles for agent-ergonomic CLI. 100% task success at the lowest cost — validated across two benchmarks and 915 runs."
     />
     <meta property="og:image" content="https://axi.md/axi-splash.png" />
     <meta property="og:type" content="website" />
@@ -20,7 +20,7 @@
     <meta name="twitter:title" content="AXI: Agent eXperience Interface" />
     <meta
       name="twitter:description"
-      content="10 design principles for agent-ergonomic CLI. 100% task success at the lowest cost — validated across two benchmarks and 915 runs."
+      content="11 design principles for agent-ergonomic CLI. 100% task success at the lowest cost — validated across two benchmarks and 915 runs."
     />
     <meta name="twitter:image" content="https://axi.md/axi-splash.png" />
 
@@ -223,7 +223,7 @@
         <p class="section-label">AXI &mdash; Agent eXperience Interface</p>
         <h1 data-annotate>Let&apos;s build apps that [agents] love.</h1>
         <p class="text-lg">
-          10 design principles for agent-ergonomic CLI. 100% task success at the
+          11 design principles for agent-ergonomic CLI. 100% task success at the
           lowest cost &mdash; validated across two benchmarks and 915 runs.
         </p>
 
@@ -1865,6 +1865,11 @@
               <strong>Consistent way to get help</strong> &mdash; Concise
               per-subcommand reference when agents need it
             </li>
+            <li>
+              <strong>Name-based addressing</strong> &mdash; Accept names and
+              human-facing IDs (<code>#110</code>, <code>Todo</code>), resolve
+              to machine IDs internally - no list-then-grep round trips
+            </li>
             <!-- generated:principles:end -->
           </ol>
         </div>
@@ -2040,6 +2045,12 @@ help[2]:
         <p>
           Each subcommand should offer a concise <code>--help</code> flag as a
           fallback when contextual hints are insufficient.
+        </p>
+        <h4><span class="text-accent">11.</span> Name-based addressing</h4>
+        <p>
+          Accept names and human-facing IDs (<code>#110</code>,
+          <code>Todo</code>) and resolve them to machine IDs internally, so
+          agents never do list-then-grep lookup round trips before acting.
         </p>
       </section>
 

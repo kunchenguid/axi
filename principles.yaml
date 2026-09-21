@@ -39,3 +39,6 @@
 - number: 10
   title: Consistent way to get help
   summary: "Concise per-subcommand reference when agents need it"
+- number: 11
+  title: Name-based addressing
+  summary: "Accept names and human-facing IDs (`#110`, `Todo`), resolve to machine IDs internally - no list-then-grep round trips"

@@ -6,7 +6,7 @@
   <a href="https://discord.gg/Wsy2NpnZDu"><img alt="Discord" src="https://img.shields.io/discord/1439901831038763092?style=flat-square&label=discord" /></a>
 </p>
 
-<h3 align="center">10 design principles for building agent-ergonomic apps.</h3>
+<h3 align="center">11 design principles for building agent-ergonomic apps.</h3>
 
 <p align="center">
   <img src="docs/axi-splash.png" alt="AXI — Let's build apps agents love." width="800">
@@ -14,7 +14,7 @@
 
 AI agents interact with external services through two dominant paradigms today: **CLIs** which were originally built for humans, and structured tool protocols like **MCP**. Both impose significant overhead.
 
-AXI is a **new paradigm** - agent-native CLI tools built from **10 design principles** that treat token budget as a first-class constraint.
+AXI is a **new paradigm** - agent-native CLI tools built from **11 design principles** that treat token budget as a first-class constraint.
 
 ## Results
 
@@ -77,18 +77,19 @@ The table below is generated from [`principles.yaml`](principles.yaml); the full
 
 <!-- generated:principles:start -->
 
-| #   | Principle                          | Summary                                                                                     |
-| --- | ---------------------------------- | ------------------------------------------------------------------------------------------- |
-| 1   | **Token-efficient output**         | Use [TOON](https://toonformat.dev/) format for ~40% token savings over JSON                 |
-| 2   | **Minimal default schemas**        | 3–4 fields per list item, not 10+                                                           |
-| 3   | **Content truncation**             | Truncate large text with size hints and a `--full` escape hatch                             |
-| 4   | **Pre-computed aggregates**        | Include aggregated counts and statuses that eliminate round trips                           |
-| 5   | **Definitive empty states**        | Explicit "0 results" rather than ambiguous empty output                                     |
-| 6   | **Structured errors & exit codes** | Idempotent mutations, structured errors, no interactive prompts, fail loud on unknown flags |
-| 7   | **Ambient context**                | Install opt-in session integrations first, then offer an on-demand skill                    |
-| 8   | **Content first**                  | Running with no arguments shows live data, not help text                                    |
-| 9   | **Contextual disclosure**          | Include next-step suggestions after each output                                             |
-| 10  | **Consistent way to get help**     | Concise per-subcommand reference when agents need it                                        |
+| #   | Principle                          | Summary                                                                                                               |
+| --- | ---------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| 1   | **Token-efficient output**         | Use [TOON](https://toonformat.dev/) format for ~40% token savings over JSON                                           |
+| 2   | **Minimal default schemas**        | 3–4 fields per list item, not 10+                                                                                     |
+| 3   | **Content truncation**             | Truncate large text with size hints and a `--full` escape hatch                                                       |
+| 4   | **Pre-computed aggregates**        | Include aggregated counts and statuses that eliminate round trips                                                     |
+| 5   | **Definitive empty states**        | Explicit "0 results" rather than ambiguous empty output                                                               |
+| 6   | **Structured errors & exit codes** | Idempotent mutations, structured errors, no interactive prompts, fail loud on unknown flags                           |
+| 7   | **Ambient context**                | Install opt-in session integrations first, then offer an on-demand skill                                              |
+| 8   | **Content first**                  | Running with no arguments shows live data, not help text                                                              |
+| 9   | **Contextual disclosure**          | Include next-step suggestions after each output                                                                       |
+| 10  | **Consistent way to get help**     | Concise per-subcommand reference when agents need it                                                                  |
+| 11  | **Name-based addressing**          | Accept names and human-facing IDs (`#110`, `Todo`), resolve to machine IDs internally - no list-then-grep round trips |
 
 <!-- generated:principles:end -->
 

@@ -1072,3 +1072,8 @@ community:
         - "Read-only wrapper: list/view/status/content/context/home only, no mutating commands, so no --confirm gating applies; src/config.ts loads tokens from mesheryctl config.yaml/auth.json (MESHERY_CONFIG/MESHERYCTL_CONFIG/MESHERYCTL_BIN accept paths, never secrets); src/server.ts attaches the token as a cookie to Server API reads at the mesheryctl context endpoint (localhost fallback)."
         - "Structured errors via AxiError codes (src/errors.ts) rendered with renderError help[n] blocks; TOON for reporting with raw YAML/JSON design/model content; src/contract.ts plus test/contract pin every spawned mesheryctl argv against a real binary in CI. Apache-2.0 LICENSE; axi-sdk-js dependency."
       exception: "No setup (or other) ambient-context install command is present, so principle 7 opt-in session integrations are not offered via the CLI."
+  - name: plane-axi
+    url: https://github.com/radityasurya/plane-axi
+    author: radityasurya
+    domain: Project tracking
+    description: "Manage Plane projects, issues, states, priorities, and comments with sequence-ID addressing (`#110`), name-based project/state resolution, and idempotent close - for Plane Cloud or self-hosted Plane."

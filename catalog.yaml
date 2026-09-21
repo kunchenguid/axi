@@ -257,7 +257,7 @@ community:
     url: https://github.com/CodyEngel/axi-axi
     author: CodyEngel
     domain: AXI authoring
-    description: "Scaffold a compliant AXI, read the 10 principles in token-tuned slices, and run read-only compliance checks against a candidate CLI."
+    description: "Scaffold a compliant AXI, read the 11 principles in token-tuned slices, and run read-only compliance checks against a candidate CLI."
   - name: jira-axi
     url: https://github.com/emilchristensen/atlassian-axi/tree/main/packages/jira-axi
     author: emilchristensen

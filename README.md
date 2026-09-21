@@ -70,7 +70,7 @@ Add to your `CLAUDE.md` or `AGENTS.md`:
 Use `gh-axi` for GitHub and `chrome-devtools-axi` for browser automation.
 ```
 
-## The 10 Principles
+## The 11 Principles
 
 These principles define what makes a CLI tool "an AXI".
 The table below is generated from [`principles.yaml`](principles.yaml); the full specification of each principle lives in the [AXI skill](.agents/skills/axi/SKILL.md).

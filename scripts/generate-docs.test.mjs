@@ -348,3 +348,40 @@ test("community catalog lands mesheryctl-axi with a pinned admission record", ()
   assert.match(html, /<code>mesheryctl-axi<\/code>/);
   assert.match(html, /help\[\] next-step suggestions/);
 });
+
+test("community catalog lands plane-axi with a pinned admission record", () => {
+  const catalog = parse(readFileSync(join(root, "catalog.yaml"), "utf8"));
+  const plane = catalog.community.find((entry) => entry.name === "plane-axi");
+  assert.ok(plane, "plane-axi must be present in catalog.community");
+  assert.equal(plane.author, "radityasurya");
+  assert.equal(plane.domain, "Project tracking");
+  assert.equal(plane.url, "https://github.com/radityasurya/plane-axi");
+
+  assert.equal(plane.admission.status, "exception");
+  assert.equal(
+    plane.admission.reviewed_revision,
+    "938475ad6ac60c101c93347185dabb0a998d3494",
+  );
+  assert.ok(
+    plane.admission.reviewed_components.includes("bin/plane-axi.js"),
+    "reviewed_components must include bin/plane-axi.js",
+  );
+  assert.ok(
+    typeof plane.admission.exception === "string" &&
+      plane.admission.exception.length > 0,
+    "admission.exception must be present",
+  );
+
+  const markdown = mdCatalogTable([plane], true);
+  assert.match(
+    markdown,
+    /\[`plane-axi`\]\(https:\/\/github\.com\/radityasurya\/plane-axi\)/,
+  );
+  assert.match(markdown, /Project tracking/);
+  assert.match(markdown, /idempotent close/);
+
+  const html = htmlCatalogRows([plane], true);
+  assert.match(html, /href="https:\/\/github\.com\/radityasurya\/plane-axi"/);
+  assert.match(html, /<code>plane-axi<\/code>/);
+  assert.match(html, /idempotent close/);
+});

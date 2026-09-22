@@ -271,3 +271,25 @@ Two things keep this honest:
 
 - The version must come from a **leaf** module. If `VERSION` is defined inside `cli.ts`, importing it re-pulls the whole graph and the fast path buys nothing.
 - Guard it with a test that measures the version path against the `node -e "console.log(1)"` floor measured in the same process, rather than an absolute millisecond budget that goes flaky across machines.
+
+## 11. Capability gradient
+
+An agent reads `--help` cold and acts on what it sees. If a destructive flag is documented there next to the safe ones, the agent has no signal that one is riskier than the other — it can reach for `--force` on the first try, with no preview and no confirmation step in between.
+
+Keep destructive operations out of the advertised surface. Reveal them only in the output of the safe command, and only when that output shows they're actually needed.
+
+```
+$ tasks cleanup
+tasks: 12 stale tasks found (closed >90 days ago)
+help[1]: Run `tasks cleanup --force` to delete them
+```
+
+`--force` never appears in `tasks cleanup --help`. It appears here, once, because the preview just proved there's something to force.
+
+- **Dry-run by default**: a command with a destructive mode runs the safe preview unless told otherwise. The agent sees what would happen before anything happens.
+- **Hide, don't document**: destructive flags stay out of generated help (e.g. `argparse.SUPPRESS`, or an equivalent omission in your own `--help` renderer). Hiding is not the same as refusing — the flag still works if the agent passes it; it just isn't advertised as a first move.
+- **Contextual, not universal, disclosure**: the hint that reveals a destructive flag depends on the state the safe command just showed. An empty preview suggests nothing to force. A non-empty one does, per §9.
+- **Categorize by risk, not by verb**: group operations as read-only, reversible, destructive, and external (side effects outside your own state — an API call, a message send, a file write outside the working tree). Only read-only and reversible operations belong in the default, undocumented-gradient-free surface; destructive and external operations always go through a preview step first.
+- **Scope external side effects**: for operations that reach outside your own state, offer scoping flags (e.g. `--allow-paths`, `--deny-paths`) so an agent — or the human who configured it — can bound the blast radius before the destructive path is ever reached.
+
+This composes with §6: the eventual destructive call still validates flags, still returns structured errors, and still uses exit code 0 for a no-op. The gradient controls *discovery*, not correctness.

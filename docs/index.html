@@ -1880,6 +1880,11 @@
               <strong>Consistent way to get help</strong> &mdash; Concise
               per-subcommand reference when agents need it
             </li>
+            <li>
+              <strong>Capability gradient</strong> &mdash; Hide destructive
+              flags from <code>--help</code>; reveal them in output only when
+              the safe path shows they're needed
+            </li>
             <!-- generated:principles:end -->
           </ol>
         </div>
@@ -2056,6 +2061,39 @@ help[2]:
           Each subcommand should offer a concise <code>--help</code> flag as a
           fallback when contextual hints are insufficient.
         </p>
+
+        <h4><span class="text-accent">11.</span> Capability gradient</h4>
+        <p>
+          Keep destructive operations out of <code>--help</code>. An agent
+          reading help cold has no way to tell a risky flag from a safe one, so
+          don&rsquo;t document them side by side. Run a dry-run preview by
+          default, and reveal the destructive flag only in that preview&rsquo;s
+          output, and only when the preview shows it&rsquo;s actually needed
+          &mdash; the same contextual-hint mechanism as principle 9, applied to
+          risk instead of workflow. Operations that reach outside the
+          tool&rsquo;s own state (an API call, a file write outside the working
+          tree) should offer scoping flags so the blast radius is bounded before
+          the destructive path is ever reached.
+        </p>
+
+        <div class="grid grid--2">
+          <div class="card">
+            <p class="section-label">
+              Conventional: --force documented upfront
+            </p>
+            <pre><code>$ tasks cleanup --help
+USAGE
+  tasks cleanup [--force]
+
+  --force   Permanently delete stale tasks</code></pre>
+          </div>
+          <div class="card">
+            <p class="section-label">AXI: --force revealed only when needed</p>
+            <pre><code>$ tasks cleanup
+tasks: 12 stale tasks found (closed &gt;90 days ago)
+help[1]: Run `tasks cleanup --force` to delete them</code></pre>
+          </div>
+        </div>
       </section>
 
       <!-- 4. Experimental Setup -->

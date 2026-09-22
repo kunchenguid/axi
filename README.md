@@ -77,18 +77,19 @@ The table below is generated from [`principles.yaml`](principles.yaml); the full
 
 <!-- generated:principles:start -->
 
-| #   | Principle                          | Summary                                                                                     |
-| --- | ---------------------------------- | ------------------------------------------------------------------------------------------- |
-| 1   | **Token-efficient output**         | Use [TOON](https://toonformat.dev/) format for ~40% token savings over JSON                 |
-| 2   | **Minimal default schemas**        | 3–4 fields per list item, not 10+                                                           |
-| 3   | **Content truncation**             | Truncate large text with size hints and a `--full` escape hatch                             |
-| 4   | **Pre-computed aggregates**        | Include aggregated counts and statuses that eliminate round trips                           |
-| 5   | **Definitive empty states**        | Explicit "0 results" rather than ambiguous empty output                                     |
-| 6   | **Structured errors & exit codes** | Idempotent mutations, structured errors, no interactive prompts, fail loud on unknown flags |
-| 7   | **Ambient context**                | Install opt-in session integrations first, then offer an on-demand skill                    |
-| 8   | **Content first**                  | Running with no arguments shows live data, not help text                                    |
-| 9   | **Contextual disclosure**          | Include next-step suggestions after each output                                             |
-| 10  | **Consistent way to get help**     | Concise per-subcommand reference when agents need it                                        |
+| #   | Principle                          | Summary                                                                                                  |
+| --- | ---------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| 1   | **Token-efficient output**         | Use [TOON](https://toonformat.dev/) format for ~40% token savings over JSON                              |
+| 2   | **Minimal default schemas**        | 3–4 fields per list item, not 10+                                                                        |
+| 3   | **Content truncation**             | Truncate large text with size hints and a `--full` escape hatch                                          |
+| 4   | **Pre-computed aggregates**        | Include aggregated counts and statuses that eliminate round trips                                        |
+| 5   | **Definitive empty states**        | Explicit "0 results" rather than ambiguous empty output                                                  |
+| 6   | **Structured errors & exit codes** | Idempotent mutations, structured errors, no interactive prompts, fail loud on unknown flags              |
+| 7   | **Ambient context**                | Install opt-in session integrations first, then offer an on-demand skill                                 |
+| 8   | **Content first**                  | Running with no arguments shows live data, not help text                                                 |
+| 9   | **Contextual disclosure**          | Include next-step suggestions after each output                                                          |
+| 10  | **Consistent way to get help**     | Concise per-subcommand reference when agents need it                                                     |
+| 11  | **Capability gradient**            | Hide destructive flags from `--help`; reveal them in output only when the safe path shows they're needed |
 
 <!-- generated:principles:end -->
 

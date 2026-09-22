@@ -39,3 +39,6 @@
 - number: 10
   title: Consistent way to get help
   summary: "Concise per-subcommand reference when agents need it"
+- number: 11
+  title: Capability gradient
+  summary: "Hide destructive flags from `--help`; reveal them in output only when the safe path shows they're needed"

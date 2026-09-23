@@ -1099,3 +1099,25 @@ community:
     author: mlegls
     domain: Bun
     description: "Run Bun tests and package.json scripts and get counts, failure locations, load errors, and tsc/oxlint diagnostics instead of raw logs - plus dependency and npm registry lookups."
+    admission:
+      status: exception
+      reviewed_revision: e3645219e2974bd7708fc0b1cf287a656d7df959
+      reviewed_components:
+        - bin/bun-axi.ts
+        - src/cli.ts
+        - src/flags.ts
+        - src/proc.ts
+        - src/tests.ts
+        - src/diagnostics.ts
+        - src/packages.ts
+        - src/version.ts
+        - skills/bun-axi/SKILL.md
+        - test/cli.test.ts
+        - test/parse.test.ts
+        - package.json
+        - README.md
+      source_observations:
+        - "bin/bun-axi.ts answers --version through axi-sdk-js/fast-path from the leaf src/version.ts before importing src/cli.ts; src/version.ts and package.json both say 0.1.0, matching the published npm release. Every command parses its own flag set with node:util parseArgs in strict mode, so an unknown flag is a VALIDATION_ERROR (exit 2) listing that command's valid flags; `--help` is answered per command from a static table."
+        - "test runs `bun test --reporter=junit` and reports counts, each failure's file:line:col and first message line, and load errors recovered from the console; failures are capped at 30 and messages at 240 chars with a --full escape hatch, the full log path is always printed, and the help[] rerun hint re-escapes the failing test name. run refuses scripts absent from package.json, strips bun's `$ cmd` echo lines from previews, and recognizes tsc, eslint/oxlint unix, and oxlint pretty diagnostics grouped by file. Empty states are explicit: `0 found`, `0 packages match`, `0 outdated`, `0 installed versions`."
+        - "Registry commands (view, versions, deps, search) use fetch against NPM_CONFIG_REGISTRY or registry.npmjs.org, translate 404 to NOT_FOUND with a search hint and other failures to REGISTRY_ERROR/NETWORK_ERROR, and never mutate anything. outdated and why wrap `bun outdated` / `bun why` read-only. Session hooks come from the SDK's installSessionStartHooks via `setup hooks` with --check/--uninstall/--project; the skill is skills/bun-axi/SKILL.md."
+      exception: "`versions --limit <value>` and `search --limit <value>` pass Number(value) unvalidated: `bun-axi versions typescript --limit abc` prints `count: \"NaN of N total\"` with an empty versions list and exit 0 instead of a VALIDATION_ERROR, and `--limit -1` prints `-1 of N` while dropping the last entry; search forwards size=NaN to the registry URL."

@@ -1094,3 +1094,8 @@ community:
         - "TOON output throughout: list tables carry count totals computed across all pages before filtering; issue descriptions truncate at 500 chars with a --full escape hatch; comments load only with --comments; empty lists print explicit zero-result lines."
         - "Mutations are narrow and declarative: issue create/update/close/comment only, and no delete command exists; priorities and sequence IDs are validated before any mutating API call; issue close is idempotent (an already-completed issue is a no-op with exit 0, though a separately requested --comment is still added, since commenting is separate intent)."
       exception: "No setup (or other) ambient-context install command is present, so principle 7 opt-in session hooks are not offered via the CLI; the installable-skill half of principle 7 is covered by skills/plane-axi/SKILL.md."
+  - name: bun-axi
+    url: https://github.com/mlegls/bun-axi
+    author: mlegls
+    domain: Bun
+    description: "Run Bun tests and package.json scripts and get counts, failure locations, load errors, and tsc/oxlint diagnostics instead of raw logs - plus dependency and npm registry lookups."

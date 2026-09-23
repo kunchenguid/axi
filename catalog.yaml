@@ -1094,6 +1094,31 @@ community:
         - "TOON output throughout: list tables carry count totals computed across all pages before filtering; issue descriptions truncate at 500 chars with a --full escape hatch; comments load only with --comments; empty lists print explicit zero-result lines."
         - "Mutations are narrow and declarative: issue create/update/close/comment only, and no delete command exists; priorities and sequence IDs are validated before any mutating API call; issue close is idempotent (an already-completed issue is a no-op with exit 0, though a separately requested --comment is still added, since commenting is separate intent)."
       exception: "No setup (or other) ambient-context install command is present, so principle 7 opt-in session hooks are not offered via the CLI; the installable-skill half of principle 7 is covered by skills/plane-axi/SKILL.md."
+  - name: gerrit-axi
+    url: https://github.com/slnkjthien/gerrit-axi
+    author: slnkjthien
+    domain: Code review / Gerrit
+    description: "Read Gerrit review state as records - attention set, change readiness, and inline comments with bot/human filtering - then publish a branch as a stack or squashed change and submit it; voting is impossible by design."
+    admission:
+      status: exception
+      reviewed_revision: 047541439990d18c000858813fff0cebf7bd0dc4
+      reviewed_components:
+        - bin/gerrit-axi.js
+        - src/axi/main.js
+        - src/axi/args.js
+        - src/axi/commands.js
+        - src/axi/output.js
+        - src/axi/records.js
+        - src/core/publish.js
+        - src/core/submit.js
+        - test/vote-ban.test.js
+        - package.json
+      source_observations:
+        - "src/axi/args.js rejects any unrecognized option as a BAD_USAGE error (exit 2) and validates change numbers and numeric flags before any server call; FLAG_SPECS in src/axi/main.js declares flags per command."
+        - "src/axi/output.js serializes every result as TOON by default or JSON under --json; list documents carry count, and show reports unreturned change numbers under missing rather than failing."
+        - "src/axi/commands.js has exactly two writes, publish and submit; src/core/publish.js builds the push ref with no label, submit, or reviewer parameter and treats the server's 'no new changes' as success, and test/vote-ban.test.js drives every operation through fake runners to assert no request can record a vote."
+        - "src/axi/main.js maps failures to typed error records with distinct exit codes (1 other, 2 usage, 3 config, 4 auth, 5 transport); no command in src/axi prompts for input."
+      exception: "Errors are written to stderr rather than stdout and unknown-flag errors do not list the command's valid flags (src/axi/main.js, src/axi/args.js); running with no arguments prints usage with exit 2 instead of live content, and there is no bin/description home view (src/axi/main.js); outputs carry no help next-step hints (src/axi/commands.js); comment and message bodies are not truncated (src/axi/records.js); subcommand --help prints the full top-level usage; --version prints 'gerrit-axi <version>' rather than the bare version, -v is not accepted, and it is answered only after the full static import graph loads (bin/gerrit-axi.js, src/axi/main.js); no setup command or installable skill offers principle 7 session integration."
   - name: bun-axi
     url: https://github.com/mlegls/bun-axi
     author: mlegls

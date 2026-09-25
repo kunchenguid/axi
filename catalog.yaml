@@ -1150,3 +1150,20 @@ community:
     author: Azd325
     domain: Router / TR-064
     description: "Agent-ergonomic router inspection CLI - read-only TR-064 inspection (device, WAN, traffic, calls, devices, leases, Wi-Fi, port forwards) plus confirmed mutations (`wifi enable|disable`, `reboot`) and configuration backup over documented FRITZ!Box TR-064 interfaces."
+    admission:
+      status: exception
+      reviewed_revision: 02db57b90fae9c9bd72bd5607b7f420c04a801ee
+      reviewed_components:
+        - bin/router-axi
+        - cmd/router-axi/main.go
+        - internal/app/app.go
+        - internal/app/watch.go
+        - internal/tr064/client.go
+        - go.mod
+        - README.md
+      source_observations:
+        - "Empty argv defaults to live status; compact output by default with --json (watch JSONL); unknown options and out-of-range watch bounds exit 2 before any router call (internal/app/app.go)."
+        - "wifi enable|disable and reboot are preview-only without --confirm; with --confirm, wifi SetEnable is sent only on state change then verified via GetInfo, and reboot sends DeviceConfig:Reboot once with redirect refusal and no retry (internal/tr064/client.go)."
+        - "backup requires ROUTER_AXI_BACKUP_PASSWORD from the environment only, HTTPS origin, atomic owner-only write, and --force to overwrite; redirects refused (internal/app/app.go, internal/tr064/client.go)."
+        - "Typed errors with exit codes 1–6 and hints; no stdin prompts; calls/devices/leases/forwards truncate at 20 with total/omitted and --all (internal/app/app.go)."
+      exception: "Errors are written to stderr rather than stdout and unknown-option errors do not list the command's valid flags (internal/app/app.go); version prints 'version: <ver>' rather than the bare version, -v is not accepted, and it is answered only after the app graph loads (cmd/router-axi/main.go, internal/app/app.go); no setup command or installable skill offers principle 7 session integration."

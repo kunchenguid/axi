@@ -1119,3 +1119,29 @@ community:
         - "src/axi/commands.js has exactly two writes, publish and submit; src/core/publish.js builds the push ref with no label, submit, or reviewer parameter and treats the server's 'no new changes' as success, and test/vote-ban.test.js drives every operation through fake runners to assert no request can record a vote."
         - "src/axi/main.js maps failures to typed error records with distinct exit codes (1 other, 2 usage, 3 config, 4 auth, 5 transport); no command in src/axi prompts for input."
       exception: "Errors are written to stderr rather than stdout and unknown-flag errors do not list the command's valid flags (src/axi/main.js, src/axi/args.js); running with no arguments prints usage with exit 2 instead of live content, and there is no bin/description home view (src/axi/main.js); outputs carry no help next-step hints (src/axi/commands.js); comment and message bodies are not truncated (src/axi/records.js); subcommand --help prints the full top-level usage; --version prints 'gerrit-axi <version>' rather than the bare version, -v is not accepted, and it is answered only after the full static import graph loads (bin/gerrit-axi.js, src/axi/main.js); no setup command or installable skill offers principle 7 session integration."
+  - name: bun-axi
+    url: https://github.com/mlegls/bun-axi
+    author: mlegls
+    domain: Bun
+    description: "Run Bun tests and package.json scripts and get counts, failure locations, load errors, and tsc/oxlint diagnostics instead of raw logs - plus dependency and npm registry lookups."
+    admission:
+      status: admitted
+      reviewed_revision: e10a27006ead6e23f8576b20f90abd775e05059a
+      reviewed_components:
+        - bin/bun-axi.ts
+        - src/cli.ts
+        - src/flags.ts
+        - src/proc.ts
+        - src/tests.ts
+        - src/diagnostics.ts
+        - src/packages.ts
+        - src/version.ts
+        - skills/bun-axi/SKILL.md
+        - test/cli.test.ts
+        - test/parse.test.ts
+        - package.json
+        - README.md
+      source_observations:
+        - "bin/bun-axi.ts answers --version through axi-sdk-js/fast-path from the leaf src/version.ts before importing src/cli.ts; src/version.ts and package.json both say 0.1.1, matching the published npm release. Every command parses its own flag set with node:util parseArgs in strict mode, so an unknown flag is a VALIDATION_ERROR (exit 2) listing that command's valid flags; `--help` is answered per command from a static table. versions and search pass `--limit` through count() in src/flags.ts, which throws VALIDATION_ERROR for anything but a positive integer before any registry fetch (test/cli.test.ts covers abc, -1, 0, and 2.5 exiting 2). This revision differs from the earlier exception revision e3645219 only by that count() helper, its two call sites in src/cli.ts, that test, and the 0.1.1 version bump."
+        - "test runs `bun test --reporter=junit` and reports counts, each failure's file:line:col and first message line, and load errors recovered from the console; failures are capped at 30 and messages at 240 chars with a --full escape hatch, the full log path is always printed, and the help[] rerun hint re-escapes the failing test name. run refuses scripts absent from package.json, strips bun's `$ cmd` echo lines from previews, and recognizes tsc, eslint/oxlint unix, and oxlint pretty diagnostics grouped by file. Empty states are explicit: `0 found`, `0 packages match`, `0 outdated`, `0 installed versions`."
+        - "Registry commands (view, versions, deps, search) use fetch against NPM_CONFIG_REGISTRY or registry.npmjs.org, translate 404 to NOT_FOUND with a search hint and other failures to REGISTRY_ERROR/NETWORK_ERROR, and never mutate anything. outdated and why wrap `bun outdated` / `bun why` read-only. Session hooks come from the SDK's installSessionStartHooks via `setup hooks` with --check/--uninstall/--project; the skill is skills/bun-axi/SKILL.md."

@@ -1151,7 +1151,7 @@ community:
     domain: Router / TR-064
     description: "Agent-ergonomic router inspection CLI - read-only TR-064 inspection (device, WAN, traffic, calls, devices, leases, Wi-Fi, guest Wi-Fi, port forwards) plus confirmed mutations (`wifi enable|disable`, `reboot`) and configuration backup over documented FRITZ!Box TR-064 interfaces."
     admission:
-      status: admitted
+      status: exception
       reviewed_revision: bd6f7b110c3f7cd0426f440c4d813defac6b8945
       reviewed_components:
         - bin/router-axi
@@ -1161,10 +1161,11 @@ community:
         - internal/tr064/client.go
         - internal/skill/skill.go
         - internal/skill/SKILL.md
+        - go.mod
         - README.md
-        - VISION.md
       source_observations:
-        - "Empty argv defaults to live status with compact TOON-style output; --json is explicit (watch is JSONL). Bare -v, -V, and --version answer before router work, and unknown or context-invalid flags exit 2 with that command/action form's valid flags (cmd/router-axi/main.go, internal/app/app.go)."
-        - "Structured results and errors use stdout with typed exit codes and remediation hints; doctor partial JSON is one doctor/error envelope, and watch terminal errors are final JSONL records. stderr is reserved for diagnostics after stdout itself fails (internal/app/app.go, internal/app/watch.go)."
+        - "Empty argv defaults to live status with compact TOON-style output; --json is explicit (watch is JSONL). Bare -v, -V, and --version print the bare version and exit 0 before any router work; unknown or context-invalid flags exit 2 with that command's valid flags (cmd/router-axi/main.go, internal/app/app.go)."
+        - "Structured results and errors use stdout with typed exit codes and remediation hints; watch terminal errors are final stdout/JSONL records, and stderr is reserved for diagnostics when stdout itself fails (internal/app/app.go, internal/app/watch.go)."
         - "wifi enable|disable and reboot preview without --confirm; confirmed Wi-Fi changes only call SetEnable when state differs and verify GetInfo afterward, while reboot sends DeviceConfig:Reboot once with redirect refusal and no retry (internal/tr064/client.go)."
-        - "backup reads ROUTER_AXI_BACKUP_PASSWORD only from the environment, requires HTTPS, writes atomically with owner-only permissions, and requires --force to overwrite; an explicit skill install command provides on-demand agent discovery without automatic registration (internal/app/app.go, internal/tr064/client.go, internal/skill/SKILL.md)."
+        - "backup reads ROUTER_AXI_BACKUP_PASSWORD only from the environment, requires HTTPS, writes atomically with owner-only permissions, and requires --force to overwrite; skill install is an explicit opt-in Agent Skill path with no automatic registration (internal/app/app.go, internal/tr064/client.go, internal/skill/skill.go)."
+      exception: "No setup hooks (or other) ambient-context install command is present, so principle 7 opt-in session integrations are not offered via the CLI (skill packaging only via `skill install`)."

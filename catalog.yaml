@@ -1145,3 +1145,27 @@ community:
         - "bin/bun-axi.ts answers --version through axi-sdk-js/fast-path from the leaf src/version.ts before importing src/cli.ts; src/version.ts and package.json both say 0.1.1, matching the published npm release. Every command parses its own flag set with node:util parseArgs in strict mode, so an unknown flag is a VALIDATION_ERROR (exit 2) listing that command's valid flags; `--help` is answered per command from a static table. versions and search pass `--limit` through count() in src/flags.ts, which throws VALIDATION_ERROR for anything but a positive integer before any registry fetch (test/cli.test.ts covers abc, -1, 0, and 2.5 exiting 2). This revision differs from the earlier exception revision e3645219 only by that count() helper, its two call sites in src/cli.ts, that test, and the 0.1.1 version bump."
         - "test runs `bun test --reporter=junit` and reports counts, each failure's file:line:col and first message line, and load errors recovered from the console; failures are capped at 30 and messages at 240 chars with a --full escape hatch, the full log path is always printed, and the help[] rerun hint re-escapes the failing test name. run refuses scripts absent from package.json, strips bun's `$ cmd` echo lines from previews, and recognizes tsc, eslint/oxlint unix, and oxlint pretty diagnostics grouped by file. Empty states are explicit: `0 found`, `0 packages match`, `0 outdated`, `0 installed versions`."
         - "Registry commands (view, versions, deps, search) use fetch against NPM_CONFIG_REGISTRY or registry.npmjs.org, translate 404 to NOT_FOUND with a search hint and other failures to REGISTRY_ERROR/NETWORK_ERROR, and never mutate anything. outdated and why wrap `bun outdated` / `bun why` read-only. Session hooks come from the SDK's installSessionStartHooks via `setup hooks` with --check/--uninstall/--project; the skill is skills/bun-axi/SKILL.md."
+  - name: router-axi
+    url: https://github.com/Azd325/router-axi
+    author: Azd325
+    domain: Router / TR-064
+    description: "Agent-ergonomic router inspection CLI - read-only TR-064 inspection (device, WAN, traffic, calls, devices, leases, Wi-Fi, guest Wi-Fi, port forwards) plus confirmed mutations (`wifi enable|disable`, `reboot`) and configuration backup over documented FRITZ!Box TR-064 interfaces."
+    admission:
+      status: exception
+      reviewed_revision: bd6f7b110c3f7cd0426f440c4d813defac6b8945
+      reviewed_components:
+        - bin/router-axi
+        - cmd/router-axi/main.go
+        - internal/app/app.go
+        - internal/app/watch.go
+        - internal/tr064/client.go
+        - internal/skill/skill.go
+        - internal/skill/SKILL.md
+        - go.mod
+        - README.md
+      source_observations:
+        - "Empty argv defaults to live status with compact TOON-style output; --json is explicit (watch is JSONL). Bare -v, -V, and --version print the bare version and exit 0 before any router work; unknown or context-invalid flags exit 2 with that command's valid flags (cmd/router-axi/main.go, internal/app/app.go)."
+        - "Structured results and errors use stdout with typed exit codes and remediation hints; watch terminal errors are final stdout/JSONL records, and stderr is reserved for diagnostics when stdout itself fails (internal/app/app.go, internal/app/watch.go)."
+        - "wifi enable|disable and reboot preview without --confirm; confirmed Wi-Fi changes only call SetEnable when state differs and verify GetInfo afterward, while reboot sends DeviceConfig:Reboot once with redirect refusal and no retry (internal/tr064/client.go)."
+        - "backup reads ROUTER_AXI_BACKUP_PASSWORD only from the environment, requires HTTPS, writes atomically with owner-only permissions, and requires --force to overwrite; skill install is an explicit opt-in Agent Skill path with no automatic registration (internal/app/app.go, internal/tr064/client.go, internal/skill/skill.go)."
+      exception: "No setup hooks (or other) ambient-context install command is present, so principle 7 opt-in session integrations are not offered via the CLI (skill packaging only via `skill install`)."

@@ -1149,21 +1149,22 @@ community:
     url: https://github.com/Azd325/router-axi
     author: Azd325
     domain: Router / TR-064
-    description: "Agent-ergonomic router inspection CLI - read-only TR-064 inspection (device, WAN, traffic, calls, devices, leases, Wi-Fi, port forwards) plus confirmed mutations (`wifi enable|disable`, `reboot`) and configuration backup over documented FRITZ!Box TR-064 interfaces."
+    description: "Agent-ergonomic router inspection CLI - read-only TR-064 inspection (device, WAN, traffic, calls, devices, leases, Wi-Fi, guest Wi-Fi, port forwards) plus confirmed mutations (`wifi enable|disable`, `reboot`) and configuration backup over documented FRITZ!Box TR-064 interfaces."
     admission:
-      status: exception
-      reviewed_revision: 02db57b90fae9c9bd72bd5607b7f420c04a801ee
+      status: admitted
+      reviewed_revision: bd6f7b110c3f7cd0426f440c4d813defac6b8945
       reviewed_components:
         - bin/router-axi
         - cmd/router-axi/main.go
         - internal/app/app.go
         - internal/app/watch.go
         - internal/tr064/client.go
-        - go.mod
+        - internal/skill/skill.go
+        - internal/skill/SKILL.md
         - README.md
+        - VISION.md
       source_observations:
-        - "Empty argv defaults to live status; compact output by default with --json (watch JSONL); unknown options and out-of-range watch bounds exit 2 before any router call (internal/app/app.go)."
-        - "wifi enable|disable and reboot are preview-only without --confirm; with --confirm, wifi SetEnable is sent only on state change then verified via GetInfo, and reboot sends DeviceConfig:Reboot once with redirect refusal and no retry (internal/tr064/client.go)."
-        - "backup requires ROUTER_AXI_BACKUP_PASSWORD from the environment only, HTTPS origin, atomic owner-only write, and --force to overwrite; redirects refused (internal/app/app.go, internal/tr064/client.go)."
-        - "Typed errors with exit codes 1–6 and hints; no stdin prompts; calls/devices/leases/forwards truncate at 20 with total/omitted and --all (internal/app/app.go)."
-      exception: "Errors are written to stderr rather than stdout and unknown-option errors do not list the command's valid flags (internal/app/app.go); version prints 'version: <ver>' rather than the bare version, -v is not accepted, and it is answered only after the app graph loads (cmd/router-axi/main.go, internal/app/app.go); no setup command or installable skill offers principle 7 session integration."
+        - "Empty argv defaults to live status with compact TOON-style output; --json is explicit (watch is JSONL). Bare -v, -V, and --version answer before router work, and unknown or context-invalid flags exit 2 with that command/action form's valid flags (cmd/router-axi/main.go, internal/app/app.go)."
+        - "Structured results and errors use stdout with typed exit codes and remediation hints; doctor partial JSON is one doctor/error envelope, and watch terminal errors are final JSONL records. stderr is reserved for diagnostics after stdout itself fails (internal/app/app.go, internal/app/watch.go)."
+        - "wifi enable|disable and reboot preview without --confirm; confirmed Wi-Fi changes only call SetEnable when state differs and verify GetInfo afterward, while reboot sends DeviceConfig:Reboot once with redirect refusal and no retry (internal/tr064/client.go)."
+        - "backup reads ROUTER_AXI_BACKUP_PASSWORD only from the environment, requires HTTPS, writes atomically with owner-only permissions, and requires --force to overwrite; an explicit skill install command provides on-demand agent discovery without automatic registration (internal/app/app.go, internal/tr064/client.go, internal/skill/SKILL.md)."

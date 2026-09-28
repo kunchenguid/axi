@@ -38,7 +38,7 @@ See the [no-mistakes quick start](https://kunchenguid.github.io/no-mistakes/star
 The catalog has one source of truth: [`catalog.yaml`](catalog.yaml).
 The tables in README.md and on [axi.md](https://axi.md) are generated from it.
 
-1. Add one entry for your AXI to the `community` list in `catalog.yaml`.
+1. Add one entry for your AXI to the `community` list in `catalog.yaml`, keeping the list in alphabetical order by name.
 2. Run `pnpm run docs:gen` to regenerate README.md and docs/index.html.
 3. Commit all three files and open your PR through the workflow above.
 

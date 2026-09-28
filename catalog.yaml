@@ -1,21 +1,22 @@
 # Single source of truth for the AXI catalog.
 #
-# To add your AXI: append an entry below, run `pnpm run docs:gen`, and commit
-# this file together with the regenerated README.md and docs/index.html.
+# To add your AXI: add an entry below in alphabetical order by name,
+# run `pnpm run docs:gen`, and commit this file together with the
+# regenerated README.md and docs/index.html.
 # CI (`pnpm run docs:check`) fails if the rendered tables drift from this file.
 #
 # Descriptions support `inline code` and [markdown links](https://example.com);
 # keep them to one sentence or two short clauses.
 
 official:
-  - name: gh-axi
-    url: https://github.com/kunchenguid/gh-axi
-    domain: GitHub
-    description: "Issues, PRs, workflow runs, releases, and more. Wraps the official `gh` CLI with agent-ergonomic output."
   - name: chrome-devtools-axi
     url: https://github.com/kunchenguid/chrome-devtools-axi
     domain: Browser automation
     description: "Navigate, click, fill, and extract with combined operations and query filtering. Wraps chrome-devtools-mcp."
+  - name: gh-axi
+    url: https://github.com/kunchenguid/gh-axi
+    domain: GitHub
+    description: "Issues, PRs, workflow runs, releases, and more. Wraps the official `gh` CLI with agent-ergonomic output."
   - name: lavish-axi
     url: https://github.com/kunchenguid/lavish-axi
     domain: Human review
@@ -26,174 +27,6 @@ official:
     description: "Reports local Claude, Codex, Cursor, Copilot, and Grok quota/usage windows for routing-aware agents - data-only and local-first."
 
 community:
-  - name: jj-axi
-    url: https://github.com/aivv73/jj-axi
-    author: aivv73
-    domain: Version control
-    description: "Inspect and reshape Jujutsu history through deterministic, non-interactive commands with compact TOON output and operation-aware undo."
-  - name: npm-axi
-    url: https://github.com/SSBrouhard/npm-axi
-    author: SSBrouhard
-    domain: npm
-    description: "Search and inspect npm registry packages, versions, dependencies, README previews, and downloads with token-efficient output."
-  - name: sqlite-axi
-    url: https://github.com/SSBrouhard/sqlite-axi
-    author: SSBrouhard
-    domain: SQLite
-    description: "Inspect schemas, sample rows, and run capped read-only SQLite queries with token-efficient TOON output."
-  - name: slack-axi
-    url: https://github.com/JarvusInnovations/slack-axi
-    author: Jarvus Innovations
-    domain: Slack
-    description: "Read, search, sweep, and safely draft Slack messages with token-efficient output."
-  - name: gws-axi
-    url: https://github.com/JarvusInnovations/gws-axi
-    author: Jarvus Innovations
-    domain: Google Workspace
-    description: "Gmail, Calendar, Docs, Drive, and Slides behind one command, with multi-account write-safety - drafts mail, never sends."
-  - name: harvest-axi
-    url: https://github.com/JarvusInnovations/harvest-axi
-    author: Jarvus Innovations
-    domain: Time tracking
-    description: "Review, log, and edit Harvest time entries by period - for yourself, your team, a project, or a client."
-  - name: specops
-    url: https://github.com/JarvusInnovations/specops
-    author: Jarvus Innovations
-    domain: Spec-driven dev
-    description: "Spec-driven development for agents - and a demo of shipping an AXI embedded in a skill, not a standalone npm executable."
-  - name: gitsheets-axi
-    url: https://github.com/JarvusInnovations/gitsheets/tree/main/packages/gitsheets-axi
-    author: Jarvus Innovations
-    domain: Git-backed data
-    description: "Read and mutate git-backed record sheets over the shell - TOON output, idempotent commits."
-  - name: metabase-axi
-    url: https://github.com/JarvusInnovations/metabase-axi
-    author: Jarvus Innovations
-    domain: Analytics / BI
-    description: "Query, explore, and export from Metabase over the shell - SQL/MBQL, saved questions, schema introspection, full-data export."
-  - name: otter-axi
-    url: https://github.com/JarvusInnovations/otter-axi
-    author: Jarvus Innovations
-    domain: Meetings
-    description: "Find and pull Otter.ai meeting transcripts from the shell - wraps Otter.ai's hosted MCP server as a scriptable, headless CLI."
-  - name: notion-axi
-    url: https://github.com/maximebrmd/notion-axi
-    author: maximebrmd
-    domain: Notion
-    description: "Search, read, create, and update Notion pages and databases over the shell - token-efficient TOON output, PAT or integration auth."
-  - name: clickup-axi
-    url: https://github.com/JanSuthacheeva/clickup-axi
-    author: JanSuthacheeva
-    domain: ClickUp
-    description: "List your open tasks, view a task with its newest comments inline, and change task status - truncation-aware, TOON-style output."
-  - name: databricks-axi
-    url: https://github.com/p33ves/databricks-axi
-    author: p33ves
-    domain: Databricks
-    description: "Run Databricks jobs, watch runs, and pull failure logs inline over the official databricks CLI - more domains coming soon."
-  - name: aws-axi
-    url: https://github.com/thatdudealso/aws-axi
-    author: thatdudealso
-    domain: AWS
-    description: "Discover, plan, provision, deploy, and inspect AWS services for hosting web, backend, database, and AI workloads through safe token-efficient CLI workflows."
-  - name: docker-axi
-    url: https://github.com/thatdudealso/docker-axi
-    author: thatdudealso
-    domain: Docker
-    description: "Discover, build, run, debug, publish, inspect, and clean up Docker apps through safe token-efficient CLI workflows."
-  - name: doctl-axi
-    url: https://github.com/batamire/doctl-axi
-    author: batamire
-    domain: DigitalOcean
-    description: "Manage Droplets, Kubernetes, App Platform, databases, networking, and Spaces via doctl with token-efficient TOON output."
-  - name: dynamodb-axi
-    url: https://github.com/thatdudealso/dynamodb-axi
-    author: thatdudealso
-    domain: DynamoDB
-    description: "Discover, inspect, query, scan, create, update, back up, restore, export, import, and safely operate DynamoDB tables through token-efficient CLI workflows."
-  - name: pg-axi
-    url: https://github.com/thatdudealso/pg-axi
-    author: thatdudealso
-    domain: PostgreSQL
-    description: "Discover, create, inspect, query, back up, restore, and maintain PostgreSQL databases through safe token-efficient CLI workflows."
-  - name: mongodb-axi
-    url: https://github.com/thatdudealso/mongodb-axi
-    author: thatdudealso
-    domain: MongoDB
-    description: "Discover, create, inspect, query, export, import, maintain, and diagnose MongoDB databases through safe token-efficient CLI workflows."
-  - name: elasticsearch-axi
-    url: https://github.com/thatdudealso/elasticsearch-axi
-    author: thatdudealso
-    domain: Elasticsearch
-    description: "Discover, inspect, query, index, map, snapshot, restore, diagnose, and operate Elasticsearch clusters through safe token-efficient CLI workflows."
-  - name: kubernetes-axi
-    url: https://github.com/thatdudealso/kubernetes-axi
-    author: thatdudealso
-    domain: Kubernetes
-    description: "Discover, inspect, deploy, debug, scale, roll out, expose, and clean up Kubernetes workloads through safe token-efficient CLI workflows."
-  - name: redis-axi
-    url: https://github.com/thatdudealso/redis-axi
-    author: thatdudealso
-    domain: Redis
-    description: "Discover, inspect, query, export, import, maintain, and diagnose Redis databases through safe token-efficient CLI workflows."
-  - name: celery-axi
-    url: https://github.com/thatdudealso/celery-axi
-    author: thatdudealso
-    domain: Celery
-    description: "Discover, inspect, run, debug, monitor, schedule, control, and safely operate Celery task queues through token-efficient CLI workflows."
-  - name: cyber-mux
-    url: https://github.com/cyberuni/cyber-mux
-    author: unional
-    domain: Terminal multiplexers
-    description: "Open, send, read, focus, and close terminal panes across tmux, herdr, and WezTerm through one detection-driven contract with token-efficient output."
-  - name: oracle-axi
-    url: https://github.com/thatdudealso/oracle-axi
-    author: thatdudealso
-    domain: Oracle Database
-    description: "Discover, create, inspect, query, export, import, maintain, and diagnose Oracle databases through safe token-efficient CLI workflows."
-  - name: glab-axi
-    url: https://github.com/karotkriss/glab-axi
-    author: karotkriss
-    domain: GitLab
-    description: "Issues, merge requests, CI/CD pipelines, variables and secrets, releases, and raw API access. Wraps the official glab CLI with agent-ergonomic TOON output."
-  - name: reactive-axi
-    url: https://github.com/adeeshsharma/reactive-axi
-    author: adeeshsharma
-    domain: UI review
-    description: "Click any element in your live React, Vue, or Svelte dev server and resolve it to the exact source file and line before it reaches your agent."
-  - name: obsidian-axi
-    url: https://github.com/AndersHoffmann/obsidian-axi
-    author: AndersHoffmann
-    domain: Obsidian
-    description: "Read, search, create, update, organize, and link Obsidian notes from the filesystem - compact TOON output, atomic writes, no plugin or server."
-  - name: comfy-cloud-axi
-    url: https://github.com/intelligentrascal/comfy-cloud-axi
-    author: intelligentrascal
-    domain: AI generation
-    description: "Generate images, video, and audio via 22 partner models, submit ComfyUI workflows and templates, track jobs, estimate credits before generating, search nodes, and report usage — wraps the Comfy Cloud MCP server with token-efficient TOON output."
-    admission:
-      status: exception
-      reviewed_revision: 0f5b75eb201512604c87f6d75f4234bb685e0879
-      exception: "The published 0.1.6 package reports version 0.1.4; `generate ... --confirm --type` defaults to image and `job chain <id> --dry-run` passes NaN before MCP calls; nodes and saved workflows report empty results for `{}` responses; paid `workflow run` and `templates run` ignore surplus positionals; and other mutating commands can ignore trailing flags."
-  - name: mobbin-axi
-    url: https://github.com/intelligentrascal/mobbin-axi
-    author: intelligentrascal
-    domain: UI/UX research
-    description: "Search real-world UI/UX patterns from production apps via Mobbin - wraps Mobbin's OAuth-gated MCP server as a scriptable, headless CLI with token-efficient TOON output."
-    admission:
-      status: exception
-      reviewed_revision: 8eda65af7d760efe45907ad3368d3164abe3062e
-      exception: "The published 0.1.3 package reports version 0.1.1; search-command --help is rejected; empty-content MCP responses can become successful `0 results`; sections ignores --platform; control commands lack per-command flag sets; and legacy --full and --json flags are no-ops."
-  - name: calendly-axi
-    url: https://github.com/JarvusInnovations/calendly-axi
-    author: Jarvus Innovations
-    domain: Scheduling
-    description: "The Calendly booking loop from the shell - see what's scheduled, mint single-use booking links, book directly, cancel, and manage event types, availability, and webhooks."
-  - name: remarkable-axi
-    url: https://github.com/JarvusInnovations/remarkable-axi
-    author: Jarvus Innovations
-    domain: E-ink tablets
-    description: "Manage content on your reMarkable tablet through the reMarkable cloud - browse and organize files, upload PDFs and EPUBs, and send web articles as reflowable EPUBs."
   - name: ado-axi
     url: https://github.com/dtabolich/ado-axi
     author: dtabolich
@@ -223,444 +56,33 @@ community:
         - "src/commands/api.ts accepts an optional positional HTTP verb, validates path, host, query, body, content type, and raw-response options before calling the shared request client."
         - "src/commands/config.ts lists configured profiles and initializes named profiles with organization, optional project, and az or PAT authentication settings."
         - "src/lib/client.ts constructs encoded Azure DevOps request URLs, resolves credentials, and translates network and HTTP failures into AxiError responses."
-  - name: supabase-axi
-    url: https://github.com/laizhenyoong/supabase-axi
-    author: laizhenyoong
-    domain: Supabase
-    description: "Inspect schemas, run SQL, and audit RLS, indexes, and logs across Supabase projects. Wraps the Supabase Management API."
-  - name: homebrew-axi
-    url: https://github.com/mstuart/homebrew-axi
-    author: mstuart
-    domain: Homebrew
-    description: "Inspect Homebrew formulae, casks, and installed packages — versions, dependencies, outdated status, and install stats — with token-efficient TOON output; read-only, never mutates."
-  - name: pypi-axi
-    url: https://github.com/mstuart/pypi-axi
-    author: mstuart
-    domain: PyPI
-    description: "Inspect PyPI packages, versions, dependencies, and download stats with token-efficient TOON output — read-only, no auth required."
-  - name: cargo-axi
-    url: https://github.com/AG9898/cargo-axi
-    author: AG9898
-    domain: Rust / Cargo
-    description: "Inspect Rust workspaces and run safe `check` or Clippy validation with compact TOON output and opt-in session context."
-  - name: forgejo-axi
-    url: https://github.com/escidmore/forgejo-axi
-    author: escidmore
-    domain: Forgejo
-    description: "Pull request lifecycle, issues, and raw API access for self-hosted Forgejo - non-interactive, reconciling mutations, with token-efficient TOON output."
-  - name: mastra-axi
-    url: https://github.com/taltas/mastra-axi
-    author: taltas
-    domain: Mastra
-    description: "Discover and run a Mastra app's agents, tools, and workflows through agent-native shell commands with compact TOON output."
-  - name: axi-axi
-    url: https://github.com/CodyEngel/axi-axi
-    author: CodyEngel
-    domain: AXI authoring
-    description: "Scaffold a compliant AXI, read the 10 principles in token-tuned slices, and run read-only compliance checks against a candidate CLI."
-  - name: jira-axi
-    url: https://github.com/emilchristensen/atlassian-axi/tree/main/packages/jira-axi
-    author: emilchristensen
-    domain: Issue tracking
-    description: "Create, search, transition, and comment on Jira work items, boards, and sprints through Atlassian's acli with token-efficient TOON output and idempotent mutations."
-  - name: confluence-axi
-    url: https://github.com/emilchristensen/atlassian-axi/tree/main/packages/confluence-axi
-    author: emilchristensen
-    domain: Documentation
-    description: "Read and write Confluence Cloud pages and spaces directly over the REST API with token-efficient TOON output and OAuth 3LO or API-token auth."
-  - name: az-axi
-    url: https://github.com/masyanru/az-axi
-    author: masyanru
-    domain: Azure
-    description: "Discover, inspect, query, and safely mutate Azure through token-efficient CLI workflows over every az module."
-  - name: mssql-axi
-    url: https://github.com/jeffreyhaen/mssql-axi
-    author: jeffreyhaen
-    domain: Microsoft SQL Server / Azure SQL
-    description: "Inspect schemas, sample rows, run capped read-only queries and showplans over the native ODBC driver - mutations double-gated with dry-run by default, TOON output."
-  # Admission review (independent source review per VISION.md): inspected
-  # Holaxis-ai/superbee at release v0.1.3, commit
-  # f4e1c37349627030f8201ff52028f71a9c92570a. Direct source observations:
-  # packages/cli/AXI-CONTRACT.md pins the agent-facing interaction contract;
-  # src/output.ts renders TOON by default with a compact --json escape hatch;
-  # src/errors.ts maps typed failures to stable error codes on the capped
-  # 0/1/2/4/5/6 exit taxonomy with structured error envelopes; src/commands/
-  # list.ts bounds repeated rows and reports count/shown with a --limit 0
-  # escape; src/commands/doc/common.ts gates doc update/delete behind
-  # --expected-version compare-and-swap and keeps delete idempotent; and
-  # src/commands/home.ts serves a zero-arg live orientation view. Verdict:
-  # the source-defined interface and behavior at that revision satisfy the
-  # applicable AXI principles; admitted.
-  - name: superbee
-    url: https://github.com/Holaxis-ai/superbee
-    author: Holaxis
-    domain: Agent knowledge infrastructure
-    description: "Turns what agents know into durable, domain-shaped infrastructure through local OKF bundles with declared schemas, exact queries, conflict-safe writes, and portable Views."
-  - name: figma-axi
-    url: https://github.com/ardaatahan/figma-axi
-    author: ardaatahan
-    domain: Design / Figma
-    description: "Inspect Figma files, export nodes to PNG/SVG/PDF, and read styles, components, and comments - summarizes huge files instead of dumping raw JSON."
-  - name: trello-axi
-    url: https://github.com/enzodevs/trello-axi
-    author: enzodevs
+  - name: asana-axi
+    url: https://github.com/brycehamrick/asana-axi
+    author: brycehamrick
     domain: Project management
-    description: "Create, search, update, move, comment on, and archive Trello cards through the REST API with compact TOON output, complete pagination, idempotent mutations, and non-interactive batch workflows."
-  - name: railway-axi
-    url: https://github.com/simkimsia/railway-axi
-    author: simkimsia
-    domain: Railway
-    description: "List projects and inspect linked project status, environments, and services. Wraps the Railway CLI with agent-ergonomic TOON output and structured errors."
-  - name: netlify-axi
-    url: https://github.com/simkimsia/netlify-axi
-    author: simkimsia
-    domain: Netlify
-    description: "List sites and inspect the linked site's status and the logged-in account. Wraps the Netlify CLI with agent-ergonomic TOON output and structured errors."
-  # Admission review (independent source review per VISION.md): inspected
-  # ardaatahan/vercel-axi at commit
-  # 81c88e3582c3018fca8fcc1c4db40c993ece6f18 (no tagged release exists).
-  # Direct source observations: src/commands/vercel.ts gates production
-  # deploys, promote/rollback, domain add/remove, dns add/remove, and env
-  # add/remove behind requireConfirm(), which throws UsageError absent
-  # --confirm; src/output/errors.ts maps UsageError to exit 2 and AxiError
-  # to exit 1 on the documented 0/1/2 taxonomy; src/vercel/process.ts wraps
-  # the official `vercel` binary via spawnSync, converts a missing binary
-  # or non-zero exit into a structured AxiError, and detects auth failures
-  # to point at `vercel login`/VERCEL_TOKEN; env list redacts value/secret/
-  # decryptedValue fields by default (vercel.ts redact()); src/index.ts
-  # registers only these gated commands, with no ungated destructive path.
-  # Verdict: the source-defined interface and behavior at that revision
-  # satisfy the applicable AXI principles; admitted.
-  - name: vercel-axi
-    url: https://github.com/ardaatahan/vercel-axi
-    author: ardaatahan
-    domain: Deployment / Vercel
-    description: "Deploy and inspect Vercel deployments, projects, domains, DNS, environment variables, and teams through the official Vercel CLI, with explicit confirmation gates for production and infrastructure changes."
-  - name: cloudflare-axi
-    url: https://github.com/simkimsia/cloudflare-axi
-    author: simkimsia
-    domain: Cloudflare
-    description: "Inspect the current Worker's deployments, Pages projects, KV namespaces, and the logged-in account. Wraps the Cloudflare CLI (wrangler) with agent-ergonomic TOON output and structured errors."
-  - name: coolify-axi
-    url: https://github.com/radityasurya/coolify-axi
-    author: radityasurya
-    domain: Coolify
-    description: "Apps, databases, services, and deployments on self-hosted or cloud Coolify - name-based addressing, redacted secrets, and TOON output over the official coolify CLI."
+    description: "Create, search, update, and complete Asana tasks, projects, sections, tags, workspaces, comments, and attachments over the Asana REST API - read-first defaults, idempotent mutations, and token-efficient TOON output."
     admission:
       status: exception
-      reviewed_revision: 513e9bb2d9addf35135c9fcdd8d7f57ce0de4a43
+      reviewed_revision: 6178bc15657339d7e1c41d805c7345a981ae5c02
       reviewed_components:
-        - bin/coolify-axi.js
-        - src/cli.js
-        - src/args.js
-        - src/coolify.js
-        - src/commands/app.js
-        - src/commands/db.js
-      source_observations:
-        - "src/cli.js passes a `home` handler to runAxiCli that fetches `resource list` and returns counts, a state rollup, and per-resource state, so a no-argument run emits live data rather than the static TOON help in TOP_HELP."
-        - "src/args.js parses each subcommand with node:util parseArgs in strict mode and converts ERR_PARSE_ARGS_UNKNOWN_OPTION into an AxiError with code VALIDATION_ERROR whose suggestion names that subcommand's valid flags."
-        - "src/coolify.js runs the `coolify` binary through execFile and translates failures into AxiError codes MISSING_DEPENDENCY (ENOENT), AUTH_ERROR, NOT_FOUND, and COOLIFY_ERROR after dropping the wrapped CLI's update banner from stderr; redact()/redactValue() replace secret-named fields and the password segment matched by URL_CREDENTIALS in connection URLs unless --reveal is passed; resolveResource() raises VALIDATION_ERROR listing candidate uuids when a name matches more than one resource."
-        - "src/commands/app.js projects `app get` through the DETAIL_FIELDS allow-list, truncates `app logs` to the last LOG_LIMIT (4000) characters with a size hint and a --full escape hatch, and returns `unchanged: true` without calling the wrapped CLI when start or stop targets a resource already in that state."
-      exception: "`db get <name|uuid>` in src/commands/db.js returns a normal result payload reading `no database named <name>` for a lookup miss, so the process exits 0; the equivalent miss for applications, services, and servers goes through resolveResource() in src/coolify.js and raises a NOT_FOUND AxiError."
-  - name: porkbun-axi
-    url: https://github.com/ardaatahan/porkbun-axi
-    author: ardaatahan
-    domain: Domains / Porkbun
-    description: "Manage Porkbun domains, DNS records, SSL certificates, URL forwarding, nameservers, and glue records through the Porkbun API, with compact TOON output and explicit confirmation gates for registrations and destructive updates/deletes."
-    admission:
-      status: exception
-      reviewed_revision: 394fb206ea58c6d0aaa33a0f24bd6f70f84f206e
-      reviewed_components:
-        - src/commands/porkbun.ts
-        - src/output/errors.ts
-        - src/api.ts
-        - src/cli/args.ts
-        - src/index.ts
-      source_observations:
-        - "src/commands/porkbun.ts defines gate() which prints the change then throws UsageError unless --confirm is set; dns update/delete, forwarding delete, nameservers set, and glue update/delete call gate(); domains register uses its own --confirm check (not gate()), preflights checkDomain, then submits cost in cents with agreeToTerms only after --confirm; dns update refuses to run without --name."
-        - "src/output/errors.ts maps UsageError to exit 2 and AxiError to exit 1 on the documented 0/1/2 taxonomy; src/cli/args.ts throws UsageError on unknown flags with the valid flag set for that command; src/index.ts registers only allCommands from porkbun.ts."
-        - "src/api.ts reads PORKBUN_API_KEY and PORKBUN_SECRET_KEY from the environment into X-API-Key / X-Secret-API-Key headers (never the request body) and attaches a fresh Idempotency-Key UUID on idempotent writes; src/commands/porkbun.ts ssl retrieve prints PEM component sizes by default and only emits the certificate material with --json."
-      exception: "`dns create`, `forwarding create`, and `glue create` in src/commands/porkbun.ts print a change line then POST the mutation; they do not take --confirm or call gate()."
-  - name: wrangler-axi
-    url: https://github.com/masculinecache/wrangler-axi
-    author: masculinecache
-    domain: Cloudflare Wrangler
-    description: "Deploy Workers and Pages, manage KV namespaces, D1 databases, R2 buckets, and Worker secrets, and tail live logs with hard bounds - wraps the official Wrangler CLI with predictable TOON lists and structured errors."
-    admission:
-      status: exception
-      reviewed_revision: 67ff6c45e12f4bb71e42ee8b71d586480c0861be
-      reviewed_components:
+        - src/bin/asana-axi.ts
         - src/cli.ts
-        - src/commands/workers.ts
         - src/args.ts
-        - src/util.ts
-        - src/wrangler.ts
-        - src/errors.ts
-        - bin/wrangler-axi.ts
-      source_observations:
-        - "src/cli.ts registers whoami, workers, secrets, kv, d1, r2, and pages areas and returns structured output plus exit codes without calling process.exit; src/commands/workers.ts bounds tail streams by --max-entries or --timeout and renders compact event summaries."
-        - "src/args.ts and src/util.ts validate flags and convert unknown areas, subcommands, and flags into AxiError VALIDATION_ERROR responses with corrective suggestions; src/wrangler.ts maps non-zero Wrangler results into structured errors and reports a missing Wrangler dependency explicitly."
-      exception: "Mutating commands do not provide an AXI-level --confirm gate; delete and similar operations only forward Wrangler's --force behavior as -f or -y."
-  - name: chezmoi-axi
-    url: https://github.com/masculinecache/chezmoi-axi
-    author: masculinecache
-    domain: Dotfiles
-    description: "List, diff, add, re-add, apply, verify, and sync chezmoi-managed dotfiles with compact TOON output - template-aware re-add verdicts, preview dry-runs, and idempotent operations."
-    admission:
-      status: exception
-      reviewed_revision: ba1c969e1c92471c2fdfc82a6bfad70361fcf2d1
-      reviewed_components:
-        - chezmoi-axi
-      source_observations:
-        - "chezmoi-axi implements status, list, diff, add, re-add, apply, verify, sync, and commit as a single shell entrypoint with compact structured output, command-specific help, and exit 0/1/2 handling for success, runtime errors, and usage errors."
-        - "re-add uses chezmoi's verbose dry-run to distinguish changed, template-managed, and in-sync files; list caps output at 50 rows with --full, and sync adds branch protection, bounded log rotation, and a preview mode for headless operation."
-      exception: "apply and sync mutate the chezmoi state without an AXI-level --confirm gate; --preview provides a dry-run escape hatch."
-  - name: mem-axi
-    url: https://github.com/masculinecache/axi-memory
-    author: masculinecache
-    domain: Agent memory
-    description: "Durable cross-session agent memory as markdown + YAML frontmatter in a git repo - typed memories, priority-ranked search with L0 abstracts, OS-side dedup, and cross-machine sync."
-    admission:
-      status: admitted
-      reviewed_revision: f6fd3d37079540efb168a189b7a81573b472fb31
-      reviewed_components:
-        - mem
-        - docs/design.md
-        - docs/integration.md
-        - docs/harnesses.md
-      source_observations:
-        - "mem stores typed markdown memories with YAML frontmatter under objects/<type>, supports init, add, update, merge, dedup, search, show, list, review, status, sync, and stats, and emits compact structured output with explicit empty states and exit 0/1/2 errors."
-        - "mem add refuses credential-like title or body content unless --force is supplied, while dedup is dry-run by default and search/list rank results by priority and freshness with --limit and --min-priority controls; sync bounds pull and push operations with a 30-second timeout."
-  - name: fal-axi
-    url: https://github.com/ardaatahan/fal-axi
-    author: ardaatahan
-    domain: Image / Video Generation
-    description: "Generate images and videos and poll fal.ai queue status/results through the official @fal-ai/client, with compact TOON output, FAL_KEY env-only auth, and --confirm gates on paid generates."
-    admission:
-      status: exception
-      reviewed_revision: 532c85a4afcf13cb76b9d7f352fe947182a3ccb8
-      reviewed_components:
-        - src/commands/fal.ts
-        - src/commands/home.ts
-        - src/api/fal.ts
-        - src/cli/args.ts
-        - src/cli/router.ts
-        - src/output/errors.ts
-        - src/index.ts
-        - bin/fal-axi.js
-      source_observations:
-        - "src/commands/fal.ts registers models list, image generate, video generate, job status, and job result; image/video generate call requireConfirmation() which throws UsageError unless --confirm is set before createApi().submit(), and reject empty/whitespace prompts locally."
-        - "src/api/fal.ts reads FAL_KEY from the environment only via requireFalKey(), wraps @fal-ai/client queue.submit/status/result, and validates endpoint IDs (rejecting empty/`.`/`..` segments) plus request IDs before any network call."
-        - "src/output/errors.ts maps UsageError to exit 1 and RuntimeError to exit 2; src/cli/args.ts supports a `--` end-of-options terminator; src/index.ts registers only allCommands from fal.ts plus home help."
-      exception: "src/output/errors.ts maps UsageError to exit 1 and RuntimeError to exit 2, inverting AXI principle 6 (1=runtime, 2=usage); version probing only accepts `--version` via src/commands/home.ts and prints `fal-axi: <version>`, while `-v`/`-V` are rejected by short-flag handling in src/cli/args.ts instead of printing the bare version and exiting 0 (AXI principle 10)."
-  - name: canva-axi
-    url: https://github.com/ardaatahan/canva-axi
-    author: ardaatahan
-    domain: Design / Canva
-    description: "List, get, create, export, and autofill Canva designs through the official Canva Connect API, with compact TOON output, CANVA_ACCESS_TOKEN env-only auth, HTTPS-only API bases, and --confirm gates on mutating writes."
-    admission:
-      status: exception
-      reviewed_revision: 2ed9911e00172c735814d871c139346bd505f37a
-      reviewed_components:
-        - src/commands/canva.ts
-        - src/commands/home.ts
-        - src/api/client.ts
-        - src/cli/args.ts
-        - src/cli/router.ts
-        - src/output/errors.ts
-        - src/index.ts
-        - bin/canva-axi.js
-      source_observations:
-        - "src/commands/canva.ts registers designs list/get/create/dataset/export-formats, exports create/get/download, and autofills update/get; designs create, exports create, exports download, and autofills update call requireConfirmation() which throws UsageError unless --confirm is set before createApi() network calls."
-        - "src/api/client.ts reads CANVA_ACCESS_TOKEN from the environment only via requireAccessToken(), enforces HTTPS-only BASE_CANVA_CONNECT_API_URL (default https://api.canva.com/rest), validates IDs before requests, and rejects non-HTTPS download URLs/redirects."
-        - "src/output/errors.ts maps UsageError to exit 1 and RuntimeError to exit 2; src/cli/args.ts supports a `--` end-of-options terminator and rejects short flags; src/index.ts registers only allCommands from canva.ts plus home help."
-      exception: "src/output/errors.ts maps UsageError to exit 1 and RuntimeError to exit 2, inverting AXI principle 6 (1=runtime, 2=usage); version probing only accepts `--version` via src/commands/home.ts and prints `canva-axi: <version>`, while `-v`/`-V` are rejected by short-flag handling in src/cli/args.ts instead of printing the bare version and exiting 0 (AXI principle 10)."
-  - name: bws-axi
-    url: https://github.com/masculinecache/bws-axi
-    author: masculinecache
-    domain: Bitwarden Secrets Manager
-    description: "Agent-ergonomic Bitwarden Secrets Manager CLI - TOON output, values redacted by default, project/key scoped listings."
-    admission:
-      status: exception
-      reviewed_revision: e3a122cf5e24790e93279760e3f32a2d552beb0b
-      reviewed_components:
-        - bin/bws-axi
-        - bin/common.mjs
-        - skill/SKILL.md
-        - package.json
-      source_observations:
-        - "Read-only Bitwarden Secrets Manager CLI: list projects/secrets, key-scoped listings; values redacted unless `--full` is passed; token goes via BWS_ACCESS_TOKEN env or BWS_TOKEN_FILE (never argv)."
-        - "Exit codes mapped correctly (0 success, 2 usage, 1 runtime), output is TOON-ish with values redacted by default."
-        - "Reviewed against the published npm tarball @masculinecache/bws-axi@1.0.1 (gitHead e3a122cf…, sha256 e8cbfab67f826a0cf3a6e977bffe248b931072d64fc200d9e255e326a3a4266)."
-      exception: "Missing `-v`/`-V` fast path — `--version` probing only via AXI principle 10: the CLI rejects the short hand and prints an error, no bare `bws-axi <version>` probing."
-  - name: ha-axi
-    url: https://github.com/batamire/ha-axi
-    author: batamire
-    domain: Home Assistant
-    description: "Inspect entities, call services behind safety gates, render templates, and read area/device registries over Home Assistant REST and WebSocket with token-efficient TOON output."
-    admission:
-      status: exception
-      reviewed_revision: cad5c4532db19f9d6a2187082f136e2daccfa467
-      reviewed_components:
-        - src/cli.ts
-        - src/ha.ts
-        - src/service.ts
-        - src/safety.ts
         - src/config.ts
-        - src/ws.ts
-        - src/bridge.ts
-        - src/bin/ha-axi.ts
-      source_observations:
-        - "src/cli.ts registers ping, entity, service, template, history, logbook, area, device, statistics, and setup through runAxiCli, and its formatError maps AxiError VALIDATION_ERROR/AUTH_MISSING to exit 2 and every other failure to exit 1 while emitting a structured TOON error object with corrective suggestions."
-        - "src/service.ts serviceCall refuses the gated domains from src/safety.ts (lock, alarm_control_panel, cover) before any network activity with no override, refuses bulk or non-concrete targets (--all, area, device, entity_id 'all', or no explicit target) unless --i-mean-all is passed, and --dry-run prints the exact request without sending anything."
-        - "src/ha.ts sends the token only via the Authorization header, retries GET requests once on 5xx while never retrying POST mutations, applies a 5s connect timeout plus a configurable request timeout, and scrub()s the token out of every error message; src/config.ts resolves flags > HASS_URL/HASS_TOKEN env > config profiles and warns when the profile file is group/world-readable."
-        - "src/ws.ts runs a stateless one-shot WebSocket bridge (connect, auth hello, one id-correlated request/response, close, hard deadline) requiring Node >=22's native WebSocket, used by src/bridge.ts for area/device registry and statistics reads; all output is TOON-encoded via @toon-format/toon."
-      exception: "`service call` performs mutations without an AXI-level --confirm flag; safety relies on hard-refused gated domains, bulk-target refusals with the explicit --i-mean-all override, and --dry-run, and a profile with `insecure = true` disables TLS verification with a stderr warning."
-  - name: calcom-axi
-    url: https://github.com/simkimsia/calcom-axi
-    author: simkimsia
-    domain: Scheduling
-    description: "Read your Cal.com agenda, bookings and one booking's attendees and meeting link, event types, availability schedules, free slots for an event type, and the logged-in account. Wraps the Cal.com CLI (calcom) with agent-ergonomic TOON output and structured errors."
-  - name: screencast-axi
-    url: https://github.com/Valzon/screencast-axi
-    author: Valzon
-    domain: Screencasts
-    description: "Scaffold, rehearse, and record scripted Playwright walkthroughs of any website into mp4, webm, and a poster with a synthetic cursor and burnt-in captions - TOON output, structured errors, and a content-first status view via axi-sdk-js. Requires ffmpeg."
-  - name: basecamp-axi
-    url: https://github.com/calebl/basecamp-axi
-    author: calebl
-    domain: Project management
-    description: "Projects, to-dos, cards, messages, comments, Campfire chat, people, search, and cross-project assignment reports. Wraps the official `basecamp` CLI with TOON output, pre-computed totals, idempotent mutations, and a `--confirm` gate on trash/archive/restore."
-    admission:
-      status: admitted
-      reviewed_revision: ef8d0ea4b549d3441cbd0286a7d7ae638d58c8a9
-      reviewed_components:
-        - bin/basecamp-axi.ts
-        - src/cli.ts
-        - src/basecamp.ts
         - src/errors.ts
-        - src/args.ts
-        - src/toon.ts
+        - src/asana.ts
         - src/commands/home.ts
-        - src/commands/todo.ts
-        - src/commands/report.ts
-        - src/commands/recording.ts
-      source_observations:
-        - "bin/basecamp-axi.ts answers -v/--version through axi-sdk-js/fast-path before importing the command graph; src/cli.ts registers project, todo, todolist, card, message, comment, chat, people, search, report, recording, url, and setup through runAxiCli with per-command help text, and its formatError renders every failure as a TOON `error`/`code`/`help` block with the exit code from exitCodeForError."
-        - "src/basecamp.ts shells out to `basecamp <args> --json --no-hints --no-stats`, parses the JSON envelope, and src/errors.ts maps envelope codes and exit codes to AxiError codes (VALIDATION_ERROR, DEPENDENCY_MISSING, DEPENDENCY_OUTDATED, TOOL_DISABLED, NOT_FOUND, AUTH_REQUIRED, FORBIDDEN, RATE_LIMITED, NETWORK_ERROR, AMBIGUOUS, API_ERROR) with a corrective suggestion each; src/args.ts rejects unknown flags and extra positionals as VALIDATION_ERROR."
-        - "src/toon.ts encodes lists and details with @toon-format/toon, and countLine prints `count: N of T total` from the totals parsed in src/basecamp.ts; src/commands/home.ts is a content-first dashboard of assigned items with an overdue count and next-step help lines, degrading to a structured unavailable message when the CLI is missing or unauthenticated."
-        - "src/commands/todo.ts `done`/`reopen` read current state first and report `already done (no-op)` instead of re-mutating; src/commands/recording.ts gates trash, archive, and restore behind --confirm, printing a `would_change` preview with from/to status and the exact command to apply when the flag is absent, skipping items already in the target status, and emitting an undo hint after applying. No other command deletes or destroys data."
-  - name: msgraph-axi
-    url: https://github.com/jeffreyhaen/msgraph-axi
-    author: jeffreyhaen
-    domain: Microsoft 365 / Outlook
-    description: "Read, search, draft, and send Outlook mail and manage calendars over the `m365` CLI - read-only by default, with TOON output and mutations behind `--execute`/`--confirm`."
-    admission:
-      status: admitted
-      reviewed_revision: cd31b17b1f2594b5a77f1738ec0f359eb5fb1555
-      reviewed_components:
-        - src/bin/msgraph-axi.ts
-        - src/main.ts
-        - src/toon.ts
-        - src/flags.ts
-        - src/backend.ts
-        - src/commands/home.ts
-        - src/commands/mail.ts
-        - src/commands/calendar.ts
-        - src/commands/mailflow.ts
-        - src/commands/raw.ts
-      source_observations:
-        - "src/bin/msgraph-axi.ts answers -v/--version and --help through axi-sdk-js/fast-path before importing the command graph, and src/main.ts registers auth, mail, calendar, user, and raw through runAxiCli with per-command help plus a `home` handler, so a bare run renders the content-first view instead of help text."
-        - "src/toon.ts caps cells at CELL_LIMIT = 200 with an ellipsis unless --full is passed, and each list command declares a token-efficient default schema (MAIL_LIST_DEFAULTS = id/from/subject/received, EVENT_DEFAULTS = id/subject/start/end) that `--fields a,b` extends; list results carry a `count` aggregate, a `truncated` marker, and `help[]` next-step lines, while src/commands/home.ts degrades to a signedIn: false object with sign-in help instead of throwing when unauthenticated."
-        - "src/flags.ts collects unknown --flags and raises VALIDATION_ERROR naming the subcommand's valid flags (observed at this revision: `mail list --bogus` prints a TOON error/code/help block and exits 2, and an unknown command exits 2); src/backend.ts spawns `m365` with stdin ignored so no agent-driven path can block on a prompt, and the single stdio: inherit call is the explicit `auth login` device-code flow."
-        - "Writes are gated consistently: src/commands/mail.ts `mail send`, src/commands/calendar.ts `calendar create`/`update`, and src/commands/mailflow.ts `mail draft` return a preview with `Run with --execute ...` help and never call `m365` without --execute; `mail delete`, `calendar cancel`, and `calendar delete` require an exact-match `--execute --confirm <id>`; src/commands/raw.ts applies the same --execute rule to raw POST/PUT/PATCH/DELETE."
-  - name: frontier-axi
-    url: https://github.com/oguzalp7/frontier-axi
-    author: oguzalp7
-    domain: Pre-flight SDLC & Cognitive Bridge
-    description: "Stage ambiguous ideas and architectural inquiries until grilling settles them into tasks-axi tickets with token-efficient TOON output."
-    admission:
-      status: exception
-      reviewed_revision: 6e17b3ec0895843c396c9c4c72e22252be99beb4
-      reviewed_components:
-        - bin/frontier-axi.ts
-        - src/cli.ts
-        - src/toon.ts
-        - src/storage.ts
-        - src/commands/promote.ts
-        - src/commands/crud.ts
-        - src/commands/home.ts
-        - src/errors.ts
-        - src/args.ts
-        - src/index.ts
-        - src/version.ts
-      source_observations:
-        - "bin/frontier-axi.ts answers bare -v/-V/--version through axi-sdk-js/fast-path with leaf src/version.ts before dynamically importing the command graph; src/cli.ts registers add/list/show/update/question/promote/done/cancel/reopen via runAxiCli with content-first home."
-        - "src/toon.ts encodes dashboard/list/show with @toon-format/toon; home summary carries active_frontiers/open_questions plus help[]; show accepts --full while truncate() caps body/reason/question text at 80 chars."
-        - "src/args.ts requireNoUnknownFlags raises VALIDATION_ERROR on command paths; errors use axi-sdk-js exitCodeForError (VALIDATION_ERROR→2, else→1); add/done/cancel/reopen/promote are idempotent already-no-ops; promote blocks open questions unless --force and spawns tasks-axi via spawnSync argv (not shell)."
-      exception: "src/toon.ts truncate()/renderShow truncates body/reason/question text to 80 chars with '...' only — no total-size hint and no --full help line when truncated (AXI principle 3); src/toon.ts renderActiveList empty path emits encode({ active: [] }) without definitive zero-results text (AXI principle 5)."
-  - name: design-system-axi
-    url: https://github.com/isamrish/design-system-axi
-    author: isamrish
-    domain: Design systems
-    description: "Look up components, import paths, props, and examples from a design system's Storybook manifest and metadata, with a deterministic `find` that marks weak matches - Primer React first."
-    admission:
-      status: admitted
-      reviewed_revision: a584548b919131286c0760204a006987af6b2fbe
-      reviewed_components:
-        - bin/design-system-axi.ts
-        - src/cli.ts
-        - src/help.ts
-        - src/args.ts
-        - src/errors.ts
-        - src/commands/home.ts
-        - src/commands/components.ts
-        - src/commands/component.ts
-        - src/commands/find.ts
-        - src/commands/sync.ts
+        - src/commands/task.ts
         - src/commands/setup.ts
-        - src/catalog/store.ts
-        - src/catalog/locate.ts
-        - src/search/rank.ts
-        - src/skill.ts
-        - src/version.ts
-        - src/format/suggest.ts
-      source_observations:
-        - "bin/design-system-axi.ts answers bare -v/-V/--version through axi-sdk-js/fast-path with the leaf src/version.ts before dynamically importing src/cli.js; src/cli.ts registers components, component, find, sync, and setup through runAxiCli with getCommandHelp from src/help.ts (per-command usage and flags) and a `home` handler, so a bare run renders the content-first view instead of help text."
-        - "src/commands/home.ts returns the design system, catalog age and sources, an installed-version `matches`/`mismatch` check with a sync warning, and per-status component counts; with no catalog it returns `catalog: none at <path>` plus sync help instead of an error. src/commands/components.ts emits name/status/from rows with a `total`, `excluded: N deprecated`, and `truncated: showing N of M (use --limit)` at DEFAULT_LIMIT = 100, and an explicit `result` when a status filter is empty."
-        - "src/commands/find.ts emits component/status/match/why rows (DEFAULT_LIMIT = 5); src/search/rank.ts derives `why` from the strongest field match and marks a match strong only for a direct query word in the name, a subcomponent name, or the description (IDENTITY_FIELDS), otherwise weak; find adds `result: no strong match ...` when every match is weak, `matches: []` with `result: no components match ...` when nothing matches, and `why_shown: evidence text shortened to 40 chars; run ... component <Name> for the full text` when rank.ts reports whyShortened."
-        - "src/commands/component.ts caps default props at PROP_LIMIT = 8 with `props_shown: 8 of N`, adds a `props_note` that inherited props may be missing, and reports every shortened field with a size hint and escape hatch - `description_shown: 299 of N chars (use --full)` past DESCRIPTION_LIMIT = 300, `example_shown` past EXAMPLE_LIMIT = 600, and `types_shown` when prop types exceed TYPE_LIMIT = 60; it lists subcomponents, related components, and duplicate-name `other_matches` with an `--id` hint, and `--full` returns untruncated descriptions, types, and every example with no hints."
-        - "src/args.ts parses flags with node:util parseArgs strict: true and converts misuse into VALIDATION_ERROR; src/errors.ts defines NO_CATALOG, NOT_FOUND (with edit-distance `did you mean`), SOURCE_UNREACHABLE, MANIFEST_SHAPE, and CATALOG_INVALID with suggestions; nothing prompts. Observed on the published 0.1.4 build of this revision: unknown flags, a missing intent, and --limit 0 exit 2; NOT_FOUND, NO_CATALOG, CATALOG_INVALID, and SOURCE_UNREACHABLE exit 1."
-        - "src/commands/sync.ts is the only network path; src/catalog/store.ts validates and writes the catalog to a temp file and renames it, and re-running sync against unchanged sources reports `changes: none` (observed), while an unreadable catalog is replaced and reported as such. src/catalog/locate.ts resolves the nearest catalog above the working directory. src/commands/setup.ts installs project or --user session-start hooks via installSessionStartHooks and reports per-agent status from sessionStartHookStatus; src/skill.ts generates a minimal SKILL.md that defers to `npx -y design-system-axi`."
-  - name: shopify-axi
-    url: https://github.com/elliottkan/shopify-axi
-    author: elliottkan
-    domain: Shopify
-    description: "Search shopify.dev and validate generated GraphQL, Liquid themes, and Polaris components against the real schemas - wraps Shopify's Dev MCP server and exits non-zero on hallucinated fields."
-    admission:
-      status: admitted
-      reviewed_revision: cf30cacd850d742857210826102c150cad8fb2ce
-      reviewed_components:
-        - bin/shopify-axi.ts
-        - src/cli.ts
-        - src/flags.ts
-        - src/usage.ts
-        - src/version.ts
-        - src/mcp.ts
-        - src/session.ts
-        - src/apis.ts
-        - src/help.ts
-        - src/commands/docs.ts
-        - src/commands/learn.ts
-        - src/commands/validate.ts
-        - src/shopify-axi.test.ts
+        - skills/asana-axi/SKILL.md
         - package.json
         - LICENSE
       source_observations:
-        - "bin/shopify-axi.ts uses axi-sdk-js/fast-path tryFastPath for bare -v/-V/--version and prints the bare version; src/cli.ts routes through runAxiCli with a content-first home view and the apis, learn, docs, validate, and setup hooks subcommands."
-        - "src/usage.ts raises AxiError with code VALIDATION_ERROR for usage mistakes, which the SDK maps to exit 2, while other AxiError codes exit 1; src/flags.ts rejects unknown flags and missing values, and the help text documents the 0/1/2 exit taxonomy."
-        - "docs, learn, and validate wrap the Shopify Dev MCP server over local stdio in src/mcp.ts with only the optional SHOPIFY_DEV_MCP_CMD and SHOPIFY_AXI_MODEL environment overrides; no API tokens or secrets appear on the CLI surface. Truncated output is recoverable with --full and empty docs results are an explicit count: 0."
-        - "No paid or mutating store writes exist; failing validations set process.exitCode = 1 with structured output, setup hooks is explicit opt-in via installSessionStartHooks, and an MIT LICENSE is present."
+        - "src/bin/asana-axi.ts answers bare -v/-V/--version through axi-sdk-js/fast-path before importing src/cli.js; src/cli.ts registers home, task, project, workspace, tag, me, and setup through runAxiCli with content-first home (src/commands/home.ts) that reports auth, my_tasks, and optional project counts."
+        - "src/args.ts is a strict parser: unknown flags and unknown subcommands raise AxiError VALIDATION_ERROR (exit 2) naming valid flags/subcommands; src/config.ts reads ASANA_ACCESS_TOKEN from the environment or ./.env (never as a CLI flag) and redacts the token from error text."
+        - "src/commands/setup.ts installs SessionStart hooks only via explicit `setup hooks` (Claude Code / Codex / OpenCode) using axi-sdk-js helpers; ordinary commands do not touch agent config. MIT LICENSE; runtime dependency axi-sdk-js only."
+        - "src/commands/task.ts gates only `task delete` behind --confirm; create, edit, complete, reopen, comment, attach, move, and tag mutations POST/PUT to the Asana REST API without an AXI-level confirmation gate."
+      exception: "src/commands/task.ts create/edit/complete/reopen/comment/attach/move and tag writes call the Asana REST API immediately without --confirm; only `task delete` requires --confirm."
   - name: asana-axi
     url: https://github.com/elliottkan/asana-axi
     author: elliottkan
@@ -694,6 +116,175 @@ community:
         - "src/format/toon.ts renders lists/details/errors through @toon-format/toon with no field-length truncation or --full escape hatch (no observed AXI principle-3 truncation logic, unlike design-system-axi/frontier-axi); output is otherwise structured (error+code+suggestions) and consistent across commands."
         - "package.json declares dependencies @modelcontextprotocol/sdk, @toon-format/toon, axi-sdk-js, open with no unexpected network or shell-exec surface beyond the Asana MCP endpoint and the OAuth browser-open flow; an MIT LICENSE is present and matches the catalog author."
       exception: "src/commands/tasks.ts delete/update/create send real mutating Asana API calls (via MCP) with no confirmation prompt or --dry-run; a scripted or hallucinated `asana-axi tasks delete <gid>` executes immediately. src/format/toon.ts has no truncation or --full hint for long fields (AXI principle 3), unlike sibling catalog entries."
+  - name: aws-axi
+    url: https://github.com/thatdudealso/aws-axi
+    author: thatdudealso
+    domain: AWS
+    description: "Discover, plan, provision, deploy, and inspect AWS services for hosting web, backend, database, and AI workloads through safe token-efficient CLI workflows."
+  - name: axi-axi
+    url: https://github.com/CodyEngel/axi-axi
+    author: CodyEngel
+    domain: AXI authoring
+    description: "Scaffold a compliant AXI, read the 10 principles in token-tuned slices, and run read-only compliance checks against a candidate CLI."
+  - name: az-axi
+    url: https://github.com/masyanru/az-axi
+    author: masyanru
+    domain: Azure
+    description: "Discover, inspect, query, and safely mutate Azure through token-efficient CLI workflows over every az module."
+  - name: basecamp-axi
+    url: https://github.com/calebl/basecamp-axi
+    author: calebl
+    domain: Project management
+    description: "Projects, to-dos, cards, messages, comments, Campfire chat, people, search, and cross-project assignment reports. Wraps the official `basecamp` CLI with TOON output, pre-computed totals, idempotent mutations, and a `--confirm` gate on trash/archive/restore."
+    admission:
+      status: admitted
+      reviewed_revision: ef8d0ea4b549d3441cbd0286a7d7ae638d58c8a9
+      reviewed_components:
+        - bin/basecamp-axi.ts
+        - src/cli.ts
+        - src/basecamp.ts
+        - src/errors.ts
+        - src/args.ts
+        - src/toon.ts
+        - src/commands/home.ts
+        - src/commands/todo.ts
+        - src/commands/report.ts
+        - src/commands/recording.ts
+      source_observations:
+        - "bin/basecamp-axi.ts answers -v/--version through axi-sdk-js/fast-path before importing the command graph; src/cli.ts registers project, todo, todolist, card, message, comment, chat, people, search, report, recording, url, and setup through runAxiCli with per-command help text, and its formatError renders every failure as a TOON `error`/`code`/`help` block with the exit code from exitCodeForError."
+        - "src/basecamp.ts shells out to `basecamp <args> --json --no-hints --no-stats`, parses the JSON envelope, and src/errors.ts maps envelope codes and exit codes to AxiError codes (VALIDATION_ERROR, DEPENDENCY_MISSING, DEPENDENCY_OUTDATED, TOOL_DISABLED, NOT_FOUND, AUTH_REQUIRED, FORBIDDEN, RATE_LIMITED, NETWORK_ERROR, AMBIGUOUS, API_ERROR) with a corrective suggestion each; src/args.ts rejects unknown flags and extra positionals as VALIDATION_ERROR."
+        - "src/toon.ts encodes lists and details with @toon-format/toon, and countLine prints `count: N of T total` from the totals parsed in src/basecamp.ts; src/commands/home.ts is a content-first dashboard of assigned items with an overdue count and next-step help lines, degrading to a structured unavailable message when the CLI is missing or unauthenticated."
+        - "src/commands/todo.ts `done`/`reopen` read current state first and report `already done (no-op)` instead of re-mutating; src/commands/recording.ts gates trash, archive, and restore behind --confirm, printing a `would_change` preview with from/to status and the exact command to apply when the flag is absent, skipping items already in the target status, and emitting an undo hint after applying. No other command deletes or destroys data."
+  - name: brevo-axi
+    url: https://github.com/brycehamrick/brevo-axi
+    author: brycehamrick
+    domain: Email marketing / Messaging
+    description: "Send and audit transactional email and SMS, manage campaigns, contacts, lists, attributes, CRM deals, companies, tasks, notes, senders, domains, and webhooks over the Brevo v3 REST API - sandbox-validated sends and `--confirm`-gated mutations with token-efficient TOON output."
+    admission:
+      status: admitted
+      reviewed_revision: c4734bb26af5f530eb6e2dc21db8fb03132ed5aa
+      reviewed_components:
+        - bin/brevo-axi.js
+        - src/index.ts
+        - src/lib/args.ts
+        - src/lib/env.ts
+        - src/lib/auth.ts
+        - src/lib/output.ts
+        - src/commands/home.ts
+        - src/commands/email.ts
+        - src/commands/sms.ts
+        - src/commands/setup.ts
+        - package.json
+        - LICENSE
+      source_observations:
+        - "src/index.ts dispatches through runAxiCli with tryFastPath version handling and a content-first home; src/lib/args.ts uses node:util parseArgs in strict mode and maps unknown options to VALIDATION_ERROR (exit 2) with the valid flag set; requireConfirm() refuses mutations until --confirm."
+        - "src/lib/env.ts and src/lib/auth.ts require BREVO_API_KEY from the environment (HTTPS-only API base, no embedded credentials); email send supports --sandbox validation without sending and still requires --confirm for live sends; SMS and CRM/contact/list/campaign/webhook writes are similarly gated."
+        - "src/commands/setup.ts installs opt-in SessionStart hooks only on explicit `setup hooks`; MIT LICENSE; runtime dependency axi-sdk-js."
+  - name: bun-axi
+    url: https://github.com/mlegls/bun-axi
+    author: mlegls
+    domain: Bun
+    description: "Run Bun tests and package.json scripts and get counts, failure locations, load errors, and tsc/oxlint diagnostics instead of raw logs - plus dependency and npm registry lookups."
+    admission:
+      status: admitted
+      reviewed_revision: e10a27006ead6e23f8576b20f90abd775e05059a
+      reviewed_components:
+        - bin/bun-axi.ts
+        - src/cli.ts
+        - src/flags.ts
+        - src/proc.ts
+        - src/tests.ts
+        - src/diagnostics.ts
+        - src/packages.ts
+        - src/version.ts
+        - skills/bun-axi/SKILL.md
+        - test/cli.test.ts
+        - test/parse.test.ts
+        - package.json
+        - README.md
+      source_observations:
+        - "bin/bun-axi.ts answers --version through axi-sdk-js/fast-path from the leaf src/version.ts before importing src/cli.ts; src/version.ts and package.json both say 0.1.1, matching the published npm release. Every command parses its own flag set with node:util parseArgs in strict mode, so an unknown flag is a VALIDATION_ERROR (exit 2) listing that command's valid flags; `--help` is answered per command from a static table. versions and search pass `--limit` through count() in src/flags.ts, which throws VALIDATION_ERROR for anything but a positive integer before any registry fetch (test/cli.test.ts covers abc, -1, 0, and 2.5 exiting 2). This revision differs from the earlier exception revision e3645219 only by that count() helper, its two call sites in src/cli.ts, that test, and the 0.1.1 version bump."
+        - "test runs `bun test --reporter=junit` and reports counts, each failure's file:line:col and first message line, and load errors recovered from the console; failures are capped at 30 and messages at 240 chars with a --full escape hatch, the full log path is always printed, and the help[] rerun hint re-escapes the failing test name. run refuses scripts absent from package.json, strips bun's `$ cmd` echo lines from previews, and recognizes tsc, eslint/oxlint unix, and oxlint pretty diagnostics grouped by file. Empty states are explicit: `0 found`, `0 packages match`, `0 outdated`, `0 installed versions`."
+        - "Registry commands (view, versions, deps, search) use fetch against NPM_CONFIG_REGISTRY or registry.npmjs.org, translate 404 to NOT_FOUND with a search hint and other failures to REGISTRY_ERROR/NETWORK_ERROR, and never mutate anything. outdated and why wrap `bun outdated` / `bun why` read-only. Session hooks come from the SDK's installSessionStartHooks via `setup hooks` with --check/--uninstall/--project; the skill is skills/bun-axi/SKILL.md."
+  - name: bws-axi
+    url: https://github.com/masculinecache/bws-axi
+    author: masculinecache
+    domain: Bitwarden Secrets Manager
+    description: "Agent-ergonomic Bitwarden Secrets Manager CLI - TOON output, values redacted by default, project/key scoped listings."
+    admission:
+      status: exception
+      reviewed_revision: e3a122cf5e24790e93279760e3f32a2d552beb0b
+      reviewed_components:
+        - bin/bws-axi
+        - bin/common.mjs
+        - skill/SKILL.md
+        - package.json
+      source_observations:
+        - "Read-only Bitwarden Secrets Manager CLI: list projects/secrets, key-scoped listings; values redacted unless `--full` is passed; token goes via BWS_ACCESS_TOKEN env or BWS_TOKEN_FILE (never argv)."
+        - "Exit codes mapped correctly (0 success, 2 usage, 1 runtime), output is TOON-ish with values redacted by default."
+        - "Reviewed against the published npm tarball @masculinecache/bws-axi@1.0.1 (gitHead e3a122cf…, sha256 e8cbfab67f826a0cf3a6e977bffe248b931072d64fc200d9e255e326a3a4266)."
+      exception: "Missing `-v`/`-V` fast path — `--version` probing only via AXI principle 10: the CLI rejects the short hand and prints an error, no bare `bws-axi <version>` probing."
+  - name: calcom-axi
+    url: https://github.com/simkimsia/calcom-axi
+    author: simkimsia
+    domain: Scheduling
+    description: "Read your Cal.com agenda, bookings and one booking's attendees and meeting link, event types, availability schedules, free slots for an event type, and the logged-in account. Wraps the Cal.com CLI (calcom) with agent-ergonomic TOON output and structured errors."
+  - name: calendly-axi
+    url: https://github.com/JarvusInnovations/calendly-axi
+    author: Jarvus Innovations
+    domain: Scheduling
+    description: "The Calendly booking loop from the shell - see what's scheduled, mint single-use booking links, book directly, cancel, and manage event types, availability, and webhooks."
+  - name: canva-axi
+    url: https://github.com/ardaatahan/canva-axi
+    author: ardaatahan
+    domain: Design / Canva
+    description: "List, get, create, export, and autofill Canva designs through the official Canva Connect API, with compact TOON output, CANVA_ACCESS_TOKEN env-only auth, HTTPS-only API bases, and --confirm gates on mutating writes."
+    admission:
+      status: exception
+      reviewed_revision: 2ed9911e00172c735814d871c139346bd505f37a
+      reviewed_components:
+        - src/commands/canva.ts
+        - src/commands/home.ts
+        - src/api/client.ts
+        - src/cli/args.ts
+        - src/cli/router.ts
+        - src/output/errors.ts
+        - src/index.ts
+        - bin/canva-axi.js
+      source_observations:
+        - "src/commands/canva.ts registers designs list/get/create/dataset/export-formats, exports create/get/download, and autofills update/get; designs create, exports create, exports download, and autofills update call requireConfirmation() which throws UsageError unless --confirm is set before createApi() network calls."
+        - "src/api/client.ts reads CANVA_ACCESS_TOKEN from the environment only via requireAccessToken(), enforces HTTPS-only BASE_CANVA_CONNECT_API_URL (default https://api.canva.com/rest), validates IDs before requests, and rejects non-HTTPS download URLs/redirects."
+        - "src/output/errors.ts maps UsageError to exit 1 and RuntimeError to exit 2; src/cli/args.ts supports a `--` end-of-options terminator and rejects short flags; src/index.ts registers only allCommands from canva.ts plus home help."
+      exception: "src/output/errors.ts maps UsageError to exit 1 and RuntimeError to exit 2, inverting AXI principle 6 (1=runtime, 2=usage); version probing only accepts `--version` via src/commands/home.ts and prints `canva-axi: <version>`, while `-v`/`-V` are rejected by short-flag handling in src/cli/args.ts instead of printing the bare version and exiting 0 (AXI principle 10)."
+  - name: cargo-axi
+    url: https://github.com/AG9898/cargo-axi
+    author: AG9898
+    domain: Rust / Cargo
+    description: "Inspect Rust workspaces and run safe `check` or Clippy validation with compact TOON output and opt-in session context."
+  - name: celery-axi
+    url: https://github.com/thatdudealso/celery-axi
+    author: thatdudealso
+    domain: Celery
+    description: "Discover, inspect, run, debug, monitor, schedule, control, and safely operate Celery task queues through token-efficient CLI workflows."
+  - name: chezmoi-axi
+    url: https://github.com/masculinecache/chezmoi-axi
+    author: masculinecache
+    domain: Dotfiles
+    description: "List, diff, add, re-add, apply, verify, and sync chezmoi-managed dotfiles with compact TOON output - template-aware re-add verdicts, preview dry-runs, and idempotent operations."
+    admission:
+      status: exception
+      reviewed_revision: ba1c969e1c92471c2fdfc82a6bfad70361fcf2d1
+      reviewed_components:
+        - chezmoi-axi
+      source_observations:
+        - "chezmoi-axi implements status, list, diff, add, re-add, apply, verify, sync, and commit as a single shell entrypoint with compact structured output, command-specific help, and exit 0/1/2 handling for success, runtime errors, and usage errors."
+        - "re-add uses chezmoi's verbose dry-run to distinguish changed, template-managed, and in-sync files; list caps output at 50 rows with --full, and sync adds branch protection, bounded log rotation, and a preview mode for headless operation."
+      exception: "apply and sync mutate the chezmoi state without an AXI-level --confirm gate; --preview provides a dry-run escape hatch."
+  - name: clickup-axi
+    url: https://github.com/JanSuthacheeva/clickup-axi
+    author: JanSuthacheeva
+    domain: ClickUp
+    description: "List your open tasks, view a task with its newest comments inline, and change task status - truncation-aware, TOON-style output."
   - name: clockify-axi
     url: https://github.com/elliottkan/clockify-axi
     author: elliottkan
@@ -729,6 +320,265 @@ community:
         - "src/rest.ts is the only network path: it reads CLOCKIFY_API_KEY from the environment (never accepted as a CLI flag, so it can't leak into shell history/process args), sends it as the x-api-key header, and raises AxiError with a distinct code for missing_api_key, api_unavailable, auth_failed (401/403), and generic api_error. No secrets appear in command output."
         - "src/commands/timer.ts, log.ts, report.ts, clients.ts, projects.ts, tasks.ts, and tags.ts each wrap one or a few Clockify REST/Reports API endpoints with thin flag parsing (project/task/tag IDs, ISO date/time, --range for reports) and return plain JSON objects for the SDK to encode; src/reports.ts computeDateRange resolves the named ranges (THIS_WEEK, LAST_MONTH, CUSTOM, etc.) using the cached weekStart so week boundaries match the user's real Clockify settings rather than assuming Monday."
         - "No mutating call is destructive beyond what Clockify's own API already allows an authenticated key to do (start/stop/log/patch time entries); there is no delete-workspace or bulk-destroy surface. An MIT LICENSE is present, and src/clockify-axi.test.ts exercises flag parsing and command routing."
+  - name: cloudflare-axi
+    url: https://github.com/simkimsia/cloudflare-axi
+    author: simkimsia
+    domain: Cloudflare
+    description: "Inspect the current Worker's deployments, Pages projects, KV namespaces, and the logged-in account. Wraps the Cloudflare CLI (wrangler) with agent-ergonomic TOON output and structured errors."
+  - name: comfy-cloud-axi
+    url: https://github.com/intelligentrascal/comfy-cloud-axi
+    author: intelligentrascal
+    domain: AI generation
+    description: "Generate images, video, and audio via 22 partner models, submit ComfyUI workflows and templates, track jobs, estimate credits before generating, search nodes, and report usage — wraps the Comfy Cloud MCP server with token-efficient TOON output."
+    admission:
+      status: exception
+      reviewed_revision: 0f5b75eb201512604c87f6d75f4234bb685e0879
+      exception: "The published 0.1.6 package reports version 0.1.4; `generate ... --confirm --type` defaults to image and `job chain <id> --dry-run` passes NaN before MCP calls; nodes and saved workflows report empty results for `{}` responses; paid `workflow run` and `templates run` ignore surplus positionals; and other mutating commands can ignore trailing flags."
+  - name: confluence-axi
+    url: https://github.com/emilchristensen/atlassian-axi/tree/main/packages/confluence-axi
+    author: emilchristensen
+    domain: Documentation
+    description: "Read and write Confluence Cloud pages and spaces directly over the REST API with token-efficient TOON output and OAuth 3LO or API-token auth."
+  - name: coolify-axi
+    url: https://github.com/radityasurya/coolify-axi
+    author: radityasurya
+    domain: Coolify
+    description: "Apps, databases, services, and deployments on self-hosted or cloud Coolify - name-based addressing, redacted secrets, and TOON output over the official coolify CLI."
+    admission:
+      status: exception
+      reviewed_revision: 513e9bb2d9addf35135c9fcdd8d7f57ce0de4a43
+      reviewed_components:
+        - bin/coolify-axi.js
+        - src/cli.js
+        - src/args.js
+        - src/coolify.js
+        - src/commands/app.js
+        - src/commands/db.js
+      source_observations:
+        - "src/cli.js passes a `home` handler to runAxiCli that fetches `resource list` and returns counts, a state rollup, and per-resource state, so a no-argument run emits live data rather than the static TOON help in TOP_HELP."
+        - "src/args.js parses each subcommand with node:util parseArgs in strict mode and converts ERR_PARSE_ARGS_UNKNOWN_OPTION into an AxiError with code VALIDATION_ERROR whose suggestion names that subcommand's valid flags."
+        - "src/coolify.js runs the `coolify` binary through execFile and translates failures into AxiError codes MISSING_DEPENDENCY (ENOENT), AUTH_ERROR, NOT_FOUND, and COOLIFY_ERROR after dropping the wrapped CLI's update banner from stderr; redact()/redactValue() replace secret-named fields and the password segment matched by URL_CREDENTIALS in connection URLs unless --reveal is passed; resolveResource() raises VALIDATION_ERROR listing candidate uuids when a name matches more than one resource."
+        - "src/commands/app.js projects `app get` through the DETAIL_FIELDS allow-list, truncates `app logs` to the last LOG_LIMIT (4000) characters with a size hint and a --full escape hatch, and returns `unchanged: true` without calling the wrapped CLI when start or stop targets a resource already in that state."
+      exception: "`db get <name|uuid>` in src/commands/db.js returns a normal result payload reading `no database named <name>` for a lookup miss, so the process exits 0; the equivalent miss for applications, services, and servers goes through resolveResource() in src/coolify.js and raises a NOT_FOUND AxiError."
+  - name: cyber-mux
+    url: https://github.com/cyberuni/cyber-mux
+    author: unional
+    domain: Terminal multiplexers
+    description: "Open, send, read, focus, and close terminal panes across tmux, herdr, and WezTerm through one detection-driven contract with token-efficient output."
+  - name: databricks-axi
+    url: https://github.com/p33ves/databricks-axi
+    author: p33ves
+    domain: Databricks
+    description: "Run Databricks jobs, watch runs, and pull failure logs inline over the official databricks CLI - more domains coming soon."
+  - name: design-system-axi
+    url: https://github.com/isamrish/design-system-axi
+    author: isamrish
+    domain: Design systems
+    description: "Look up components, import paths, props, and examples from a design system's Storybook manifest and metadata, with a deterministic `find` that marks weak matches - Primer React first."
+    admission:
+      status: admitted
+      reviewed_revision: a584548b919131286c0760204a006987af6b2fbe
+      reviewed_components:
+        - bin/design-system-axi.ts
+        - src/cli.ts
+        - src/help.ts
+        - src/args.ts
+        - src/errors.ts
+        - src/commands/home.ts
+        - src/commands/components.ts
+        - src/commands/component.ts
+        - src/commands/find.ts
+        - src/commands/sync.ts
+        - src/commands/setup.ts
+        - src/catalog/store.ts
+        - src/catalog/locate.ts
+        - src/search/rank.ts
+        - src/skill.ts
+        - src/version.ts
+        - src/format/suggest.ts
+      source_observations:
+        - "bin/design-system-axi.ts answers bare -v/-V/--version through axi-sdk-js/fast-path with the leaf src/version.ts before dynamically importing src/cli.js; src/cli.ts registers components, component, find, sync, and setup through runAxiCli with getCommandHelp from src/help.ts (per-command usage and flags) and a `home` handler, so a bare run renders the content-first view instead of help text."
+        - "src/commands/home.ts returns the design system, catalog age and sources, an installed-version `matches`/`mismatch` check with a sync warning, and per-status component counts; with no catalog it returns `catalog: none at <path>` plus sync help instead of an error. src/commands/components.ts emits name/status/from rows with a `total`, `excluded: N deprecated`, and `truncated: showing N of M (use --limit)` at DEFAULT_LIMIT = 100, and an explicit `result` when a status filter is empty."
+        - "src/commands/find.ts emits component/status/match/why rows (DEFAULT_LIMIT = 5); src/search/rank.ts derives `why` from the strongest field match and marks a match strong only for a direct query word in the name, a subcomponent name, or the description (IDENTITY_FIELDS), otherwise weak; find adds `result: no strong match ...` when every match is weak, `matches: []` with `result: no components match ...` when nothing matches, and `why_shown: evidence text shortened to 40 chars; run ... component <Name> for the full text` when rank.ts reports whyShortened."
+        - "src/commands/component.ts caps default props at PROP_LIMIT = 8 with `props_shown: 8 of N`, adds a `props_note` that inherited props may be missing, and reports every shortened field with a size hint and escape hatch - `description_shown: 299 of N chars (use --full)` past DESCRIPTION_LIMIT = 300, `example_shown` past EXAMPLE_LIMIT = 600, and `types_shown` when prop types exceed TYPE_LIMIT = 60; it lists subcomponents, related components, and duplicate-name `other_matches` with an `--id` hint, and `--full` returns untruncated descriptions, types, and every example with no hints."
+        - "src/args.ts parses flags with node:util parseArgs strict: true and converts misuse into VALIDATION_ERROR; src/errors.ts defines NO_CATALOG, NOT_FOUND (with edit-distance `did you mean`), SOURCE_UNREACHABLE, MANIFEST_SHAPE, and CATALOG_INVALID with suggestions; nothing prompts. Observed on the published 0.1.4 build of this revision: unknown flags, a missing intent, and --limit 0 exit 2; NOT_FOUND, NO_CATALOG, CATALOG_INVALID, and SOURCE_UNREACHABLE exit 1."
+        - "src/commands/sync.ts is the only network path; src/catalog/store.ts validates and writes the catalog to a temp file and renames it, and re-running sync against unchanged sources reports `changes: none` (observed), while an unreadable catalog is replaced and reported as such. src/catalog/locate.ts resolves the nearest catalog above the working directory. src/commands/setup.ts installs project or --user session-start hooks via installSessionStartHooks and reports per-agent status from sessionStartHookStatus; src/skill.ts generates a minimal SKILL.md that defers to `npx -y design-system-axi`."
+  - name: docker-axi
+    url: https://github.com/thatdudealso/docker-axi
+    author: thatdudealso
+    domain: Docker
+    description: "Discover, build, run, debug, publish, inspect, and clean up Docker apps through safe token-efficient CLI workflows."
+  - name: doctl-axi
+    url: https://github.com/batamire/doctl-axi
+    author: batamire
+    domain: DigitalOcean
+    description: "Manage Droplets, Kubernetes, App Platform, databases, networking, and Spaces via doctl with token-efficient TOON output."
+  - name: dynamodb-axi
+    url: https://github.com/thatdudealso/dynamodb-axi
+    author: thatdudealso
+    domain: DynamoDB
+    description: "Discover, inspect, query, scan, create, update, back up, restore, export, import, and safely operate DynamoDB tables through token-efficient CLI workflows."
+  - name: elasticsearch-axi
+    url: https://github.com/thatdudealso/elasticsearch-axi
+    author: thatdudealso
+    domain: Elasticsearch
+    description: "Discover, inspect, query, index, map, snapshot, restore, diagnose, and operate Elasticsearch clusters through safe token-efficient CLI workflows."
+  - name: fal-axi
+    url: https://github.com/ardaatahan/fal-axi
+    author: ardaatahan
+    domain: Image / Video Generation
+    description: "Generate images and videos and poll fal.ai queue status/results through the official @fal-ai/client, with compact TOON output, FAL_KEY env-only auth, and --confirm gates on paid generates."
+    admission:
+      status: exception
+      reviewed_revision: 532c85a4afcf13cb76b9d7f352fe947182a3ccb8
+      reviewed_components:
+        - src/commands/fal.ts
+        - src/commands/home.ts
+        - src/api/fal.ts
+        - src/cli/args.ts
+        - src/cli/router.ts
+        - src/output/errors.ts
+        - src/index.ts
+        - bin/fal-axi.js
+      source_observations:
+        - "src/commands/fal.ts registers models list, image generate, video generate, job status, and job result; image/video generate call requireConfirmation() which throws UsageError unless --confirm is set before createApi().submit(), and reject empty/whitespace prompts locally."
+        - "src/api/fal.ts reads FAL_KEY from the environment only via requireFalKey(), wraps @fal-ai/client queue.submit/status/result, and validates endpoint IDs (rejecting empty/`.`/`..` segments) plus request IDs before any network call."
+        - "src/output/errors.ts maps UsageError to exit 1 and RuntimeError to exit 2; src/cli/args.ts supports a `--` end-of-options terminator; src/index.ts registers only allCommands from fal.ts plus home help."
+      exception: "src/output/errors.ts maps UsageError to exit 1 and RuntimeError to exit 2, inverting AXI principle 6 (1=runtime, 2=usage); version probing only accepts `--version` via src/commands/home.ts and prints `fal-axi: <version>`, while `-v`/`-V` are rejected by short-flag handling in src/cli/args.ts instead of printing the bare version and exiting 0 (AXI principle 10)."
+  - name: figma-axi
+    url: https://github.com/ardaatahan/figma-axi
+    author: ardaatahan
+    domain: Design / Figma
+    description: "Inspect Figma files, export nodes to PNG/SVG/PDF, and read styles, components, and comments - summarizes huge files instead of dumping raw JSON."
+  - name: firecrawl-axi
+    url: https://github.com/brycehamrick/firecrawl-axi
+    author: brycehamrick
+    domain: Web data / Research
+    description: "Scrape, map, and crawl sites, search the web and research indexes, parse documents, run async research agents, and manage change monitors over the hosted Firecrawl MCP server - token-efficient TOON output."
+    admission:
+      status: admitted
+      reviewed_revision: 11784566466a761ce26c1d44a7594160dac13ffa
+      reviewed_components:
+        - bin/firecrawl-axi.js
+        - src/index.ts
+        - src/lib/args.ts
+        - src/lib/env.ts
+        - src/mcp/client.ts
+        - src/commands/home.ts
+        - src/commands/scrape.ts
+        - src/commands/crawl.ts
+        - src/commands/agent.ts
+        - src/commands/monitors.ts
+        - src/commands/setup.ts
+        - package.json
+        - LICENSE
+      source_observations:
+        - "src/index.ts uses runAxiCli with tryFastPath; src/lib/args.ts strict parseArgs maps unknown flags to VALIDATION_ERROR; src/mcp/client.ts talks to the hosted Firecrawl MCP over Streamable HTTP with FIRECRAWL_API_KEY (keyless covers search/scrape/parse within anonymous limits)."
+        - "Paid or unbounded work is gated: agent start and monitors create/update/delete/run require --confirm; crawl requires --limit or --confirm for unbounded crawls. Read-path scrape/search/map/parse do not require confirmation by design."
+        - "src/commands/setup.ts is opt-in SessionStart hooks only; TOON truncation with --full; MIT LICENSE; axi-sdk-js runtime dependency."
+  - name: forgejo-axi
+    url: https://github.com/escidmore/forgejo-axi
+    author: escidmore
+    domain: Forgejo
+    description: "Pull request lifecycle, issues, and raw API access for self-hosted Forgejo - non-interactive, reconciling mutations, with token-efficient TOON output."
+  - name: frontier-axi
+    url: https://github.com/oguzalp7/frontier-axi
+    author: oguzalp7
+    domain: Pre-flight SDLC & Cognitive Bridge
+    description: "Stage ambiguous ideas and architectural inquiries until grilling settles them into tasks-axi tickets with token-efficient TOON output."
+    admission:
+      status: exception
+      reviewed_revision: 6e17b3ec0895843c396c9c4c72e22252be99beb4
+      reviewed_components:
+        - bin/frontier-axi.ts
+        - src/cli.ts
+        - src/toon.ts
+        - src/storage.ts
+        - src/commands/promote.ts
+        - src/commands/crud.ts
+        - src/commands/home.ts
+        - src/errors.ts
+        - src/args.ts
+        - src/index.ts
+        - src/version.ts
+      source_observations:
+        - "bin/frontier-axi.ts answers bare -v/-V/--version through axi-sdk-js/fast-path with leaf src/version.ts before dynamically importing the command graph; src/cli.ts registers add/list/show/update/question/promote/done/cancel/reopen via runAxiCli with content-first home."
+        - "src/toon.ts encodes dashboard/list/show with @toon-format/toon; home summary carries active_frontiers/open_questions plus help[]; show accepts --full while truncate() caps body/reason/question text at 80 chars."
+        - "src/args.ts requireNoUnknownFlags raises VALIDATION_ERROR on command paths; errors use axi-sdk-js exitCodeForError (VALIDATION_ERROR→2, else→1); add/done/cancel/reopen/promote are idempotent already-no-ops; promote blocks open questions unless --force and spawns tasks-axi via spawnSync argv (not shell)."
+      exception: "src/toon.ts truncate()/renderShow truncates body/reason/question text to 80 chars with '...' only — no total-size hint and no --full help line when truncated (AXI principle 3); src/toon.ts renderActiveList empty path emits encode({ active: [] }) without definitive zero-results text (AXI principle 5)."
+  - name: gerrit-axi
+    url: https://github.com/slnkjthien/gerrit-axi
+    author: slnkjthien
+    domain: Code review / Gerrit
+    description: "Read Gerrit review state as records - attention set, change readiness, and inline comments with bot/human filtering - then publish a branch as a stack or squashed change and submit it; voting is impossible by design."
+    admission:
+      status: exception
+      reviewed_revision: 047541439990d18c000858813fff0cebf7bd0dc4
+      reviewed_components:
+        - bin/gerrit-axi.js
+        - src/axi/main.js
+        - src/axi/args.js
+        - src/axi/commands.js
+        - src/axi/output.js
+        - src/axi/records.js
+        - src/core/publish.js
+        - src/core/submit.js
+        - test/vote-ban.test.js
+        - package.json
+      source_observations:
+        - "src/axi/args.js rejects any unrecognized option as a BAD_USAGE error (exit 2) and validates change numbers and numeric flags before any server call; FLAG_SPECS in src/axi/main.js declares flags per command."
+        - "src/axi/output.js serializes every result as TOON by default or JSON under --json; list documents carry count, and show reports unreturned change numbers under missing rather than failing."
+        - "src/axi/commands.js has exactly two writes, publish and submit; src/core/publish.js builds the push ref with no label, submit, or reviewer parameter and treats the server's 'no new changes' as success, and test/vote-ban.test.js drives every operation through fake runners to assert no request can record a vote."
+        - "src/axi/main.js maps failures to typed error records with distinct exit codes (1 other, 2 usage, 3 config, 4 auth, 5 transport); no command in src/axi prompts for input."
+      exception: "Errors are written to stderr rather than stdout and unknown-flag errors do not list the command's valid flags (src/axi/main.js, src/axi/args.js); running with no arguments prints usage with exit 2 instead of live content, and there is no bin/description home view (src/axi/main.js); outputs carry no help next-step hints (src/axi/commands.js); comment and message bodies are not truncated (src/axi/records.js); subcommand --help prints the full top-level usage; --version prints 'gerrit-axi <version>' rather than the bare version, -v is not accepted, and it is answered only after the full static import graph loads (bin/gerrit-axi.js, src/axi/main.js); no setup command or installable skill offers principle 7 session integration."
+  - name: gitsheets-axi
+    url: https://github.com/JarvusInnovations/gitsheets/tree/main/packages/gitsheets-axi
+    author: Jarvus Innovations
+    domain: Git-backed data
+    description: "Read and mutate git-backed record sheets over the shell - TOON output, idempotent commits."
+  - name: glab-axi
+    url: https://github.com/karotkriss/glab-axi
+    author: karotkriss
+    domain: GitLab
+    description: "Issues, merge requests, CI/CD pipelines, variables and secrets, releases, and raw API access. Wraps the official glab CLI with agent-ergonomic TOON output."
+  - name: gws-axi
+    url: https://github.com/JarvusInnovations/gws-axi
+    author: Jarvus Innovations
+    domain: Google Workspace
+    description: "Gmail, Calendar, Docs, Drive, and Slides behind one command, with multi-account write-safety - drafts mail, never sends."
+  - name: ha-axi
+    url: https://github.com/batamire/ha-axi
+    author: batamire
+    domain: Home Assistant
+    description: "Inspect entities, call services behind safety gates, render templates, and read area/device registries over Home Assistant REST and WebSocket with token-efficient TOON output."
+    admission:
+      status: exception
+      reviewed_revision: cad5c4532db19f9d6a2187082f136e2daccfa467
+      reviewed_components:
+        - src/cli.ts
+        - src/ha.ts
+        - src/service.ts
+        - src/safety.ts
+        - src/config.ts
+        - src/ws.ts
+        - src/bridge.ts
+        - src/bin/ha-axi.ts
+      source_observations:
+        - "src/cli.ts registers ping, entity, service, template, history, logbook, area, device, statistics, and setup through runAxiCli, and its formatError maps AxiError VALIDATION_ERROR/AUTH_MISSING to exit 2 and every other failure to exit 1 while emitting a structured TOON error object with corrective suggestions."
+        - "src/service.ts serviceCall refuses the gated domains from src/safety.ts (lock, alarm_control_panel, cover) before any network activity with no override, refuses bulk or non-concrete targets (--all, area, device, entity_id 'all', or no explicit target) unless --i-mean-all is passed, and --dry-run prints the exact request without sending anything."
+        - "src/ha.ts sends the token only via the Authorization header, retries GET requests once on 5xx while never retrying POST mutations, applies a 5s connect timeout plus a configurable request timeout, and scrub()s the token out of every error message; src/config.ts resolves flags > HASS_URL/HASS_TOKEN env > config profiles and warns when the profile file is group/world-readable."
+        - "src/ws.ts runs a stateless one-shot WebSocket bridge (connect, auth hello, one id-correlated request/response, close, hard deadline) requiring Node >=22's native WebSocket, used by src/bridge.ts for area/device registry and statistics reads; all output is TOON-encoded via @toon-format/toon."
+      exception: "`service call` performs mutations without an AXI-level --confirm flag; safety relies on hard-refused gated domains, bulk-target refusals with the explicit --i-mean-all override, and --dry-run, and a profile with `insecure = true` disables TLS verification with a stderr warning."
+  - name: harvest-axi
+    url: https://github.com/JarvusInnovations/harvest-axi
+    author: Jarvus Innovations
+    domain: Time tracking
+    description: "Review, log, and edit Harvest time entries by period - for yourself, your team, a project, or a client."
+  - name: homebrew-axi
+    url: https://github.com/mstuart/homebrew-axi
+    author: mstuart
+    domain: Homebrew
+    description: "Inspect Homebrew formulae, casks, and installed packages — versions, dependencies, outdated status, and install stats — with token-efficient TOON output; read-only, never mutates."
   - name: jev-axi
     url: https://github.com/shiftynick/jev-axi
     author: shiftynick
@@ -767,6 +617,21 @@ community:
         - "src/cli.ts formatError renders errors as TOON on stdout with an indented help block; src/client.ts translates TypeSafe SDK errors (401, 422, 429, 529, max_tokens_exceeded, connection failures) into AxiError codes with actionable suggestions rather than leaking raw API bodies. The API key is read from TYPESAFE_API_KEY, ./.env, or the config file and is never accepted as a flag or written to output."
         - "Output is TOON with minimal rows: src/commands/batch.ts and find.ts return ranked rows of 3-4 fields with counts like '5 shown of 35 items', pair every ranking with a separate yes/no existence question so empty results are definitive ('0 items above --min'), and emit next-step help only when relevant; src/commands/common.ts finish() appends a one-line usage summary (tokens, latency, model, estimated cost) and supports --json."
         - "The tool performs no mutations beyond local files it owns: a response cache and a usage ledger under the XDG config/cache directories (src/config.ts, src/usage.ts), recipe scaffolding, and opt-in session hooks installed only by the explicit `setup hooks` command (src/commands/meta.ts). guard exits 3 on a block verdict so pipelines can gate on it. skills/jev-axi/SKILL.md is generated from src/commands/table.ts by scripts/build-skill.ts with a --check drift mode run in CI. MIT LICENSE is present."
+  - name: jira-axi
+    url: https://github.com/emilchristensen/atlassian-axi/tree/main/packages/jira-axi
+    author: emilchristensen
+    domain: Issue tracking
+    description: "Create, search, transition, and comment on Jira work items, boards, and sprints through Atlassian's acli with token-efficient TOON output and idempotent mutations."
+  - name: jj-axi
+    url: https://github.com/aivv73/jj-axi
+    author: aivv73
+    domain: Version control
+    description: "Inspect and reshape Jujutsu history through deterministic, non-interactive commands with compact TOON output and operation-aware undo."
+  - name: kubernetes-axi
+    url: https://github.com/thatdudealso/kubernetes-axi
+    author: thatdudealso
+    domain: Kubernetes
+    description: "Discover, inspect, deploy, debug, scale, roll out, expose, and clean up Kubernetes workloads through safe token-efficient CLI workflows."
   - name: linear-sdk-axi
     url: https://github.com/shiftynick/linear-sdk-axi
     author: shiftynick
@@ -798,245 +663,27 @@ community:
         - "src/errors.ts maps Linear SDK failures by HTTP status or message into AxiError codes AUTH_REQUIRED, FORBIDDEN, NOT_FOUND, RATE_LIMITED, and UNKNOWN with suggested next steps; src/args.ts assertNoUnknownFlags rejects unrecognized flags and empty flag values with VALIDATION_ERROR rather than silently dropping them."
         - "src/pagination.ts requires `--all` to be paired with an explicit `--max-items` bound and reports endCursor, hasNextPage, and capped state so list output never silently truncates."
         - "src/commands/issue.ts and project.ts gate every mutation behind `--dry-run` (prints the planned SDK mutation and input) and optional `--verify` (src/verification.ts re-reads and compares normalized intended versus observed state, failing on mismatch); update, close, and relation add/remove return explicit no-op results when already in the desired state. The only delete call is deleteIssueRelation - issues are closed, not deleted. An MIT LICENSE is present."
-
-  - name: asana-axi
-    url: https://github.com/brycehamrick/asana-axi
-    author: brycehamrick
-    domain: Project management
-    description: "Create, search, update, and complete Asana tasks, projects, sections, tags, workspaces, comments, and attachments over the Asana REST API - read-first defaults, idempotent mutations, and token-efficient TOON output."
-    admission:
-      status: exception
-      reviewed_revision: 6178bc15657339d7e1c41d805c7345a981ae5c02
-      reviewed_components:
-        - src/bin/asana-axi.ts
-        - src/cli.ts
-        - src/args.ts
-        - src/config.ts
-        - src/errors.ts
-        - src/asana.ts
-        - src/commands/home.ts
-        - src/commands/task.ts
-        - src/commands/setup.ts
-        - skills/asana-axi/SKILL.md
-        - package.json
-        - LICENSE
-      source_observations:
-        - "src/bin/asana-axi.ts answers bare -v/-V/--version through axi-sdk-js/fast-path before importing src/cli.js; src/cli.ts registers home, task, project, workspace, tag, me, and setup through runAxiCli with content-first home (src/commands/home.ts) that reports auth, my_tasks, and optional project counts."
-        - "src/args.ts is a strict parser: unknown flags and unknown subcommands raise AxiError VALIDATION_ERROR (exit 2) naming valid flags/subcommands; src/config.ts reads ASANA_ACCESS_TOKEN from the environment or ./.env (never as a CLI flag) and redacts the token from error text."
-        - "src/commands/setup.ts installs SessionStart hooks only via explicit `setup hooks` (Claude Code / Codex / OpenCode) using axi-sdk-js helpers; ordinary commands do not touch agent config. MIT LICENSE; runtime dependency axi-sdk-js only."
-        - "src/commands/task.ts gates only `task delete` behind --confirm; create, edit, complete, reopen, comment, attach, move, and tag mutations POST/PUT to the Asana REST API without an AXI-level confirmation gate."
-      exception: "src/commands/task.ts create/edit/complete/reopen/comment/attach/move and tag writes call the Asana REST API immediately without --confirm; only `task delete` requires --confirm."
-
-  - name: brevo-axi
-    url: https://github.com/brycehamrick/brevo-axi
-    author: brycehamrick
-    domain: Email marketing / Messaging
-    description: "Send and audit transactional email and SMS, manage campaigns, contacts, lists, attributes, CRM deals, companies, tasks, notes, senders, domains, and webhooks over the Brevo v3 REST API - sandbox-validated sends and `--confirm`-gated mutations with token-efficient TOON output."
+  - name: mastra-axi
+    url: https://github.com/taltas/mastra-axi
+    author: taltas
+    domain: Mastra
+    description: "Discover and run a Mastra app's agents, tools, and workflows through agent-native shell commands with compact TOON output."
+  - name: mem-axi
+    url: https://github.com/masculinecache/axi-memory
+    author: masculinecache
+    domain: Agent memory
+    description: "Durable cross-session agent memory as markdown + YAML frontmatter in a git repo - typed memories, priority-ranked search with L0 abstracts, OS-side dedup, and cross-machine sync."
     admission:
       status: admitted
-      reviewed_revision: c4734bb26af5f530eb6e2dc21db8fb03132ed5aa
+      reviewed_revision: f6fd3d37079540efb168a189b7a81573b472fb31
       reviewed_components:
-        - bin/brevo-axi.js
-        - src/index.ts
-        - src/lib/args.ts
-        - src/lib/env.ts
-        - src/lib/auth.ts
-        - src/lib/output.ts
-        - src/commands/home.ts
-        - src/commands/email.ts
-        - src/commands/sms.ts
-        - src/commands/setup.ts
-        - package.json
-        - LICENSE
+        - mem
+        - docs/design.md
+        - docs/integration.md
+        - docs/harnesses.md
       source_observations:
-        - "src/index.ts dispatches through runAxiCli with tryFastPath version handling and a content-first home; src/lib/args.ts uses node:util parseArgs in strict mode and maps unknown options to VALIDATION_ERROR (exit 2) with the valid flag set; requireConfirm() refuses mutations until --confirm."
-        - "src/lib/env.ts and src/lib/auth.ts require BREVO_API_KEY from the environment (HTTPS-only API base, no embedded credentials); email send supports --sandbox validation without sending and still requires --confirm for live sends; SMS and CRM/contact/list/campaign/webhook writes are similarly gated."
-        - "src/commands/setup.ts installs opt-in SessionStart hooks only on explicit `setup hooks`; MIT LICENSE; runtime dependency axi-sdk-js."
-
-  - name: firecrawl-axi
-    url: https://github.com/brycehamrick/firecrawl-axi
-    author: brycehamrick
-    domain: Web data / Research
-    description: "Scrape, map, and crawl sites, search the web and research indexes, parse documents, run async research agents, and manage change monitors over the hosted Firecrawl MCP server - token-efficient TOON output."
-    admission:
-      status: admitted
-      reviewed_revision: 11784566466a761ce26c1d44a7594160dac13ffa
-      reviewed_components:
-        - bin/firecrawl-axi.js
-        - src/index.ts
-        - src/lib/args.ts
-        - src/lib/env.ts
-        - src/mcp/client.ts
-        - src/commands/home.ts
-        - src/commands/scrape.ts
-        - src/commands/crawl.ts
-        - src/commands/agent.ts
-        - src/commands/monitors.ts
-        - src/commands/setup.ts
-        - package.json
-        - LICENSE
-      source_observations:
-        - "src/index.ts uses runAxiCli with tryFastPath; src/lib/args.ts strict parseArgs maps unknown flags to VALIDATION_ERROR; src/mcp/client.ts talks to the hosted Firecrawl MCP over Streamable HTTP with FIRECRAWL_API_KEY (keyless covers search/scrape/parse within anonymous limits)."
-        - "Paid or unbounded work is gated: agent start and monitors create/update/delete/run require --confirm; crawl requires --limit or --confirm for unbounded crawls. Read-path scrape/search/map/parse do not require confirmation by design."
-        - "src/commands/setup.ts is opt-in SessionStart hooks only; TOON truncation with --full; MIT LICENSE; axi-sdk-js runtime dependency."
-
-  - name: n8n-axi
-    url: https://github.com/brycehamrick/n8n-axi
-    author: brycehamrick
-    domain: Workflow automation
-    description: "Search, inspect, run, test, publish, and archive n8n workflows; triage executions; and manage projects, folders, tags, data tables, and credentials over n8n's instance-level MCP server - validate-then-create authoring with `--confirm`-gated mutations."
-    admission:
-      status: exception
-      reviewed_revision: 07ba22ea76fa0a77d9c6182664b934b6c0629679
-      reviewed_components:
-        - bin/n8n-axi.js
-        - src/cli.ts
-        - src/cli/args.ts
-        - src/config.ts
-        - src/runtime.ts
-        - src/mcp/client.ts
-        - src/commands/home.ts
-        - src/commands/workflows.ts
-        - src/commands/setup.ts
-        - package.json
-        - LICENSE
-      source_observations:
-        - "src/cli.ts registers workflows/executions/projects/folders/tags/tables/credentials/build/setup through runAxiCli; src/cli/args.ts rejects unknown flags with VALIDATION_ERROR; src/runtime.ts requireConfirm gates mutations before network I/O."
-        - "src/config.ts reads N8N_MCP_URL and N8N_MCP_TOKEN from the environment only (HTTPS except loopback; no embedded URL credentials); src/commands/workflows.ts run/test/publish/unpublish/archive/restore and build create/update require --confirm."
-        - "src/commands/setup.ts installs opt-in SessionStart hooks; MIT LICENSE; axi-sdk-js dependency. Content-first home degrades to a structured unavailable object when the instance rejects credentials or is unreachable AFTER config resolves."
-      exception: "Unauthenticated no-args home calls createRuntime()/resolveConfig() first, so missing N8N_MCP_URL or N8N_MCP_TOKEN raises VALIDATION_ERROR exit 2 with setup help instead of an exit-0 structured auth:not-configured degrade."
-
-  - name: open-design-axi
-    url: https://github.com/brycehamrick/open-design-axi
-    author: brycehamrick
-    domain: Design
-    description: "Browse and operate OpenDesign projects, files, artifacts, and generation runs from the shell, with offline reads from the local data directory when the daemon is down - `--confirm`-gated project create/delete and generation runs."
-    admission:
-      status: exception
-      reviewed_revision: 4955e6f2eec9f78718ab3d6af6299d181070870c
-      reviewed_components:
-        - bin/open-design-axi.js
-        - src/cli.ts
-        - src/args.ts
-        - src/api.ts
-        - src/commands/shared.ts
-        - src/commands/home.ts
-        - src/commands/projects.ts
-        - src/commands/write.ts
-        - src/commands/run.ts
-        - src/commands/setup.ts
-        - package.json
-        - LICENSE
-      source_observations:
-        - "src/cli.ts dispatches through runAxiCli with tryFastPath; src/args.ts rejects unknown flags with VALIDATION_ERROR; projects create/delete, write, delete, and run start/cancel call requireConfirm() in src/commands/shared.ts before mutating the daemon or spending generation tokens."
-        - "Offline reads fall back to the local OpenDesign data directory when the daemon is down (src/offline.ts); setup hooks are opt-in via src/commands/setup.ts; MIT LICENSE; depends on axi-sdk-js and @toon-format/toon."
-      exception: "Missing --confirm throws AxiError code CONFIRM_REQUIRED, which axi-sdk-js maps to exit 1 rather than VALIDATION_ERROR exit 2 (principle 6 usage taxonomy)."
-
-  - name: playwright-axi
-    url: https://github.com/brycehamrick/playwright-axi
-    author: brycehamrick
-    domain: Browser automation
-    description: "Navigate, click, fill, and extract with combined operations, inline filtered snapshots, and TOON output. Wraps the `playwright` npm package's agent CLI."
-    admission:
-      status: exception
-      reviewed_revision: e1290d7ab10f5241a2b07706398d2833ae9e857e
-      reviewed_components:
-        - bin/playwright-axi.js
-        - src/index.ts
-        - src/args.ts
-        - src/registry.ts
-        - src/commands.ts
-        - src/engine.ts
-        - src/render.ts
-        - src/home.ts
-        - src/setup.ts
-        - package.json
-        - LICENSE
-      source_observations:
-        - "src/index.ts uses runAxiCli with a content-first home (src/home.ts) over the embedded playwright agent CLI; src/args.ts rejects unknown flags with VALIDATION_ERROR; src/commands.ts dispatches strictly from src/registry.ts and requires --confirm when a CommandSpec sets confirm:true (delete-data)."
-        - "src/engine.ts spawns the local playwright CLI with JSON envelopes; src/render.ts emits TOON with truncation and --query filtering; src/setup.ts installs opt-in SessionStart hooks; MIT LICENSE; depends on axi-sdk-js and playwright."
-      exception: "Only delete-data is confirm-gated in src/registry.ts; close, close-all, and kill-all terminate browser sessions without --confirm, and interaction commands (click/fill/open/…) mutate the live browser immediately by design."
-
-  - name: tally-axi
-    url: https://github.com/brycehamrick/tally-axi
-    author: brycehamrick
-    domain: Forms / Surveys
-    description: "Read Tally forms and submissions field-by-field and manage FORM_RESPONSE webhooks over the public Tally REST API - pre-computed counts, truncation with a `--full` escape hatch, and token-efficient TOON output."
-    admission:
-      status: exception
-      reviewed_revision: 5063f99552522768e65c20558e278d17a0074778
-      reviewed_components:
-        - bin/tally-axi.js
-        - src/index.ts
-        - src/lib/args.ts
-        - src/lib/env.ts
-        - src/tally/http.ts
-        - src/commands/home.ts
-        - src/commands/forms.ts
-        - src/commands/submissions.ts
-        - src/commands/webhooks.ts
-        - skills/tally-axi/SKILL.md
-        - package.json
-        - LICENSE
-      source_observations:
-        - "src/index.ts uses runAxiCli with tryFastPath; src/lib/args.ts strict parseArgs maps unknown flags to VALIDATION_ERROR and requireConfirm gates submissions delete and webhooks create/delete before network I/O."
-        - "src/lib/env.ts requires TALLY_API_KEY from the environment with HTTPS-only API base (no embedded credentials); keyless home degrades to a structured setup hint without network calls; TOON truncation with --full; MIT LICENSE; axi-sdk-js dependency."
-      exception: "No `setup hooks` (or other) ambient-context install command is present, so principle 7 opt-in session integrations are not offered via the CLI (skill packaging only)."
-
-  - name: walter-axi
-    url: https://github.com/brycehamrick/walter-axi
-    author: brycehamrick
-    domain: AI content editing
-    description: "Detect AI-generated patterns, humanize drafts with locked keywords, and batch QA content through the WalterWrites MCP server - `--confirm` gates on credit-consuming writes."
-    admission:
-      status: admitted
-      reviewed_revision: 7bf0f3b1df22b26aedbd56ac8cda9955fd1ea8f8
-      reviewed_components:
-        - bin/walter-axi.js
-        - src/cli.ts
-        - src/flags.ts
-        - src/walter/config.ts
-        - src/walter/oauth.ts
-        - src/walter/client.ts
-        - src/commands/home.ts
-        - src/commands/humanize.ts
-        - src/commands/batch.ts
-        - src/commands/pipeline.ts
-        - src/commands/setup.ts
-        - package.json
-        - LICENSE
-      source_observations:
-        - "src/cli.ts uses runAxiCli with tryFastPath; src/flags.ts rejects unknown flags with VALIDATION_ERROR naming the valid set; src/commands/shared.ts requireConfirm gates humanize, batch, and pipeline before credit-consuming WalterWrites MCP calls."
-        - "src/walter/config.ts stores OAuth tokens under XDG config with mkdir 0o700 and writeFile 0o600; WALTER_ACCESS_TOKEN env overrides stored tokens; credentials are never CLI flags."
-        - "src/commands/setup.ts installs opt-in SessionStart hooks; MIT LICENSE; depends on axi-sdk-js and @modelcontextprotocol/sdk."
-
-  - name: wordpress-axi
-    url: https://github.com/brycehamrick/wordpress-axi
-    author: brycehamrick
-    domain: CMS / WordPress
-    description: "Publish and moderate posts, pages, media, terms, comments, users, and settings, and inspect plugins and themes over the core WordPress REST API - new content defaults to draft, publication and deletion are `--confirm`-gated."
-    admission:
-      status: exception
-      reviewed_revision: edfe47eba5550895d1108991fad8c285f8b88ee9
-      reviewed_components:
-        - bin/wordpress-axi.js
-        - src/index.ts
-        - src/lib/args.ts
-        - src/lib/config.ts
-        - src/commands/home.ts
-        - src/commands/content.ts
-        - src/commands/comment.ts
-        - src/commands/media.ts
-        - src/commands/user.ts
-        - src/commands/setup.ts
-        - package.json
-        - LICENSE
-      source_observations:
-        - "src/index.ts uses runAxiCli with tryFastPath; src/lib/args.ts strict parseArgs maps unknown flags to VALIDATION_ERROR; me validates flags via parseFlags; unauthenticated/missing-config home degrades to a structured auth:not-configured view."
-        - "src/lib/config.ts reads WORDPRESS_URL plus WORDPRESS_APPLICATION_PASSWORD / username from the environment (HTTPS, no embedded URL credentials). New posts/pages default to draft; publish, delete, role changes, plugin/theme activation, and comment moderation require --confirm."
-        - "src/commands/setup.ts installs opt-in SessionStart hooks; MIT LICENSE; axi-sdk-js dependency."
-      exception: "comment create/reply and media upload POST to the WordPress REST API without --confirm (publication, deletion, and moderation remain confirm-gated; new posts/pages default to draft)."
-
+        - "mem stores typed markdown memories with YAML frontmatter under objects/<type>, supports init, add, update, merge, dedup, search, show, list, review, status, sync, and stats, and emits compact structured output with explicit empty states and exit 0/1/2 errors."
+        - "mem add refuses credential-like title or body content unless --force is supplied, while dedup is dry-run by default and search/list rank results by priority and freshness with --limit and --min-priority controls; sync bounds pull and push operations with a 30-second timeout."
   - name: mesheryctl-axi
     url: https://github.com/meshery-extensions/mesheryctl-axi
     author: Meshery Authors
@@ -1072,6 +719,139 @@ community:
         - "Read-only wrapper: list/view/status/content/context/home only, no mutating commands, so no --confirm gating applies; src/config.ts loads tokens from mesheryctl config.yaml/auth.json (MESHERY_CONFIG/MESHERYCTL_CONFIG/MESHERYCTL_BIN accept paths, never secrets); src/server.ts attaches the token as a cookie to Server API reads at the mesheryctl context endpoint (localhost fallback)."
         - "Structured errors via AxiError codes (src/errors.ts) rendered with renderError help[n] blocks; TOON for reporting with raw YAML/JSON design/model content; src/contract.ts plus test/contract pin every spawned mesheryctl argv against a real binary in CI. Apache-2.0 LICENSE; axi-sdk-js dependency."
       exception: "No setup (or other) ambient-context install command is present, so principle 7 opt-in session integrations are not offered via the CLI."
+  - name: metabase-axi
+    url: https://github.com/JarvusInnovations/metabase-axi
+    author: Jarvus Innovations
+    domain: Analytics / BI
+    description: "Query, explore, and export from Metabase over the shell - SQL/MBQL, saved questions, schema introspection, full-data export."
+  - name: mobbin-axi
+    url: https://github.com/intelligentrascal/mobbin-axi
+    author: intelligentrascal
+    domain: UI/UX research
+    description: "Search real-world UI/UX patterns from production apps via Mobbin - wraps Mobbin's OAuth-gated MCP server as a scriptable, headless CLI with token-efficient TOON output."
+    admission:
+      status: exception
+      reviewed_revision: 8eda65af7d760efe45907ad3368d3164abe3062e
+      exception: "The published 0.1.3 package reports version 0.1.1; search-command --help is rejected; empty-content MCP responses can become successful `0 results`; sections ignores --platform; control commands lack per-command flag sets; and legacy --full and --json flags are no-ops."
+  - name: mongodb-axi
+    url: https://github.com/thatdudealso/mongodb-axi
+    author: thatdudealso
+    domain: MongoDB
+    description: "Discover, create, inspect, query, export, import, maintain, and diagnose MongoDB databases through safe token-efficient CLI workflows."
+  - name: msgraph-axi
+    url: https://github.com/jeffreyhaen/msgraph-axi
+    author: jeffreyhaen
+    domain: Microsoft 365 / Outlook
+    description: "Read, search, draft, and send Outlook mail and manage calendars over the `m365` CLI - read-only by default, with TOON output and mutations behind `--execute`/`--confirm`."
+    admission:
+      status: admitted
+      reviewed_revision: cd31b17b1f2594b5a77f1738ec0f359eb5fb1555
+      reviewed_components:
+        - src/bin/msgraph-axi.ts
+        - src/main.ts
+        - src/toon.ts
+        - src/flags.ts
+        - src/backend.ts
+        - src/commands/home.ts
+        - src/commands/mail.ts
+        - src/commands/calendar.ts
+        - src/commands/mailflow.ts
+        - src/commands/raw.ts
+      source_observations:
+        - "src/bin/msgraph-axi.ts answers -v/--version and --help through axi-sdk-js/fast-path before importing the command graph, and src/main.ts registers auth, mail, calendar, user, and raw through runAxiCli with per-command help plus a `home` handler, so a bare run renders the content-first view instead of help text."
+        - "src/toon.ts caps cells at CELL_LIMIT = 200 with an ellipsis unless --full is passed, and each list command declares a token-efficient default schema (MAIL_LIST_DEFAULTS = id/from/subject/received, EVENT_DEFAULTS = id/subject/start/end) that `--fields a,b` extends; list results carry a `count` aggregate, a `truncated` marker, and `help[]` next-step lines, while src/commands/home.ts degrades to a signedIn: false object with sign-in help instead of throwing when unauthenticated."
+        - "src/flags.ts collects unknown --flags and raises VALIDATION_ERROR naming the subcommand's valid flags (observed at this revision: `mail list --bogus` prints a TOON error/code/help block and exits 2, and an unknown command exits 2); src/backend.ts spawns `m365` with stdin ignored so no agent-driven path can block on a prompt, and the single stdio: inherit call is the explicit `auth login` device-code flow."
+        - "Writes are gated consistently: src/commands/mail.ts `mail send`, src/commands/calendar.ts `calendar create`/`update`, and src/commands/mailflow.ts `mail draft` return a preview with `Run with --execute ...` help and never call `m365` without --execute; `mail delete`, `calendar cancel`, and `calendar delete` require an exact-match `--execute --confirm <id>`; src/commands/raw.ts applies the same --execute rule to raw POST/PUT/PATCH/DELETE."
+  - name: mssql-axi
+    url: https://github.com/jeffreyhaen/mssql-axi
+    author: jeffreyhaen
+    domain: Microsoft SQL Server / Azure SQL
+    description: "Inspect schemas, sample rows, run capped read-only queries and showplans over the native ODBC driver - mutations double-gated with dry-run by default, TOON output."
+  - name: n8n-axi
+    url: https://github.com/brycehamrick/n8n-axi
+    author: brycehamrick
+    domain: Workflow automation
+    description: "Search, inspect, run, test, publish, and archive n8n workflows; triage executions; and manage projects, folders, tags, data tables, and credentials over n8n's instance-level MCP server - validate-then-create authoring with `--confirm`-gated mutations."
+    admission:
+      status: exception
+      reviewed_revision: 07ba22ea76fa0a77d9c6182664b934b6c0629679
+      reviewed_components:
+        - bin/n8n-axi.js
+        - src/cli.ts
+        - src/cli/args.ts
+        - src/config.ts
+        - src/runtime.ts
+        - src/mcp/client.ts
+        - src/commands/home.ts
+        - src/commands/workflows.ts
+        - src/commands/setup.ts
+        - package.json
+        - LICENSE
+      source_observations:
+        - "src/cli.ts registers workflows/executions/projects/folders/tags/tables/credentials/build/setup through runAxiCli; src/cli/args.ts rejects unknown flags with VALIDATION_ERROR; src/runtime.ts requireConfirm gates mutations before network I/O."
+        - "src/config.ts reads N8N_MCP_URL and N8N_MCP_TOKEN from the environment only (HTTPS except loopback; no embedded URL credentials); src/commands/workflows.ts run/test/publish/unpublish/archive/restore and build create/update require --confirm."
+        - "src/commands/setup.ts installs opt-in SessionStart hooks; MIT LICENSE; axi-sdk-js dependency. Content-first home degrades to a structured unavailable object when the instance rejects credentials or is unreachable AFTER config resolves."
+      exception: "Unauthenticated no-args home calls createRuntime()/resolveConfig() first, so missing N8N_MCP_URL or N8N_MCP_TOKEN raises VALIDATION_ERROR exit 2 with setup help instead of an exit-0 structured auth:not-configured degrade."
+  - name: netlify-axi
+    url: https://github.com/simkimsia/netlify-axi
+    author: simkimsia
+    domain: Netlify
+    description: "List sites and inspect the linked site's status and the logged-in account. Wraps the Netlify CLI with agent-ergonomic TOON output and structured errors."
+  - name: notion-axi
+    url: https://github.com/maximebrmd/notion-axi
+    author: maximebrmd
+    domain: Notion
+    description: "Search, read, create, and update Notion pages and databases over the shell - token-efficient TOON output, PAT or integration auth."
+  - name: npm-axi
+    url: https://github.com/SSBrouhard/npm-axi
+    author: SSBrouhard
+    domain: npm
+    description: "Search and inspect npm registry packages, versions, dependencies, README previews, and downloads with token-efficient output."
+  - name: obsidian-axi
+    url: https://github.com/AndersHoffmann/obsidian-axi
+    author: AndersHoffmann
+    domain: Obsidian
+    description: "Read, search, create, update, organize, and link Obsidian notes from the filesystem - compact TOON output, atomic writes, no plugin or server."
+  - name: open-design-axi
+    url: https://github.com/brycehamrick/open-design-axi
+    author: brycehamrick
+    domain: Design
+    description: "Browse and operate OpenDesign projects, files, artifacts, and generation runs from the shell, with offline reads from the local data directory when the daemon is down - `--confirm`-gated project create/delete and generation runs."
+    admission:
+      status: exception
+      reviewed_revision: 4955e6f2eec9f78718ab3d6af6299d181070870c
+      reviewed_components:
+        - bin/open-design-axi.js
+        - src/cli.ts
+        - src/args.ts
+        - src/api.ts
+        - src/commands/shared.ts
+        - src/commands/home.ts
+        - src/commands/projects.ts
+        - src/commands/write.ts
+        - src/commands/run.ts
+        - src/commands/setup.ts
+        - package.json
+        - LICENSE
+      source_observations:
+        - "src/cli.ts dispatches through runAxiCli with tryFastPath; src/args.ts rejects unknown flags with VALIDATION_ERROR; projects create/delete, write, delete, and run start/cancel call requireConfirm() in src/commands/shared.ts before mutating the daemon or spending generation tokens."
+        - "Offline reads fall back to the local OpenDesign data directory when the daemon is down (src/offline.ts); setup hooks are opt-in via src/commands/setup.ts; MIT LICENSE; depends on axi-sdk-js and @toon-format/toon."
+      exception: "Missing --confirm throws AxiError code CONFIRM_REQUIRED, which axi-sdk-js maps to exit 1 rather than VALIDATION_ERROR exit 2 (principle 6 usage taxonomy)."
+  - name: oracle-axi
+    url: https://github.com/thatdudealso/oracle-axi
+    author: thatdudealso
+    domain: Oracle Database
+    description: "Discover, create, inspect, query, export, import, maintain, and diagnose Oracle databases through safe token-efficient CLI workflows."
+  - name: otter-axi
+    url: https://github.com/JarvusInnovations/otter-axi
+    author: Jarvus Innovations
+    domain: Meetings
+    description: "Find and pull Otter.ai meeting transcripts from the shell - wraps Otter.ai's hosted MCP server as a scriptable, headless CLI."
+  - name: pg-axi
+    url: https://github.com/thatdudealso/pg-axi
+    author: thatdudealso
+    domain: PostgreSQL
+    description: "Discover, create, inspect, query, back up, restore, and maintain PostgreSQL databases through safe token-efficient CLI workflows."
   - name: plane-axi
     url: https://github.com/radityasurya/plane-axi
     author: radityasurya
@@ -1094,57 +874,74 @@ community:
         - "TOON output throughout: list tables carry count totals computed across all pages before filtering; issue descriptions truncate at 500 chars with a --full escape hatch; comments load only with --comments; empty lists print explicit zero-result lines."
         - "Mutations are narrow and declarative: issue create/update/close/comment only, and no delete command exists; priorities and sequence IDs are validated before any mutating API call; issue close is idempotent (an already-completed issue is a no-op with exit 0, though a separately requested --comment is still added, since commenting is separate intent)."
       exception: "No setup (or other) ambient-context install command is present, so principle 7 opt-in session hooks are not offered via the CLI; the installable-skill half of principle 7 is covered by skills/plane-axi/SKILL.md."
-  - name: gerrit-axi
-    url: https://github.com/slnkjthien/gerrit-axi
-    author: slnkjthien
-    domain: Code review / Gerrit
-    description: "Read Gerrit review state as records - attention set, change readiness, and inline comments with bot/human filtering - then publish a branch as a stack or squashed change and submit it; voting is impossible by design."
+  - name: playwright-axi
+    url: https://github.com/brycehamrick/playwright-axi
+    author: brycehamrick
+    domain: Browser automation
+    description: "Navigate, click, fill, and extract with combined operations, inline filtered snapshots, and TOON output. Wraps the `playwright` npm package's agent CLI."
     admission:
       status: exception
-      reviewed_revision: 047541439990d18c000858813fff0cebf7bd0dc4
+      reviewed_revision: e1290d7ab10f5241a2b07706398d2833ae9e857e
       reviewed_components:
-        - bin/gerrit-axi.js
-        - src/axi/main.js
-        - src/axi/args.js
-        - src/axi/commands.js
-        - src/axi/output.js
-        - src/axi/records.js
-        - src/core/publish.js
-        - src/core/submit.js
-        - test/vote-ban.test.js
+        - bin/playwright-axi.js
+        - src/index.ts
+        - src/args.ts
+        - src/registry.ts
+        - src/commands.ts
+        - src/engine.ts
+        - src/render.ts
+        - src/home.ts
+        - src/setup.ts
         - package.json
+        - LICENSE
       source_observations:
-        - "src/axi/args.js rejects any unrecognized option as a BAD_USAGE error (exit 2) and validates change numbers and numeric flags before any server call; FLAG_SPECS in src/axi/main.js declares flags per command."
-        - "src/axi/output.js serializes every result as TOON by default or JSON under --json; list documents carry count, and show reports unreturned change numbers under missing rather than failing."
-        - "src/axi/commands.js has exactly two writes, publish and submit; src/core/publish.js builds the push ref with no label, submit, or reviewer parameter and treats the server's 'no new changes' as success, and test/vote-ban.test.js drives every operation through fake runners to assert no request can record a vote."
-        - "src/axi/main.js maps failures to typed error records with distinct exit codes (1 other, 2 usage, 3 config, 4 auth, 5 transport); no command in src/axi prompts for input."
-      exception: "Errors are written to stderr rather than stdout and unknown-flag errors do not list the command's valid flags (src/axi/main.js, src/axi/args.js); running with no arguments prints usage with exit 2 instead of live content, and there is no bin/description home view (src/axi/main.js); outputs carry no help next-step hints (src/axi/commands.js); comment and message bodies are not truncated (src/axi/records.js); subcommand --help prints the full top-level usage; --version prints 'gerrit-axi <version>' rather than the bare version, -v is not accepted, and it is answered only after the full static import graph loads (bin/gerrit-axi.js, src/axi/main.js); no setup command or installable skill offers principle 7 session integration."
-  - name: bun-axi
-    url: https://github.com/mlegls/bun-axi
-    author: mlegls
-    domain: Bun
-    description: "Run Bun tests and package.json scripts and get counts, failure locations, load errors, and tsc/oxlint diagnostics instead of raw logs - plus dependency and npm registry lookups."
+        - "src/index.ts uses runAxiCli with a content-first home (src/home.ts) over the embedded playwright agent CLI; src/args.ts rejects unknown flags with VALIDATION_ERROR; src/commands.ts dispatches strictly from src/registry.ts and requires --confirm when a CommandSpec sets confirm:true (delete-data)."
+        - "src/engine.ts spawns the local playwright CLI with JSON envelopes; src/render.ts emits TOON with truncation and --query filtering; src/setup.ts installs opt-in SessionStart hooks; MIT LICENSE; depends on axi-sdk-js and playwright."
+      exception: "Only delete-data is confirm-gated in src/registry.ts; close, close-all, and kill-all terminate browser sessions without --confirm, and interaction commands (click/fill/open/…) mutate the live browser immediately by design."
+  - name: porkbun-axi
+    url: https://github.com/ardaatahan/porkbun-axi
+    author: ardaatahan
+    domain: Domains / Porkbun
+    description: "Manage Porkbun domains, DNS records, SSL certificates, URL forwarding, nameservers, and glue records through the Porkbun API, with compact TOON output and explicit confirmation gates for registrations and destructive updates/deletes."
     admission:
-      status: admitted
-      reviewed_revision: e10a27006ead6e23f8576b20f90abd775e05059a
+      status: exception
+      reviewed_revision: 394fb206ea58c6d0aaa33a0f24bd6f70f84f206e
       reviewed_components:
-        - bin/bun-axi.ts
-        - src/cli.ts
-        - src/flags.ts
-        - src/proc.ts
-        - src/tests.ts
-        - src/diagnostics.ts
-        - src/packages.ts
-        - src/version.ts
-        - skills/bun-axi/SKILL.md
-        - test/cli.test.ts
-        - test/parse.test.ts
-        - package.json
-        - README.md
+        - src/commands/porkbun.ts
+        - src/output/errors.ts
+        - src/api.ts
+        - src/cli/args.ts
+        - src/index.ts
       source_observations:
-        - "bin/bun-axi.ts answers --version through axi-sdk-js/fast-path from the leaf src/version.ts before importing src/cli.ts; src/version.ts and package.json both say 0.1.1, matching the published npm release. Every command parses its own flag set with node:util parseArgs in strict mode, so an unknown flag is a VALIDATION_ERROR (exit 2) listing that command's valid flags; `--help` is answered per command from a static table. versions and search pass `--limit` through count() in src/flags.ts, which throws VALIDATION_ERROR for anything but a positive integer before any registry fetch (test/cli.test.ts covers abc, -1, 0, and 2.5 exiting 2). This revision differs from the earlier exception revision e3645219 only by that count() helper, its two call sites in src/cli.ts, that test, and the 0.1.1 version bump."
-        - "test runs `bun test --reporter=junit` and reports counts, each failure's file:line:col and first message line, and load errors recovered from the console; failures are capped at 30 and messages at 240 chars with a --full escape hatch, the full log path is always printed, and the help[] rerun hint re-escapes the failing test name. run refuses scripts absent from package.json, strips bun's `$ cmd` echo lines from previews, and recognizes tsc, eslint/oxlint unix, and oxlint pretty diagnostics grouped by file. Empty states are explicit: `0 found`, `0 packages match`, `0 outdated`, `0 installed versions`."
-        - "Registry commands (view, versions, deps, search) use fetch against NPM_CONFIG_REGISTRY or registry.npmjs.org, translate 404 to NOT_FOUND with a search hint and other failures to REGISTRY_ERROR/NETWORK_ERROR, and never mutate anything. outdated and why wrap `bun outdated` / `bun why` read-only. Session hooks come from the SDK's installSessionStartHooks via `setup hooks` with --check/--uninstall/--project; the skill is skills/bun-axi/SKILL.md."
+        - "src/commands/porkbun.ts defines gate() which prints the change then throws UsageError unless --confirm is set; dns update/delete, forwarding delete, nameservers set, and glue update/delete call gate(); domains register uses its own --confirm check (not gate()), preflights checkDomain, then submits cost in cents with agreeToTerms only after --confirm; dns update refuses to run without --name."
+        - "src/output/errors.ts maps UsageError to exit 2 and AxiError to exit 1 on the documented 0/1/2 taxonomy; src/cli/args.ts throws UsageError on unknown flags with the valid flag set for that command; src/index.ts registers only allCommands from porkbun.ts."
+        - "src/api.ts reads PORKBUN_API_KEY and PORKBUN_SECRET_KEY from the environment into X-API-Key / X-Secret-API-Key headers (never the request body) and attaches a fresh Idempotency-Key UUID on idempotent writes; src/commands/porkbun.ts ssl retrieve prints PEM component sizes by default and only emits the certificate material with --json."
+      exception: "`dns create`, `forwarding create`, and `glue create` in src/commands/porkbun.ts print a change line then POST the mutation; they do not take --confirm or call gate()."
+  - name: pypi-axi
+    url: https://github.com/mstuart/pypi-axi
+    author: mstuart
+    domain: PyPI
+    description: "Inspect PyPI packages, versions, dependencies, and download stats with token-efficient TOON output — read-only, no auth required."
+  - name: railway-axi
+    url: https://github.com/simkimsia/railway-axi
+    author: simkimsia
+    domain: Railway
+    description: "List projects and inspect linked project status, environments, and services. Wraps the Railway CLI with agent-ergonomic TOON output and structured errors."
+  - name: reactive-axi
+    url: https://github.com/adeeshsharma/reactive-axi
+    author: adeeshsharma
+    domain: UI review
+    description: "Click any element in your live React, Vue, or Svelte dev server and resolve it to the exact source file and line before it reaches your agent."
+  - name: redis-axi
+    url: https://github.com/thatdudealso/redis-axi
+    author: thatdudealso
+    domain: Redis
+    description: "Discover, inspect, query, export, import, maintain, and diagnose Redis databases through safe token-efficient CLI workflows."
+  - name: remarkable-axi
+    url: https://github.com/JarvusInnovations/remarkable-axi
+    author: Jarvus Innovations
+    domain: E-ink tablets
+    description: "Manage content on your reMarkable tablet through the reMarkable cloud - browse and organize files, upload PDFs and EPUBs, and send web articles as reflowable EPUBs."
   - name: router-axi
     url: https://github.com/Azd325/router-axi
     author: Azd325
@@ -1169,3 +966,197 @@ community:
         - "wifi enable|disable and reboot preview without --confirm; confirmed Wi-Fi changes only call SetEnable when state differs and verify GetInfo afterward, while reboot sends DeviceConfig:Reboot once with redirect refusal and no retry (internal/tr064/client.go)."
         - "backup reads ROUTER_AXI_BACKUP_PASSWORD only from the environment, requires HTTPS, writes atomically with owner-only permissions, and requires --force to overwrite; skill install is an explicit opt-in Agent Skill path with no automatic registration (internal/app/app.go, internal/tr064/client.go, internal/skill/skill.go)."
       exception: "No setup hooks (or other) ambient-context install command is present, so principle 7 opt-in session integrations are not offered via the CLI (skill packaging only via `skill install`)."
+  - name: screencast-axi
+    url: https://github.com/Valzon/screencast-axi
+    author: Valzon
+    domain: Screencasts
+    description: "Scaffold, rehearse, and record scripted Playwright walkthroughs of any website into mp4, webm, and a poster with a synthetic cursor and burnt-in captions - TOON output, structured errors, and a content-first status view via axi-sdk-js. Requires ffmpeg."
+  - name: shopify-axi
+    url: https://github.com/elliottkan/shopify-axi
+    author: elliottkan
+    domain: Shopify
+    description: "Search shopify.dev and validate generated GraphQL, Liquid themes, and Polaris components against the real schemas - wraps Shopify's Dev MCP server and exits non-zero on hallucinated fields."
+    admission:
+      status: admitted
+      reviewed_revision: cf30cacd850d742857210826102c150cad8fb2ce
+      reviewed_components:
+        - bin/shopify-axi.ts
+        - src/cli.ts
+        - src/flags.ts
+        - src/usage.ts
+        - src/version.ts
+        - src/mcp.ts
+        - src/session.ts
+        - src/apis.ts
+        - src/help.ts
+        - src/commands/docs.ts
+        - src/commands/learn.ts
+        - src/commands/validate.ts
+        - src/shopify-axi.test.ts
+        - package.json
+        - LICENSE
+      source_observations:
+        - "bin/shopify-axi.ts uses axi-sdk-js/fast-path tryFastPath for bare -v/-V/--version and prints the bare version; src/cli.ts routes through runAxiCli with a content-first home view and the apis, learn, docs, validate, and setup hooks subcommands."
+        - "src/usage.ts raises AxiError with code VALIDATION_ERROR for usage mistakes, which the SDK maps to exit 2, while other AxiError codes exit 1; src/flags.ts rejects unknown flags and missing values, and the help text documents the 0/1/2 exit taxonomy."
+        - "docs, learn, and validate wrap the Shopify Dev MCP server over local stdio in src/mcp.ts with only the optional SHOPIFY_DEV_MCP_CMD and SHOPIFY_AXI_MODEL environment overrides; no API tokens or secrets appear on the CLI surface. Truncated output is recoverable with --full and empty docs results are an explicit count: 0."
+        - "No paid or mutating store writes exist; failing validations set process.exitCode = 1 with structured output, setup hooks is explicit opt-in via installSessionStartHooks, and an MIT LICENSE is present."
+  - name: slack-axi
+    url: https://github.com/JarvusInnovations/slack-axi
+    author: Jarvus Innovations
+    domain: Slack
+    description: "Read, search, sweep, and safely draft Slack messages with token-efficient output."
+  - name: specops
+    url: https://github.com/JarvusInnovations/specops
+    author: Jarvus Innovations
+    domain: Spec-driven dev
+    description: "Spec-driven development for agents - and a demo of shipping an AXI embedded in a skill, not a standalone npm executable."
+  - name: sqlite-axi
+    url: https://github.com/SSBrouhard/sqlite-axi
+    author: SSBrouhard
+    domain: SQLite
+    description: "Inspect schemas, sample rows, and run capped read-only SQLite queries with token-efficient TOON output."
+  - name: supabase-axi
+    url: https://github.com/laizhenyoong/supabase-axi
+    author: laizhenyoong
+    domain: Supabase
+    description: "Inspect schemas, run SQL, and audit RLS, indexes, and logs across Supabase projects. Wraps the Supabase Management API."
+  # Admission review (independent source review per VISION.md): inspected
+  # Holaxis-ai/superbee at release v0.1.3, commit
+  # f4e1c37349627030f8201ff52028f71a9c92570a. Direct source observations:
+  # packages/cli/AXI-CONTRACT.md pins the agent-facing interaction contract;
+  # src/output.ts renders TOON by default with a compact --json escape hatch;
+  # src/errors.ts maps typed failures to stable error codes on the capped
+  # 0/1/2/4/5/6 exit taxonomy with structured error envelopes; src/commands/
+  # list.ts bounds repeated rows and reports count/shown with a --limit 0
+  # escape; src/commands/doc/common.ts gates doc update/delete behind
+  # --expected-version compare-and-swap and keeps delete idempotent; and
+  # src/commands/home.ts serves a zero-arg live orientation view. Verdict:
+  # the source-defined interface and behavior at that revision satisfy the
+  # applicable AXI principles; admitted.
+  - name: superbee
+    url: https://github.com/Holaxis-ai/superbee
+    author: Holaxis
+    domain: Agent knowledge infrastructure
+    description: "Turns what agents know into durable, domain-shaped infrastructure through local OKF bundles with declared schemas, exact queries, conflict-safe writes, and portable Views."
+  - name: tally-axi
+    url: https://github.com/brycehamrick/tally-axi
+    author: brycehamrick
+    domain: Forms / Surveys
+    description: "Read Tally forms and submissions field-by-field and manage FORM_RESPONSE webhooks over the public Tally REST API - pre-computed counts, truncation with a `--full` escape hatch, and token-efficient TOON output."
+    admission:
+      status: exception
+      reviewed_revision: 5063f99552522768e65c20558e278d17a0074778
+      reviewed_components:
+        - bin/tally-axi.js
+        - src/index.ts
+        - src/lib/args.ts
+        - src/lib/env.ts
+        - src/tally/http.ts
+        - src/commands/home.ts
+        - src/commands/forms.ts
+        - src/commands/submissions.ts
+        - src/commands/webhooks.ts
+        - skills/tally-axi/SKILL.md
+        - package.json
+        - LICENSE
+      source_observations:
+        - "src/index.ts uses runAxiCli with tryFastPath; src/lib/args.ts strict parseArgs maps unknown flags to VALIDATION_ERROR and requireConfirm gates submissions delete and webhooks create/delete before network I/O."
+        - "src/lib/env.ts requires TALLY_API_KEY from the environment with HTTPS-only API base (no embedded credentials); keyless home degrades to a structured setup hint without network calls; TOON truncation with --full; MIT LICENSE; axi-sdk-js dependency."
+      exception: "No `setup hooks` (or other) ambient-context install command is present, so principle 7 opt-in session integrations are not offered via the CLI (skill packaging only)."
+  - name: trello-axi
+    url: https://github.com/enzodevs/trello-axi
+    author: enzodevs
+    domain: Project management
+    description: "Create, search, update, move, comment on, and archive Trello cards through the REST API with compact TOON output, complete pagination, idempotent mutations, and non-interactive batch workflows."
+  # Admission review (independent source review per VISION.md): inspected
+  # ardaatahan/vercel-axi at commit
+  # 81c88e3582c3018fca8fcc1c4db40c993ece6f18 (no tagged release exists).
+  # Direct source observations: src/commands/vercel.ts gates production
+  # deploys, promote/rollback, domain add/remove, dns add/remove, and env
+  # add/remove behind requireConfirm(), which throws UsageError absent
+  # --confirm; src/output/errors.ts maps UsageError to exit 2 and AxiError
+  # to exit 1 on the documented 0/1/2 taxonomy; src/vercel/process.ts wraps
+  # the official `vercel` binary via spawnSync, converts a missing binary
+  # or non-zero exit into a structured AxiError, and detects auth failures
+  # to point at `vercel login`/VERCEL_TOKEN; env list redacts value/secret/
+  # decryptedValue fields by default (vercel.ts redact()); src/index.ts
+  # registers only these gated commands, with no ungated destructive path.
+  # Verdict: the source-defined interface and behavior at that revision
+  # satisfy the applicable AXI principles; admitted.
+  - name: vercel-axi
+    url: https://github.com/ardaatahan/vercel-axi
+    author: ardaatahan
+    domain: Deployment / Vercel
+    description: "Deploy and inspect Vercel deployments, projects, domains, DNS, environment variables, and teams through the official Vercel CLI, with explicit confirmation gates for production and infrastructure changes."
+  - name: walter-axi
+    url: https://github.com/brycehamrick/walter-axi
+    author: brycehamrick
+    domain: AI content editing
+    description: "Detect AI-generated patterns, humanize drafts with locked keywords, and batch QA content through the WalterWrites MCP server - `--confirm` gates on credit-consuming writes."
+    admission:
+      status: admitted
+      reviewed_revision: 7bf0f3b1df22b26aedbd56ac8cda9955fd1ea8f8
+      reviewed_components:
+        - bin/walter-axi.js
+        - src/cli.ts
+        - src/flags.ts
+        - src/walter/config.ts
+        - src/walter/oauth.ts
+        - src/walter/client.ts
+        - src/commands/home.ts
+        - src/commands/humanize.ts
+        - src/commands/batch.ts
+        - src/commands/pipeline.ts
+        - src/commands/setup.ts
+        - package.json
+        - LICENSE
+      source_observations:
+        - "src/cli.ts uses runAxiCli with tryFastPath; src/flags.ts rejects unknown flags with VALIDATION_ERROR naming the valid set; src/commands/shared.ts requireConfirm gates humanize, batch, and pipeline before credit-consuming WalterWrites MCP calls."
+        - "src/walter/config.ts stores OAuth tokens under XDG config with mkdir 0o700 and writeFile 0o600; WALTER_ACCESS_TOKEN env overrides stored tokens; credentials are never CLI flags."
+        - "src/commands/setup.ts installs opt-in SessionStart hooks; MIT LICENSE; depends on axi-sdk-js and @modelcontextprotocol/sdk."
+  - name: wordpress-axi
+    url: https://github.com/brycehamrick/wordpress-axi
+    author: brycehamrick
+    domain: CMS / WordPress
+    description: "Publish and moderate posts, pages, media, terms, comments, users, and settings, and inspect plugins and themes over the core WordPress REST API - new content defaults to draft, publication and deletion are `--confirm`-gated."
+    admission:
+      status: exception
+      reviewed_revision: edfe47eba5550895d1108991fad8c285f8b88ee9
+      reviewed_components:
+        - bin/wordpress-axi.js
+        - src/index.ts
+        - src/lib/args.ts
+        - src/lib/config.ts
+        - src/commands/home.ts
+        - src/commands/content.ts
+        - src/commands/comment.ts
+        - src/commands/media.ts
+        - src/commands/user.ts
+        - src/commands/setup.ts
+        - package.json
+        - LICENSE
+      source_observations:
+        - "src/index.ts uses runAxiCli with tryFastPath; src/lib/args.ts strict parseArgs maps unknown flags to VALIDATION_ERROR; me validates flags via parseFlags; unauthenticated/missing-config home degrades to a structured auth:not-configured view."
+        - "src/lib/config.ts reads WORDPRESS_URL plus WORDPRESS_APPLICATION_PASSWORD / username from the environment (HTTPS, no embedded URL credentials). New posts/pages default to draft; publish, delete, role changes, plugin/theme activation, and comment moderation require --confirm."
+        - "src/commands/setup.ts installs opt-in SessionStart hooks; MIT LICENSE; axi-sdk-js dependency."
+      exception: "comment create/reply and media upload POST to the WordPress REST API without --confirm (publication, deletion, and moderation remain confirm-gated; new posts/pages default to draft)."
+  - name: wrangler-axi
+    url: https://github.com/masculinecache/wrangler-axi
+    author: masculinecache
+    domain: Cloudflare Wrangler
+    description: "Deploy Workers and Pages, manage KV namespaces, D1 databases, R2 buckets, and Worker secrets, and tail live logs with hard bounds - wraps the official Wrangler CLI with predictable TOON lists and structured errors."
+    admission:
+      status: exception
+      reviewed_revision: 67ff6c45e12f4bb71e42ee8b71d586480c0861be
+      reviewed_components:
+        - src/cli.ts
+        - src/commands/workers.ts
+        - src/args.ts
+        - src/util.ts
+        - src/wrangler.ts
+        - src/errors.ts
+        - bin/wrangler-axi.ts
+      source_observations:
+        - "src/cli.ts registers whoami, workers, secrets, kv, d1, r2, and pages areas and returns structured output plus exit codes without calling process.exit; src/commands/workers.ts bounds tail streams by --max-entries or --timeout and renders compact event summaries."
+        - "src/args.ts and src/util.ts validate flags and convert unknown areas, subcommands, and flags into AxiError VALIDATION_ERROR responses with corrective suggestions; src/wrangler.ts maps non-zero Wrangler results into structured errors and reports a missing Wrangler dependency explicitly."
+      exception: "Mutating commands do not provide an AXI-level --confirm gate; delete and similar operations only forward Wrangler's --force behavior as -f or -y."

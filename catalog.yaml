@@ -1098,27 +1098,36 @@ community:
     url: https://github.com/slnkjthien/gerrit-axi
     author: slnkjthien
     domain: Code review / Gerrit
-    description: "Read Gerrit review state as records - attention set, change readiness, and inline comments with bot/human filtering - then publish a branch as a stack or squashed change and submit it; voting is impossible by design."
+    description: "Read Gerrit review state as records - a sectioned dashboard, change readiness, and inline comments with bot/human filtering - then publish a branch as a stack or squashed change, post a change message, and submit it; voting is impossible by design."
     admission:
-      status: exception
-      reviewed_revision: 047541439990d18c000858813fff0cebf7bd0dc4
+      status: admitted
+      reviewed_revision: 7fb81b92e41f2a1f213b835c1337f4333f5a2c82
       reviewed_components:
         - bin/gerrit-axi.js
+        - src/axi/version.js
         - src/axi/main.js
         - src/axi/args.js
-        - src/axi/commands.js
         - src/axi/output.js
+        - src/axi/help.js
+        - src/axi/hints.js
+        - src/axi/commands.js
         - src/axi/records.js
+        - src/axi/setup.js
+        - src/core/message.js
         - src/core/publish.js
         - src/core/submit.js
+        - src/core/rest.js
+        - src/core/ssh.js
+        - skills/gerrit-axi/SKILL.md
+        - test/axi.test.js
         - test/vote-ban.test.js
         - package.json
       source_observations:
-        - "src/axi/args.js rejects any unrecognized option as a BAD_USAGE error (exit 2) and validates change numbers and numeric flags before any server call; FLAG_SPECS in src/axi/main.js declares flags per command."
-        - "src/axi/output.js serializes every result as TOON by default or JSON under --json; list documents carry count, and show reports unreturned change numbers under missing rather than failing."
-        - "src/axi/commands.js has exactly two writes, publish and submit; src/core/publish.js builds the push ref with no label, submit, or reviewer parameter and treats the server's 'no new changes' as success, and test/vote-ban.test.js drives every operation through fake runners to assert no request can record a vote."
-        - "src/axi/main.js maps failures to typed error records with distinct exit codes (1 other, 2 usage, 3 config, 4 auth, 5 transport); no command in src/axi prompts for input."
-      exception: "Errors are written to stderr rather than stdout and unknown-flag errors do not list the command's valid flags (src/axi/main.js, src/axi/args.js); running with no arguments prints usage with exit 2 instead of live content, and there is no bin/description home view (src/axi/main.js); outputs carry no help next-step hints (src/axi/commands.js); comment and message bodies are not truncated (src/axi/records.js); subcommand --help prints the full top-level usage; --version prints 'gerrit-axi <version>' rather than the bare version, -v is not accepted, and it is answered only after the full static import graph loads (bin/gerrit-axi.js, src/axi/main.js); no setup command or installable skill offers principle 7 session integration."
+        - "bin/gerrit-axi.js answers a bare -v, -V, or --version from tryFastPath in src/axi/version.js, a leaf that imports only node:fs, before it dynamically imports src/axi/main.js; the probe prints the bare version (0.4.0, read from package.json) and exits 0."
+        - "src/axi/main.js writes every result to stdout, error records included, as TOON or as JSON under --json, and never writes stderr; a failure is a typed record (ok false, code, kind, remedy, help) with exit 1 other, 2 usage, 3 config, 4 auth, 5 transport. COMMAND_OPTIONS in src/axi/args.js declares each command's flags: an unknown one is BAD_USAGE (exit 2) before git or the server is asked, and its remedy names the nearest valid flag and lists the command's own and the global flags. `<command> --help` prints that command's page from COMMAND_HELP in src/axi/help.js."
+        - "A bare invocation, or one that starts with an option, runs opDashboard in src/axi/commands.js: bin and description first, then five sections (your_turn, wip, outgoing, incoming, cced) with counts, 5-field entry rows, and help[] next steps from src/axi/hints.js, which carry --host and the other connection overrides and use `<change>` placeholders. `status` rows default to STATUS_FIELDS in src/axi/records.js (change, subject, status, submit); `--fields` adds named columns, the labels and votes tables, or all, and an unknown name is BAD_USAGE listing the valid ones. records.js cuts message and comment bodies at 1000 code points with chars and truncated on every row, and truncationHint adds the --full command only when a body was cut."
+        - "src/axi/setup.js `setup hooks` registers `gerrit-axi dashboard --ambient` as a SessionStart hook for Claude Code and Codex (setting Codex's `[features] hooks` flag) and as an OpenCode plugin, naming the bare binary only when PATH resolves to this executable; a repeat run reports unchanged, a moved binary is repaired, and --remove takes out only its own entries. The ambient view prints bin and description, queries the server only when the host came from a Gerrit origin remote, and exits 0 on failure; skills/gerrit-axi/SKILL.md is the installable skill."
+        - "The three writes are publish, submit, and message. src/core/publish.js builds the push ref with no label, submit, or reviewer parameter and treats 'no new changes' as success; src/core/submit.js reads the change back only after a SUBMIT_REFUSED and answers a MERGED change as success with already_merged true (exit 0), leaving any other refusal standing; src/core/message.js builds `gerrit review --message <quoted text> <change>,<patch set>` with no other option; test/vote-ban.test.js drives every operation through fake runners and asserts no request can record a vote."
   - name: bun-axi
     url: https://github.com/mlegls/bun-axi
     author: mlegls

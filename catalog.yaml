@@ -1178,3 +1178,37 @@ community:
         - "wifi enable|disable and reboot preview without --confirm; confirmed Wi-Fi changes only call SetEnable when state differs and verify GetInfo afterward, while reboot sends DeviceConfig:Reboot once with redirect refusal and no retry (internal/tr064/client.go)."
         - "backup reads ROUTER_AXI_BACKUP_PASSWORD only from the environment, requires HTTPS, writes atomically with owner-only permissions, and requires --force to overwrite; skill install is an explicit opt-in Agent Skill path with no automatic registration (internal/app/app.go, internal/tr064/client.go, internal/skill/skill.go)."
       exception: "No setup hooks (or other) ambient-context install command is present, so principle 7 opt-in session integrations are not offered via the CLI (skill packaging only via `skill install`)."
+  - name: google-marketing-axi
+    url: https://github.com/elliottkan/google-marketing-axi
+    author: elliottkan
+    domain: Google Analytics / Tag Manager
+    description: "Run GA4 reports, realtime views, and dimension/metric search, and inspect or edit Google Tag Manager tags, triggers, and variables with field-level diffs, --dry-run, and fingerprinted updates - version snapshots stop short of publishing by design."
+    admission:
+      status: admitted
+      reviewed_revision: c970a911c9063234d1f4eea960615ff66ad46aa0
+      reviewed_components:
+        - bin/google-marketing-axi.ts
+        - src/version.ts
+        - src/cli.ts
+        - src/help.ts
+        - src/flags.ts
+        - src/usage.ts
+        - src/defaults.ts
+        - src/auth.ts
+        - src/google.ts
+        - src/report.ts
+        - src/gtm.ts
+        - src/commands/whoami.ts
+        - src/commands/ga.ts
+        - src/commands/gtm.ts
+        - src/google-marketing-axi.test.ts
+        - skills/google-marketing-axi/SKILL.md
+        - package.json
+      source_observations:
+        - "bin/google-marketing-axi.ts answers a bare -v, -V, or --version through axi-sdk-js/fast-path from the leaf src/version.ts before dynamically importing src/cli.ts; src/cli.ts registers whoami, auth status, ga, gtm, and setup hooks through runAxiCli, and its home view prints bin and description, then reads only local state (credentials file type and quota project, cached GA property and GTM account/container/workspace from src/defaults.ts) with next-step help that changes depending on which defaults are cached."
+        - "src/flags.ts parseFlags is a strict per-subcommand parser: an unknown flag or a value flag with no value throws usageError (src/usage.ts, VALIDATION_ERROR, exit 2) listing that subcommand's valid flags, and positiveInt rejects bad --limit/--minutes; ga and gtm route `<sub> --help` to their own per-subcommand pages (GA_HELP, GTM_HELP) with flags, defaults, and examples."
+        - "src/google.ts is the single request path: it sends the ADC-refreshed bearer token (src/auth.ts, memory only, never printed) plus x-goog-user-project, follows nextPageToken in listAll, and googleError translates 401, insufficient-scope, disabled-API, quota-project, 403, 404, 429, and invalid-metric 400 responses into distinct AxiError codes whose suggestions carry the exact re-login command, the activation URL, or a `ga dims <field>` search."
+        - "src/commands/ga.ts is read-only (Admin accountSummaries, Data runReport/runRealtimeReport/metadata); src/report.ts shapes rows to keyed records with ISO dates and rounded ratios, reports `N of M rows` with a --limit rerun hint, surfaces thresholding and sampling notes, and every empty result is a stated zero (`0 rows - no sessions data by ... in <range>`, `0 matching <query> dimensions`)."
+        - "src/commands/gtm.ts list views default to id, name, type (plus firing trigger names and paused for tags) with --fields for extra columns and `N of M` counts; detail views truncate string leaves at 500 chars with a --full hint only when something was cut. validateWriteInput checks write usage (create needs a name and type, update needs a change and a ref, --paused excludes --unpause) before any request, and src/google-marketing-axi.test.ts asserts those cases exit 2 with zero fetch calls. Writes merge parameters by key (src/gtm.ts merge), print a field-by-field before/after diff, honor --dry-run, send PUT with the fetched fingerprint, and are idempotent: an unchanged update or identical create is a no-op, deleting an absent entity is a no-op (exit 0), and ambiguous names raise an error listing IDs. There is no publish command; `version create` requires --name, refuses on merge conflicts or compiler errors, and ends with a GTM UI link for a human to publish."
+        - "`setup hooks` calls the SDK's installSessionStartHooks (Claude Code, Codex, OpenCode) only when invoked, and skills/google-marketing-axi/SKILL.md is a trigger-shaped installable skill that defers command details to the CLI's home view and --help."
+        - "package.json 0.1.0 matches src/version.ts, and the npm registry reports google-marketing-axi 0.1.0 with gitHead c970a911c9063234d1f4eea960615ff66ad46aa0, so the skill's `npx -y google-marketing-axi` commands resolve and the SDK built-in `update --check` reports current and latest 0.1.0 (exit 0)."

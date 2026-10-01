@@ -328,8 +328,11 @@ function openCodePluginId(marker: string): string {
 /**
  * The generated plugin default-exports one object that both OpenCode
  * generations accept (https://opencode.ai/v2/docs/build/plugins/migrate-v1):
- * OpenCode 2 validates `id` and runs `setup(ctx)`, while OpenCode 1 (1.3.4
- * and newer) runs `server(input)` and ignores `setup`.
+ * OpenCode 2 validates `id` and runs `setup(ctx)`, while OpenCode 1 runs
+ * `server(input)` and ignores `setup`. The guide names 1.18.29 as the V1
+ * floor, but V1's loader has accepted `default.server` since 1.3.4 (verified
+ * on 1.3.4, 1.18.34 and 2.0.21); 1.3.3 and older are unsupported.
+ * Drop `server()` once OpenCode 1 support ends.
  */
 function buildOpenCodeAmbientPluginSource(
   marker: string,

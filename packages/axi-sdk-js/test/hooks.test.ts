@@ -742,6 +742,9 @@ describe("installSessionStartHooks (OpenCode plugin)", () => {
 
     const plugin = readFileSync(pluginPath(home), "utf-8");
     expect(plugin).toContain("axi-sdk-js managed opencode plugin: gh-axi");
+    expect(plugin).toContain("export default {");
+    expect(plugin).toContain('id: "axi-gh-axi"');
+    expect(plugin).toContain('ctx.session.hook("context"');
     expect(plugin).toContain("experimental.chat.system.transform");
     expect(plugin).toContain("## AXI ambient context: gh-axi");
     expect(plugin).toContain('ambientHeader + "\\n" + homeView');
@@ -751,7 +754,7 @@ describe("installSessionStartHooks (OpenCode plugin)", () => {
     expect(plugin).not.toContain("tool:");
   });
 
-  it("runs the generated OpenCode plugin and appends ambient context", async () => {
+  function installRunnablePlugin(): { home: string; workspace: string } {
     const home = join(tmp, "home");
     const workspace = join(tmp, "workspace");
     const execFile = join(tmp, "pkg", "dist", "bin", "gh-axi.js");
@@ -771,13 +774,53 @@ describe("installSessionStartHooks (OpenCode plugin)", () => {
       homeDir: home,
     });
 
-    const pluginModule = await import(pathToFileURL(pluginPath(home)).href);
-    const plugin = await pluginModule.AxiGhAxiAmbientContextPlugin({
-      directory: workspace,
+    return { home, workspace };
+  }
+
+  it("runs the generated plugin's OpenCode 2 entrypoint and pushes ambient context", async () => {
+    const { home, workspace } = installRunnablePlugin();
+
+    const { default: plugin } = await import(
+      pathToFileURL(pluginPath(home)).href
+    );
+    expect(plugin.id).toBe("axi-gh-axi");
+
+    const hooks = new Map<string, (event: unknown) => Promise<void>>();
+    await plugin.setup({
+      location: { directory: workspace },
+      session: {
+        hook: async (
+          name: string,
+          callback: (event: unknown) => Promise<void>,
+        ) => {
+          hooks.set(name, callback);
+          return { dispose: async () => {} };
+        },
+      },
     });
+    expect([...hooks.keys()]).toEqual(["context"]);
+
+    const event = { sessionID: "session-1", system: [] as unknown[] };
+    await hooks.get("context")!(event);
+
+    expect(event.system).toEqual([
+      {
+        type: "text",
+        text: `## AXI ambient context: gh-axi\nhome cwd:${realpathSync(workspace)}`,
+      },
+    ]);
+  });
+
+  it("runs the generated plugin's OpenCode 1 entrypoint and appends ambient context", async () => {
+    const { home, workspace } = installRunnablePlugin();
+
+    const { default: plugin } = await import(
+      pathToFileURL(pluginPath(home)).href
+    );
+    const hooks = await plugin.server({ directory: workspace });
     const output = { system: [] as string[] };
 
-    await plugin["experimental.chat.system.transform"](
+    await hooks["experimental.chat.system.transform"](
       { sessionID: "session-1" },
       output,
     );
@@ -785,6 +828,30 @@ describe("installSessionStartHooks (OpenCode plugin)", () => {
     expect(output.system).toEqual([
       `## AXI ambient context: gh-axi\nhome cwd:${realpathSync(workspace)}`,
     ]);
+  });
+
+  it("upgrades a managed plugin written in the OpenCode 1-only shape", () => {
+    const home = join(tmp, "home");
+    const target = pluginPath(home);
+    mkdirSync(join(home, ".config", "opencode", "plugins"), {
+      recursive: true,
+    });
+    writeFileSync(
+      target,
+      "// axi-sdk-js managed opencode plugin: gh-axi\nexport const AxiGhAxiAmbientContextPlugin = async () => ({})\n",
+      "utf-8",
+    );
+
+    installSessionStartHooks({
+      marker: "gh-axi",
+      execPath: join(tmp, "pkg", "dist", "bin", "gh-axi.js"),
+      binaryNames: ["gh-axi"],
+      homeDir: home,
+    });
+
+    const plugin = readFileSync(target, "utf-8");
+    expect(plugin).toContain("export default {");
+    expect(plugin).not.toContain("AxiGhAxiAmbientContextPlugin");
   });
 
   it("repairs the managed OpenCode plugin when the executable path changes", () => {

@@ -320,26 +320,22 @@ export function computeCodexConfigUpdate(content: string): [string, boolean] {
   ];
 }
 
-function sanitizeOpenCodePluginFilePart(marker: string): string {
-  return marker.replace(/[^A-Za-z0-9._-]+/g, "_");
+/** Plugin ID OpenCode reports in diagnostics; also the plugin file's name. */
+function openCodePluginId(marker: string): string {
+  return `axi-${marker.replace(/[^A-Za-z0-9._-]+/g, "_")}`;
 }
 
-function sanitizeOpenCodeExportName(marker: string): string {
-  const name = marker
-    .split(/[^A-Za-z0-9]+/)
-    .filter(Boolean)
-    .map((part) => `${part[0]?.toUpperCase() ?? ""}${part.slice(1)}`)
-    .join("");
-
-  return `Axi${name || "Plugin"}AmbientContextPlugin`;
-}
-
+/**
+ * The generated plugin default-exports one object that both OpenCode
+ * generations accept (https://opencode.ai/v2/docs/build/plugins/migrate-v1):
+ * OpenCode 2 validates `id` and runs `setup(ctx)`, while OpenCode 1 (1.3.4
+ * and newer) runs `server(input)` and ignores `setup`.
+ */
 function buildOpenCodeAmbientPluginSource(
   marker: string,
   command: string,
   timeoutSeconds: number,
 ): string {
-  const exportName = sanitizeOpenCodeExportName(marker);
   const managedMarker = `${OPENCODE_PLUGIN_MANAGED_PREFIX} ${marker}`;
 
   return `// ${managedMarker}
@@ -405,28 +401,47 @@ function directoryOrFallback(directory) {
     : process.cwd();
 }
 
-export const ${exportName} = async ({ directory }) => {
+// Returns the session's ambient context text, running the AXI home view once per session.
+function ambientContextFor(directory) {
   const sessionCache = new Map();
 
-  return {
-    "experimental.chat.system.transform": async (input, output) => {
-      const sessionID = input.sessionID ?? "__global__";
-      let homeView = sessionCache.get(sessionID);
-      if (homeView === undefined) {
-        homeView = await runAxiHomeView(directory);
-        sessionCache.set(sessionID, homeView);
-      }
-
-      if (homeView.length === 0) return;
-      output.system.push(ambientHeader + "\\n" + homeView);
-    },
+  return async (sessionID) => {
+    const key = sessionID ?? "__global__";
+    let homeView = sessionCache.get(key);
+    if (homeView === undefined) {
+      homeView = await runAxiHomeView(directory);
+      sessionCache.set(key, homeView);
+    }
+    return homeView.length === 0 ? "" : ambientHeader + "\\n" + homeView;
   };
+}
+
+export default {
+  id: ${JSON.stringify(openCodePluginId(marker))},
+  // OpenCode 2 entrypoint.
+  async setup(ctx) {
+    const ambientContext = ambientContextFor(ctx.location.directory);
+    await ctx.session.hook("context", async (event) => {
+      const text = await ambientContext(event.sessionID);
+      if (text) event.system.push({ type: "text", text });
+    });
+  },
+  // OpenCode 1 entrypoint.
+  async server({ directory }) {
+    const ambientContext = ambientContextFor(directory);
+    return {
+      "experimental.chat.system.transform": async (input, output) => {
+        const text = await ambientContext(input.sessionID);
+        if (text) output.system.push(text);
+      },
+    };
+  },
 };
 `;
 }
 
 function openCodePluginFileName(marker: string): string {
-  return `axi-${sanitizeOpenCodePluginFilePart(marker)}.js`;
+  return `${openCodePluginId(marker)}.js`;
 }
 
 /**

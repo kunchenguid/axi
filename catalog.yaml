@@ -1217,3 +1217,33 @@ community:
     author: TangentialSolutions
     domain: HEY email
     description: "HEY email, calendars, todos, habits, journal, and time tracking over Basecamp's official `hey` CLI - live Imbox home view, `setup hooks`, minimal TOON fields with `--fields`/`--full`, and send safety: compose and reply save drafts unless `--allow-send`."
+    admission:
+      status: exception
+      reviewed_revision: 2af99c1b7e58563b26812de141982e928e9c2f44
+      reviewed_components:
+        - src/hey-axi.js
+        - src/version.js
+        - src/cli.js
+        - src/args.js
+        - src/router.js
+        - src/manifest.json
+        - src/shape.js
+        - src/home.js
+        - src/guide.js
+        - src/text.js
+        - src/hooks.js
+        - src/errors.js
+        - src/policy.js
+        - scripts/gen-skill.js
+        - skills/hey-axi/SKILL.md
+        - .github/workflows/test.yml
+        - package.json
+      source_observations:
+        - "src/hey-axi.js answers bare -v, -V, and --version using axi-sdk-js/fast-path and import-free src/version.js before dynamically importing src/cli.js. package.json and src/version.js declare 0.2.0; the npm registry's hey-axi@0.2.0 gitHead matches the inspected revision. Registry metadata establishes release identity only, not AXI compliance."
+        - "src/cli.js renders ordinary JSON responses as TOON on stdout, with explicit JSON, quiet, full, and raw modes. src/shape.js projects list schemas of two to seven fields, supports --fields aliases and dotted paths, truncates list cells at 120 characters and detail strings at 1000 with original sizes and a conditional --full hint, states zero results, and reports shown versus total counts when HEY supplies meta.total_count. Bare non-envelope responses bypass list projection and explicit empty-state handling; --quiet omits envelope counts, empty messages, and suggestions. Aggregates depend on HEY's supplied envelope rather than independent computation."
+        - "src/args.js validates known and required flag names per command, and src/cli.js prints usage errors with valid flags and synopsis before ordinary execution. scanArgs does not validate missing flag values, validateFlags checks presence rather than values or positional arity, and src/router.js resolveCommand leaves trailing words to HEY. Unknown-command discovery invokes HEY before validation. src/cli.js preserves upstream failure statuses, including 3-8 and 127, and delegates mutation idempotence to HEY rather than establishing it for commands such as todo complete and seen."
+        - "src/errors.js extracts HEY error envelopes and rewrites hints toward hey-axi with exit-specific next steps, but fallback errors copy stderr or stdout verbatim and preserve warning prefixes. src/cli.js raw, interactive, and streaming paths pass dependency diagnostics through; src/policy.js allows interactive login, setup, and upgrade without suppressing prompts. src/manifest.json documents editor fallback for compose/reply, and the wrapper does not require message input to prevent it."
+        - "src/home.js queries ten live Imbox threads with executable identity, description, explicit empty state, and next commands from src/guide.js; failures become status/help with exit 0. It uses the default HEY account without working-directory filtering and discards the truncation flag and envelope totals, so truncated home content lacks a --full hint and total-count disclosure. src/shape.js rewrites backend breadcrumbs as next-step commands but does not carry invocation selectors such as --account into them; its truncation rerun does preserve the original selectors."
+        - "src/hooks.js offers explicit setup hooks install/repair, status, removal, and project scope through axi-sdk-js for Claude Code, Codex, and OpenCode; ordinary wrapper commands do not call this installer. Hooks run the same account-wide home view, with no session-end capture. scripts/gen-skill.js generates static guidance from src/guide.js, and .github/workflows/test.yml runs skill:check; skills/hey-axi/SKILL.md has trigger-shaped frontmatter and explains hooks and npx, but generated command examples still use bare hey-axi."
+        - "src/cli.js commandHelp renders per-command synopsis, flags, available defaults, examples, notes, and policy guidance from src/manifest.json offline for known commands. Some commands have one or no examples, and src/router.js normalizeCatalog omits zero/false/empty defaults. src/policy.js stages compose/reply with --draft unless explicitly allowed, refuses forward/draft send/bulk-reply send without opt-in, and gates auth token. Structured staged responses include sent: false and saved_as: draft; raw modes bypass that marker. These are direct wrapper-source observations; upstream HEY behavior and dependency implementations were not independently reviewed."
+      exception: "Principles 2-5 are partial: some schemas exceed four fields, bare non-envelope lists bypass shaping and explicit empty states, and home content loses truncation hints and totals. Principle 6 is partial: missing values/positional arguments are delegated, interactive/editor paths remain, fallback/raw errors can expose dependency text, upstream exit codes are preserved, and mutation idempotence is unestablished. Principle 7 lacks directory-scoped mailbox content and session-end capture, and generated skill examples require the binary on PATH. Principle 9 backend suggestions do not preserve account selectors. Principle 10 examples and explicit defaults are incomplete on some commands. Observations apply to the pinned wrapper source, not independently verified upstream HEY behavior."

@@ -1252,3 +1252,42 @@ community:
         - "src/shape.js passes HEY's next-command hints (breadcrumbs) through as hey-axi suggestions with --account and --base-url carried, replaces existing --page/--all in paging hints, shell-quotes scope values, and adds a view/show or create suggestion when HEY gives none; the wrapper does not judge each hint's relevance, and one empty-list fallback in src/cli.js omits the carried selectors. src/cli.js and src/examples.js render per-command help with arguments, every flag's type and default, global flags, and two or three examples offline; setup hooks and setup scope help list every default."
         - "npm test (142 tests against a fake hey) passed locally at this revision; these are wrapper-source and fake-backend observations. Upstream HEY error wording, paging, and schemas, and real harness hook delivery were not independently verified."
       exception: "Three behaviors are intentional design choices by the maintainer: HEY's own next-command hints are kept as suggestions (rewritten to hey-axi with account selectors carried) rather than filtered for relevance; HEY's interactive commands are refused unless the explicit --interactive opt-in is passed; and the home view and session hook are account-wide by default, with directory scope opt-in through setup scope. The reviewer treats the first and third as partial against principles 9 and 7 and the opt-in as consistent with principle 6. Remaining source gaps: an empty result is labelled 0 total without proof of completeness (principle 4), error-line cleaning is pattern-based so some dependency text can pass through and no-op detection depends on HEY's wording (principle 6), one empty-list suggestion drops --account (principle 9), and journal/clip/snippet lists keep a truncated content preview (principle 2). Observations apply to the pinned wrapper source, not independently verified upstream HEY behavior."
+  - name: plex-axi
+    url: https://github.com/dmealing/plex-axi
+    author: dmealing
+    domain: Plex
+    description: "Structured per-field search and diagnosis across a Plex music library, ending at a `plex://` identifier - ratings and audio playlist edits need `PLEX_AXI_ALLOW_WRITES=true` plus `--write` (otherwise they preview), and playback commands stay hidden unless `PLEX_AXI_ALLOW_PLAYBACK=true`, with `play` only previewing until `--now`."
+    admission:
+      status: exception
+      reviewed_revision: 3f4edb61b70072c1477fb64b88a064df606dc5a1
+      reviewed_components:
+        - pyproject.toml
+        - src/plex_axi/__init__.py
+        - src/plex_axi/cli.py
+        - src/plex_axi/argspec.py
+        - src/plex_axi/errors.py
+        - src/plex_axi/output.py
+        - src/plex_axi/playback.py
+        - src/plex_axi/writes.py
+        - src/plex_axi/hooks.py
+        - src/plex_axi/commands/home.py
+        - src/plex_axi/commands/search.py
+        - src/plex_axi/commands/api.py
+        - src/plex_axi/commands/rate.py
+        - src/plex_axi/commands/playlist.py
+        - src/plex_axi/commands/play.py
+        - src/plex_axi/commands/recent.py
+        - src/plex_axi/commands/item.py
+        - src/plex_axi/music.py
+        - src/plex_axi/commands/setup.py
+        - src/plex_axi/commands/context.py
+        - src/plex_axi/commands/skill.py
+        - skills/plex-axi/SKILL.md
+      source_observations:
+        - "Tag v0.6.1 (3f4edb61b70072c1477fb64b88a064df606dc5a1) differs from v0.6.0 (339fb0913867e298d9890f6a3b31f41dc52ff5ff, independently reviewed and approved in kunchenguid/axi#169) only in scripts/dev-setup.sh, tests/test_dev_setup.py, docs, release metadata, and the version string in pyproject.toml and src/plex_axi/__init__.py; no runtime module under src/plex_axi changed. pyproject.toml declares the `plex-axi` console script with dependencies PlexAPI>=4.18 and axi-toolkit>=0.4.0."
+        - "src/plex_axi/cli.py is the single error boundary: AXI errors render as a structured document on stdout with the error's exit code, and any unexpected exception renders as INTERNAL_ERROR with recovery lines instead of a raw traceback. src/plex_axi/errors.py maps UsageError to the usage exit code and supplies recovery `help` lines naming the fixing command. src/plex_axi/argspec.py rejects unknown flags by name, with a replacement where one exists. `-v`/`--version` print the tool name and version."
+        - "src/plex_axi/output.py renders TOON by default with JSON and human modes, redacts registered secrets, and truncates long text with the original length. src/plex_axi/commands/search.py exposes per-field search, reports shown versus total counts, suggests a larger `--limit` when results are truncated, and treats an empty result as exit 0 with next steps."
+        - "src/plex_axi/writes.py gates `rate` (src/plex_axi/commands/rate.py) and playlist edits (src/plex_axi/commands/playlist.py) behind PLEX_AXI_ALLOW_WRITES=true; without `--write` they preview and send nothing. src/plex_axi/playback.py keeps the `clients` and `play` commands out of help, the home view, context, and the skill unless PLEX_AXI_ALLOW_PLAYBACK=true, and src/plex_axi/commands/play.py returns a preview with the exact rerun command until `--now` is passed. src/plex_axi/commands/api.py allows GET only and refuses other methods by name."
+        - "src/plex_axi/commands/home.py is the no-argument live view of the music library. src/plex_axi/hooks.py installs SessionStart hooks for Claude Code, Codex, and OpenCode only when `plex-axi setup hooks` runs (src/plex_axi/commands/setup.py); the hook runs `plex-axi context`, which src/plex_axi/commands/context.py writes to need no connection or credential and to exit 0. The skill is produced by `plex-axi skill` (src/plex_axi/commands/skill.py), which generates skills/plex-axi/SKILL.md from the command table and has a `--check` mode for staleness."
+        - "src/plex_axi/music.py ROW_FIELDS defaults list rows to five fields for tracks (key, media_id, title, artist, album) and albums (key, media_id, title, artist, year) and three for artists; `--fields` selects from the wider set. Only detail summaries truncate, with a `--full` hint (src/plex_axi/commands/item.py); `api` bounds output by XML depth (`--depth`, default 3), not by size. src/plex_axi/commands/rate.py treats a rating that already holds as a no-op with exit 0, but src/plex_axi/commands/playlist.py appends on every `add` (a repeat duplicates membership), refuses `create` for an existing title with PLAYLIST_EXISTS, and refuses `remove` of an absent key with NOT_IN_PLAYLIST, all exit 1. The bare home view (src/plex_axi/commands/home.py) prints the description and setup help but exits 1 when PLEX_URL/PLEX_TOKEN are unset or the server is unreachable. `setup hooks` has no status or removal subcommand and installs no session-end hook. src/plex_axi/commands/recent.py suggests `recent --limit <n>` without carrying the caller's `--type`."
+      exception: "Principle 2 is partial: track and album list defaults carry five fields. Principle 3 is partial: `api` output is depth-bounded, not size-truncated. Principle 6 is partial: `playlist add` is not idempotent, and repeating `playlist create` or `playlist remove` fails instead of reporting the state already holds. Principle 7 lacks hook status/removal and session-end capture. Principle 8 home view exits 1 without configuration or a reachable server. Principle 9 `recent` follow-up suggestions drop `--type`. Observations apply to the pinned wrapper source, not independently verified Plex server or PlexAPI behavior."

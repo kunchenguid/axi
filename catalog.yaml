@@ -1252,3 +1252,48 @@ community:
         - "src/shape.js passes HEY's next-command hints (breadcrumbs) through as hey-axi suggestions with --account and --base-url carried, replaces existing --page/--all in paging hints, shell-quotes scope values, and adds view/show, create, or content suggestions (with selectors) when HEY gives none; the wrapper does not filter hints for relevance, and the generic error fallback suggests --help. src/cli.js and src/examples.js render per-command help with arguments, every flag's type and default, global flags, and two or three examples offline."
         - "npm test (143 tests against a fake hey) passed locally at this revision; these are wrapper-source and fake-backend observations. Upstream HEY error wording, paging, and schemas, and real harness hook delivery were not independently verified."
       exception: "Three behaviors are intentional design choices by the maintainer: HEY's own next-command hints are kept as suggestions (rewritten to hey-axi with account selectors carried) rather than filtered for relevance; HEY's interactive commands are refused unless the explicit --interactive opt-in is passed; and the home view and session hook are account-wide by default, with directory scope opt-in through setup scope. The reviewer treats the opt-in as consistent with principle 6 and the other two as specification exceptions against principles 9 and 7. Remaining source gaps: no-op detection depends on HEY's wording and can treat a single-id command as already done when HEY names a different id, and error cleaning is pattern-based, so some dependency names and HEY's code field can pass through (principle 6); the home view calls an empty first page nothing without completeness evidence (principles 4-5); and the generic error fallback suggests --help rather than a specific fix (principle 9). Observations apply to the pinned wrapper source, not independently verified upstream HEY behavior."
+  - name: hass-axi
+    url: https://github.com/dmealing/hass-axi
+    author: dmealing
+    domain: Home Assistant
+    description: "Read and update the entity, area, and device registries that only the WebSocket API exposes, call services with a capability pre-check and an explained refusal, and summarise sensor history, logbook, and recorder statistics with their data-quality caveats - `HASS_AXI_READ_ONLY` refuses every write on both transports."
+    admission:
+      status: exception
+      reviewed_revision: 5555f1323d8b27c5aa1dd36ebbf6b7b6f2e8222c
+      reviewed_components:
+        - pyproject.toml
+        - src/hass_axi/__init__.py
+        - src/hass_axi/cli.py
+        - src/hass_axi/errors.py
+        - src/hass_axi/output.py
+        - src/hass_axi/toon.py
+        - src/hass_axi/readonly.py
+        - src/hass_axi/rest.py
+        - src/hass_axi/ws.py
+        - src/hass_axi/config.py
+        - src/hass_axi/hooks.py
+        - src/hass_axi/commands/_common.py
+        - src/hass_axi/commands/home.py
+        - src/hass_axi/commands/context.py
+        - src/hass_axi/commands/setup.py
+        - src/hass_axi/commands/state.py
+        - src/hass_axi/commands/sensor.py
+        - src/hass_axi/commands/logbook.py
+        - src/hass_axi/commands/statistics.py
+        - src/hass_axi/commands/service.py
+        - src/hass_axi/commands/template.py
+        - src/hass_axi/commands/entity.py
+        - src/hass_axi/commands/area.py
+        - src/hass_axi/commands/device.py
+        - src/hass_axi/commands/api.py
+        - src/hass_axi/commands/wscmd.py
+        - skills/hass-axi/SKILL.md
+      source_observations:
+        - "Tag v0.8.0 is 5555f1323d8b27c5aa1dd36ebbf6b7b6f2e8222c. pyproject.toml declares the `hass-axi` console script (hass_axi.cli:main) with dependencies axi-toolkit>=0.3.0 and websockets>=13.0, and src/hass_axi/__init__.py carries version 0.8.0. The tool was published as `ha-axi` up to 0.7.1 and renamed; it is unrelated to the batamire/ha-axi entry above."
+        - "src/hass_axi/cli.py is the single error boundary: an AxiError renders as a structured `error`/`code`/`class`/`help` document on stdout with the error's exit code, and any other exception renders as INTERNAL_ERROR instead of a raw traceback. src/hass_axi/errors.py maps usage errors to exit 2 and every other failure to exit 1. An unknown flag is refused by name with the valid flags for that subcommand (UNKNOWN_FLAG, exit 2), an unknown command and a missing subcommand list the valid ones, and `-v`/`--version` print the tool name and version."
+        - "src/hass_axi/toon.py is an in-tree TOON encoder and src/hass_axi/output.py is the one output boundary: TOON by default with `--json` and `--human` modes, registered secrets redacted before anything reaches stdout or stderr, and `truncate` appending the original length. src/hass_axi/commands/state.py, service.py, and template.py truncate long attribute, description, and rendered-template text with a `--full` hint. List commands print shown, matched, and total counts with a larger-`--limit` suggestion; `entity list`, `device list`, and `state list` default to three fields and `statistics list` to four, with `--fields` selecting from the wider set."
+        - "src/hass_axi/readonly.py classifies every subcommand and declared WebSocket command as read, write, or dynamic, treats anything unclassified as a write, and refuses writes with READ_ONLY (exit 2) when HASS_AXI_READ_ONLY is non-empty; src/hass_axi/rest.py and src/hass_axi/ws.py enforce the same gate on their own transports. src/hass_axi/commands/api.py treats only GET, HEAD, and OPTIONS as reads, and src/hass_axi/ws.py classifies a `ws --raw` type no declaration names as a write. src/hass_axi/config.py takes the URL and token from the environment only (no token flag or credential file), and src/hass_axi/rest.py refuses a redirect that changes scheme or host instead of forwarding the Authorization header."
+        - "src/hass_axi/commands/service.py pre-checks the capability a service publishes for area and device targets (UNSUPPORTED_CAPABILITY, with `--no-check` to send anyway), exits 1 with NO_ENTITIES_TARGETED when a target reached nothing, and explains a refused call from the service model (for example UNKNOWN_SERVICE_FIELD listing the accepted fields). src/hass_axi/commands/entity.py, area.py, and device.py report `already matches the requested values, no change made` for an update that already holds, and `area create` reports an existing area of the same name instead of failing."
+        - "src/hass_axi/commands/home.py is the no-argument live view (entity counts by domain, unavailable count, next-step help). src/hass_axi/hooks.py installs a SessionStart hook for Claude Code and Codex and a managed OpenCode plugin only when `hass-axi setup hooks` runs (src/hass_axi/commands/setup.py); the hook runs `hass-axi context`, which src/hass_axi/commands/context.py writes to need no connection or credential and to exit 0. The skill is produced by `hass-axi setup skill`, which generates skills/hass-axi/SKILL.md from the command table and has a `--check` mode for staleness; the committed copy is current at the pin."
+        - "Gaps observed at the pin: src/hass_axi/commands/sensor.py defaults list rows to six fields and src/hass_axi/commands/logbook.py to five. src/hass_axi/commands/api.py and src/hass_axi/commands/wscmd.py print the whole response with no size truncation. `service call`, write-method `api` requests, and write `ws` commands are sent without a confirmation or preview flag; the capability pre-check and HASS_AXI_READ_ONLY are the only gates. `setup hooks` has no status or removal subcommand and installs no session-end hook. The bare home view prints the description and setup help but exits 1 when HA_URL/HA_TOKEN are unset or Home Assistant is unreachable."
+      exception: "Principle 2 is partial: `sensor list` defaults to six fields and `logbook get` to five. Principle 3 is partial: `api` and `ws` output is not size-truncated. Principle 6 is partial: `service call` and the raw `api`/`ws` write paths mutate without a confirmation or preview step, relying on the capability pre-check and the opt-in `HASS_AXI_READ_ONLY` switch. Principle 7 lacks hook status/removal and session-end capture. Principle 8 home view exits 1 without configuration or a reachable server. Observations apply to the pinned wrapper source, not independently verified Home Assistant behavior."

@@ -31,6 +31,11 @@ community:
     author: aivv73
     domain: Version control
     description: "Inspect and reshape Jujutsu history through deterministic, non-interactive commands with compact TOON output and operation-aware undo."
+  - name: but-axi
+    url: https://github.com/edheltzel/but-axi
+    author: edheltzel
+    domain: GitButler
+    description: "Status, diffs, commits, branches, push, undo/redo, and oplog for GitButler workspaces. Wraps `but --json` with compact TOON output and combined mutations."
   - name: npm-axi
     url: https://github.com/SSBrouhard/npm-axi
     author: SSBrouhard

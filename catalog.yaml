@@ -36,6 +36,30 @@ community:
     author: edheltzel
     domain: GitButler
     description: "Status, diffs, commits, branches, push, undo/redo, and oplog for GitButler workspaces. Wraps but --json with compact TOON output and combined mutations."
+    admission:
+      status: exception
+      reviewed_revision: 6eda0a60f8b05ba433ae6a52973cc08366aae767
+      reviewed_components:
+        - package.json
+        - bin/but-axi.ts
+        - src/cli.ts
+        - src/args.ts
+        - src/commands.ts
+        - src/but.ts
+        - src/errors.ts
+        - src/format.ts
+        - src/help.ts
+        - src/hooks.ts
+        - src/omp.ts
+        - src/workspace.ts
+        - omp/but-axi.ts
+        - skills/but-axi/SKILL.md
+      source_observations:
+        - "src/cli.ts exposes content-first home, status, diff, show, commit, branch, push, undo, redo, and oplog paths; src/but.ts invokes `but` with `--json`, closes stdin, disables pagers and editors, and translates dependency failures into AxiError output."
+        - "src/args.ts rejects unknown flags and missing flag values with UsageError exit 2; src/format.ts renders data and errors through @toon-format/toon, validates requested fields, and supplies definitive empty-list text."
+        - "src/commands.ts bounds patches, commit bodies, commit lists, and oplog lists, returns aggregate workspace state after mutations, and treats an existing branch or empty commit as a successful no-op."
+        - "src/hooks.ts installs or repairs opt-in SessionStart integrations for Claude Code, Codex, Cursor, and omp; omp/but-axi.ts injects a bounded dashboard, and skills/but-axi/SKILL.md directs agents to the CLI as the current command source."
+      exception: "The shared branch flag spec accepts --above and --below for `branch list` and `branch show`, but those paths ignore them; bin/but-axi.ts statically imports src/cli.ts, and main accepts only -v and --version, so -V fails and version probes load the full command graph; missing arguments for show, branch new/show, commit, and oplog restore use runtime exit 1 instead of usage exit 2; session setup omits OpenCode and SessionEnd; and package.json has no generated-skill drift check."
   - name: npm-axi
     url: https://github.com/SSBrouhard/npm-axi
     author: SSBrouhard

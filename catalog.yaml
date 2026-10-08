@@ -1382,4 +1382,4 @@ community:
     url: https://github.com/Azd325/axeos-axi
     author: Azd325
     domain: Bitcoin miner / AxeOS
-    description: "Agent-ergonomic AxeOS Bitcoin miner CLI (Bitaxe included) - read-only inspection (status, info, asic, stats, firmware, scoreboard, logs, health, discover) plus confirmed changes (`restart`, `tuning`, `pool`) over the miner's documented HTTP API."
+    description: "Agent-ergonomic AxeOS Bitcoin miner CLI (Bitaxe included) - read-only inspection (a no-argument home view, info, asic, stats, firmware, scoreboard, logs, health, discover) plus confirmed changes (`restart`, `tuning`, `pool`) over the miner's documented HTTP API."

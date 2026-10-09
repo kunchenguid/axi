@@ -31,6 +31,31 @@ community:
     author: aivv73
     domain: Version control
     description: "Inspect and reshape Jujutsu history through deterministic, non-interactive commands with compact TOON output and operation-aware undo."
+  - name: but-axi
+    url: https://github.com/edheltzel/but-axi
+    author: edheltzel
+    domain: GitButler
+    description: "Status, diffs, commits, branches, push, undo/redo, and oplog for GitButler workspaces. Wraps `but --json` with compact TOON output and combined mutations."
+    admission:
+      status: admitted
+      reviewed_revision: f1eb01d8a6260d6c08fa75b31fbafbad8ec2aea8
+      reviewed_components:
+        - bin/but-axi.ts
+        - src/version.ts
+        - src/args.ts
+        - src/cli.ts
+        - src/but.ts
+        - src/commands.ts
+        - src/hooks.ts
+        - skills/but-axi/SKILL.md
+        - package.json
+        - README.md
+      source_observations:
+        - "At tag v0.1.1, revision f1eb01d8a6260d6c08fa75b31fbafbad8ec2aea8, bin/but-axi.ts answers -v, -V, and --version through isBareVersion from src/version.ts, which imports only node builtins, before dynamically importing src/cli.js."
+        - "src/args.ts parseArgs is strict and throws UsageError with exit 2 for UNKNOWN_FLAG and MISSING_VALUE; maxPositionals and rejectFlags reject extra arguments and sibling-subcommand flags; src/cli.ts parses every command before runBut, and unwrapped but verbs get UNKNOWN_COMMAND with a pointer."
+        - "src/but.ts runBut spawns but with --json, stdin ignored, and the pager and editor disabled, mapping ENOENT to BUT_NOT_FOUND and failures to a structured AxiError rendered on stdout."
+        - "src/commands.ts reports idempotent no-ops with exit 0 (branch new on an existing branch, commit with nothing to commit, push with nothing new, undo/redo with nothing to do); list schemas default to three or four fields with validated --fields extras; patches, bodies, and commit lists are truncated with size hints and --full; views carry count lines and explicit 0 empty states; homeView shows live workspace state with no arguments; help next steps appear throughout."
+        - "src/hooks.ts writes SessionStart entries for Claude Code, Codex, and Cursor only from but-axi setup hooks, finds its own entry by a marker, repairs a stale path in place, makes no change on a repeat run, backs up before writing, and supports --status, --uninstall, and --dry-run; skills/but-axi/SKILL.md directs agents to npx -y but-axi, which resolves to the npm but-axi@0.1.1 release of this tag."
   - name: npm-axi
     url: https://github.com/SSBrouhard/npm-axi
     author: SSBrouhard

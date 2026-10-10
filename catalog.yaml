@@ -26,6 +26,37 @@ official:
     description: "Reports local Claude, Codex, Cursor, Copilot, and Grok quota/usage windows for routing-aware agents - data-only and local-first."
 
 community:
+  - name: adb-axi
+    url: https://github.com/aleksandr-deich/adb-axi
+    author: aleksandr-deich
+    domain: Android app development
+    description: "Manage Android app lifecycle, check process-death behavior, inspect logs and crashes, and perform read-only app database inspection through an agent-friendly adb CLI."
+    admission:
+      status: exception
+      reviewed_revision: 0966edd675bc5296fa176f0988c7e7bb6c7686d4
+      reviewed_components:
+        - bin/adb-axi.ts
+        - src/cli.ts
+        - src/core/args.ts
+        - src/core/errors.ts
+        - src/commands/home.ts
+        - src/commands/app/list.ts
+        - src/core/truncate.ts
+        - src/commands/data/sql-guard.ts
+        - src/commands/data/db.ts
+        - src/commands/data/host-sqlite.ts
+        - src/commands/app/clear.ts
+        - src/commands/shell.ts
+        - skills/adb-axi/SKILL.md
+        - package.json
+        - README.md
+      source_observations:
+        - "At tag v0.1.3, revision 0966edd675bc5296fa176f0988c7e7bb6c7686d4, bin/adb-axi.ts calls tryFastPath from axi-sdk-js/fast-path with VERSION from src/version.ts before loading src/cli.js; src/cli.ts uses runAxiCli, and command invocation parsing validates declared flags before adb calls. src/core/args.ts reports unknown flags as VALIDATION_ERROR, which src/core/errors.ts maps to exit 2; errors render structured fields and help on stdout."
+        - "src/commands/home.ts provides a no-argument live view of devices, target, foreground app, and recent crashes, tolerating failed device selection in the output. src/commands/app/list.ts emits three fields per row and a system-package count; src/core/truncate.ts marks capped output and supports full output to a file."
+        - "src/commands/data/sql-guard.ts accepts one SELECT, WITH, VALUES, EXPLAIN, or PRAGMA statement and rejects dot-commands, ATTACH, and VACUUM INTO before database listing or copying. src/commands/data/db.ts copies the database and WAL from the device, and src/commands/data/host-sqlite.ts queries the local copy using sqlite3 -safe -readonly -batch -json."
+        - "src/commands/app/clear.ts validates the package before constructing pm clear, requires Success, and verifies process exit and, for debuggable apps, remaining data files. src/commands/shell.ts returns the device command's exit code and reports non-zero results as REMOTE_EXIT."
+        - "skills/adb-axi/SKILL.md is a discovery stub directing agents to live --help. The reviewed source did not show a setup hooks command or another ambient-context install path."
+      exception: "No setup hooks (or other ambient-context install) command exists, so principle 7's opt-in session integration is not offered; only the skill half is covered by skills/adb-axi/SKILL.md."
   - name: jj-axi
     url: https://github.com/aivv73/jj-axi
     author: aivv73

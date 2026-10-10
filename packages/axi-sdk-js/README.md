@@ -98,6 +98,65 @@ await runAxiCli({
 });
 ```
 
+## Declared flags
+
+AXI principle 6 says a CLI must refuse unknown flags before doing any work. `runAxiCli()` enforces it for any command that declares its flags: register `{ flags, run }` instead of a bare function.
+
+```ts
+await runAxiCli({
+  // ...other options
+  globalFlags: { account: { type: "string" } }, // accepted by every declared command
+  commands: {
+    search: {
+      flags: {
+        query: { type: "string" },
+        limit: { type: "string" },
+        full: { type: "boolean" },
+        recursive: { type: "boolean", short: "r" },
+        label: { type: "string", multiple: true },
+        page: { type: "string", default: "1" },
+        querry: { refuse: "Did you mean --query?" }, // a likely guess or a renamed flag
+      },
+      run: async (args, context, parsed) => search(parsed.values),
+    },
+    status: statusCommand, // a bare function: unchecked, receives argv exactly as given
+  },
+});
+```
+
+The declaration is a [`node:util` `parseArgs`](https://nodejs.org/api/util.html#utilparseargsconfig) options map (`type`, `short`, `multiple`, `default`) plus one AXI extension, `refuse`. Before `resolveContext` and before the handler run, the args are checked in strict mode. An unknown flag, a `refuse`d flag, a value flag with no value, or a boolean flag given a value is a `VALIDATION_ERROR` (exit 2):
+
+```sh
+$ my-axi search --querry fix
+error: Unknown flag --querry for `search`
+code: VALIDATION_ERROR
+help[3]: Did you mean --query?,"Valid flags for `search`: --account, --full, --label, --limit, --page, --query, --recursive (--help always allowed)",Run `my-axi search --help` for usage
+```
+
+`--help` always passes. Everything after a bare `--` is not checked. A lone `-` is a positional. Single-dash tokens that are not a declared `short` alias are unknown flags. `flags: {}` means the command takes no flags.
+
+**Normalization.** The handler's `args` are rewritten into the one form a hand-written parser understands, so a command can opt in without changing how it reads its flags:
+
+| Given                 | Handler receives               |
+| --------------------- | ------------------------------ |
+| `--limit=5`           | `--limit`, `5`                 |
+| `-r`                  | `--recursive`                  |
+| `-n5` or `-n 5`       | `--name`, `5`                  |
+| `--offset=-5`         | `--offset`, `-5`               |
+| `--label a --label=b` | `--label`, `a`, `--label`, `b` |
+
+Positionals, option values, and everything after `--` (including the `--`) pass through byte-identical and in order. Note that strict `parseArgs` rejects `--offset -5` as ambiguous and tells the caller to write `--offset=-5`; the normalized args then carry `--offset`, `-5`. `default` values appear only in `parsed.values`, never in `args`.
+
+**Known limit.** An inline value that itself starts with `--` (for example `--content=--foo`) is normalized to `--content`, `--foo`. A hand-written parser that treats any `--`-prefixed next token as a missing value will reject that; read such values from `parsed` instead, where `parsed.values.content` is `"--foo"`.
+
+**`parsed`.** A declared handler gets an optional third argument, `{ values, positionals }`, straight from `parseArgs`. Handlers may ignore it; `resolveContext` receives the same normalized `args` and `parsed`.
+
+**`globalFlags`** are merged under every declared command's own `flags`, so an `--account` selector is accepted (and listed) everywhere. The command's declaration wins on a name clash, which lets one command narrow a global or refuse it (`account: { refuse: "..." }`). Global flags have no effect on bare-function commands.
+
+**`checkFlags(args, flags, commandName, { globalFlags?, bin? })`** is the same check, exported for tools with their own nested subcommand dispatcher. It returns `{ args, parsed }` or throws the same `AxiError` that `runAxiCli()` would, so `gmail search --bogus` reads identically whether the top-level runtime or the `gmail` dispatcher refused it. Pass the nested name (`"gmail search"`) so the error and the `--help` suggestion name the right command.
+
+**Opt-in rule.** Behaviour changes only follow declarations. A bare-function command, `home`, and the built-in `update` receive argv exactly as before, with no checking and no normalization. Future declaration fields (typed values, choices, descriptions for generated help, nested subcommands) will be optional additions to the same shape.
+
 ## Reference
 
 `axi-sdk-js` is a library package. In normal use, `runAxiCli()` is the main
@@ -109,6 +168,7 @@ full command graph.
 | --------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `runAxiCli()`                           | Shared runtime for command-first dispatch, bare `--help`/`--version` handling, the built-in `update` command, lazy context resolution, home header injection, TOON serialization, and errors |
 | `axi-sdk-js/fast-path`: `tryFastPath()` | Dependency-free subpath for handling a bare `-v`, `-V`, or `--version` before loading the full CLI graph; all other arguments fall through unchanged                                         |
+| `checkFlags()`                          | Check and normalize args against a flag declaration, for nested subcommand dispatchers; same errors as `runAxiCli()` ([Declared flags](#declared-flags))                                     |
 
 ### Advanced Exports
 

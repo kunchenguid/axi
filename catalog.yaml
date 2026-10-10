@@ -1414,3 +1414,37 @@ community:
         - "src/plex_axi/commands/api.py issues GET only and refuses other methods by name. Before connecting it also refuses, with STATE_CHANGING_PATH (exit 2), a path whose GET changes server state: src/plex_axi/toolkit/shapes.py acts_on_get matches the `/:/`, `/player/`, `/playqueues`, `/butler`, `/updater`, and `/actions/` prefixes and endings such as `/refresh`, `/analyze`, `/emptyTrash`, `/optimize`, `/match`, `/unmatch`, and `/scrobble`, after percent-decoding, slash-collapsing, and lower-casing the path; `.` and `..` segments are refused. A token passed as a query parameter is refused, and any response attribute whose name marks a credential (is_credential_name: token, secret, password, authkey, apikey, credential) prints as `<redacted>` and is registered as a secret, which covers the account token in `/myplex/account`. Output is bounded by size as well as depth: `--depth` defaults to 3, at most 20 children of one tag render with the rest counted, and values over 800 characters are previewed with their full length; `--full` and `--depth` lift the bounds and are suggested only when a bound was hit."
         - "src/plex_axi/commands/home.py is the no-argument live view of the music library; when PLEX_URL/PLEX_TOKEN are unset or the server is not reached it still prints the description, the write-gate state, and the next setup step, and exits 0. src/plex_axi/commands/recent.py carries the caller's `--type` and `--fields` into its `--limit` follow-up suggestion."
         - "src/plex_axi/hooks.py installs session hooks for Claude Code, Codex, and OpenCode only when `plex-axi setup hooks` runs (src/plex_axi/commands/setup.py); `setup status` reports each target without writing and `setup remove` takes out only the entries the installer marked as its own. The session-start hook runs `plex-axi context`, which src/plex_axi/commands/context.py writes to need no connection or credential and to exit 0. Claude Code also gets a SessionEnd hook, `plex-axi context end`, which src/plex_axi/sessionlog.py uses to record command names and counts (never arguments) for the next session's context; Codex and OpenCode get the session-start context only; the installer registers no session-end hook for them. The skill is produced by `plex-axi skill` (src/plex_axi/commands/skill.py), which generates skills/plex-axi/SKILL.md from the command table and has a `--check` mode for staleness. Observations apply to the pinned wrapper source, not independently verified Plex server or PlexAPI behavior."
+  - name: axeos-axi
+    url: https://github.com/Azd325/axeos-axi
+    author: Azd325
+    domain: Bitcoin miner / AxeOS
+    description: "Agent-ergonomic AxeOS Bitcoin miner CLI (Bitaxe included) - read-only inspection (a no-argument home view, info, asic, stats, firmware, scoreboard, logs, health, discover) plus confirmed changes (`restart`, `tuning`, `pool`) over the miner's documented HTTP API."
+    admission:
+      status: exception
+      reviewed_revision: 459682f9e5b630ef2463ed29277583a7ffb58900
+      reviewed_components:
+        - cmd/axeos-axi/main.go
+        - internal/app/app.go
+        - internal/app/restart.go
+        - internal/app/tuning.go
+        - internal/app/pool.go
+        - internal/app/writes.go
+        - internal/app/logs.go
+        - internal/app/skill.go
+        - internal/skill/skill.go
+        - internal/axeos/client.go
+        - internal/app/logs_follow.go
+        - internal/ws/ws.go
+        - internal/app/release.go
+        - internal/release/release.go
+        - internal/app/discover.go
+        - internal/mdns/browse.go
+        - internal/app/host.go
+      source_observations:
+        - "-v, -V, and --version print the bare version (or {\"version\":...} with --json) and exit 0, and --help prints help, both before any host lookup or miner request; unknown flags, unknown commands, repeated flags, missing values, and flags of another command are usage errors with exit 2 that print the valid flags and commands on stdout (internal/app/app.go, cmd/axeos-axi/main.go)."
+        - "Reads are GET requests to /api/system on the miner for info, asic, statistics (with a columns query), firmware/checksum, scoreboard, and logs; `logs --follow` opens a read-only WebSocket at /api/ws on the miner; `firmware --check-release` sends one HTTPS GET without token or cookie to the GitHub releases API for bitaxeorg/ESP-Miner, the only request that leaves the local network; `discover` sends only mDNS queries and contacts no miner API; `host save` sends one GET /api/system/info and writes the local host file; the only write requests are POST /api/system/restart and PATCH /api/system for frequency, coreVoltage, and pools; miner requests follow no redirect and ignore proxy variables (internal/axeos/client.go, internal/ws/ws.go, internal/app/logs_follow.go, internal/app/release.go, internal/release/release.go, internal/app/discover.go, internal/mdns/browse.go, internal/app/host.go)."
+        - "restart, tuning, and pool send no write request without --confirm and print the host, request, effect, and exact execute command; the tuning and pool previews read info (and asic for tuning) to print present and new values, and a multi-host restart preview reads info from each miner; with --confirm each sends exactly one write request per miner; tuning refuses values outside the lists the miner reports, pool checks fixed format rules for URL, port, and user, failures are *_not_sent, *_unconfirmed, or *_failed with exit 1, and tuning and pool print a restore command; a confirmed pool --user requires --show-user (internal/app/restart.go, internal/app/tuning.go, internal/app/pool.go, internal/app/writes.go, internal/app/app.go)."
+        - "Several --host values are checked first with reads; if any miner fails the check no write is sent, otherwise writes go one after the other and stop at the first failure, with later rows not_attempted (internal/app/writes.go)."
+        - "logs prints only total_lines and size_bytes by default and has an explicit `0 lines in the miner log buffer` empty state; --lines is opt-in and replaces the pool user, MAC, and Wi-Fi name reported by info unless --show-private is given (internal/app/logs.go)."
+        - "skill install writes the embedded SKILL.md to ~/.agents/skills/axeos-axi/SKILL.md or under --path through a temporary file and rename, reports written, and writes nothing when the content is identical; it needs no host and registers nothing automatically (internal/app/skill.go, internal/skill/skill.go)."
+      exception: "No `setup hooks` (or other session-integration) command exists, so principle 7's session integration is not offered and only the skill half is covered by `axeos-axi skill install`. Observations apply to the pinned wrapper source, not to AxeOS firmware behavior or a real miner."

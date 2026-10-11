@@ -1493,3 +1493,8 @@ community:
         - "Session hooks are opt-in, installed only by `setup hooks` for Claude Code, Codex, and OpenCode through the SDK. `setup hooks` (src/cli.ts setupHooks) passes onError through, re-reads the installed hook status, and reports what is actually present, failing with a structured error when nothing was written. The skill is generated from src/skill.ts and CI runs `build:skill -- --check`. With no config the no-argument call prints bin, description, `server: not configured`, and setup hints with exit 0; with a server it shows the version and a node list."
         - "Hints follow lists, truncation, sub-resources, and UPID tasks, with task follow-ups quoted (src/run.ts). Every endpoint has `--help` with flags, types, required-ness, and permissions, and verbs, `ls`, and `setup` have their own help; `--version` uses the fast path in bin/proxmox-axi.ts, covered by test/bin.test.ts."
       exception: "There is no session-end capture (principle 7); axi-sdk-js 0.1.13 only provides a SessionStart hook."
+  - name: codebase-search-axi
+    url: https://github.com/pikos-apikos/codebase-search-axi
+    author: pikos-apikos
+    domain: Codebase search
+    description: "TypeScript/Node CLI for read-only `rg` file discovery, search, context, and counts, with `axi-sdk-js` dispatch, TOON/JSON output, and mandatory path exclusions."

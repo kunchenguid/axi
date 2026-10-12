@@ -1473,7 +1473,7 @@ community:
     description: "Agent-ergonomic CLI for the whole Proxmox VE REST API - one generic engine builds `ls`, `get`, `create`, `set`, and `delete` commands from the bundled pve-docs schema, with `--dry-run` previews, TOON output, and an opt-in session hook for Claude Code, Codex, and OpenCode."
     admission:
       status: exception
-      reviewed_revision: 376fd338db33511e3f1ae3e51f13e119253fb008
+      reviewed_revision: 544987b0f0e2c8dd36a4be76490af3662909676c
       reviewed_components:
         - bin/proxmox-axi.ts
         - src/cli.ts
@@ -1488,8 +1488,8 @@ community:
         - package.json
         - README.md
       source_observations:
-        - "At tag v0.1.0, revision 376fd338db33511e3f1ae3e51f13e119253fb008, output goes through runAxiCli as TOON (src/cli.ts). Cells are cut at 120 characters and text at 500 with a `(truncated, N chars total)` note, `--full` disables truncation, and the hint appears only when something was clipped (src/output.ts, src/run.ts). Long lists print `count: N of M total` with a `--limit 0` hint (src/run.ts callCommand), and an empty array prints `<key>: 0 results`; `ls` reports `0 paths match` and `0 sub-paths (leaf)`."
+        - "At tag v0.1.1, revision 544987b0f0e2c8dd36a4be76490af3662909676c, output goes through runAxiCli as TOON (src/cli.ts). Cells are cut at 120 characters and text at 500 with a `(truncated, N chars total)` note, `--full` disables truncation, and the hint appears only when something was clipped (src/output.ts, src/run.ts). Long lists print `count: N of M total` with a `--limit 0` hint (src/run.ts callCommand), and an empty array prints `<key>: 0 results`; `ls` reports `0 paths match` and `0 sub-paths (leaf)`."
         - "src/flags.ts checks flags against the bundled schema before any request: unknown flags, bad values, and missing required flags exit 2 with the valid flags listed. HTTP and connection errors are structured with hints and exit 1 (src/client.ts). There are no prompts, and `--dry-run` redacts the Authorization header and secret-named parameters."
-        - "Session hooks are opt-in, installed only by `setup hooks` for Claude Code, Codex, and OpenCode through the SDK; the skill is generated from src/skill.ts and CI runs `build:skill -- --check`. With no config the no-argument call prints bin, description, `server: not configured`, and setup hints with exit 0; with a server it shows the version and a node list."
+        - "Session hooks are opt-in, installed only by `setup hooks` for Claude Code, Codex, and OpenCode through the SDK. `setup hooks` (src/cli.ts setupHooks) passes onError through, re-reads the installed hook status, and reports what is actually present, failing with a structured error when nothing was written. The skill is generated from src/skill.ts and CI runs `build:skill -- --check`. With no config the no-argument call prints bin, description, `server: not configured`, and setup hints with exit 0; with a server it shows the version and a node list."
         - "Hints follow lists, truncation, sub-resources, and UPID tasks, with task follow-ups quoted (src/run.ts). Every endpoint has `--help` with flags, types, required-ness, and permissions, and verbs, `ls`, and `setup` have their own help; `--version` uses the fast path in bin/proxmox-axi.ts, covered by test/bin.test.ts."
-      exception: "Default list columns are capped at six (principle 2 asks for three or four); there is no session-end capture (principle 7); the generic engine does not translate already-in-that-state server errors into exit-0 no-ops (principle 6); and `setup hooks` prints `installed` when run from source via tsx without writing files, while the built dist is correct (fix planned in 0.1.1)."
+      exception: "Default list columns are capped at six (principle 2 asks for three or four); there is no session-end capture (principle 7); the generic engine does not translate already-in-that-state server errors into exit-0 no-ops (principle 6)."

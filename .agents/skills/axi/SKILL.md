@@ -130,7 +130,7 @@ error: unknown flag --stat for `list`
 help: valid flags for `list`: --state, --assignee, --limit (--help always allowed)
 ```
 
-- **Validate before any dependency call**, with exit code 2 — the same as a missing required flag. Each command declares its own known flags; an unrecognized one is rejected by name and the command's valid flags are listed.
+- **Validate before any dependency call**, with exit code 2 — the same as a missing required flag. Each command declares its own known flags; an unrecognized one is rejected by name and the command's valid flags are listed. `axi-sdk-js` does this for any `runAxiCli` command that declares `flags` (and exports `checkFlags` for nested dispatchers).
 - **`--help` always passes** — it's the one universal flag. Beyond it, a CLI may standardize its own always-allowed globals (e.g. an `--account` selector); whatever the set, those flags pass on every command and are never reported as unknown.
 - **Renamed or removed flags get a targeted hint**, not the generic list — point at what replaced them (`--status was renamed; use --state instead`) so the agent self-corrects in one step.
 - **Per-subcommand flag sets.** For grouped nouns where one command dispatches to subcommands (a `list` vs a `create` under the same noun), validate against the _subcommand's_ flags — they differ, and only the subcommand layer knows which is in play.

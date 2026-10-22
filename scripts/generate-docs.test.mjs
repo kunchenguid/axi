@@ -399,7 +399,7 @@ test("community catalog lands mikrotik-axi with a pinned admission record", () =
   assert.equal(mikrotik.admission.status, "exception");
   assert.equal(
     mikrotik.admission.reviewed_revision,
-    "3ac977db25eb0d571205f1b0b1d85f0d4f86bf92",
+    "a335ea96196a14b06fa19a63c98d6838670a3a98",
   );
   assert.ok(
     mikrotik.admission.reviewed_components.includes("src/bin.ts"),

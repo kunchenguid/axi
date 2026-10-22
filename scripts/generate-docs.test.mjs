@@ -385,3 +385,57 @@ test("community catalog lands plane-axi with a pinned admission record", () => {
   assert.match(html, /<code>plane-axi<\/code>/);
   assert.match(html, /idempotent close/);
 });
+
+test("community catalog lands mikrotik-axi with a pinned admission record", () => {
+  const catalog = parse(readFileSync(join(root, "catalog.yaml"), "utf8"));
+  const mikrotik = catalog.community.find(
+    (entry) => entry.name === "mikrotik-axi",
+  );
+  assert.ok(mikrotik, "mikrotik-axi must be present in catalog.community");
+  assert.equal(mikrotik.author, "ngoviet");
+  assert.equal(mikrotik.domain, "MikroTik RouterOS");
+  assert.equal(mikrotik.url, "https://github.com/ngoviet/mikrotik-axi");
+
+  assert.equal(mikrotik.admission.status, "exception");
+  assert.equal(
+    mikrotik.admission.reviewed_revision,
+    "3ac977db25eb0d571205f1b0b1d85f0d4f86bf92",
+  );
+  assert.ok(
+    mikrotik.admission.reviewed_components.includes("src/bin.ts"),
+    "reviewed_components must include src/bin.ts",
+  );
+  assert.ok(
+    mikrotik.admission.reviewed_components.includes("src/commands/fw.ts"),
+    "reviewed_components must include src/commands/fw.ts",
+  );
+  assert.ok(
+    typeof mikrotik.admission.exception === "string" &&
+      mikrotik.admission.exception.length > 0,
+    "admission.exception must be present",
+  );
+  assert.match(
+    mikrotik.admission.exception,
+    /Principle 7 has no session-end lifecycle capture/,
+    "exception must document Principle 7 missing lifecycle capture",
+  );
+  assert.match(
+    mikrotik.admission.exception,
+    /Principle 2: the `fw` table defaults to five columns/,
+    "exception must document Principle 2 fw table default columns",
+  );
+
+  const markdown = mdCatalogTable([mikrotik], true);
+  assert.match(
+    markdown,
+    /\[`mikrotik-axi`\]\(https:\/\/github\.com\/ngoviet\/mikrotik-axi\)/,
+  );
+  assert.match(markdown, /MikroTik RouterOS/);
+  assert.match(markdown, /Inspect MikroTik RouterOS v7 over REST/);
+
+  const html = htmlCatalogRows([mikrotik], true);
+  assert.match(html, /href="https:\/\/github\.com\/ngoviet\/mikrotik-axi"/);
+  assert.match(html, /<code>mikrotik-axi<\/code>/);
+  assert.match(html, /MikroTik RouterOS/);
+  assert.match(html, /Inspect MikroTik RouterOS v7 over REST/);
+});

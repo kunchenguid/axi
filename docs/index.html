@@ -1929,6 +1929,92 @@
                     snapshot revert.
                   </td>
                 </tr>
+                <tr>
+                  <td>
+                    <a href="https://github.com/cmosgh/hetzner-axi"
+                      ><code>hetzner-axi</code></a
+                    >
+                  </td>
+                  <td>cmosgh</td>
+                  <td>Hetzner Cloud</td>
+                  <td>
+                    Servers, firewalls, volumes, floating and primary IPs, SSH
+                    keys, and DNS zones and records on Hetzner Cloud over the
+                    REST API, plus read-only networks, load balancers, and
+                    actions, with keychain-stored per-project tokens, TOON
+                    output, previews until --confirm, and idempotent mutations.
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <a
+                      href="https://github.com/cmosgh/mysql-axi/tree/main/packages/mysql-axi"
+                      ><code>mysql-axi</code></a
+                    >
+                  </td>
+                  <td>cmosgh</td>
+                  <td>MySQL</td>
+                  <td>
+                    Read-only MySQL for agents - find, list, and describe
+                    schemas, sample rows, and run capped SELECT/SHOW/EXPLAIN
+                    queries in TOON, with every statement passing a client-side
+                    SQL guard and running in a read-only session and
+                    transaction.
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <a
+                      href="https://github.com/cmosgh/mysql-axi/tree/main/packages/mysql-rw-axi"
+                      ><code>mysql-rw-axi</code></a
+                    >
+                  </td>
+                  <td>cmosgh</td>
+                  <td>MySQL</td>
+                  <td>
+                    Write companion to mysql-axi for local dev databases - runs
+                    single statements, SQL dump imports, and database
+                    create/drop only against loopback hosts and unix sockets,
+                    previews irreversible statements until
+                    <code>--confirm</code>, and keeps its read commands
+                    read-only.
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <a
+                      href="https://github.com/cmosgh/mongo-axi/tree/main/packages/mongo-axi"
+                      ><code>mongo-axi</code></a
+                    >
+                  </td>
+                  <td>cmosgh</td>
+                  <td>MongoDB (read-only)</td>
+                  <td>
+                    Read-only by construction: infer schemas from samples and
+                    run capped find, aggregate, count, distinct, and explain on
+                    any MongoDB deployment, with filters parsed as data and
+                    every command checked against a read allowlist before it is
+                    sent; writes ship only in the separate mongo-rw-axi.
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <a
+                      href="https://github.com/cmosgh/mongo-axi/tree/main/packages/mongo-rw-axi"
+                      ><code>mongo-rw-axi</code></a
+                    >
+                  </td>
+                  <td>cmosgh</td>
+                  <td>MongoDB (loopback-only writes)</td>
+                  <td>
+                    Insert, update, delete, import, and index, collection, and
+                    database changes for a local dev MongoDB only - one loopback
+                    host or unix socket over a direct connection, tunnels to
+                    remote replica sets refused, and irreversible operations
+                    previewed until <code>--confirm</code>; reads go through
+                    mongo-axi's read-only guard.
+                  </td>
+                </tr>
                 <!-- generated:catalog-community:end -->
               </tbody>
             </table>

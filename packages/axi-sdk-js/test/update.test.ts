@@ -260,8 +260,39 @@ describe("detectInstallMethod", () => {
       detectInstallMethod({
         entry: "/Users/me/src/gh-axi/dist/bin/gh-axi.js",
         env: {},
+        fs: fakeFs({}),
       }),
     ).toEqual({ kind: "unknown" });
+  });
+
+  it("detects a linked git checkout outside every package store", () => {
+    expect(
+      detectInstallMethod({
+        entry: "/Users/me/src/gh-axi/dist/bin/gh-axi.js",
+        env: { PNPM_HOME: "/Users/me/Library/pnpm" },
+        fs: fakeFs({ "/Users/me/src/gh-axi/.git": "" }),
+      }),
+    ).toEqual({ kind: "linked", checkout: "/Users/me/src/gh-axi" });
+  });
+
+  it("does not treat node_modules paths inside a git checkout as linked", () => {
+    expect(
+      detectInstallMethod({
+        entry: "/Users/me/repo/node_modules/gh-axi/dist/bin/gh-axi.js",
+        env: {},
+        fs: fakeFs({ "/Users/me/repo/.git": "" }),
+      }),
+    ).toEqual({ kind: "unknown" });
+  });
+
+  it("keeps global installs ahead of an enclosing git work tree", () => {
+    expect(
+      detectInstallMethod({
+        entry: "/Users/me/.npm-global/lib/node_modules/gh-axi/dist/bin/x.js",
+        env: { HOME: "/Users/me" },
+        fs: fakeFs({ "/Users/me/.git": "" }),
+      }),
+    ).toEqual({ kind: "npm-global" });
   });
 });
 
@@ -292,6 +323,20 @@ describe("planUpgrade", () => {
     ).toBeNull();
     expect(planUpgrade({ kind: "npx" }, "gh-axi").argv).toBeNull();
     expect(planUpgrade({ kind: "unknown" }, "gh-axi").argv).toBeNull();
+  });
+
+  it("is print-only for a linked checkout and names the checkout", () => {
+    const plan = planUpgrade(
+      { kind: "linked", checkout: "/Users/me/src/gh-axi" },
+      "gh-axi",
+    );
+    expect(plan).toMatchObject({
+      method: "linked",
+      command: "git -C /Users/me/src/gh-axi pull",
+      argv: null,
+    });
+    expect(plan.note).toContain("/Users/me/src/gh-axi");
+    expect(plan.command).not.toContain("install");
   });
 });
 
@@ -639,6 +684,46 @@ describe("runUpdate", () => {
     expect(output).toMatchObject({
       update: { action: "manual", run: "npm install -g gh-axi@latest" },
     });
+    expect(runInstall).not.toHaveBeenCalled();
+  });
+
+  it("does not suggest a registry install from a linked checkout", async () => {
+    const runInstall = vi.fn();
+    const output = await runUpdate({
+      ...baseDeps,
+      args: [],
+      invokedAs: "/Users/me/Library/pnpm/gh-axi",
+      realpath: () => "/Users/me/src/gh-axi/dist/bin/gh-axi.js",
+      fs: fakeFs({
+        "/Users/me/src/gh-axi/.git": "",
+        "/Users/me/src/gh-axi/package.json": JSON.stringify({
+          name: "gh-axi",
+          version: "1.2.3",
+        }),
+      }),
+      env: { PNPM_HOME: "/Users/me/Library/pnpm" },
+      stdout,
+      fetchLatest: async () => "1.3.0",
+      runInstall,
+    });
+
+    expect(output).toMatchObject({
+      update: {
+        current: "1.2.3",
+        latest: "1.3.0",
+        action: "manual",
+        checkout: "/Users/me/src/gh-axi",
+      },
+    });
+    const update = (output as { update: Record<string, unknown> }).update;
+    expect(update).not.toHaveProperty("run");
+    expect(String(update.reason)).toContain(
+      "git checkout at /Users/me/src/gh-axi",
+    );
+    const help = (output as { help: string[] }).help;
+    expect(help.join("\n")).toContain("git -C /Users/me/src/gh-axi pull");
+    expect(help.join("\n")).toContain("pnpm remove -g gh-axi");
+    expect(help.join("\n")).not.toContain("npm install -g");
     expect(runInstall).not.toHaveBeenCalled();
   });
 

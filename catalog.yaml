@@ -1972,3 +1972,18 @@ community:
         - "src/commands/home.ts is the no-argument view: the 5 most recent meetings (id, date, duration, title) with next-step hints, '0 meetings found' when empty, and a 'transcripts: status: unavailable' block with exit 0 when the CLI is missing, auth fails, or the API errors or rate-limits."
         - "src/commands/transcripts.ts lists 20 meetings by default (max 100) with four default columns, --fields organizer,participants checked against the allowed list, no invented total, and an exact --skip rerun hint on a full page. src/commands/transcript.ts shows one meeting with a 1,500-character preview, 300 characters per turn, and the first 10 participants unless --full; a missing id is refused rather than defaulting to the latest meeting. src/commands/download.ts saves via the CLI and re-stats the reported path, failing as WRITE_FAILED when it can't be read."
       exception: "Principle 7 has no lifecycle hooks: fireflies-axi ships a skill only (skills/fireflies-axi/SKILL.md) and installs no session-start or session-end hooks."
+  - name: argo-workflows-axi
+    url: https://github.com/Dematom1/argo-workflows-axi
+    author: Dematom1
+    domain: Argo Workflows
+    description: "Inspect and operate Argo Workflows with read-first commands, previewed writes, and token-efficient output. Reviewed npm release: `argo-workflows-axi@0.1.10`."
+  - name: argocd-axi
+    url: https://github.com/Dematom1/argocd-axi
+    author: Dematom1
+    domain: Argo CD
+    description: "Inspect Argo CD applications, sync state, resources, and operations; preview writes before applying. Reviewed npm release: `argocd-axi@0.1.8`."
+  - name: datadog-axi
+    url: https://github.com/Dematom1/datadog-axi
+    author: Dematom1
+    domain: Datadog
+    description: "Read Datadog monitors, logs, metrics, traces, services, and incidents through a token-efficient CLI. Reviewed npm release: `datadog-axi@0.1.9`."

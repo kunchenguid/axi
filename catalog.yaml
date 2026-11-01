@@ -1976,14 +1976,71 @@ community:
     url: https://github.com/Dematom1/argo-workflows-axi
     author: Dematom1
     domain: Argo Workflows
-    description: "Inspect and operate Argo Workflows with read-first commands, previewed writes, and token-efficient output. Reviewed npm release: `argo-workflows-axi@0.1.10`."
+    description: "Inspect and operate Argo Workflows with read-first commands, previewed writes, and token-efficient output."
+    admission:
+      status: admitted
+      reviewed_revision: "argo-workflows-axi@0.1.10"
+      reviewed_components:
+        - dist/bin/argo-workflows-axi.js
+        - dist/src/args.js
+        - dist/src/cli.js
+        - dist/src/commands/home.js
+        - dist/src/commands/setup.js
+        - dist/src/commands/wf-read.js
+        - dist/src/commands/wf-write.js
+        - dist/src/errors.js
+        - dist/src/format.js
+        - dist/src/render.js
+        - dist/skills/argo-workflows-axi/SKILL.md
+      source_observations:
+        - "The published 0.1.10 source uses TOON output and bounded compact workflow rows, reports shown/total counts including empty results, and signals truncation with a --full option. Home summarizes workflow phases; command results provide relevant follow-up commands."
+        - "Argument validation rejects unknown flags; errors are structured with defined exit codes. Workflow writes are previewed and include retry-safe resubmit behavior. Setup provides opt-in, idempotent session hooks, and the packaged skill supports discovery. The bin entrypoint has a version fast path and the CLI provides consistent top-level and command help."
+        - "These are source observations, not live backend validation. Installed-tarball checks reported unavailable Kubernetes/Argo configuration; no Argo fixture was included."
   - name: argocd-axi
     url: https://github.com/Dematom1/argocd-axi
     author: Dematom1
     domain: Argo CD
-    description: "Inspect Argo CD applications, sync state, resources, and operations; preview writes before applying. Reviewed npm release: `argocd-axi@0.1.8`."
+    description: "Inspect Argo CD applications, sync state, resources, and operations; preview writes before applying."
+    admission:
+      status: admitted
+      reviewed_revision: "argocd-axi@0.1.8"
+      reviewed_components:
+        - dist/bin/argocd-axi.js
+        - dist/src/args.js
+        - dist/src/commands/apps.js
+        - dist/src/commands/common.js
+        - dist/src/commands/ctx.js
+        - dist/src/commands/home.js
+        - dist/src/errors.js
+        - dist/src/help.js
+        - dist/src/toon.js
+        - dist/skills/argocd-axi/SKILL.md
+      source_observations:
+        - "The published 0.1.8 source uses compact TOON output and list rows, validates optional fields, reports shown/total and attention/operation counts, and explicitly reports empty lists. Truncation is signaled with a --full option, and home and list results include relevant follow-up guidance."
+        - "Unknown flags produce structured errors with defined exit codes; mutations require --confirm. Setup installs opt-in session hooks, ctx is an offline compact view, and the packaged skill supports discovery. The bin entrypoint has a version fast path; help includes usage, examples, flags, and command-specific guidance."
+        - "These are source observations. A separate installed-tarball live read succeeded with configured credentials and performed no writes; it does not establish behavior beyond the observed read paths."
   - name: datadog-axi
     url: https://github.com/Dematom1/datadog-axi
     author: Dematom1
     domain: Datadog
-    description: "Read Datadog monitors, logs, metrics, traces, services, and incidents through a token-efficient CLI. Reviewed npm release: `datadog-axi@0.1.9`."
+    description: "Read Datadog monitors, logs, metrics, traces, services, and incidents through a token-efficient CLI."
+    admission:
+      status: admitted
+      reviewed_revision: "datadog-axi@0.1.9"
+      reviewed_components:
+        - dist/bin/datadog-axi.js
+        - dist/src/args.js
+        - dist/src/cli.js
+        - dist/src/commands/api.js
+        - dist/src/commands/home.js
+        - dist/src/commands/metrics.js
+        - dist/src/commands/monitors.js
+        - dist/src/errors.js
+        - dist/src/render.js
+        - dist/src/commands/setup.js
+        - dist/src/commands/ctx.js
+        - dist/skills/datadog-axi/SKILL.md
+      source_observations:
+        - "The published 0.1.9 source renders compact TOON output and monitor rows, supports selected fields, reports status counts and totals, and truncates with a --full hint. Metrics explicitly report zero results; home aggregates monitor and incident states, and results provide relevant follow-up guidance."
+        - "Unknown flags are rejected and structured errors map to defined codes; the API command refuses writes. Setup installs opt-in session hooks, ctx provides a compact offline view, and the packaged skill supports discovery. The bin entrypoint has a version fast path and CLI help includes command references, flags, and examples."
+        - "These are source observations, not live backend validation. Installed-tarball checks reported missing credentials; no Datadog fixture was included."

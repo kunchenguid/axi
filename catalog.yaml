@@ -1979,8 +1979,9 @@ community:
     description: "Inspect and operate Argo Workflows with read-first commands, previewed writes, and token-efficient output."
     admission:
       status: admitted
-      reviewed_revision: "argo-workflows-axi@0.1.10"
+      reviewed_revision: bcfb03049ad62ea9b45310b2020d5b87e79adbb0
       reviewed_components:
+        - package.json
         - dist/bin/argo-workflows-axi.js
         - dist/src/args.js
         - dist/src/cli.js
@@ -1990,12 +1991,14 @@ community:
         - dist/src/commands/wf-write.js
         - dist/src/errors.js
         - dist/src/format.js
+        - dist/src/gate.js
         - dist/src/render.js
+        - dist/src/registry.js
         - dist/skills/argo-workflows-axi/SKILL.md
       source_observations:
-        - "The published 0.1.10 source uses TOON output and bounded compact workflow rows, reports shown/total counts including empty results, and signals truncation with a --full option. Home summarizes workflow phases; command results provide relevant follow-up commands."
-        - "Argument validation rejects unknown flags; errors are structured with defined exit codes. Workflow writes are previewed and include retry-safe resubmit behavior. Setup provides opt-in, idempotent session hooks, and the packaged skill supports discovery. The bin entrypoint has a version fast path and the CLI provides consistent top-level and command help."
-        - "These are source observations, not live backend validation. Installed-tarball checks reported unavailable Kubernetes/Argo configuration; no Argo fixture was included."
+        - "At published npm release argo-workflows-axi@0.1.13 (gitHead bcfb03049ad62ea9b45310b2020d5b87e79adbb0; tarball SHA-1 5285f61bc5682cdb45a3ac2911ebe47dd8c1ae90), dist/src/render.js encodes TOON; wf-read.js and home.js use bounded compact schemas, shown/total counts, explicit empty results, truncation markers and --full hints, and contextual follow-ups."
+        - "dist/src/wf-write.js previews writes, treats named existing workflows as no-ops, and makes wf resubmit retry-safe by key/generation (native memoized resubmit is separately gated); args.js rejects unknown flags and validates input, errors.js renders structured errors and exit codes, and setup.js reports per-agent/file hook failures as SETUP_FAILED while installing opt-in Claude Code, Codex and OpenCode session integrations."
+        - "dist/bin/argo-workflows-axi.js answers the version fast path before loading the CLI; cli.js and command help provide usage, flags and examples, home.js is the no-argument live view, and the packaged SKILL.md is the on-demand discovery path. These are source observations; separate read-only installed-package runs lacked Kubernetes/Argo credentials, and no fixture was included."
   - name: argocd-axi
     url: https://github.com/Dematom1/argocd-axi
     author: Dematom1
@@ -2003,22 +2006,26 @@ community:
     description: "Inspect Argo CD applications, sync state, resources, and operations; preview writes before applying."
     admission:
       status: admitted
-      reviewed_revision: "argocd-axi@0.1.8"
+      reviewed_revision: 5754950d1a520e4968bb4895fc177ccdc4603622
       reviewed_components:
+        - package.json
         - dist/bin/argocd-axi.js
         - dist/src/args.js
         - dist/src/commands/apps.js
         - dist/src/commands/common.js
         - dist/src/commands/ctx.js
         - dist/src/commands/home.js
+        - dist/src/commands/setup.js
         - dist/src/errors.js
         - dist/src/help.js
+        - dist/src/model.js
+        - dist/src/session-hook.js
         - dist/src/toon.js
         - dist/skills/argocd-axi/SKILL.md
       source_observations:
-        - "The published 0.1.8 source uses compact TOON output and list rows, validates optional fields, reports shown/total and attention/operation counts, and explicitly reports empty lists. Truncation is signaled with a --full option, and home and list results include relevant follow-up guidance."
-        - "Unknown flags produce structured errors with defined exit codes; mutations require --confirm. Setup installs opt-in session hooks, ctx is an offline compact view, and the packaged skill supports discovery. The bin entrypoint has a version fast path; help includes usage, examples, flags, and command-specific guidance."
-        - "These are source observations. A separate installed-tarball live read succeeded with configured credentials and performed no writes; it does not establish behavior beyond the observed read paths."
+        - "At published npm release argocd-axi@0.1.9 (gitHead 5754950d1a520e4968bb4895fc177ccdc4603622; tarball SHA-1 2f7a96152a1eba045a54dfae7d4c187e6f454b7b), dist/src/toon.js encodes TOON; apps.js defaults to four columns (app, sync, health, why), supports validated extra fields, reports totals and attention counts, states zero results explicitly, truncates long content with --full, and emits relevant next steps."
+        - "dist/src/args.js rejects unknown flags and invalid fields, errors.js maps failures to structured codes and exit statuses, and apps.js gates mutations behind --confirm. home.js shows live attention and operation summaries; ctx.js is offline; setup.js installs opt-in Claude Code, Codex and OpenCode hooks, verifies all destinations, and reports hook failures as UPSTREAM_ERROR."
+        - "dist/bin/argocd-axi.js has a version fast path; help.js and command specs provide per-command usage, flags and examples, and the packaged SKILL.md supports discovery. A separate read-only installed-package Argo CD read succeeded with existing credentials; it does not establish behavior beyond those observed read paths."
   - name: datadog-axi
     url: https://github.com/Dematom1/datadog-axi
     author: Dematom1
@@ -2026,21 +2033,24 @@ community:
     description: "Read Datadog monitors, logs, metrics, traces, services, and incidents through a token-efficient CLI."
     admission:
       status: admitted
-      reviewed_revision: "datadog-axi@0.1.9"
+      reviewed_revision: 9fb44aa4a55a89c6bf042a45c47d96af42b59134
       reviewed_components:
+        - package.json
         - dist/bin/datadog-axi.js
         - dist/src/args.js
         - dist/src/cli.js
         - dist/src/commands/api.js
+        - dist/src/commands/ctx.js
         - dist/src/commands/home.js
         - dist/src/commands/metrics.js
         - dist/src/commands/monitors.js
+        - dist/src/commands/setup.js
         - dist/src/errors.js
         - dist/src/render.js
-        - dist/src/commands/setup.js
-        - dist/src/commands/ctx.js
+        - dist/src/skill.js
+        - dist/src/target.js
         - dist/skills/datadog-axi/SKILL.md
       source_observations:
-        - "The published 0.1.9 source renders compact TOON output and monitor rows, supports selected fields, reports status counts and totals, and truncates with a --full hint. Metrics explicitly report zero results; home aggregates monitor and incident states, and results provide relevant follow-up guidance."
-        - "Unknown flags are rejected and structured errors map to defined codes; the API command refuses writes. Setup installs opt-in session hooks, ctx provides a compact offline view, and the packaged skill supports discovery. The bin entrypoint has a version fast path and CLI help includes command references, flags, and examples."
-        - "These are source observations, not live backend validation. Installed-tarball checks reported missing credentials; no Datadog fixture was included."
+        - "At published npm release datadog-axi@0.1.10 (gitHead 9fb44aa4a55a89c6bf042a45c47d96af42b59134; tarball SHA-1 1203f041dfdb0ea952ba8986b8afc38eefd07299), dist/src/render.js encodes compact TOON; monitors.js uses a minimal default schema with selected fields, status counts/totals, truncation and --full hints, while metrics.js explicitly reports zero results and home.js aggregates current monitor and incident state."
+        - "dist/src/args.js rejects unknown flags; cli.js and errors.js provide structured stdout errors and exit codes; api.js is read-only. setup.js installs opt-in session hooks, checks the Codex and OpenCode destinations, preserves/repairs Claude settings and surfaces permission failures as SETUP_FAILED; ctx.js is an offline local-config view."
+        - "dist/bin/datadog-axi.js provides a version fast path, cli.js and help.js describe commands, flags and examples, and the packaged SKILL.md supports discovery. These are source observations, not live Datadog backend validation; the separate read-only run lacked credentials and no Datadog fixture was included."

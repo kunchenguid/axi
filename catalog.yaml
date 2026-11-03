@@ -2057,3 +2057,24 @@ community:
         - "At published npm release datadog-axi@0.1.10 (gitHead 9fb44aa4a55a89c6bf042a45c47d96af42b59134; tarball SHA-1 1203f041dfdb0ea952ba8986b8afc38eefd07299), dist/src/render.js encodes compact TOON; monitors.js uses a minimal default schema with selected fields, status counts/totals, truncation and --full hints, while metrics.js explicitly reports zero results and home.js aggregates current monitor and incident state."
         - "dist/src/args.js rejects unknown flags; cli.js and errors.js provide structured stdout errors and exit codes; api.js is read-only. setup.js installs opt-in session hooks, checks the Codex and OpenCode destinations, preserves/repairs Claude settings and surfaces permission failures as SETUP_FAILED; ctx.js is an offline local-config view."
         - "dist/bin/datadog-axi.js provides a version fast path, cli.js and help.js describe commands, flags and examples, and the packaged SKILL.md supports discovery. These are source observations, not live Datadog backend validation; the separate read-only run lacked credentials and no Datadog fixture was included."
+  - name: deepsearch-axi
+    url: https://github.com/ddbaron/deepsearch-axi
+    author: ddbaron
+    domain: Web search
+    description: "Search the web and fetch page text through DeepSeek's native Search and Fetch API with compact TOON output; a Python shell CLI with a skill and no hooks."
+    admission:
+      status: exception
+      reviewed_revision: 771c81e726269c63768c4005786de92a891cbf26
+      reviewed_components:
+        - deepsearch_axi/cli.py
+        - deepsearch_axi/search.py
+        - deepsearch_axi/fetch.py
+        - deepsearch_axi/transport.py
+        - deepsearch_axi/output.py
+        - deepsearch_axi/config.py
+        - .agents/skills/deepsearch-axi/SKILL.md
+      source_observations:
+        - "cli.py parses each command in one pass and rejects unknown, repeated or valueless flags as usage errors (exit 2) with corrective help; main() is the only stdout writer and emits one TOON document; the no-argument view shows bin, credential source and effective backend with next commands and makes no network request."
+        - "search.py defaults to title,url,snippet and 10 rows (1-50), validates --fields, returns an explicit count 0 with a refinement hint, and suggests a higher --limit on a full page; fetch.py shows a 1000-character preview with length, truncated: true and a --full hint, and an explicit status for empty text."
+        - "transport.py sends one POST with no redirects and maps HTTP failures to specific errors with next steps (exit 1); output.py redacts the effective key from all output; config.py only accepts an https or loopback-http backend override."
+      exception: "Principle 7 has no lifecycle hooks: deepsearch-axi ships a skill only (.agents/skills/deepsearch-axi/SKILL.md) and installs no session-start or session-end hooks."

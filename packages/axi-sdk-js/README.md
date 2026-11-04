@@ -117,6 +117,10 @@ await runAxiCli({
 | `NAME_FILE`    | Path to a file holding the secret; one trailing newline is stripped                           |
 | `NAME_COMMAND` | Shell command (`/bin/sh -c`) that prints the secret, such as `op read ...` or `pass show ...` |
 
+`NAME_FILE` is read and `NAME_COMMAND` is executed with the caller's privileges
+and environment—the same trust level as setting `NAME` directly. Resolve only
+the variable names your tool documents.
+
 ```ts
 import { resolveSecret } from "axi-sdk-js";
 

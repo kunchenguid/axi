@@ -84,7 +84,9 @@ const MAX_COMMAND_OUTPUT_BYTES = 1024 * 1024;
  * Resolve a secret from exactly one of three variables: `NAME` (the value),
  * `NAME_FILE` (a file holding the value), or `NAME_COMMAND` (a shell command
  * that prints the value, such as `op read ...`, `pass show ...`, or
- * `security find-generic-password -w ...`). One trailing newline is stripped
+ * `security find-generic-password -w ...`). File reads and commands run with
+ * the caller's privileges and environment, like reading `NAME` itself; resolve
+ * only variable names your tool documents. One trailing newline is stripped
  * from file contents and command output. Empty variables count as unset.
  * Returns `undefined` when none is set.
  */

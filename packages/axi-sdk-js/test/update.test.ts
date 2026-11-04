@@ -473,6 +473,24 @@ describe("detectInstallMethod managers", () => {
     });
   });
 
+  it("detects project-local .bin wrappers without recommending a global install", () => {
+    expect(
+      detectInstallMethod({
+        entry: "/Users/me/repo/node_modules/.bin/gh-axi",
+        env: { HOME: home },
+        packageName: "gh-axi",
+        fs: fakeFs({
+          "/Users/me/repo/package.json": "{}",
+          "/Users/me/repo/pnpm-lock.yaml": "",
+        }),
+      }),
+    ).toEqual({
+      kind: "project-local",
+      project: "/Users/me/repo",
+      packageManager: "pnpm",
+    });
+  });
+
   it("canonicalizes configured roots before comparing", () => {
     expect(
       detectInstallMethod({

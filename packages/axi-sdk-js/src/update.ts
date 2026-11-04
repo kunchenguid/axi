@@ -644,7 +644,11 @@ function projectLocalInstall(
   fs: IdentityFs,
 ): InstallMethod | undefined {
   const nodeModules = path.indexOf("/node_modules/");
-  if (nodeModules < 0 || !path.includes(`/node_modules/${packageName}/`)) {
+  if (
+    nodeModules < 0 ||
+    (!path.includes(`/node_modules/${packageName}/`) &&
+      !path.startsWith(`${path.slice(0, nodeModules)}/node_modules/.bin/`))
+  ) {
     return undefined;
   }
 
@@ -1098,7 +1102,9 @@ async function defaultRunInstall(
     const [command, ...args] = argv;
     const absolute = command.startsWith("/") || win32.isAbsolute(command);
     const windowsAbsoluteNpm =
-      context.platform === "win32" && absolute && command.toLowerCase().endsWith("/npm");
+      context.platform === "win32" &&
+      absolute &&
+      command.replaceAll("\\", "/").toLowerCase().endsWith("/npm");
     const executable = windowsAbsoluteNpm
       ? `"${command}.cmd"`
       : packageManagerExecutable(command, context.platform);
@@ -1113,7 +1119,7 @@ async function defaultRunInstall(
         }
       : {};
     const child = spawn(
-      executable, 
+      executable,
       args,
       {
         stdio: ["ignore", "pipe", "pipe"],

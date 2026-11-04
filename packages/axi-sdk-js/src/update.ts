@@ -185,7 +185,7 @@ export function readNearestPackageJson(
 export type NodeVersionManager = "nvm" | "fnm" | "asdf" | "mise" | "volta";
 
 /** System package databases that can own a file under `/usr`. */
-export type SystemPackageManager = "dpkg" | "rpm" | "pacman";
+export type SystemPackageManager = "dpkg" | "rpm" | "pacman" | "apk";
 
 /** Package managers that can own a project-local dependency. */
 export type ProjectPackageManager = "npm" | "pnpm" | "yarn" | "bun";
@@ -207,6 +207,7 @@ export type InstallMethod =
   | { kind: "mise-npm-backend" }
   | { kind: "nix" }
   | { kind: "system-package"; manager: SystemPackageManager; package: string }
+  | { kind: "system-package-unverified" }
   | {
       kind: "project-local";
       project: string;
@@ -227,6 +228,8 @@ export interface ExecSyncResult {
   /** Exit status, or `null` when the command could not start or was killed. */
   status: number | null;
   stdout: string;
+  /** True only when the query executable is absent, which is not an inconclusive probe. */
+  unavailable?: boolean;
 }
 
 /** Runs an argv synchronously; used to ask system package databases who owns a file. */
@@ -246,7 +249,13 @@ const defaultExecSync: ExecSyncLike = ([command, ...args], timeoutMs) => {
     stdio: ["ignore", "pipe", "ignore"],
     timeout: timeoutMs,
   });
-  return { status: result.status, stdout: result.stdout ?? "" };
+  return {
+    status: result.status,
+    stdout: result.stdout ?? "",
+    ...((result.error as NodeJS.ErrnoException | undefined)?.code === "ENOENT"
+      ? { unavailable: true }
+      : {}),
+  };
 };
 
 function defaultRealpath(path: string): string {
@@ -576,6 +585,11 @@ const SYSTEM_PACKAGE_DATABASES: Array<{
     markers: ["/var/lib/pacman/local"],
     query: ["pacman", "-Qqo"],
   },
+  {
+    manager: "apk",
+    markers: ["/lib/apk/db/installed"],
+    query: ["apk", "info", "-W"],
+  },
 ];
 
 function systemPackageOwner(
@@ -588,6 +602,7 @@ function systemPackageOwner(
   }
 
   const deadline = Date.now() + PACKAGE_QUERY_TIMEOUT_MS;
+  let unverified = false;
   for (const database of SYSTEM_PACKAGE_DATABASES) {
     if (!database.markers.some((marker) => fs.existsSync(marker))) {
       continue;
@@ -595,9 +610,20 @@ function systemPackageOwner(
 
     const timeoutMs = deadline - Date.now();
     if (timeoutMs <= 0) {
+      unverified = true;
       break;
     }
-    const result = exec([...database.query, path], timeoutMs);
+    let result: ExecSyncResult;
+    try {
+      result = exec([...database.query, path], timeoutMs);
+    } catch {
+      unverified = true;
+      break;
+    }
+    if (result.status === null && !result.unavailable) {
+      unverified = true;
+      break;
+    }
     const owner =
       result.status === 0
         ? parseSystemPackageOwner(database.manager, result.stdout)
@@ -611,7 +637,7 @@ function systemPackageOwner(
     }
   }
 
-  return undefined;
+  return unverified ? { kind: "system-package-unverified" } : undefined;
 }
 
 function parseSystemPackageOwner(
@@ -626,6 +652,10 @@ function parseSystemPackageOwner(
     case "rpm":
     case "pacman":
       return line || undefined;
+    case "apk": {
+      const match = /^.+ is owned by (.+)-[^-]+-r\d+$/.exec(line);
+      return match?.[1];
+    }
   }
 }
 
@@ -741,6 +771,7 @@ const SYSTEM_UPGRADE_COMMAND: Record<SystemPackageManager, string> = {
   dpkg: "sudo apt install --only-upgrade",
   rpm: "sudo dnf upgrade",
   pacman: "sudo pacman -S",
+  apk: "sudo apk upgrade",
 };
 
 /**
@@ -788,6 +819,12 @@ export function planUpgrade(
         note: "This installation is managed by Nix, which owns the read-only store",
         instruction:
           "Update the package in your Nix configuration or flake inputs, then rebuild (for example `home-manager switch` or `nixos-rebuild switch`)",
+      });
+    case "system-package-unverified":
+      return manualPlan(method, "system package manager", {
+        note: "System package ownership could not be verified",
+        instruction:
+          "Update through the system package manager, or retry when its package database is available",
       });
     case "system-package": {
       const command = `${SYSTEM_UPGRADE_COMMAND[method.manager]} ${method.package}`;

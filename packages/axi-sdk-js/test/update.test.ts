@@ -434,8 +434,11 @@ describe("detectInstallMethod managers", () => {
     });
     expect(exec).toHaveBeenCalledWith(
       ["dpkg-query", "-S", "/usr/lib/node_modules/gh-axi/dist/bin/gh-axi.js"],
-      5_000,
+      expect.any(Number),
     );
+    const timeout = exec.mock.calls[0]?.[1];
+    expect(timeout).toBeGreaterThan(0);
+    expect(timeout).toBeLessThanOrEqual(5_000);
   });
 
   it("parses rpm and pacman owners", () => {
@@ -453,6 +456,16 @@ describe("detectInstallMethod managers", () => {
     });
     expect(detect("/var/lib/pacman/local", "gh-axi\n")).toMatchObject({
       manager: "pacman",
+      package: "gh-axi",
+    });
+    expect(
+      detect(
+        "/lib/apk/db/installed",
+        "/usr/lib/node_modules/gh-axi/index.js is owned by gh-axi-1.2.3-r0\n",
+      ),
+    ).toEqual({
+      kind: "system-package",
+      manager: "apk",
       package: "gh-axi",
     });
   });
@@ -479,6 +492,28 @@ describe("detectInstallMethod managers", () => {
     } finally {
       dateNow.mockRestore();
     }
+  });
+
+  it("returns a print-only plan when a package ownership probe times out", () => {
+    const method = detectInstallMethod({
+      entry: "/usr/lib/node_modules/gh-axi/dist/bin/gh-axi.js",
+      env: {},
+      fs: fakeFs({
+        "/var/lib/dpkg/status": "",
+        "/var/lib/rpm": "",
+      }),
+      exec: () => ({ status: null, stdout: "" }),
+    });
+
+    expect(method).toEqual({ kind: "system-package-unverified" });
+    expect(planUpgrade(method, "gh-axi")).toMatchObject({
+      manager: "system package manager",
+      argv: null,
+      note: expect.stringContaining("ownership could not be verified"),
+      instruction: expect.stringContaining(
+        "Update through the system package manager",
+      ),
+    });
   });
 
   it("checks later package databases after an earlier database misses", () => {
@@ -613,6 +648,7 @@ describe("planUpgrade", () => {
     const methods: InstallMethod[] = [
       { kind: "nix" },
       { kind: "system-package", manager: "dpkg", package: "node-gh-axi" },
+      { kind: "system-package", manager: "apk", package: "gh-axi" },
       { kind: "mise-npm-backend" },
       { kind: "project-local", project: "/repo", packageManager: "pnpm" },
       {
@@ -635,6 +671,12 @@ describe("planUpgrade", () => {
         "gh-axi",
       ).command,
     ).toBe("sudo apt install --only-upgrade node-gh-axi");
+    expect(
+      planUpgrade(
+        { kind: "system-package", manager: "apk", package: "gh-axi" },
+        "gh-axi",
+      ).command,
+    ).toBe("sudo apk upgrade gh-axi");
     expect(
       planUpgrade(
         { kind: "project-local", project: "/repo", packageManager: "pnpm" },

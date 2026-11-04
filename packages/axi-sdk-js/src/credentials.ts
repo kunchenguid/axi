@@ -272,10 +272,14 @@ export const runSecretCommand: SecretCommandRunner = (
       }
       if (process.platform === "win32") {
         try {
-          const killer = spawn("taskkill", ["/pid", String(child.pid), "/T", "/F"], {
-            stdio: "ignore",
-            windowsHide: true,
-          });
+          const killer = spawn(
+            "taskkill",
+            ["/pid", String(child.pid), "/T", "/F"],
+            {
+              stdio: "ignore",
+              windowsHide: true,
+            },
+          );
           killer.on("error", () => {});
         } catch {
           // The command may already have exited.

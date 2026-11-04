@@ -607,7 +607,11 @@ function systemPackageOwner(
         ? parseSystemPackageOwner(database.manager, result.stdout)
         : undefined;
     if (owner) {
-      return { kind: "system-package", manager: database.manager, package: owner };
+      return {
+        kind: "system-package",
+        manager: database.manager,
+        package: owner,
+      };
     }
   }
 

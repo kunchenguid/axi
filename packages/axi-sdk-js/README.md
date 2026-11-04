@@ -125,8 +125,8 @@ const token = await resolveSecret({ name: "DEMO_AXI_TOKEN" });
 ```
 
 - Empty variables count as unset. Setting more than one throws `CredentialConflictError` (`CREDENTIAL_CONFLICT`), which names the variables.
-- Every other failure throws `CredentialSourceError` (`CREDENTIAL_ERROR`) with a `reason`: `env-empty`, `file-missing`, `file-unreadable`, `file-empty`, `command-failed`, `command-timeout`, or `command-empty`.
-- The command runs with stdin closed and a 10 second default timeout (`timeoutMs`); its process group is killed on timeout. Its stderr is discarded and errors report only the variable name and exit code, so neither the secret nor the command text reaches output.
+- Every other failure throws `CredentialSourceError` (`CREDENTIAL_ERROR`) with a `reason`: `env-empty`, `file-missing`, `file-unreadable`, `file-empty`, `command-failed`, `command-timeout`, `command-output-too-large`, or `command-empty`.
+- The command runs with stdin closed, a 10 second default timeout (`timeoutMs`), and a 1 MiB stdout limit; its process group is killed on timeout or when output exceeds the limit. Its stderr is discarded and errors report only the variable name and failure, so neither the secret nor the command text reaches output.
 - `variable` is safe to print, for example as a `source:` field in a setup status view. `readFile` and `exec` are test seams.
 
 ## Reference

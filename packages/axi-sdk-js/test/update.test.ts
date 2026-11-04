@@ -209,7 +209,8 @@ describe("detectInstallMethod", () => {
   it("does not mistake a POSIX `:/` path for a Windows Node path", () => {
     expect(
       detectInstallMethod({
-        entry: "/opt/node:/custom/.nvm/versions/node/v22/lib/node_modules/gh-axi/index.js",
+        entry:
+          "/opt/node:/custom/.nvm/versions/node/v22/lib/node_modules/gh-axi/index.js",
         env: { NVM_DIR: "/opt/node:/custom/.nvm" },
       }),
     ).toMatchObject({

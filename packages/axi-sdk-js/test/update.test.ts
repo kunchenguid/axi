@@ -481,6 +481,10 @@ describe("detectInstallMethod managers", () => {
         packageName: "gh-axi",
         fs: fakeFs({
           "/Users/me/repo/package.json": "{}",
+          "/Users/me/repo/node_modules/gh-axi/package.json": JSON.stringify({
+            name: "gh-axi",
+            bin: "./bin/gh-axi.js",
+          }),
           "/Users/me/repo/pnpm-lock.yaml": "",
         }),
       }),
@@ -489,6 +493,40 @@ describe("detectInstallMethod managers", () => {
       project: "/Users/me/repo",
       packageManager: "pnpm",
     });
+  });
+
+  it("classifies only declared project-local package bins", () => {
+    const projectFiles = {
+      "/repo/package.json": "{}",
+      "/repo/node_modules/gh-axi/package.json": JSON.stringify({
+        name: "gh-axi",
+        bin: "./bin/gh-axi.js",
+      }),
+      "/repo/pnpm-lock.yaml": "",
+    };
+    const detectBin = (name: string, files = projectFiles) =>
+      detectInstallMethod({
+        entry: `/repo/node_modules/.bin/${name}`,
+        env: {},
+        packageName: "gh-axi",
+        fs: fakeFs(files),
+      });
+
+    expect(detectBin("gh-axi")).toEqual({
+      kind: "project-local",
+      project: "/repo",
+      packageManager: "pnpm",
+    });
+    expect(
+      detectBin("gh-axi.cmd", {
+        ...projectFiles,
+        "/repo/node_modules/gh-axi/package.json": JSON.stringify({
+          name: "gh-axi",
+          bin: { "gh-axi": "./bin/gh-axi.js" },
+        }),
+      }),
+    ).toMatchObject({ kind: "project-local" });
+    expect(detectBin("other-tool")).toEqual({ kind: "unknown" });
   });
 
   it("canonicalizes configured roots before comparing", () => {

@@ -644,16 +644,44 @@ function projectLocalInstall(
   fs: IdentityFs,
 ): InstallMethod | undefined {
   const nodeModules = path.indexOf("/node_modules/");
-  if (
-    nodeModules < 0 ||
-    (!path.includes(`/node_modules/${packageName}/`) &&
-      !path.startsWith(`${path.slice(0, nodeModules)}/node_modules/.bin/`))
-  ) {
+  if (nodeModules < 0) {
     return undefined;
   }
 
   const project = path.slice(0, nodeModules);
-  if (!fs.existsSync(join(project, "package.json"))) {
+  const packagePath = `/node_modules/${packageName}/`;
+  const binPath = `${project}/node_modules/.bin/`;
+  if (path.includes(packagePath)) {
+    if (!fs.existsSync(join(project, "package.json"))) {
+      return undefined;
+    }
+  } else if (path.startsWith(binPath)) {
+    const packageJson = join(project, "node_modules", packageName, "package.json");
+    if (!fs.existsSync(join(project, "package.json")) || !fs.existsSync(packageJson)) {
+      return undefined;
+    }
+
+    try {
+      const parsed: unknown = JSON.parse(fs.readFileSync(packageJson, "utf-8"));
+      if (typeof parsed !== "object" || parsed === null || !("bin" in parsed)) {
+        return undefined;
+      }
+      const invokedBin = basename(path).replace(/\.(?:cmd|ps1)$/i, "");
+      const bin = parsed.bin;
+      const packageBin = packageName.split("/").at(-1);
+      const matches =
+        typeof bin === "string"
+          ? invokedBin === packageBin
+          : typeof bin === "object" &&
+            bin !== null &&
+            Object.hasOwn(bin, invokedBin);
+      if (!matches) {
+        return undefined;
+      }
+    } catch {
+      return undefined;
+    }
+  } else {
     return undefined;
   }
 

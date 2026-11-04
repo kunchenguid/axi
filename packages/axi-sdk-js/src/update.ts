@@ -891,7 +891,10 @@ function packageManagerExecutable(
 ): string {
   if (
     platform === "win32" &&
-    (command === "npm" || command === "pnpm" || command === "npx")
+    (command === "npm" ||
+      command === "pnpm" ||
+      command === "yarn" ||
+      command === "npx")
   ) {
     return `${command}.cmd`;
   }
@@ -904,7 +907,10 @@ function shouldUseWindowsPackageManagerShell(
 ): boolean {
   return (
     platform === "win32" &&
-    (command === "npm" || command === "pnpm" || command === "npx")
+    (command === "npm" ||
+      command === "pnpm" ||
+      command === "yarn" ||
+      command === "npx")
   );
 }
 

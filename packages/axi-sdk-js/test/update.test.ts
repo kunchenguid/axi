@@ -1401,6 +1401,24 @@ describe("default install runner", () => {
         platform: "win32",
       });
 
+      await runUpdateWithMockedSpawn({
+        args: [],
+        stdout,
+        invokedAs: "C:/Node Versions/nvm/versions/node/v22/bin/gh-axi",
+        realpath: () =>
+          "C:/Node Versions/nvm/versions/node/v22/lib/node_modules/gh-axi/dist/bin/gh-axi.js",
+        fs: fakeFs({
+          "C:/Node Versions/nvm/versions/node/v22/lib/node_modules/gh-axi/package.json":
+            JSON.stringify({ name: "gh-axi", version: "1.2.3" }),
+        }),
+        env: {
+          NVM_DIR: "C:/Node Versions/nvm",
+          PATH: "C:/other/bin",
+        },
+        fetchLatest: async () => "1.3.0",
+        platform: "win32",
+      });
+
       expect(spawn).toHaveBeenNthCalledWith(
         1,
         "npm.cmd",
@@ -1418,6 +1436,18 @@ describe("default install runner", () => {
         "yarn.cmd",
         ["global", "add", "gh-axi@latest"],
         { stdio: ["ignore", "pipe", "pipe"], shell: true },
+      );
+      expect(spawn).toHaveBeenNthCalledWith(
+        4,
+        '"C:/Node Versions/nvm/versions/node/v22/npm.cmd"',
+        ["install", "-g", "gh-axi@latest"],
+        {
+          stdio: ["ignore", "pipe", "pipe"],
+          shell: true,
+          env: expect.objectContaining({
+            PATH: "C:/Node Versions/nvm/versions/node/v22;C:/other/bin",
+          }),
+        },
       );
     } finally {
       vi.doUnmock("node:child_process");

@@ -6,7 +6,7 @@ import {
   readFileSync,
   realpathSync,
 } from "node:fs";
-import { basename, delimiter, dirname, join } from "node:path";
+import { basename, delimiter, dirname, join, win32 } from "node:path";
 import { promisify } from "node:util";
 import { AxiError } from "./errors.js";
 import { collapseHomeDirectory, type AxiRenderable } from "./output.js";
@@ -552,7 +552,7 @@ function versionManagerInstall(
       return {
         kind: "node-version-manager",
         manager,
-        npm: `${path.slice(0, markerIndex)}/bin/npm`,
+        npm: `${path.slice(0, markerIndex)}${path.includes(":/") ? "/npm" : "/bin/npm"}`,
       };
     }
   }
@@ -1096,22 +1096,30 @@ async function defaultRunInstall(
 
   return new Promise<InstallResult>((resolve) => {
     const [command, ...args] = argv;
-    // A version manager's own npm (an absolute path) must run on that Node,
-    // not on whichever `node` is first on PATH.
-    const env = command.startsWith("/")
+    const absolute = command.startsWith("/") || win32.isAbsolute(command);
+    const windowsAbsoluteNpm =
+      context.platform === "win32" && absolute && command.toLowerCase().endsWith("/npm");
+    const executable = windowsAbsoluteNpm
+      ? `"${command}.cmd"`
+      : packageManagerExecutable(command, context.platform);
+    // A version manager's own npm must run on that Node, not whichever `node`
+    // is first on PATH.
+    const env = absolute
       ? {
           env: {
             ...context.env,
-            PATH: `${dirname(command)}${delimiter}${context.env.PATH ?? ""}`,
+            PATH: `${absolute && context.platform === "win32" ? win32.dirname(command) : dirname(command)}${context.platform === "win32" ? ";" : delimiter}${context.env.PATH ?? ""}`,
           },
         }
       : {};
     const child = spawn(
-      packageManagerExecutable(command, context.platform),
+      executable, 
       args,
       {
         stdio: ["ignore", "pipe", "pipe"],
-        shell: shouldUseWindowsPackageManagerShell(command, context.platform),
+        shell:
+          windowsAbsoluteNpm ||
+          shouldUseWindowsPackageManagerShell(command, context.platform),
         ...env,
       },
     );

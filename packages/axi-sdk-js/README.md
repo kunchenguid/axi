@@ -107,6 +107,28 @@ await runAxiCli({
 });
 ```
 
+## Credentials
+
+`resolveSecret()` gives every tool the same three ways to supply a secret, so users can keep tokens in a file or a secret manager instead of a plain environment variable:
+
+| Variable       | Meaning                                                                                       |
+| -------------- | --------------------------------------------------------------------------------------------- |
+| `NAME`         | The secret itself                                                                             |
+| `NAME_FILE`    | Path to a file holding the secret; one trailing newline is stripped                           |
+| `NAME_COMMAND` | Shell command (`/bin/sh -c`) that prints the secret, such as `op read ...` or `pass show ...` |
+
+```ts
+import { resolveSecret } from "axi-sdk-js";
+
+const token = await resolveSecret({ name: "DEMO_AXI_TOKEN" });
+// -> { value, source: "env" | "file" | "command", variable: "DEMO_AXI_TOKEN_FILE" } | undefined
+```
+
+- Empty variables count as unset. Setting more than one throws `CredentialConflictError` (`CREDENTIAL_CONFLICT`), which names the variables.
+- Every other failure throws `CredentialSourceError` (`CREDENTIAL_ERROR`) with a `reason`: `env-empty`, `file-missing`, `file-unreadable`, `file-empty`, `command-failed`, `command-timeout`, or `command-empty`.
+- The command runs with stdin closed and a 10 second default timeout (`timeoutMs`); its process group is killed on timeout. Its stderr is discarded and errors report only the variable name and exit code, so neither the secret nor the command text reaches output.
+- `variable` is safe to print, for example as a `source:` field in a setup status view. `readFile` and `exec` are test seams.
+
 ## Reference
 
 `axi-sdk-js` is a library package. In normal use, `runAxiCli()` is the main
@@ -130,6 +152,7 @@ Most AXI authors should not need these directly.
 | `runUpdate()`                            | The built-in self-update flow (registry lookup, install-method detection, upgrade)                      |
 | `fetchLatestVersion()`                   | Resolve the latest npm version through the registry endpoint with an `npm view` fallback                |
 | `detectInstallMethod()`, `planUpgrade()` | Inspect an entrypoint path and map it to the manager and upgrade command the built-in updater would use |
+| `resolveSecret()`                        | Resolve a secret from `NAME`, `NAME_FILE`, or `NAME_COMMAND`                                            |
 | `compareSemver()`, `isUpdateAvailable()` | Semver helpers used by the updater, including prerelease ordering                                       |
 | `installSessionStartHooks()`             | Install or repair Claude Code hooks, Codex hooks, and OpenCode ambient context plugins directly         |
 | `sessionStartHookStatus()`               | Report install status for Claude Code, Codex, and OpenCode at a given scope, without writing            |

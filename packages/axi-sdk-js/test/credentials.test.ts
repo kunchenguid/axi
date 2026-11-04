@@ -281,6 +281,17 @@ describe("resolveSecret redaction", () => {
     },
   ];
 
+  it("never exposes NAME_FILE paths in file errors", async () => {
+    const path = join(dir, "private-secret-path");
+    const error = (await failure({
+      name: NAME,
+      env: { [`${NAME}_FILE`]: path },
+    })) as CredentialSourceError;
+    const rendered = [error.message, ...error.suggestions].join("\\n");
+    expect(rendered).toContain(`${NAME}_FILE`);
+    expect(rendered).not.toContain(path);
+  });
+
   it("never puts the secret or the command text in errors or TOON output", async () => {
     for (const options of branches) {
       const error = (await failure(options)) as AxiError;

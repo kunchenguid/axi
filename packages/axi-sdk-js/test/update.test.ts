@@ -206,6 +206,18 @@ describe("detectInstallMethod", () => {
     });
   });
 
+  it("does not mistake a POSIX `:/` path for a Windows Node path", () => {
+    expect(
+      detectInstallMethod({
+        entry: "/opt/node:/custom/.nvm/versions/node/v22/lib/node_modules/gh-axi/index.js",
+        env: { NVM_DIR: "/opt/node:/custom/.nvm" },
+      }),
+    ).toMatchObject({
+      kind: "node-version-manager",
+      npm: "/opt/node:/custom/.nvm/versions/node/v22/bin/npm",
+    });
+  });
+
   it("ties npm globals under a version manager to that Node's own npm", () => {
     expect(
       detectInstallMethod({

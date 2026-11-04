@@ -557,7 +557,7 @@ function versionManagerInstall(
       return {
         kind: "node-version-manager",
         manager,
-        npm: `${path.slice(0, markerIndex)}${path.includes(":/") ? "/npm" : "/bin/npm"}`,
+        npm: `${path.slice(0, markerIndex)}${/^[A-Za-z]:\//.test(path) ? "/npm" : "/bin/npm"}`,
       };
     }
   }

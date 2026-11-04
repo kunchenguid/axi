@@ -174,15 +174,15 @@ function readSecretFile(
       throw new CredentialSourceError(
         variable,
         "file-missing",
-        `${variable} points to a file that does not exist: ${path}`,
-        [`Create ${path} or point ${variable} at the secret file`],
+        `${variable} points to a file that does not exist`,
+        [`Point ${variable} at a readable secret file`],
       );
     }
     throw new CredentialSourceError(
       variable,
       "file-unreadable",
-      `${variable} points to a file that cannot be read: ${path}${code ? ` (${code})` : ""}`,
-      [`Make ${path} a readable regular file`],
+      `${variable} points to a file that cannot be read${code ? ` (${code})` : ""}`,
+      [`Point ${variable} at a readable secret file`],
     );
   }
   return requireNonBlank(

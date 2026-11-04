@@ -606,9 +606,9 @@ function systemPackageOwner(
       result.status === 0
         ? parseSystemPackageOwner(database.manager, result.stdout)
         : undefined;
-    return owner
-      ? { kind: "system-package", manager: database.manager, package: owner }
-      : undefined;
+    if (owner) {
+      return { kind: "system-package", manager: database.manager, package: owner };
+    }
   }
 
   return undefined;
@@ -1069,6 +1069,7 @@ export interface InstallResult {
 /** Runtime context passed to a custom install runner. */
 export interface RunInstallContext {
   platform: NodeJS.Platform;
+  env: NodeJS.ProcessEnv;
 }
 
 async function defaultRunInstall(
@@ -1090,8 +1091,8 @@ async function defaultRunInstall(
     const env = command.startsWith("/")
       ? {
           env: {
-            ...process.env,
-            PATH: `${dirname(command)}${delimiter}${process.env.PATH ?? ""}`,
+            ...context.env,
+            PATH: `${dirname(command)}${delimiter}${context.env.PATH ?? ""}`,
           },
         }
       : {};
@@ -1355,7 +1356,10 @@ export async function runUpdate(
 
   const command = plan.command ?? plan.argv.join(" ");
   const runInstall = options.runInstall ?? defaultRunInstall;
-  const result = await runInstall(plan, options.stdout, { platform });
+  const result = await runInstall(plan, options.stdout, {
+    platform,
+    env: options.env ?? process.env,
+  });
   if (!result.ok) {
     throw new AxiError(`Failed to upgrade ${packageName}`, "UPDATE_ERROR", [
       `Run \`${command}\` manually`,

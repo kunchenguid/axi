@@ -423,6 +423,26 @@ describe("detectInstallMethod managers", () => {
     ).toMatchObject({ manager: "apk", package: "gh-axi" });
   });
 
+  it("checks later package databases after an earlier database misses", () => {
+    const entry = "/usr/lib/node_modules/gh-axi/dist/bin/gh-axi.js";
+    const exec = vi.fn((argv: string[]) =>
+      argv[0] === "dpkg-query"
+        ? { status: 1, stdout: "" }
+        : { status: 0, stdout: "gh-axi\n" },
+    );
+    expect(
+      detectInstallMethod({
+        entry,
+        env: {},
+        fs: fakeFs({
+          "/var/lib/dpkg/status": "",
+          "/var/lib/rpm": "",
+        }),
+        exec,
+      }),
+    ).toEqual({ kind: "system-package", manager: "rpm", package: "gh-axi" });
+  });
+
   it("keeps an unowned /usr/lib install as an npm global", () => {
     expect(
       detectInstallMethod({
@@ -1291,7 +1311,7 @@ describe("default install runner", () => {
           "/Users/me/.nvm/versions/node/v24.13.1/lib/node_modules/gh-axi/package.json":
             JSON.stringify({ name: "gh-axi", version: "1.2.3" }),
         }),
-        env: { HOME: "/Users/me" },
+        env: { HOME: "/Users/me", PATH: "/custom/node/bin:/other/bin" },
         isWritable: () => true,
         fetchLatest: async () => "1.3.0",
         platform: "darwin",
@@ -1303,7 +1323,7 @@ describe("default install runner", () => {
         expect.objectContaining({
           env: expect.objectContaining({
             PATH: expect.stringMatching(
-              /^\/Users\/me\/\.nvm\/versions\/node\/v24\.13\.1\/bin[:;]/,
+              /^\/Users\/me\/\.nvm\/versions\/node\/v24\.13\.1\/bin[:;]\/custom\/node\/bin:\/other\/bin$/,
             ),
           }),
         }),

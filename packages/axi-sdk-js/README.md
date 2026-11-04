@@ -85,10 +85,10 @@ How it works:
   - yarn global -> `yarn global add <pkg>@latest`
   - bun global -> `bun add -g <pkg>@latest`
   - Volta -> `volta install <pkg>@latest`
-  - nvm, fnm, asdf, mise, nodenv, or Volta-managed Node -> that Node's own `npm install -g <pkg>@latest`, so a different Node on `PATH` is never updated instead
+  - nvm, fnm, asdf, mise, or Volta-managed Node -> that Node's own `npm install -g <pkg>@latest`, so a different Node on `PATH` is never updated instead
   - Homebrew (`/Cellar/`) -> `brew upgrade <formula>`
   - Nix (`/nix/store/`) -> print-only: update your Nix configuration and rebuild
-  - system package (a dpkg, rpm, pacman, or apk database owns the file) -> print-only: the matching `sudo apt|dnf|pacman|apk` upgrade
+  - system package (a dpkg, rpm, or pacman database owns the file) -> print-only: the matching `sudo apt|dnf|pacman` upgrade
   - mise npm backend -> print-only: `mise upgrade npm:<pkg>`
   - project dependency (`<project>/node_modules/`) -> print-only: the project's own `npm install`, `pnpm add`, `yarn add`, or `bun add`
   - installed package directory not writable by the current user -> print-only: update it through whatever installed it

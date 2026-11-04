@@ -187,11 +187,10 @@ export type NodeVersionManager =
   | "fnm"
   | "asdf"
   | "mise"
-  | "nodenv"
   | "volta";
 
 /** System package databases that can own a file under `/usr`. */
-export type SystemPackageManager = "dpkg" | "rpm" | "pacman" | "apk";
+export type SystemPackageManager = "dpkg" | "rpm" | "pacman";
 
 /** Package managers that can own a project-local dependency. */
 export type ProjectPackageManager = "npm" | "pnpm" | "yarn" | "bun";
@@ -543,7 +542,6 @@ function versionManagerInstall(
       root(env.MISE_DATA_DIR) ?? fromHome(".local/share/mise"),
       "installs/node",
     ],
-    ["nodenv", root(env.NODENV_ROOT) ?? fromHome(".nodenv"), "versions"],
     ["volta", root(env.VOLTA_HOME) ?? fromHome(".volta"), "tools/image/node"],
   ];
 
@@ -579,11 +577,6 @@ const SYSTEM_PACKAGE_DATABASES: Array<{
     manager: "pacman",
     markers: ["/var/lib/pacman/local"],
     query: ["pacman", "-Qqo"],
-  },
-  {
-    manager: "apk",
-    markers: ["/lib/apk/db/installed"],
-    query: ["apk", "info", "-W"],
   },
 ];
 
@@ -632,11 +625,6 @@ function parseSystemPackageOwner(
     case "dpkg":
       // `nodejs: /usr/lib/...` or `pkg:amd64: /usr/lib/...`
       return line.split(":")[0]?.trim() || undefined;
-    case "apk": {
-      // `/usr/lib/... is owned by pkg-1.2.3-r0`
-      const owned = line.split(" is owned by ")[1]?.trim();
-      return owned?.replace(/-\d[^-]*-r\d+$/, "") || undefined;
-    }
     case "rpm":
     case "pacman":
       return line || undefined;
@@ -755,7 +743,6 @@ const SYSTEM_UPGRADE_COMMAND: Record<SystemPackageManager, string> = {
   dpkg: "sudo apt install --only-upgrade",
   rpm: "sudo dnf upgrade",
   pacman: "sudo pacman -S",
-  apk: "sudo apk upgrade",
 };
 
 /**

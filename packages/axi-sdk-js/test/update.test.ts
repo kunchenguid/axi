@@ -382,16 +382,6 @@ describe("detectInstallMethod managers", () => {
       },
     },
     {
-      name: "nodenv Node",
-      entry:
-        "/Users/me/.nodenv/versions/22.1.0/lib/node_modules/gh-axi/dist/bin/gh-axi.js",
-      expected: {
-        kind: "node-version-manager",
-        manager: "nodenv",
-        npm: "/Users/me/.nodenv/versions/22.1.0/bin/npm",
-      },
-    },
-    {
       name: "mise npm backend",
       entry:
         "/Users/me/.local/share/mise/installs/npm-gh-axi/1.2.3/lib/node_modules/gh-axi/dist/bin/gh-axi.js",
@@ -452,7 +442,7 @@ describe("detectInstallMethod managers", () => {
     );
   });
 
-  it("parses rpm, pacman, and apk owners", () => {
+  it("parses rpm and pacman owners", () => {
     const entry = "/usr/lib/node_modules/gh-axi/dist/bin/gh-axi.js";
     const detect = (marker: string, stdout: string) =>
       detectInstallMethod({
@@ -469,9 +459,6 @@ describe("detectInstallMethod managers", () => {
       manager: "pacman",
       package: "gh-axi",
     });
-    expect(
-      detect("/lib/apk/db/installed", `${entry} is owned by gh-axi-1.2.3-r0\n`),
-    ).toMatchObject({ manager: "apk", package: "gh-axi" });
   });
 
   it("shares one timeout budget across package database probes", () => {

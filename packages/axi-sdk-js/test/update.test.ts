@@ -1,4 +1,13 @@
 import { EventEmitter } from "node:events";
+import {
+  mkdtempSync,
+  mkdirSync,
+  realpathSync,
+  rmSync,
+  writeFileSync,
+} from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { describe, expect, it, vi } from "vitest";
 import { AxiError } from "../src/errors.js";
 import {
@@ -156,6 +165,45 @@ describe("detectInstallMethod", () => {
         env: { PREFIX: "/Users/me/repo" },
       }),
     ).toEqual({ kind: "unknown" });
+  });
+
+  it("detects a real npm global prefix and selects npm's installer", () => {
+    const prefix = mkdtempSync(join(tmpdir(), "axi-update-prefix-"));
+    const entry = join(prefix, "lib/node_modules/gh-axi/dist/bin/gh-axi.js");
+    mkdirSync(join(prefix, "lib/node_modules/gh-axi/dist/bin"), {
+      recursive: true,
+    });
+    writeFileSync(entry, "");
+    try {
+      const method = detectInstallMethod({
+        entry: realpathSync(entry),
+        env: { npm_config_prefix: prefix },
+        packageName: "gh-axi",
+      });
+      expect(method).toEqual({ kind: "npm-global" });
+      expect(planUpgrade(method, "gh-axi").argv).toEqual([
+        "npm",
+        "install",
+        "-g",
+        "gh-axi@latest",
+      ]);
+    } finally {
+      rmSync(prefix, { recursive: true, force: true });
+    }
+  });
+
+  it("normalizes Windows separators before choosing the version manager's npm", () => {
+    expect(
+      detectInstallMethod({
+        entry:
+          "C:\\Users\\me\\.nvm\\versions\\node\\v22\\lib\\node_modules\\gh-axi\\dist\\bin\\gh-axi.js",
+        env: { NVM_DIR: "C:\\Users\\me\\.nvm" },
+      }),
+    ).toEqual({
+      kind: "node-version-manager",
+      manager: "nvm",
+      npm: "C:/Users/me/.nvm/versions/node/v22/npm",
+    });
   });
 
   it("ties npm globals under a version manager to that Node's own npm", () => {
@@ -394,11 +442,14 @@ describe("detectInstallMethod managers", () => {
       manager: "dpkg",
       package: "node-gh-axi",
     });
-    expect(exec).toHaveBeenCalledWith([
-      "dpkg-query",
-      "-S",
-      "/usr/lib/node_modules/gh-axi/dist/bin/gh-axi.js",
-    ]);
+    expect(exec).toHaveBeenCalledWith(
+      [
+        "dpkg-query",
+        "-S",
+        "/usr/lib/node_modules/gh-axi/dist/bin/gh-axi.js",
+      ],
+      5_000,
+    );
   });
 
   it("parses rpm, pacman, and apk owners", () => {
@@ -421,6 +472,30 @@ describe("detectInstallMethod managers", () => {
     expect(
       detect("/lib/apk/db/installed", `${entry} is owned by gh-axi-1.2.3-r0\n`),
     ).toMatchObject({ manager: "apk", package: "gh-axi" });
+  });
+
+  it("shares one timeout budget across package database probes", () => {
+    let now = 0;
+    const dateNow = vi.spyOn(Date, "now").mockImplementation(() => now);
+    const timeouts: number[] = [];
+    try {
+      detectInstallMethod({
+        entry: "/usr/lib/node_modules/gh-axi/index.js",
+        env: {},
+        fs: fakeFs({
+          "/var/lib/dpkg/status": "",
+          "/var/lib/rpm": "",
+        }),
+        exec: (_argv, timeoutMs) => {
+          timeouts.push(timeoutMs);
+          now += 3_000;
+          return { status: 1, stdout: "" };
+        },
+      });
+      expect(timeouts).toEqual([5_000, 2_000]);
+    } finally {
+      dateNow.mockRestore();
+    }
   });
 
   it("checks later package databases after an earlier database misses", () => {
@@ -471,62 +546,6 @@ describe("detectInstallMethod managers", () => {
       project: "/Users/me/repo/packages/app",
       packageManager: "pnpm",
     });
-  });
-
-  it("detects project-local .bin wrappers without recommending a global install", () => {
-    expect(
-      detectInstallMethod({
-        entry: "/Users/me/repo/node_modules/.bin/gh-axi",
-        env: { HOME: home },
-        packageName: "gh-axi",
-        fs: fakeFs({
-          "/Users/me/repo/package.json": "{}",
-          "/Users/me/repo/node_modules/gh-axi/package.json": JSON.stringify({
-            name: "gh-axi",
-            bin: "./bin/gh-axi.js",
-          }),
-          "/Users/me/repo/pnpm-lock.yaml": "",
-        }),
-      }),
-    ).toEqual({
-      kind: "project-local",
-      project: "/Users/me/repo",
-      packageManager: "pnpm",
-    });
-  });
-
-  it("classifies only declared project-local package bins", () => {
-    const projectFiles = {
-      "/repo/package.json": "{}",
-      "/repo/node_modules/gh-axi/package.json": JSON.stringify({
-        name: "gh-axi",
-        bin: "./bin/gh-axi.js",
-      }),
-      "/repo/pnpm-lock.yaml": "",
-    };
-    const detectBin = (name: string, files = projectFiles) =>
-      detectInstallMethod({
-        entry: `/repo/node_modules/.bin/${name}`,
-        env: {},
-        packageName: "gh-axi",
-        fs: fakeFs(files),
-      });
-
-    expect(detectBin("gh-axi")).toEqual({
-      kind: "project-local",
-      project: "/repo",
-      packageManager: "pnpm",
-    });
-    expect(
-      detectBin("gh-axi.cmd", {
-        ...projectFiles,
-        "/repo/node_modules/gh-axi/package.json": JSON.stringify({
-          name: "gh-axi",
-          bin: { "gh-axi": "./bin/gh-axi.js" },
-        }),
-      }),
-    ).toMatchObject({ kind: "project-local" });
-    expect(detectBin("other-tool")).toEqual({ kind: "unknown" });
   });
 
   it("canonicalizes configured roots before comparing", () => {

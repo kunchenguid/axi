@@ -236,18 +236,18 @@ export interface ExecSyncResult {
 }
 
 /** Runs an argv synchronously; used to ask system package databases who owns a file. */
-export type ExecSyncLike = (argv: string[]) => ExecSyncResult;
+export type ExecSyncLike = (argv: string[], timeoutMs: number) => ExecSyncResult;
 
 const PACKAGE_QUERY_TIMEOUT_MS = 5_000;
 
-const defaultExecSync: ExecSyncLike = ([command, ...args]) => {
+const defaultExecSync: ExecSyncLike = ([command, ...args], timeoutMs) => {
   if (!command) {
     return { status: null, stdout: "" };
   }
   const result = spawnSync(command, args, {
     encoding: "utf-8",
     stdio: ["ignore", "pipe", "ignore"],
-    timeout: PACKAGE_QUERY_TIMEOUT_MS,
+    timeout: timeoutMs,
   });
   return { status: result.status, stdout: result.stdout ?? "" };
 };
@@ -596,12 +596,17 @@ function systemPackageOwner(
     return undefined;
   }
 
+  const deadline = Date.now() + PACKAGE_QUERY_TIMEOUT_MS;
   for (const database of SYSTEM_PACKAGE_DATABASES) {
     if (!database.markers.some((marker) => fs.existsSync(marker))) {
       continue;
     }
 
-    const result = exec([...database.query, path]);
+    const timeoutMs = deadline - Date.now();
+    if (timeoutMs <= 0) {
+      break;
+    }
+    const result = exec([...database.query, path], timeoutMs);
     const owner =
       result.status === 0
         ? parseSystemPackageOwner(database.manager, result.stdout)
@@ -644,44 +649,12 @@ function projectLocalInstall(
   fs: IdentityFs,
 ): InstallMethod | undefined {
   const nodeModules = path.indexOf("/node_modules/");
-  if (nodeModules < 0) {
+  if (nodeModules < 0 || !path.includes(`/node_modules/${packageName}/`)) {
     return undefined;
   }
 
   const project = path.slice(0, nodeModules);
-  const packagePath = `/node_modules/${packageName}/`;
-  const binPath = `${project}/node_modules/.bin/`;
-  if (path.includes(packagePath)) {
-    if (!fs.existsSync(join(project, "package.json"))) {
-      return undefined;
-    }
-  } else if (path.startsWith(binPath)) {
-    const packageJson = join(project, "node_modules", packageName, "package.json");
-    if (!fs.existsSync(join(project, "package.json")) || !fs.existsSync(packageJson)) {
-      return undefined;
-    }
-
-    try {
-      const parsed: unknown = JSON.parse(fs.readFileSync(packageJson, "utf-8"));
-      if (typeof parsed !== "object" || parsed === null || !("bin" in parsed)) {
-        return undefined;
-      }
-      const invokedBin = basename(path).replace(/\.(?:cmd|ps1)$/i, "");
-      const bin = parsed.bin;
-      const packageBin = packageName.split("/").at(-1);
-      const matches =
-        typeof bin === "string"
-          ? invokedBin === packageBin
-          : typeof bin === "object" &&
-            bin !== null &&
-            Object.hasOwn(bin, invokedBin);
-      if (!matches) {
-        return undefined;
-      }
-    } catch {
-      return undefined;
-    }
-  } else {
+  if (!fs.existsSync(join(project, "package.json"))) {
     return undefined;
   }
 

@@ -241,8 +241,8 @@ function commandFailed(variable: string, what: string): CredentialSourceError {
 /**
  * Default runner: `/bin/sh -c <command>` with stdin closed and stderr
  * discarded, because a secret manager's diagnostics can include secret
- * material. The whole process group is killed on timeout so a hung helper
- * cannot keep the pipe open.
+ * material. The command tree is killed on timeout or when output exceeds the
+ * limit so a hung helper cannot keep the pipe open.
  */
 export const runSecretCommand: SecretCommandRunner = (
   command,
@@ -267,12 +267,23 @@ export const runSecretCommand: SecretCommandRunner = (
     const chunks: Buffer[] = [];
     let outputBytes = 0;
     const kill = () => {
-      try {
-        if (child.pid !== undefined && process.platform !== "win32") {
-          process.kill(-child.pid, "SIGKILL");
-        } else {
-          child.kill("SIGKILL");
+      if (child.pid === undefined) {
+        return;
+      }
+      if (process.platform === "win32") {
+        try {
+          const killer = spawn("taskkill", ["/pid", String(child.pid), "/T", "/F"], {
+            stdio: "ignore",
+            windowsHide: true,
+          });
+          killer.on("error", () => {});
+        } catch {
+          // The command may already have exited.
         }
+        return;
+      }
+      try {
+        process.kill(-child.pid, "SIGKILL");
       } catch {
         // Already exited.
       }

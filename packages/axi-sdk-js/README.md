@@ -79,13 +79,22 @@ How it works:
 
 - **Identity is auto-derived.** The package name and version are read from the nearest `package.json` (walking up from the realpath-resolved entrypoint). `version` from `runAxiCli()` is preferred when present. No wiring needed.
 - **The latest version comes from the registry.** It queries `https://registry.npmjs.org/<pkg>/latest`, falling back to `npm view <pkg> version`, and compares with proper semver. Network, registry, and not-found failures surface as structured `AxiError`s.
-- **The upgrade matches the install method**, detected from the entrypoint path and environment:
+- **The upgrade matches whoever manages the installation**, detected from the realpath-resolved entrypoint and environment. Only the owning manager is ever run; every other case is print-only (`action: manual`) and names the manager in `manager` and `reason`, with the next step in `help`:
   - npm global -> `npm install -g <pkg>@latest`
   - pnpm global -> `pnpm add -g <pkg>@latest`
+  - yarn global -> `yarn global add <pkg>@latest`
+  - bun global -> `bun add -g <pkg>@latest`
+  - Volta -> `volta install <pkg>@latest`
+  - nvm, fnm, asdf, mise, nodenv, or Volta-managed Node -> that Node's own `npm install -g <pkg>@latest`, so a different Node on `PATH` is never updated instead
   - Homebrew (`/Cellar/`) -> `brew upgrade <formula>`
+  - Nix (`/nix/store/`) -> print-only: update your Nix configuration and rebuild
+  - system package (a dpkg, rpm, pacman, or apk database owns the file) -> print-only: the matching `sudo apt|dnf|pacman|apk` upgrade
+  - mise npm backend -> print-only: `mise upgrade npm:<pkg>`
+  - project dependency (`<project>/node_modules/`) -> print-only: the project's own `npm install`, `pnpm add`, `yarn add`, or `bun add`
+  - installed package directory not writable by the current user -> print-only: update it through whatever installed it
   - npx / ephemeral cache -> reports that `npx -y <pkg>@latest` already runs the latest (print-only)
   - unknown -> prints the recommended command without guessing (print-only)
-- **`update --check`** (a/k/a `--dry-run`) reports current vs latest and whether an update is available, installing nothing. When already on the latest version, `update` reports up-to-date and exits 0.
+- **`update --check`** (a/k/a `--dry-run`) reports current vs latest, whether an update is available, and the detected `manager` and `path`, installing nothing. Its `help` is the manual step when `update` would not install. When already on the latest version, `update` reports up-to-date and exits 0.
 - **Discoverability is SDK-owned.** Bare `--help` gets a compact built-in command footer when the tool has not registered its own `update`, and `<tool> update --help` shows the command reference.
 
 `update` is a **reserved command name**. A tool that registers its own `update` in `commands` keeps full control - the built-in never shadows it. Pass `packageName` to `runAxiCli()` only as an escape hatch when the package name cannot be derived from `package.json`:
@@ -114,20 +123,20 @@ full command graph.
 
 Most AXI authors should not need these directly.
 
-| API                                      | Description                                                                                     |
-| ---------------------------------------- | ----------------------------------------------------------------------------------------------- |
-| `AxiError`                               | Throw structured AXI errors from command handlers                                               |
-| `RESERVED_COMMANDS`                      | SDK-owned built-in command names, currently `update`                                            |
-| `runUpdate()`                            | The built-in self-update flow (registry lookup, install-method detection, upgrade)              |
-| `fetchLatestVersion()`                   | Resolve the latest npm version through the registry endpoint with an `npm view` fallback        |
-| `detectInstallMethod()`, `planUpgrade()` | Inspect an entrypoint path and map it to the upgrade command the built-in updater would use     |
-| `compareSemver()`, `isUpdateAvailable()` | Semver helpers used by the updater, including prerelease ordering                               |
-| `installSessionStartHooks()`             | Install or repair Claude Code hooks, Codex hooks, and OpenCode ambient context plugins directly |
-| `sessionStartHookStatus()`               | Report install status for Claude Code, Codex, and OpenCode at a given scope, without writing    |
-| `uninstallSessionStartHooks()`           | Remove marker-matched managed hooks/plugin at a given scope, without touching unrelated entries |
-| `resolvePortableHookCommand()`           | Resolve a hook command to a safe binary name or absolute path                                   |
-| `PortableHookCommandContext`             | Context for resolving portable hook commands                                                    |
-| `shouldInstallHooksForNodeAxiExecPath()` | Check whether an executable path is safe for hook installation                                  |
+| API                                      | Description                                                                                             |
+| ---------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| `AxiError`                               | Throw structured AXI errors from command handlers                                                       |
+| `RESERVED_COMMANDS`                      | SDK-owned built-in command names, currently `update`                                                    |
+| `runUpdate()`                            | The built-in self-update flow (registry lookup, install-method detection, upgrade)                      |
+| `fetchLatestVersion()`                   | Resolve the latest npm version through the registry endpoint with an `npm view` fallback                |
+| `detectInstallMethod()`, `planUpgrade()` | Inspect an entrypoint path and map it to the manager and upgrade command the built-in updater would use |
+| `compareSemver()`, `isUpdateAvailable()` | Semver helpers used by the updater, including prerelease ordering                                       |
+| `installSessionStartHooks()`             | Install or repair Claude Code hooks, Codex hooks, and OpenCode ambient context plugins directly         |
+| `sessionStartHookStatus()`               | Report install status for Claude Code, Codex, and OpenCode at a given scope, without writing            |
+| `uninstallSessionStartHooks()`           | Remove marker-matched managed hooks/plugin at a given scope, without touching unrelated entries         |
+| `resolvePortableHookCommand()`           | Resolve a hook command to a safe binary name or absolute path                                           |
+| `PortableHookCommandContext`             | Context for resolving portable hook commands                                                            |
+| `shouldInstallHooksForNodeAxiExecPath()` | Check whether an executable path is safe for hook installation                                          |
 
 ### Session Hook Setup
 

@@ -11,6 +11,7 @@ import {
   readNearestPackageJson,
   runUpdate,
   type IdentityFs,
+  type InstallMethod,
   type InstallResult,
   type UpgradePlan,
 } from "../src/update.js";
@@ -157,14 +158,18 @@ describe("detectInstallMethod", () => {
     ).toEqual({ kind: "unknown" });
   });
 
-  it("detects npm globals under configured version manager roots", () => {
+  it("ties npm globals under a version manager to that Node's own npm", () => {
     expect(
       detectInstallMethod({
         entry:
           "/Users/me/.nvm/versions/node/v24.13.1/lib/node_modules/gh-axi/dist/bin/gh-axi.js",
         env: { HOME: "/Users/me" },
       }),
-    ).toEqual({ kind: "npm-global" });
+    ).toEqual({
+      kind: "node-version-manager",
+      manager: "nvm",
+      npm: "/Users/me/.nvm/versions/node/v24.13.1/bin/npm",
+    });
   });
 
   it("detects pnpm global installs", () => {
@@ -265,6 +270,210 @@ describe("detectInstallMethod", () => {
   });
 });
 
+describe("detectInstallMethod managers", () => {
+  const home = "/Users/me";
+  const cases: Array<{
+    name: string;
+    entry: string;
+    env?: NodeJS.ProcessEnv;
+    expected: InstallMethod;
+  }> = [
+    {
+      name: "Nix store",
+      entry:
+        "/nix/store/abc123-gh-axi-1.2.3/lib/node_modules/gh-axi/dist/bin/gh-axi.js",
+      expected: { kind: "nix" },
+    },
+    {
+      name: "pnpm dlx cache",
+      entry:
+        "/Users/me/Library/Caches/pnpm/dlx/abc/node_modules/gh-axi/dist/bin/gh-axi.js",
+      expected: { kind: "npx" },
+    },
+    {
+      name: "bunx cache",
+      entry:
+        "/tmp/bunx-501-gh-axi@latest/node_modules/gh-axi/dist/bin/gh-axi.js",
+      expected: { kind: "npx" },
+    },
+    {
+      name: "Volta package image",
+      entry:
+        "/Users/me/.volta/tools/image/packages/gh-axi/lib/node_modules/gh-axi/dist/bin/gh-axi.js",
+      expected: { kind: "volta" },
+    },
+    {
+      name: "fnm Node",
+      entry:
+        "/Users/me/.local/share/fnm/node-versions/v22.1.0/installation/lib/node_modules/gh-axi/dist/bin/gh-axi.js",
+      expected: {
+        kind: "node-version-manager",
+        manager: "fnm",
+        npm: "/Users/me/.local/share/fnm/node-versions/v22.1.0/installation/bin/npm",
+      },
+    },
+    {
+      name: "asdf Node via ASDF_DATA_DIR",
+      entry:
+        "/opt/asdf/installs/nodejs/22.1.0/lib/node_modules/gh-axi/dist/bin/gh-axi.js",
+      env: { HOME: home, ASDF_DATA_DIR: "/opt/asdf" },
+      expected: {
+        kind: "node-version-manager",
+        manager: "asdf",
+        npm: "/opt/asdf/installs/nodejs/22.1.0/bin/npm",
+      },
+    },
+    {
+      name: "mise Node",
+      entry:
+        "/Users/me/.local/share/mise/installs/node/22.1.0/lib/node_modules/gh-axi/dist/bin/gh-axi.js",
+      expected: {
+        kind: "node-version-manager",
+        manager: "mise",
+        npm: "/Users/me/.local/share/mise/installs/node/22.1.0/bin/npm",
+      },
+    },
+    {
+      name: "nodenv Node",
+      entry:
+        "/Users/me/.nodenv/versions/22.1.0/lib/node_modules/gh-axi/dist/bin/gh-axi.js",
+      expected: {
+        kind: "node-version-manager",
+        manager: "nodenv",
+        npm: "/Users/me/.nodenv/versions/22.1.0/bin/npm",
+      },
+    },
+    {
+      name: "mise npm backend",
+      entry:
+        "/Users/me/.local/share/mise/installs/npm-gh-axi/1.2.3/lib/node_modules/gh-axi/dist/bin/gh-axi.js",
+      expected: { kind: "mise-npm-backend" },
+    },
+    {
+      name: "yarn global",
+      entry:
+        "/Users/me/.config/yarn/global/node_modules/gh-axi/dist/bin/gh-axi.js",
+      expected: { kind: "yarn-global" },
+    },
+    {
+      name: "bun global",
+      entry:
+        "/Users/me/.bun/install/global/node_modules/gh-axi/dist/bin/gh-axi.js",
+      expected: { kind: "bun-global" },
+    },
+  ];
+
+  for (const testCase of cases) {
+    it(`detects ${testCase.name}`, () => {
+      expect(
+        detectInstallMethod({
+          entry: testCase.entry,
+          env: testCase.env ?? { HOME: home },
+          packageName: "gh-axi",
+          fs: fakeFs({}),
+          exec: () => ({ status: 1, stdout: "" }),
+        }),
+      ).toEqual(testCase.expected);
+    });
+  }
+
+  it("asks the system package database who owns a /usr/lib install", () => {
+    const exec = vi.fn(() => ({
+      status: 0,
+      stdout: "node-gh-axi: /usr/lib/node_modules/gh-axi/dist/bin/gh-axi.js\n",
+    }));
+    expect(
+      detectInstallMethod({
+        entry: "/usr/lib/node_modules/gh-axi/dist/bin/gh-axi.js",
+        env: {},
+        fs: fakeFs({ "/var/lib/dpkg/status": "" }),
+        exec,
+      }),
+    ).toEqual({
+      kind: "system-package",
+      manager: "dpkg",
+      package: "node-gh-axi",
+    });
+    expect(exec).toHaveBeenCalledWith([
+      "dpkg-query",
+      "-S",
+      "/usr/lib/node_modules/gh-axi/dist/bin/gh-axi.js",
+    ]);
+  });
+
+  it("parses rpm, pacman, and apk owners", () => {
+    const entry = "/usr/lib/node_modules/gh-axi/dist/bin/gh-axi.js";
+    const detect = (marker: string, stdout: string) =>
+      detectInstallMethod({
+        entry,
+        env: {},
+        fs: fakeFs({ [marker]: "" }),
+        exec: () => ({ status: 0, stdout }),
+      });
+    expect(detect("/var/lib/rpm", "gh-axi\n")).toMatchObject({
+      manager: "rpm",
+      package: "gh-axi",
+    });
+    expect(detect("/var/lib/pacman/local", "gh-axi\n")).toMatchObject({
+      manager: "pacman",
+      package: "gh-axi",
+    });
+    expect(
+      detect("/lib/apk/db/installed", `${entry} is owned by gh-axi-1.2.3-r0\n`),
+    ).toMatchObject({ manager: "apk", package: "gh-axi" });
+  });
+
+  it("keeps an unowned /usr/lib install as an npm global", () => {
+    expect(
+      detectInstallMethod({
+        entry: "/usr/lib/node_modules/gh-axi/dist/bin/gh-axi.js",
+        env: {},
+        fs: fakeFs({ "/var/lib/dpkg/status": "" }),
+        exec: () => ({ status: 1, stdout: "" }),
+      }),
+    ).toEqual({ kind: "npm-global" });
+  });
+
+  it("detects project-local installs and the project's package manager", () => {
+    expect(
+      detectInstallMethod({
+        entry:
+          "/Users/me/repo/packages/app/node_modules/.pnpm/gh-axi@1.2.3/node_modules/gh-axi/dist/bin/gh-axi.js",
+        env: { HOME: home },
+        packageName: "gh-axi",
+        fs: fakeFs({
+          "/Users/me/repo/packages/app/package.json": "{}",
+          "/Users/me/repo/pnpm-lock.yaml": "",
+        }),
+      }),
+    ).toEqual({
+      kind: "project-local",
+      project: "/Users/me/repo/packages/app",
+      packageManager: "pnpm",
+    });
+  });
+
+  it("canonicalizes configured roots before comparing", () => {
+    expect(
+      detectInstallMethod({
+        entry:
+          "/private/tmp/bun/install/global/node_modules/gh-axi/dist/bin/gh-axi.js",
+        env: { BUN_INSTALL: "/tmp/bun" },
+        fs: fakeFs({}),
+        realpath: (path) => path.replace(/^\/tmp\//, "/private/tmp/"),
+      }),
+    ).toEqual({ kind: "bun-global" });
+    expect(
+      detectInstallMethod({
+        entry: "/private/tmp/prefix/lib/node_modules/gh-axi/dist/bin/gh-axi.js",
+        env: { npm_config_prefix: "/tmp/prefix" },
+        fs: fakeFs({}),
+        realpath: (path) => path.replace(/^\/tmp\//, "/private/tmp/"),
+      }),
+    ).toEqual({ kind: "npm-global" });
+  });
+});
+
 describe("planUpgrade", () => {
   it("plans runnable npm and pnpm upgrades", () => {
     expect(planUpgrade({ kind: "npm-global" }, "gh-axi")).toMatchObject({
@@ -283,6 +492,80 @@ describe("planUpgrade", () => {
     ).toMatchObject({
       command: "brew upgrade gh-axi",
       argv: ["brew", "upgrade", "gh-axi"],
+    });
+  });
+
+  it("runs each detected manager's own installer", () => {
+    const plan = (method: InstallMethod) => planUpgrade(method, "gh-axi");
+    expect(plan({ kind: "yarn-global" }).argv).toEqual([
+      "yarn",
+      "global",
+      "add",
+      "gh-axi@latest",
+    ]);
+    expect(plan({ kind: "bun-global" }).argv).toEqual([
+      "bun",
+      "add",
+      "-g",
+      "gh-axi@latest",
+    ]);
+    expect(plan({ kind: "volta" }).argv).toEqual([
+      "volta",
+      "install",
+      "gh-axi@latest",
+    ]);
+    expect(
+      plan({
+        kind: "node-version-manager",
+        manager: "nvm",
+        npm: "/Users/me/.nvm/versions/node/v24.13.1/bin/npm",
+      }),
+    ).toMatchObject({
+      manager: "nvm",
+      argv: [
+        "/Users/me/.nvm/versions/node/v24.13.1/bin/npm",
+        "install",
+        "-g",
+        "gh-axi@latest",
+      ],
+    });
+  });
+
+  it("never plans a runnable installer for externally managed installs", () => {
+    const methods: InstallMethod[] = [
+      { kind: "nix" },
+      { kind: "system-package", manager: "dpkg", package: "node-gh-axi" },
+      { kind: "mise-npm-backend" },
+      { kind: "project-local", project: "/repo", packageManager: "pnpm" },
+      {
+        kind: "read-only",
+        path: "/usr/local/lib/node_modules/gh-axi",
+        manager: "npm",
+      },
+    ];
+    for (const method of methods) {
+      expect(planUpgrade(method, "gh-axi").argv).toBeNull();
+    }
+    expect(planUpgrade({ kind: "nix" }, "gh-axi")).toMatchObject({
+      manager: "nix",
+      command: null,
+      note: expect.stringContaining("managed by Nix"),
+    });
+    expect(
+      planUpgrade(
+        { kind: "system-package", manager: "dpkg", package: "node-gh-axi" },
+        "gh-axi",
+      ).command,
+    ).toBe("sudo apt install --only-upgrade node-gh-axi");
+    expect(
+      planUpgrade(
+        { kind: "project-local", project: "/repo", packageManager: "pnpm" },
+        "gh-axi",
+      ),
+    ).toMatchObject({
+      manager: "pnpm",
+      command: "pnpm add gh-axi@latest",
+      instruction: expect.stringContaining("/repo"),
     });
   });
 
@@ -757,6 +1040,141 @@ describe("runUpdate", () => {
     });
   });
 
+  const nixEntry =
+    "/nix/store/abc123-gh-axi-1.2.3/lib/node_modules/gh-axi/dist/bin/gh-axi.js";
+  const nixDeps = {
+    ...baseDeps,
+    invokedAs: "/Users/me/.nix-profile/bin/gh-axi",
+    realpath: () => nixEntry,
+    fs: fakeFs({
+      "/nix/store/abc123-gh-axi-1.2.3/lib/node_modules/gh-axi/package.json":
+        JSON.stringify({ name: "gh-axi", version: "1.2.3" }),
+    }),
+  };
+
+  it("says who manages the installation instead of running a mismatched installer", async () => {
+    const runInstall = vi.fn();
+    const output = await runUpdate({
+      ...nixDeps,
+      args: [],
+      stdout,
+      fetchLatest: async () => "1.3.0",
+      runInstall,
+    });
+
+    expect(output).toEqual({
+      update: {
+        package: "gh-axi",
+        current: "1.2.3",
+        latest: "1.3.0",
+        available: true,
+        action: "manual",
+        manager: "nix",
+        path: nixEntry,
+        reason:
+          "This installation is managed by Nix, which owns the read-only store",
+      },
+      help: [
+        "Update the package in your Nix configuration or flake inputs, then rebuild (for example `home-manager switch` or `nixos-rebuild switch`)",
+      ],
+    });
+    expect(runInstall).not.toHaveBeenCalled();
+  });
+
+  it("reports the manager and its instruction from --check", async () => {
+    const output = await runUpdate({
+      ...nixDeps,
+      args: ["--check"],
+      stdout,
+      fetchLatest: async () => "1.3.0",
+    });
+
+    expect(output).toMatchObject({
+      update: { manager: "nix", path: nixEntry, available: true },
+      help: [expect.stringContaining("Nix configuration")],
+    });
+  });
+
+  it("reports the runnable manager from --check", async () => {
+    const output = await runUpdate({
+      ...baseDeps,
+      args: ["--check"],
+      stdout,
+      fetchLatest: async () => "1.3.0",
+    });
+
+    expect(output).toMatchObject({
+      update: {
+        manager: "npm",
+        path: "/usr/local/lib/node_modules/gh-axi/dist/bin/gh-axi.js",
+      },
+      help: ["Run `gh-axi update` to upgrade"],
+    });
+  });
+
+  it("refuses to update an install the current user cannot write", async () => {
+    const runInstall = vi.fn();
+    const isWritable = vi.fn(() => false);
+    const output = await runUpdate({
+      ...baseDeps,
+      args: [],
+      stdout,
+      fetchLatest: async () => "1.3.0",
+      runInstall,
+      isWritable,
+    });
+
+    expect(isWritable).toHaveBeenCalledWith(
+      "/usr/local/lib/node_modules/gh-axi",
+    );
+    expect(output).toMatchObject({
+      update: {
+        action: "manual",
+        manager: "npm",
+        reason: expect.stringContaining("not writable"),
+      },
+    });
+    expect(output).not.toMatchObject({ update: { run: expect.anything() } });
+    expect(runInstall).not.toHaveBeenCalled();
+  });
+
+  it("upgrades a version-manager install with that Node's npm", async () => {
+    const runInstall = vi.fn(
+      async (): Promise<InstallResult> => ({ ok: true }),
+    );
+    const output = await runUpdate({
+      ...baseDeps,
+      args: [],
+      invokedAs: "/Users/me/.nvm/versions/node/v24.13.1/bin/gh-axi",
+      realpath: () =>
+        "/Users/me/.nvm/versions/node/v24.13.1/lib/node_modules/gh-axi/dist/bin/gh-axi.js",
+      fs: fakeFs({
+        "/Users/me/.nvm/versions/node/v24.13.1/lib/node_modules/gh-axi/package.json":
+          JSON.stringify({ name: "gh-axi", version: "1.2.3" }),
+      }),
+      env: { HOME: "/Users/me" },
+      isWritable: () => true,
+      stdout,
+      fetchLatest: async () => "1.3.0",
+      runInstall,
+    });
+
+    const plan = runInstall.mock.calls[0]?.[0] as UpgradePlan;
+    expect(plan).toMatchObject({
+      manager: "nvm",
+      argv: [
+        "/Users/me/.nvm/versions/node/v24.13.1/bin/npm",
+        "install",
+        "-g",
+        "gh-axi@latest",
+      ],
+    });
+    expect(output).toMatchObject({
+      command:
+        "/Users/me/.nvm/versions/node/v24.13.1/bin/npm install -g gh-axi@latest",
+    });
+  });
+
   it("raises an AxiError when the package name cannot be resolved", async () => {
     const error = await runUpdate({
       args: ["--check"],
@@ -836,6 +1254,61 @@ describe("default install runner", () => {
       });
     } finally {
       stderrWrite.mockRestore();
+      vi.doUnmock("node:child_process");
+      vi.resetModules();
+    }
+  });
+
+  it("runs a version manager's npm with its own Node first on PATH", async () => {
+    vi.resetModules();
+
+    const spawn = vi.fn(() => {
+      const child = new EventEmitter() as EventEmitter & {
+        stdout: EventEmitter;
+        stderr: EventEmitter;
+      };
+      child.stdout = new EventEmitter();
+      child.stderr = new EventEmitter();
+      queueMicrotask(() => child.emit("close", 0));
+      return child;
+    });
+    vi.doMock("node:child_process", () => ({
+      execFile: vi.fn(),
+      spawn,
+      spawnSync: vi.fn(),
+    }));
+
+    try {
+      const { runUpdate: runUpdateWithMockedSpawn } =
+        await import("../src/update.js");
+      await runUpdateWithMockedSpawn({
+        args: [],
+        stdout: { write: vi.fn(() => true) },
+        invokedAs: "/Users/me/.nvm/versions/node/v24.13.1/bin/gh-axi",
+        realpath: () =>
+          "/Users/me/.nvm/versions/node/v24.13.1/lib/node_modules/gh-axi/dist/bin/gh-axi.js",
+        fs: fakeFs({
+          "/Users/me/.nvm/versions/node/v24.13.1/lib/node_modules/gh-axi/package.json":
+            JSON.stringify({ name: "gh-axi", version: "1.2.3" }),
+        }),
+        env: { HOME: "/Users/me" },
+        isWritable: () => true,
+        fetchLatest: async () => "1.3.0",
+        platform: "darwin",
+      });
+
+      expect(spawn).toHaveBeenCalledWith(
+        "/Users/me/.nvm/versions/node/v24.13.1/bin/npm",
+        ["install", "-g", "gh-axi@latest"],
+        expect.objectContaining({
+          env: expect.objectContaining({
+            PATH: expect.stringMatching(
+              /^\/Users\/me\/\.nvm\/versions\/node\/v24\.13\.1\/bin[:;]/,
+            ),
+          }),
+        }),
+      );
+    } finally {
       vi.doUnmock("node:child_process");
       vi.resetModules();
     }

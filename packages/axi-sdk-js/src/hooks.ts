@@ -141,31 +141,46 @@ export function computeSessionStartHookUpdate(
     changed = true;
   }
 
-  for (const group of updated.hooks.SessionStart) {
+  const timeout = spec.timeoutSeconds ?? 10;
+  let found = false;
+
+  updated.hooks.SessionStart = updated.hooks.SessionStart.filter((group) => {
     if (!Array.isArray(group.hooks)) {
-      continue;
+      return true;
     }
 
-    for (const hook of group.hooks) {
+    const before = group.hooks.length;
+    group.hooks = group.hooks.filter((hook) => {
       if (!isManagedHook(hook, spec.marker)) {
-        continue;
+        return true;
+      }
+      if (found) {
+        return false;
       }
 
-      const timeout = spec.timeoutSeconds ?? 10;
-      const isCorrect =
-        hook.command === spec.command &&
-        hook.type === "command" &&
-        hook.timeout === timeout;
-
-      if (isCorrect && !changed) {
-        return [settings, false];
+      found = true;
+      if (
+        hook.command !== spec.command ||
+        hook.type !== "command" ||
+        hook.timeout !== timeout
+      ) {
+        hook.command = spec.command;
+        hook.type = "command";
+        hook.timeout = timeout;
+        changed = true;
       }
+      return true;
+    });
 
-      hook.command = spec.command;
-      hook.type = "command";
-      hook.timeout = timeout;
-      return [updated, true];
+    if (group.hooks.length === before) {
+      return true;
     }
+    changed = true;
+    return group.hooks.length > 0;
+  });
+
+  if (found) {
+    return changed ? [updated, true] : [settings, false];
   }
 
   updated.hooks.SessionStart.push({
@@ -174,7 +189,7 @@ export function computeSessionStartHookUpdate(
       {
         type: "command",
         command: spec.command,
-        timeout: spec.timeoutSeconds ?? 10,
+        timeout,
       },
     ],
   });

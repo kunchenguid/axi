@@ -1,4 +1,10 @@
-import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import {
+  mkdirSync,
+  mkdtempSync,
+  readFileSync,
+  rmSync,
+  writeFileSync,
+} from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterAll, describe, expect, it } from "vitest";
@@ -14,6 +20,15 @@ import { AxiError } from "../src/errors.js";
 import { renderError } from "../src/output.js";
 
 const SENTINEL = "sk-SENTINEL-6f1d2c";
+
+/**
+ * A shell command that runs a small Node script, so these tests use the same
+ * command on POSIX `/bin/sh` and Windows `cmd.exe`. Scripts use single quotes
+ * only and no `$`, so the double-quoted argument survives both shells.
+ */
+function nodeCommand(script: string): string {
+  return `${JSON.stringify(process.execPath)} -e ${JSON.stringify(script)}`;
+}
 const NAME = "DEMO_AXI_TOKEN";
 
 const dir = mkdtempSync(join(tmpdir(), "axi-credentials-"));
@@ -65,14 +80,15 @@ describe("resolveSecret sources", () => {
   });
 
   it("resolves NAME_COMMAND through the shell and strips one trailing newline", async () => {
-    const path = file("token-for-cat", `${SENTINEL}\r\n`);
+    const path = file("token-for-command", `${SENTINEL}\r\n`);
     await expect(
       resolveSecret({
         name: NAME,
         env: {
           ...process.env,
+          SECRET_PATH: path,
           [`${NAME}_COMMAND`]: nodeCommand(
-            `process.stdout.write(require('node:fs').readFileSync(${JSON.stringify(path)}, 'utf8'))`,
+            "process.stdout.write(require('fs').readFileSync(process.env.SECRET_PATH))",
           ),
         },
       }),
@@ -242,11 +258,7 @@ describe("resolveSecret redaction", () => {
     { name: NAME, env: { [`${NAME}_FILE`]: secretPath } },
     {
       name: NAME,
-      env: {
-        [`${NAME}_COMMAND`]: nodeCommand(
-          `process.stdout.write(${JSON.stringify(`${SENTINEL}\n`)}); process.exit(4)`,
-        ),
-      },
+      env: { [`${NAME}_COMMAND`]: `echo ${SENTINEL}; exit 4` },
       exec: fakeExec({ status: "exited", exitCode: 4, stdout: SENTINEL }),
     },
     {
@@ -256,14 +268,14 @@ describe("resolveSecret redaction", () => {
     },
     {
       name: NAME,
-      env: { [`${NAME}_COMMAND`]: nodeCommand("process.stdout.write(' ')") },
+      env: { [`${NAME}_COMMAND`]: `printf ' ' # ${SENTINEL}` },
       exec: fakeExec({ status: "exited", exitCode: 0, stdout: " " }),
     },
     {
       name: NAME,
       env: {
         [`${NAME}_COMMAND`]: nodeCommand(
-          `process.stderr.write(${JSON.stringify(`${SENTINEL}\n`)}); process.exit(1)`,
+          `process.stderr.write('${SENTINEL}'); process.exit(1)`,
         ),
       },
     },
@@ -284,9 +296,6 @@ describe("resolveSecret redaction", () => {
   });
 });
 
-const nodeCommand = (code: string) =>
-  `${JSON.stringify(process.execPath)} -e ${JSON.stringify(code)}`;
-
 describe("runSecretCommand", () => {
   it("captures stdout only and reports the exit code", async () => {
     await expect(
@@ -306,7 +315,7 @@ describe("runSecretCommand", () => {
     await expect(
       runSecretCommand(
         nodeCommand(
-          "setInterval(() => process.stdout.write('x'.repeat(8192)), 0)",
+          "setInterval(() => process.stdout.write('x'.repeat(65536)), 0)",
         ),
         { env: process.env, timeoutMs: 5_000 },
       ),
@@ -318,7 +327,7 @@ describe("runSecretCommand", () => {
       name: NAME,
       env: {
         [`${NAME}_COMMAND`]: nodeCommand(
-          "setInterval(() => process.stdout.write('secret-output'.repeat(1024)), 0)",
+          "setInterval(() => process.stdout.write('secret-output'.repeat(4096)), 0)",
         ),
       },
     })) as CredentialSourceError;
@@ -330,25 +339,29 @@ describe("runSecretCommand", () => {
   it("does not read stdin", async () => {
     await expect(
       runSecretCommand(
-        nodeCommand("process.stdin.on('data', () => process.exit(1))"),
+        nodeCommand(
+          "let input = ''; process.stdin.on('data', (chunk) => (input += chunk)); process.stdin.on('end', () => process.stdout.write(input))",
+        ),
         { env: process.env, timeoutMs: 5_000 },
       ),
     ).resolves.toEqual({ status: "exited", exitCode: 0, stdout: "" });
   });
 
-  it("times out and kills the whole process group", async () => {
+  it("times out and kills the command's child processes too", async () => {
+    const pidFile = join(dir, "grandchild.pid");
     const started = Date.now();
     await expect(
       runSecretCommand(
         nodeCommand(
-          "const { spawn } = require('node:child_process'); spawn(process.execPath, ['-e', 'setTimeout(() => {}, 30000)'], { stdio: 'ignore' }); setTimeout(() => {}, 30000)",
+          "const child = require('child_process').spawn(process.execPath, ['-e', 'setTimeout(() => {}, 30000)'], { stdio: 'ignore' }); require('fs').writeFileSync(process.env.PID_FILE, String(child.pid)); setTimeout(() => {}, 30000)",
         ),
-        {
-          env: process.env,
-          timeoutMs: 200,
-        },
+        { env: { ...process.env, PID_FILE: pidFile }, timeoutMs: 1_000 },
       ),
     ).resolves.toEqual({ status: "timed-out" });
     expect(Date.now() - started).toBeLessThan(5_000);
+
+    const grandchild = Number(readFileSync(pidFile, "utf-8"));
+    await new Promise((resolve) => setTimeout(resolve, 500));
+    expect(() => process.kill(grandchild, 0)).toThrow();
   });
 });

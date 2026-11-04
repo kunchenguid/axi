@@ -241,9 +241,9 @@ function commandFailed(variable: string, what: string): CredentialSourceError {
 }
 
 /**
- * Default runner: `/bin/sh -c <command>` with stdin closed and stderr
- * discarded, because a secret manager's diagnostics can include secret
- * material. The command tree is killed on timeout or when output exceeds the
+ * Default runner: the platform shell (`/bin/sh -c` on POSIX, `cmd.exe` on
+ * Windows) with stdin closed and stderr discarded, because diagnostics can
+ * include secret material. The command tree is killed on timeout or when output exceeds the
  * limit so a hung helper cannot keep the pipe open.
  */
 export const runSecretCommand: SecretCommandRunner = (

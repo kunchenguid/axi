@@ -18,6 +18,7 @@ export type SecretCommandResult =
   | { status: "exited"; exitCode: number; stdout: string }
   | { status: "signaled" }
   | { status: "timed-out" }
+  | { status: "output-too-large" }
   | { status: "failed-to-start" };
 
 /** Runs a credential command through the shell and captures only its stdout. */
@@ -47,6 +48,7 @@ export type CredentialSourceFailure =
   | "file-empty"
   | "command-failed"
   | "command-timeout"
+  | "command-output-too-large"
   | "command-empty";
 
 /** More than one of `NAME`, `NAME_FILE`, and `NAME_COMMAND` is set. */
@@ -76,6 +78,7 @@ export class CredentialSourceError extends AxiError {
 }
 
 const DEFAULT_COMMAND_TIMEOUT_MS = 10_000;
+const MAX_COMMAND_OUTPUT_BYTES = 1024 * 1024;
 
 /**
  * Resolve a secret from exactly one of three variables: `NAME` (the value),
@@ -206,6 +209,13 @@ function secretFromCommand(
       throw commandFailed(variable, "was terminated by a signal");
     case "failed-to-start":
       throw commandFailed(variable, "could not be started");
+    case "output-too-large":
+      throw new CredentialSourceError(
+        variable,
+        "command-output-too-large",
+        `${variable} output exceeded the 1 MiB limit`,
+        [`Make the command in ${variable} print only the secret`],
+      );
     case "timed-out":
       throw new CredentialSourceError(
         variable,
@@ -255,7 +265,27 @@ export const runSecretCommand: SecretCommandRunner = (
       detached: process.platform !== "win32",
     });
     const chunks: Buffer[] = [];
-    child.stdout?.on("data", (chunk: Buffer) => chunks.push(chunk));
+    let outputBytes = 0;
+    const kill = () => {
+      try {
+        if (child.pid !== undefined && process.platform !== "win32") {
+          process.kill(-child.pid, "SIGKILL");
+        } else {
+          child.kill("SIGKILL");
+        }
+      } catch {
+        // Already exited.
+      }
+    };
+    child.stdout?.on("data", (chunk: Buffer) => {
+      outputBytes += chunk.length;
+      if (outputBytes > MAX_COMMAND_OUTPUT_BYTES) {
+        kill();
+        settle({ status: "output-too-large" });
+      } else {
+        chunks.push(chunk);
+      }
+    });
     child.on("error", () => settle({ status: "failed-to-start" }));
     child.on("close", (code) =>
       settle(
@@ -270,15 +300,7 @@ export const runSecretCommand: SecretCommandRunner = (
     );
 
     const timer = setTimeout(() => {
-      try {
-        if (child.pid !== undefined && process.platform !== "win32") {
-          process.kill(-child.pid, "SIGKILL");
-        } else {
-          child.kill("SIGKILL");
-        }
-      } catch {
-        // Already exited.
-      }
+      kill();
       settle({ status: "timed-out" });
     }, timeoutMs);
   });

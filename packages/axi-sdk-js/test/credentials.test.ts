@@ -281,6 +281,22 @@ describe("runSecretCommand", () => {
     ).resolves.toEqual({ status: "exited", exitCode: 7, stdout: "out" });
   });
 
+  it("kills a command that exceeds the stdout limit", async () => {
+    await expect(
+      runSecretCommand("yes x", { env: process.env, timeoutMs: 5_000 }),
+    ).resolves.toEqual({ status: "output-too-large" });
+  });
+
+  it("reports oversized output without including command output", async () => {
+    const error = (await failure({
+      name: NAME,
+      env: { [`${NAME}_COMMAND`]: "yes secret-output" },
+    })) as CredentialSourceError;
+    expect(error.reason).toBe("command-output-too-large");
+    expect(error.message).toContain("1 MiB");
+    expect(error.message).not.toContain("secret-output");
+  });
+
   it("does not read stdin", async () => {
     await expect(
       runSecretCommand("cat", { env: process.env, timeoutMs: 5_000 }),

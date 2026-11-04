@@ -111,10 +111,10 @@ await runAxiCli({
 
 `resolveSecret()` gives every tool the same three ways to supply a secret, so users can keep tokens in a file or a secret manager instead of a plain environment variable:
 
-| Variable       | Meaning                                                                                       |
-| -------------- | --------------------------------------------------------------------------------------------- |
-| `NAME`         | The secret itself                                                                             |
-| `NAME_FILE`    | Path to a file holding the secret; one trailing newline is stripped                           |
+| Variable       | Meaning                                                                                                                                               |
+| -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `NAME`         | The secret itself                                                                                                                                     |
+| `NAME_FILE`    | Path to a file holding the secret; one trailing newline is stripped                                                                                   |
 | `NAME_COMMAND` | Command run through the platform shell (`/bin/sh -c` on POSIX, `cmd.exe` on Windows) that prints the secret, such as `op read ...` or `pass show ...` |
 
 `NAME_FILE` is read and `NAME_COMMAND` is executed with the caller's privileges

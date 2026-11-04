@@ -433,11 +433,7 @@ describe("detectInstallMethod managers", () => {
       package: "node-gh-axi",
     });
     expect(exec).toHaveBeenCalledWith(
-      [
-        "dpkg-query",
-        "-S",
-        "/usr/lib/node_modules/gh-axi/dist/bin/gh-axi.js",
-      ],
+      ["dpkg-query", "-S", "/usr/lib/node_modules/gh-axi/dist/bin/gh-axi.js"],
       5_000,
     );
   });

@@ -182,12 +182,7 @@ export function readNearestPackageJson(
 }
 
 /** Node version managers whose own npm owns a global install. */
-export type NodeVersionManager =
-  | "nvm"
-  | "fnm"
-  | "asdf"
-  | "mise"
-  | "volta";
+export type NodeVersionManager = "nvm" | "fnm" | "asdf" | "mise" | "volta";
 
 /** System package databases that can own a file under `/usr`. */
 export type SystemPackageManager = "dpkg" | "rpm" | "pacman";
@@ -235,7 +230,10 @@ export interface ExecSyncResult {
 }
 
 /** Runs an argv synchronously; used to ask system package databases who owns a file. */
-export type ExecSyncLike = (argv: string[], timeoutMs: number) => ExecSyncResult;
+export type ExecSyncLike = (
+  argv: string[],
+  timeoutMs: number,
+) => ExecSyncResult;
 
 const PACKAGE_QUERY_TIMEOUT_MS = 5_000;
 
@@ -1106,17 +1104,13 @@ async function defaultRunInstall(
           },
         }
       : {};
-    const child = spawn(
-      executable,
-      args,
-      {
-        stdio: ["ignore", "pipe", "pipe"],
-        shell:
-          windowsAbsoluteNpm ||
-          shouldUseWindowsPackageManagerShell(command, context.platform),
-        ...env,
-      },
-    );
+    const child = spawn(executable, args, {
+      stdio: ["ignore", "pipe", "pipe"],
+      shell:
+        windowsAbsoluteNpm ||
+        shouldUseWindowsPackageManagerShell(command, context.platform),
+      ...env,
+    });
     child.stdout?.on("data", (chunk: string | Buffer) => {
       process.stderr.write(chunk);
     });

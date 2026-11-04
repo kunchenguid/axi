@@ -548,7 +548,7 @@ describe("detectInstallMethod managers", () => {
     ).toEqual({ kind: "system-package", manager: "rpm", package: "gh-axi" });
   });
 
-  it("keeps an unowned /usr/lib install as an npm global", () => {
+  it("keeps a confirmed unowned /usr/lib install as an npm global", () => {
     expect(
       detectInstallMethod({
         entry: "/usr/lib/node_modules/gh-axi/dist/bin/gh-axi.js",
@@ -557,6 +557,18 @@ describe("detectInstallMethod managers", () => {
         exec: () => ({ status: 1, stdout: "" }),
       }),
     ).toEqual({ kind: "npm-global" });
+  });
+
+  it("keeps installs manual when a system ownership query is unavailable", () => {
+    const method = detectInstallMethod({
+      entry: "/usr/lib/node_modules/gh-axi/dist/bin/gh-axi.js",
+      env: {},
+      fs: fakeFs({ "/var/lib/dpkg/status": "" }),
+      exec: () => ({ status: null, stdout: "", unavailable: true }),
+    });
+
+    expect(method).toEqual({ kind: "system-package-unverified" });
+    expect(planUpgrade(method, "gh-axi").argv).toBeNull();
   });
 
   it("detects project-local installs and the project's package manager", () => {

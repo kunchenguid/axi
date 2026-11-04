@@ -228,7 +228,7 @@ export interface ExecSyncResult {
   /** Exit status, or `null` when the command could not start or was killed. */
   status: number | null;
   stdout: string;
-  /** True only when the query executable is absent, which is not an inconclusive probe. */
+  /** True when the query executable is absent, so ownership could not be verified. */
   unavailable?: boolean;
 }
 
@@ -620,7 +620,7 @@ function systemPackageOwner(
       unverified = true;
       break;
     }
-    if (result.status === null && !result.unavailable) {
+    if (result.unavailable || result.status === null) {
       unverified = true;
       break;
     }

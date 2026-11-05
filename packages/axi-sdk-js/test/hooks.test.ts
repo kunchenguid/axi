@@ -162,6 +162,60 @@ describe("computeSessionStartHookUpdate", () => {
     expect(changed).toBe(false);
     expect(updated).toBe(settings);
   });
+
+  it("removes duplicate managed hooks and keeps the first", () => {
+    const managed = {
+      type: "command",
+      command: "/usr/local/bin/gh-axi",
+      timeout: 10,
+    };
+    const other = { type: "command", command: "/usr/local/bin/other" };
+    const [updated, changed] = computeSessionStartHookUpdate(
+      {
+        hooks: {
+          SessionStart: [
+            { matcher: "", hooks: [managed] },
+            { matcher: "", hooks: [other, { ...managed }] },
+          ],
+        },
+      },
+      { marker: "gh-axi", command: "/usr/local/bin/gh-axi" },
+    );
+
+    expect(changed).toBe(true);
+    expect(updated.hooks?.SessionStart).toEqual([
+      { matcher: "", hooks: [managed] },
+      { matcher: "", hooks: [other] },
+    ]);
+  });
+
+  it("drops hook groups emptied by duplicate removal", () => {
+    const [updated, changed] = computeSessionStartHookUpdate(
+      {
+        hooks: {
+          SessionStart: [
+            {
+              matcher: "",
+              hooks: [{ type: "command", command: "/old/path/gh-axi" }],
+            },
+            {
+              matcher: "",
+              hooks: [{ type: "command", command: "/older/path/gh-axi" }],
+            },
+          ],
+        },
+      },
+      { marker: "gh-axi", command: "/new/path/gh-axi" },
+    );
+
+    expect(changed).toBe(true);
+    expect(updated.hooks?.SessionStart).toEqual([
+      {
+        matcher: "",
+        hooks: [{ type: "command", command: "/new/path/gh-axi", timeout: 10 }],
+      },
+    ]);
+  });
 });
 
 describe("computeSessionStartHookRemoval", () => {

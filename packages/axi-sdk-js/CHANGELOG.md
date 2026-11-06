@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.14](https://github.com/kunchenguid/axi/compare/axi-sdk-js-v0.1.13...axi-sdk-js-v0.1.14) (2026-11-05)
+
+
+### Bug Fixes
+
+* **axi-sdk-js:** remove duplicate managed SessionStart hooks ([#261](https://github.com/kunchenguid/axi/issues/261)) ([72b139e](https://github.com/kunchenguid/axi/commit/72b139eeba5451d0422e8ca919c6a81500996ecd)), closes [#259](https://github.com/kunchenguid/axi/issues/259)
+
 ## [0.1.13](https://github.com/kunchenguid/axi/compare/axi-sdk-js-v0.1.12...axi-sdk-js-v0.1.13) (2026-10-02)
 
 

@@ -182,6 +182,7 @@ export type InstallMethod =
   | { kind: "pnpm-global" }
   | { kind: "homebrew"; formula: string | null }
   | { kind: "npx" }
+  | { kind: "linked"; checkout: string }
   | { kind: "unknown" };
 
 /**
@@ -192,6 +193,8 @@ export type InstallMethod =
 export function detectInstallMethod(options: {
   entry: string;
   env?: NodeJS.ProcessEnv;
+  /** Filesystem seam used to look for a git checkout around the entry. */
+  fs?: Pick<IdentityFs, "existsSync">;
 }): InstallMethod {
   const env = options.env ?? process.env;
   const path = options.entry.replaceAll("\\", "/");
@@ -221,7 +224,36 @@ export function detectInstallMethod(options: {
     return { kind: "npm-global" };
   }
 
+  // `pnpm link --global` / `npm link` resolve the entry into the source
+  // checkout itself, outside every package store. A registry install there
+  // would be shadowed by the link, so it gets its own print-only plan.
+  const checkout = linkedCheckoutRoot(path, options.fs ?? nodeFs);
+  if (checkout) {
+    return { kind: "linked", checkout };
+  }
+
   return { kind: "unknown" };
+}
+
+function linkedCheckoutRoot(
+  path: string,
+  fs: Pick<IdentityFs, "existsSync">,
+): string | null {
+  if (path.includes("/node_modules/")) {
+    return null;
+  }
+
+  let dir = dirname(path);
+  let previous = "";
+  while (dir !== previous) {
+    if (fs.existsSync(join(dir, ".git"))) {
+      return dir;
+    }
+    previous = dir;
+    dir = dirname(dir);
+  }
+
+  return null;
 }
 
 function normalizePathRoot(path: string | undefined): string | undefined {
@@ -436,6 +468,13 @@ export function planUpgrade(
         command: `npx -y ${packageName}@latest`,
         argv: null,
         note: "npx always runs the latest published version, so no install is needed",
+      };
+    case "linked":
+      return {
+        method: method.kind,
+        command: `git -C ${method.checkout} pull`,
+        argv: null,
+        note: `Running from a git checkout at ${method.checkout}, so a registry install would not change the binary that runs`,
       };
     case "unknown":
       return {
@@ -855,9 +894,29 @@ export async function runUpdate(
   }
 
   const method: InstallMethod = entry
-    ? detectInstallMethod({ entry, env: options.env })
+    ? detectInstallMethod({ entry, env: options.env, fs })
     : { kind: "unknown" };
   const plan = planUpgrade(method, packageName);
+
+  if (method.kind === "linked") {
+    // No `run:` hint: neither a registry install nor a bare pull alone changes
+    // the binary that runs from a linked checkout.
+    return {
+      update: {
+        package: packageName,
+        current,
+        latest,
+        available: true,
+        action: "manual",
+        reason: plan.note,
+        checkout: method.checkout,
+      },
+      help: [
+        `Update the checkout with \`${plan.command}\`, then rebuild it`,
+        `If the checkout is globally linked, remove the link (\`pnpm remove -g ${packageName}\` or \`npm unlink -g ${packageName}\`) to use a registry install of ${packageName}@latest instead`,
+      ],
+    };
+  }
 
   if (!plan.argv) {
     const help =

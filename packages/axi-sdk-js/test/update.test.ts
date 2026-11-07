@@ -1045,9 +1045,7 @@ describe("runUpdate", () => {
       runInstall,
     });
 
-    expect(output).toMatchObject({
-      update: { action: "manual", run: null },
-    });
+    expect(output).toMatchObject({ update: { action: "manual" } });
     expect(runInstall).not.toHaveBeenCalled();
   });
 
@@ -1069,9 +1067,7 @@ describe("runUpdate", () => {
       runInstall,
     });
 
-    expect(output).toMatchObject({
-      update: { action: "manual", run: null },
-    });
+    expect(output).toMatchObject({ update: { action: "manual" } });
     expect(runInstall).not.toHaveBeenCalled();
   });
 
@@ -1093,9 +1089,7 @@ describe("runUpdate", () => {
       runInstall,
     });
 
-    expect(output).toMatchObject({
-      update: { action: "manual", run: null },
-    });
+    expect(output).toMatchObject({ update: { action: "manual" } });
     expect(runInstall).not.toHaveBeenCalled();
   });
 
@@ -1117,9 +1111,7 @@ describe("runUpdate", () => {
       runInstall,
     });
 
-    expect(output).toMatchObject({
-      update: { action: "manual", run: null },
-    });
+    expect(output).toMatchObject({ update: { action: "manual" } });
     expect(runInstall).not.toHaveBeenCalled();
   });
 

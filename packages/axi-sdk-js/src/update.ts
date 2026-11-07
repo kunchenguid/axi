@@ -624,16 +624,21 @@ function systemPackageOwner(
       unverified = true;
       break;
     }
-    const owner =
-      result.status === 0
-        ? parseSystemPackageOwner(database.manager, result.stdout)
-        : undefined;
-    if (owner) {
+    if (result.status === 0) {
+      const owner = parseSystemPackageOwner(database.manager, result.stdout);
+      if (!owner) {
+        unverified = true;
+        break;
+      }
       return {
         kind: "system-package",
         manager: database.manager,
         package: owner,
       };
+    }
+    if (result.status !== 1) {
+      unverified = true;
+      break;
     }
   }
 
@@ -760,13 +765,6 @@ function manualPlan(
   };
 }
 
-const PROJECT_ADD_COMMAND: Record<ProjectPackageManager, string> = {
-  npm: "npm install",
-  pnpm: "pnpm add",
-  yarn: "yarn add",
-  bun: "bun add",
-};
-
 const SYSTEM_UPGRADE_COMMAND: Record<SystemPackageManager, string> = {
   dpkg: "sudo apt install --only-upgrade",
   rpm: "sudo dnf upgrade",
@@ -842,14 +840,11 @@ export function planUpgrade(
         instruction: `Run \`${command}\`, or raise its version in your mise config`,
       });
     }
-    case "project-local": {
-      const command = `${PROJECT_ADD_COMMAND[method.packageManager]} ${latest}`;
+    case "project-local":
       return manualPlan(method, method.packageManager, {
-        command,
-        note: `This installation is a project dependency of ${method.project}`,
-        instruction: `Run \`${command}\` in ${method.project}, or raise its version in package.json`,
+        note: "This installation is a project dependency",
+        instruction: `Update ${latest} in the workspace package that declares it`,
       });
-    }
     case "read-only":
       return manualPlan(method, method.manager, {
         note: `This installation is managed by ${method.manager}, but ${method.path} is not writable by the current user`,

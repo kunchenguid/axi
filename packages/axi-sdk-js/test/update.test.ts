@@ -560,6 +560,21 @@ describe("detectInstallMethod managers", () => {
     ).toEqual({ kind: "npm-global" });
   });
 
+  it.each([
+    { status: 2, stdout: "" },
+    { status: 0, stdout: "" },
+  ])("keeps failed or unparseable ownership queries manual (%o)", (result) => {
+    const method = detectInstallMethod({
+      entry: "/usr/lib/node_modules/gh-axi/dist/bin/gh-axi.js",
+      env: {},
+      fs: fakeFs({ "/var/lib/dpkg/status": "" }),
+      exec: () => result,
+    });
+
+    expect(method).toEqual({ kind: "system-package-unverified" });
+    expect(planUpgrade(method, "gh-axi").argv).toBeNull();
+  });
+
   it("keeps installs manual when a system ownership query is unavailable", () => {
     const method = detectInstallMethod({
       entry: "/usr/lib/node_modules/gh-axi/dist/bin/gh-axi.js",
@@ -709,8 +724,8 @@ describe("planUpgrade", () => {
       ),
     ).toMatchObject({
       manager: "pnpm",
-      command: "pnpm add gh-axi@latest",
-      instruction: expect.stringContaining("/repo"),
+      command: null,
+      instruction: expect.stringContaining("workspace package that declares it"),
     });
   });
 

@@ -212,6 +212,7 @@ export type InstallMethod =
       kind: "project-local";
       project: string;
       packageManager: ProjectPackageManager;
+      declaresPackage: boolean;
     }
   | {
       kind: "read-only";
@@ -695,25 +696,21 @@ function projectLocalInstall(
 
   const project = path.slice(0, nodeModules);
   const packageJsonPath = join(project, "package.json");
-  if (!fs.existsSync(packageJsonPath)) {
-    return undefined;
-  }
-
+  let declaresPackage = false;
   try {
     const parsed: unknown = JSON.parse(
       fs.readFileSync(packageJsonPath, "utf-8"),
     );
-    if (!declaresDependency(parsed, packageName)) {
-      return undefined;
-    }
+    declaresPackage = declaresDependency(parsed, packageName);
   } catch {
-    return undefined;
+    // The install remains project-local; without metadata, guidance is print-only.
   }
 
   return {
     kind: "project-local",
     project,
     packageManager: projectPackageManager(project, fs),
+    declaresPackage,
   };
 }
 
@@ -873,9 +870,13 @@ export function planUpgrade(
     }
     case "project-local":
       return manualPlan(method, method.packageManager, {
-        command: `${method.packageManager} add ${latest}`,
+        command: method.declaresPackage
+          ? `${method.packageManager} add ${latest}`
+          : null,
         note: "This installation is a project dependency",
-        instruction: `Run this in the workspace package that declares ${packageName}`,
+        instruction: method.declaresPackage
+          ? `Run this in the workspace package that declares ${packageName}`
+          : `Update ${packageName} in the package that declares it`,
       });
     case "read-only":
       return manualPlan(method, method.manager, {

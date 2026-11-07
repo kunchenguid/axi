@@ -604,7 +604,31 @@ describe("detectInstallMethod managers", () => {
       kind: "project-local",
       project: "/Users/me/repo/packages/app",
       packageManager: "pnpm",
+      declaresPackage: true,
     });
+  });
+
+  it("recognizes shared-store installs without targeting the workspace root", () => {
+    const common = {
+      entry: "/repo/node_modules/.pnpm/gh-axi@1/node_modules/gh-axi/bin.js",
+      env: {},
+      packageName: "gh-axi",
+    };
+    const member = detectInstallMethod({
+      ...common,
+      fs: fakeFs({ "/repo/package.json": '{"name":"root"}', "/repo/pnpm-lock.yaml": "" }),
+    });
+    expect(member).toMatchObject({ kind: "project-local", declaresPackage: false });
+    expect(planUpgrade(member, "gh-axi")).toMatchObject({
+      command: null,
+      instruction: "Update gh-axi in the package that declares it",
+    });
+    const root = detectInstallMethod({
+      ...common,
+      fs: fakeFs({ "/repo/package.json": '{"dependencies":{"gh-axi":"1"}}', "/repo/pnpm-lock.yaml": "" }),
+    });
+    expect(root).toMatchObject({ kind: "project-local", declaresPackage: true });
+    expect(planUpgrade(root, "gh-axi").command).toBe("pnpm add gh-axi@latest");
   });
 
   it("does not treat a transitive nested install as a root project dependency", () => {
@@ -617,7 +641,7 @@ describe("detectInstallMethod managers", () => {
           "/repo/package.json": '{"dependencies":{"parent":"1.0.0"}}',
         }),
       }),
-    ).toEqual({ kind: "unknown" });
+    ).toMatchObject({ kind: "project-local", declaresPackage: false });
   });
 
   it("canonicalizes configured roots before comparing", () => {
@@ -704,7 +728,7 @@ describe("planUpgrade", () => {
       { kind: "system-package", manager: "dpkg", package: "node-gh-axi" },
       { kind: "system-package", manager: "apk", package: "gh-axi" },
       { kind: "mise-npm-backend" },
-      { kind: "project-local", project: "/repo", packageManager: "pnpm" },
+      { kind: "project-local", project: "/repo", packageManager: "pnpm", declaresPackage: true },
       {
         kind: "read-only",
         path: "/usr/local/lib/node_modules/gh-axi",
@@ -733,7 +757,7 @@ describe("planUpgrade", () => {
     ).toBe("sudo apk upgrade gh-axi");
     expect(
       planUpgrade(
-        { kind: "project-local", project: "/repo", packageManager: "pnpm" },
+        { kind: "project-local", project: "/repo", packageManager: "pnpm", declaresPackage: true },
         "gh-axi",
       ),
     ).toMatchObject({
@@ -1022,7 +1046,7 @@ describe("runUpdate", () => {
     });
 
     expect(output).toMatchObject({
-      update: { action: "manual", run: "npm install -g gh-axi@latest" },
+      update: { action: "manual", run: null },
     });
     expect(runInstall).not.toHaveBeenCalled();
   });
@@ -1046,7 +1070,7 @@ describe("runUpdate", () => {
     });
 
     expect(output).toMatchObject({
-      update: { action: "manual", run: "npm install -g gh-axi@latest" },
+      update: { action: "manual", run: null },
     });
     expect(runInstall).not.toHaveBeenCalled();
   });
@@ -1070,7 +1094,7 @@ describe("runUpdate", () => {
     });
 
     expect(output).toMatchObject({
-      update: { action: "manual", run: "npm install -g gh-axi@latest" },
+      update: { action: "manual", run: null },
     });
     expect(runInstall).not.toHaveBeenCalled();
   });
@@ -1094,7 +1118,7 @@ describe("runUpdate", () => {
     });
 
     expect(output).toMatchObject({
-      update: { action: "manual", run: "npm install -g gh-axi@latest" },
+      update: { action: "manual", run: null },
     });
     expect(runInstall).not.toHaveBeenCalled();
   });

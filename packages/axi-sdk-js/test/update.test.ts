@@ -595,7 +595,8 @@ describe("detectInstallMethod managers", () => {
         env: { HOME: home },
         packageName: "gh-axi",
         fs: fakeFs({
-          "/Users/me/repo/packages/app/package.json": '{"dependencies":{"gh-axi":"^1.2.3"}}',
+          "/Users/me/repo/packages/app/package.json":
+            '{"dependencies":{"gh-axi":"^1.2.3"}}',
           "/Users/me/repo/pnpm-lock.yaml": "",
         }),
       }),

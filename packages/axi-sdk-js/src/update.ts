@@ -674,13 +674,13 @@ function declaresDependency(value: unknown, packageName: string): boolean {
     "optionalDependencies",
     "peerDependencies",
   ].some((field) => {
-      const dependencies = Reflect.get(value, field);
-      return (
-        typeof dependencies === "object" &&
-        dependencies !== null &&
-        Object.hasOwn(dependencies, packageName)
-      );
-    });
+    const dependencies = Reflect.get(value, field);
+    return (
+      typeof dependencies === "object" &&
+      dependencies !== null &&
+      Object.hasOwn(dependencies, packageName)
+    );
+  });
 }
 
 function projectLocalInstall(

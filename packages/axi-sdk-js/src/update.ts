@@ -873,7 +873,7 @@ export function planUpgrade(
       return manualPlan(method, method.packageManager, {
         command: method.declaresPackage
           ? `${method.packageManager} add ${latest}`
-          : null,
+          : undefined,
         note: "This installation is a project dependency",
         instruction: method.declaresPackage
           ? `Run this in the workspace package that declares ${packageName}`

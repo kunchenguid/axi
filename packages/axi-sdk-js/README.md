@@ -79,22 +79,7 @@ How it works:
 
 - **Identity is auto-derived.** The package name and version are read from the nearest `package.json` (walking up from the realpath-resolved entrypoint). `version` from `runAxiCli()` is preferred when present. No wiring needed.
 - **The latest version comes from the registry.** It queries `https://registry.npmjs.org/<pkg>/latest`, falling back to `npm view <pkg> version`, and compares with proper semver. Network, registry, and not-found failures surface as structured `AxiError`s.
-- **The upgrade matches whoever manages the installation**, detected from the realpath-resolved entrypoint and environment. Only the owning manager is ever run; every other case is print-only (`action: manual`) and names the manager in `manager` and `reason`, with the next step in `help`:
-  - npm global -> `npm install -g <pkg>@latest`
-  - pnpm global -> `pnpm add -g <pkg>@latest`
-  - yarn global -> `yarn global add <pkg>@latest`
-  - bun global -> `bun add -g <pkg>@latest`
-  - Volta -> `volta install <pkg>@latest`
-  - nvm, fnm, asdf, mise, or Volta-managed Node -> that Node's own `npm install -g <pkg>@latest`, so a different Node on `PATH` is never updated instead
-  - Homebrew (`/Cellar/`) -> `brew upgrade <formula>`
-  - Nix (`/nix/store/`) -> print-only: update your Nix configuration and rebuild
-  - system package (a dpkg, rpm, pacman, or apk database owns the file) -> print-only: the matching `sudo apt|dnf|pacman|apk` upgrade
-  - system package ownership could not be verified -> print-only: update through the system package manager or retry
-  - mise npm backend -> print-only: `mise upgrade npm:<pkg>`
-  - project dependency (`<project>/node_modules/`) -> print-only: the project's own `npm install`, `pnpm add`, `yarn add`, or `bun add`
-  - installed package directory not writable by the current user -> print-only: update it through whatever installed it
-  - npx / ephemeral cache -> reports that `npx -y <pkg>@latest` already runs the latest (print-only)
-  - unknown -> prints the recommended command without guessing (print-only)
+- **The upgrade matches whoever manages the installation**, detected from the realpath-resolved entrypoint and environment. Only the owning manager is ever run; see [`update.ts`](src/update.ts) for the manager-to-action mapping. Manual plans name the manager and next step in `manager`, `reason`, and `help`.
 - **`update --check`** (a/k/a `--dry-run`) reports current vs latest, whether an update is available, and the detected `manager` and `path`, installing nothing. Its `help` is the manual step when `update` would not install. When already on the latest version, `update` reports up-to-date and exits 0.
 - **Discoverability is SDK-owned.** Bare `--help` gets a compact built-in command footer when the tool has not registered its own `update`, and `<tool> update --help` shows the command reference.
 

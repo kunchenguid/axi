@@ -664,6 +664,25 @@ function parseSystemPackageOwner(
   }
 }
 
+function declaresDependency(value: unknown, packageName: string): boolean {
+  if (typeof value !== "object" || value === null || Array.isArray(value)) {
+    return false;
+  }
+  return [
+    "dependencies",
+    "devDependencies",
+    "optionalDependencies",
+    "peerDependencies",
+  ].some((field) => {
+      const dependencies = Reflect.get(value, field);
+      return (
+        typeof dependencies === "object" &&
+        dependencies !== null &&
+        Object.hasOwn(dependencies, packageName)
+      );
+    });
+}
+
 function projectLocalInstall(
   path: string,
   packageName: string,
@@ -675,7 +694,19 @@ function projectLocalInstall(
   }
 
   const project = path.slice(0, nodeModules);
-  if (!fs.existsSync(join(project, "package.json"))) {
+  const packageJsonPath = join(project, "package.json");
+  if (!fs.existsSync(packageJsonPath)) {
+    return undefined;
+  }
+
+  try {
+    const parsed: unknown = JSON.parse(
+      fs.readFileSync(packageJsonPath, "utf-8"),
+    );
+    if (!declaresDependency(parsed, packageName)) {
+      return undefined;
+    }
+  } catch {
     return undefined;
   }
 

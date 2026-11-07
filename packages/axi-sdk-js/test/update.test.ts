@@ -595,7 +595,7 @@ describe("detectInstallMethod managers", () => {
         env: { HOME: home },
         packageName: "gh-axi",
         fs: fakeFs({
-          "/Users/me/repo/packages/app/package.json": "{}",
+          "/Users/me/repo/packages/app/package.json": '{"dependencies":{"gh-axi":"^1.2.3"}}',
           "/Users/me/repo/pnpm-lock.yaml": "",
         }),
       }),
@@ -604,6 +604,19 @@ describe("detectInstallMethod managers", () => {
       project: "/Users/me/repo/packages/app",
       packageManager: "pnpm",
     });
+  });
+
+  it("does not treat a transitive nested install as a root project dependency", () => {
+    expect(
+      detectInstallMethod({
+        entry: "/repo/node_modules/parent/node_modules/gh-axi/bin.js",
+        env: {},
+        packageName: "gh-axi",
+        fs: fakeFs({
+          "/repo/package.json": '{"dependencies":{"parent":"1.0.0"}}',
+        }),
+      }),
+    ).toEqual({ kind: "unknown" });
   });
 
   it("canonicalizes configured roots before comparing", () => {

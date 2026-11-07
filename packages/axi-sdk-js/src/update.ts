@@ -842,8 +842,9 @@ export function planUpgrade(
     }
     case "project-local":
       return manualPlan(method, method.packageManager, {
+        command: `${method.packageManager} add ${latest}`,
         note: "This installation is a project dependency",
-        instruction: `Update ${latest} in the workspace package that declares it`,
+        instruction: `Run this in the workspace package that declares ${packageName}`,
       });
     case "read-only":
       return manualPlan(method, method.manager, {

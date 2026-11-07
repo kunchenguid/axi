@@ -725,7 +725,9 @@ describe("planUpgrade", () => {
     ).toMatchObject({
       manager: "pnpm",
       command: null,
-      instruction: expect.stringContaining("workspace package that declares it"),
+      instruction: expect.stringContaining(
+        "workspace package that declares it",
+      ),
     });
   });
 

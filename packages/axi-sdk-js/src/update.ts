@@ -707,9 +707,16 @@ function projectLocalInstall(
   };
 }
 
-function packageDeclares(fs: IdentityFs, path: string, packageName: string): boolean {
+function packageDeclares(
+  fs: IdentityFs,
+  path: string,
+  packageName: string,
+): boolean {
   try {
-    return declaresDependency(JSON.parse(fs.readFileSync(path, "utf-8")), packageName);
+    return declaresDependency(
+      JSON.parse(fs.readFileSync(path, "utf-8")),
+      packageName,
+    );
   } catch {
     return false;
   }

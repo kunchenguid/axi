@@ -620,19 +620,29 @@ describe("detectInstallMethod managers", () => {
         "/repo/package.json": '{"name":"root"}',
         "/repo/pnpm-lock.yaml": "",
         "/repo/pnpm-workspace.yaml": "packages:\n  - packages/*\n",
-        "/repo/packages/app/package.json": '{"name":"app","dependencies":{"gh-axi":"1"}}',
+        "/repo/packages/app/package.json":
+          '{"name":"app","dependencies":{"gh-axi":"1"}}',
       }),
     });
-    expect(member).toMatchObject({ kind: "project-local", declaresPackage: false });
+    expect(member).toMatchObject({
+      kind: "project-local",
+      declaresPackage: false,
+    });
     expect(planUpgrade(member, "gh-axi")).toMatchObject({
       command: null,
       instruction: "Update gh-axi in the package that declares it",
     });
     const root = detectInstallMethod({
       ...common,
-      fs: fakeFs({ "/repo/package.json": '{"dependencies":{"gh-axi":"1"}}', "/repo/pnpm-lock.yaml": "" }),
+      fs: fakeFs({
+        "/repo/package.json": '{"dependencies":{"gh-axi":"1"}}',
+        "/repo/pnpm-lock.yaml": "",
+      }),
     });
-    expect(root).toMatchObject({ kind: "project-local", declaresPackage: true });
+    expect(root).toMatchObject({
+      kind: "project-local",
+      declaresPackage: true,
+    });
     expect(planUpgrade(root, "gh-axi").command).toBe("pnpm add gh-axi@latest");
   });
 
@@ -733,7 +743,12 @@ describe("planUpgrade", () => {
       { kind: "system-package", manager: "dpkg", package: "node-gh-axi" },
       { kind: "system-package", manager: "apk", package: "gh-axi" },
       { kind: "mise-npm-backend" },
-      { kind: "project-local", project: "/repo", packageManager: "pnpm", declaresPackage: true },
+      {
+        kind: "project-local",
+        project: "/repo",
+        packageManager: "pnpm",
+        declaresPackage: true,
+      },
       {
         kind: "read-only",
         path: "/usr/local/lib/node_modules/gh-axi",
@@ -762,7 +777,12 @@ describe("planUpgrade", () => {
     ).toBe("sudo apk upgrade gh-axi");
     expect(
       planUpgrade(
-        { kind: "project-local", project: "/repo", packageManager: "pnpm", declaresPackage: true },
+        {
+          kind: "project-local",
+          project: "/repo",
+          packageManager: "pnpm",
+          declaresPackage: true,
+        },
         "gh-axi",
       ),
     ).toMatchObject({

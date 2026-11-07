@@ -86,11 +86,6 @@ describe("isUpdateAvailable", () => {
 function fakeFs(files: Record<string, string>): IdentityFs {
   return {
     existsSync: (path) => Object.prototype.hasOwnProperty.call(files, path),
-    readdirSync: (path) => Object.keys(files)
-      .filter((file) => file.startsWith(`${path}/`))
-      .map((file) => file.slice(path.length + 1).split("/")[0]!)
-      .filter((name, index, names) => names.indexOf(name) === index)
-      .map((name) => ({ name, isDirectory: () => true })),
     readFileSync: (path) => {
       if (!Object.prototype.hasOwnProperty.call(files, path)) {
         throw new Error(`ENOENT: ${path}`);
@@ -628,10 +623,10 @@ describe("detectInstallMethod managers", () => {
         "/repo/packages/app/package.json": '{"name":"app","dependencies":{"gh-axi":"1"}}',
       }),
     });
-    expect(member).toMatchObject({ kind: "project-local", project: "/repo/packages/app", declaresPackage: true });
+    expect(member).toMatchObject({ kind: "project-local", declaresPackage: false });
     expect(planUpgrade(member, "gh-axi")).toMatchObject({
-      command: "pnpm add gh-axi@latest",
-      instruction: "Run this in the workspace package that declares gh-axi",
+      command: null,
+      instruction: "Update gh-axi in the package that declares it",
     });
     const root = detectInstallMethod({
       ...common,

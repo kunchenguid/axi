@@ -131,16 +131,11 @@ export interface PackageIdentity {
 export interface IdentityFs {
   existsSync: (path: string) => boolean;
   readFileSync: (path: string, encoding: "utf-8") => string;
-  readdirSync?: (path: string, options: { withFileTypes: true }) => Array<{
-    name: string;
-    isDirectory: () => boolean;
-  }>;
 }
 
 const nodeFs: IdentityFs = {
   existsSync,
   readFileSync: (path, encoding) => readFileSync(path, encoding),
-  readdirSync: (path, options) => nodeFs.readdirSync(path, options),
 };
 
 /**
@@ -699,24 +694,16 @@ function projectLocalInstall(
     return undefined;
   }
 
-  let project = path.slice(0, nodeModules);
-  let packageJsonPath = join(project, "package.json");
-  let declaresPackage = packageDeclares(fs, packageJsonPath, packageName);
-  if (!declaresPackage && path.includes("/node_modules/.pnpm/")) {
-    const workspaceRoot = project;
-    const member = findWorkspaceDeclaration(workspaceRoot, packageName, fs);
-    if (member) {
-      project = member;
-      packageJsonPath = join(project, "package.json");
-      declaresPackage = true;
-    }
-  }
-
+  const project = path.slice(0, nodeModules);
   return {
     kind: "project-local",
-    project: declaresPackage ? project : path.slice(0, nodeModules),
+    project,
     packageManager: projectPackageManager(project, fs),
-    declaresPackage,
+    declaresPackage: packageDeclares(
+      fs,
+      join(project, "package.json"),
+      packageName,
+    ),
   };
 }
 
@@ -726,35 +713,6 @@ function packageDeclares(fs: IdentityFs, path: string, packageName: string): boo
   } catch {
     return false;
   }
-}
-
-function findWorkspaceDeclaration(
-  root: string,
-  packageName: string,
-  fs: IdentityFs,
-): string | undefined {
-  if (!fs.readdirSync) return undefined;
-  let workspace: string;
-  try {
-    workspace = fs.readFileSync(join(root, "pnpm-workspace.yaml"), "utf-8");
-  } catch {
-    return undefined;
-  }
-  const patterns = [...workspace.matchAll(/^\s*-\s*['"]?([^'"\s]+)['"]?\s*$/gm)]
-    .map((match) => match[1]!)
-    .filter((pattern) => !pattern.startsWith("!") && !pattern.includes("**"));
-  for (const pattern of patterns) {
-    const base = pattern.endsWith("/*") ? pattern.slice(0, -2) : pattern;
-    const parent = join(root, base);
-    let entries;
-    try { entries = fs.readdirSync(parent, { withFileTypes: true }); } catch { continue; }
-    for (const entry of entries) {
-      if (entry.isDirectory() && packageDeclares(fs, join(parent, entry.name, "package.json"), packageName)) {
-        return join(parent, entry.name);
-      }
-    }
-  }
-  return undefined;
 }
 
 const LOCKFILES: Array<[string, ProjectPackageManager]> = [

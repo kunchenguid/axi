@@ -79,7 +79,7 @@ How it works:
 
 - **Identity is auto-derived.** The package name and version are read from the nearest `package.json` (walking up from the realpath-resolved entrypoint). `version` from `runAxiCli()` is preferred when present. No wiring needed.
 - **The latest version comes from the registry.** It queries `https://registry.npmjs.org/<pkg>/latest`, falling back to `npm view <pkg> version`, and compares with proper semver. Network, registry, and not-found failures surface as structured `AxiError`s.
-- **The upgrade matches whoever manages the installation**, detected from the realpath-resolved entrypoint and environment. Only the owning manager is ever run; see [`update.ts`](src/update.ts) for the manager-to-action mapping. Manual plans name the manager and next step in `manager`, `reason`, and `help`.
+- **The upgrade matches whoever manages the installation**, detected from the realpath-resolved entrypoint and environment. Only the owning manager is ever run; Nix-store installs are print-only and direct users to update their Nix configuration or flake inputs and rebuild. See [`update.ts`](src/update.ts) for the manager-to-action mapping. Manual plans name the manager and next step in `manager`, `reason`, and `help`.
 - **`update --check`** (a/k/a `--dry-run`) reports current vs latest, whether an update is available, and the detected `manager` and `path`, installing nothing. Its `help` is the manual step when `update` would not install. When already on the latest version, `update` reports up-to-date and exits 0.
 - **Discoverability is SDK-owned.** Bare `--help` gets a compact built-in command footer when the tool has not registered its own `update`, and `<tool> update --help` shows the command reference.
 
@@ -97,11 +97,11 @@ await runAxiCli({
 
 `resolveSecret()` gives every tool the same three ways to supply a secret, so users can keep tokens in a file or a secret manager instead of a plain environment variable:
 
-| Variable       | Meaning                                                                                                                                               |
-| -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `NAME`         | The secret itself                                                                                                                                     |
-| `NAME_FILE`    | Path to a file holding the secret; one trailing newline is stripped                                                                                   |
-| `NAME_COMMAND` | Command run through the platform shell (`/bin/sh -c` on POSIX, `cmd.exe` on Windows) that prints the secret, such as `op read ...` or `pass show ...` |
+| Variable       | Meaning                                                                                                 |
+| -------------- | ------------------------------------------------------------------------------------------------------- |
+| `NAME`         | The secret itself                                                                                       |
+| `NAME_FILE`    | Path to a file holding the secret; one trailing newline is stripped                                     |
+| `NAME_COMMAND` | Command run through the platform shell that prints the secret, such as `op read ...` or `pass show ...` |
 
 `NAME_FILE` is read and `NAME_COMMAND` is executed with the caller's privileges
 and environment—the same trust level as setting `NAME` directly. Resolve only

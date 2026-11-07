@@ -724,10 +724,8 @@ describe("planUpgrade", () => {
       ),
     ).toMatchObject({
       manager: "pnpm",
-      command: null,
-      instruction: expect.stringContaining(
-        "workspace package that declares it",
-      ),
+      command: "pnpm add gh-axi@latest",
+      instruction: "Run this in the workspace package that declares gh-axi",
     });
   });
 

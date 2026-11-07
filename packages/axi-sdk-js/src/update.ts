@@ -1399,6 +1399,7 @@ export async function runUpdate(
         latest,
         available,
         ...installation,
+        ...(available && plan.command ? { run: plan.command } : {}),
       },
     };
     if (available) {
@@ -1464,7 +1465,9 @@ export async function runUpdate(
 
 function manualHelp(plan: UpgradePlan, method: InstallMethod): string {
   if (plan.instruction) {
-    return plan.instruction;
+    return plan.command
+      ? `${plan.instruction}. Run \`${plan.command}\``
+      : plan.instruction;
   }
   return method.kind === "npx"
     ? `Re-run with \`${plan.command}\` to use the latest version`

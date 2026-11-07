@@ -1327,6 +1327,57 @@ describe("runUpdate", () => {
     });
   });
 
+  it("shows a project-local installer command in --check output and help", async () => {
+    const output = await runUpdate({
+      ...baseDeps,
+      args: ["--check"],
+      realpath: () => "/repo/node_modules/gh-axi/dist/bin/gh-axi.js",
+      fs: fakeFs({
+        "/repo/package.json": '{"dependencies":{"gh-axi":"1.2.3"}}',
+        "/repo/pnpm-lock.yaml": "",
+        "/repo/node_modules/gh-axi/package.json": JSON.stringify({
+          name: "gh-axi",
+          version: "1.2.3",
+        }),
+      }),
+      stdout,
+      fetchLatest: async () => "1.3.0",
+    });
+
+    expect(output).toMatchObject({
+      update: { manager: "pnpm", run: "pnpm add gh-axi@latest" },
+      help: [expect.stringContaining("pnpm add gh-axi@latest")],
+    });
+  });
+
+  it("keeps undeclared shared-store --check guidance print-only", async () => {
+    const entry =
+      "/repo/node_modules/.pnpm/gh-axi@1/node_modules/gh-axi/dist/bin/gh-axi.js";
+    const output = await runUpdate({
+      ...baseDeps,
+      args: ["--check"],
+      realpath: () => entry,
+      fs: fakeFs({
+        "/repo/package.json": '{"name":"root"}',
+        "/repo/pnpm-lock.yaml": "",
+        "/repo/pnpm-workspace.yaml": "packages:\n  - packages/*\n",
+        "/repo/packages/app/package.json":
+          '{"name":"app","dependencies":{"gh-axi":"1.2.3"}}',
+        "/repo/node_modules/.pnpm/gh-axi@1/node_modules/gh-axi/package.json":
+          JSON.stringify({ name: "gh-axi", version: "1.2.3" }),
+      }),
+      stdout,
+      fetchLatest: async () => "1.3.0",
+    });
+
+    expect(output).toMatchObject({
+      update: { manager: "pnpm", path: entry },
+      help: [expect.stringContaining("package that declares it")],
+    });
+    expect(output).not.toMatchObject({ update: { run: expect.anything() } });
+    expect(JSON.stringify(output)).not.toContain("npm install -g");
+  });
+
   it("refuses to update an install the current user cannot write", async () => {
     const runInstall = vi.fn();
     const isWritable = vi.fn(() => false);

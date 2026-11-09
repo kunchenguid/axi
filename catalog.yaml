@@ -2259,6 +2259,7 @@ community:
         - src/commands/update.ts
         - scripts/build-skill.ts
         - scripts/build-cli.ts
+        - scripts/scrub-check.sh
         - skills/agent-recall-axi/SKILL.md
         - skills/agent-recall-axi/scripts/agent-recall-axi
         - README.md
@@ -2270,7 +2271,10 @@ community:
         - test/helpers/block-network.mjs
         - test/cli.test.ts
         - test/home.test.ts
+        - test/home-perf.test.ts
         - test/hook.test.ts
+        - test/large.test.ts
+        - test/readonly.test.ts
         - test/sessions.test.ts
       source_observations:
         - "agent-recall-axi was published as agent-session-axi through v0.1.2 and renamed in v0.2.0, with no in-tool migration. Tag v0.2.0 is 5561e8db3940f418d778f6b730b53f04fac779cb, a merge of 3b563ce (`build: stamp the skill bundle 0.2.0`) into v0.1.2's 60e5acd; its tree is identical to 3b563ce (empty `git diff --stat 3b563ce 5561e8d` (observed)). npm agent-recall-axi@0.2.0 reports the same gitHead. It was a manual first publish of the new name, because trusted publishing needs the package to exist, so 0.2.0 carries no provenance attestation; trusted publishing is configured for later releases. npm agent-session-axi is deprecated with a pointer to the new name. package.json names agent-recall-axi and carries 0.0.0 by design (RELEASING.md: the tag is the version, and publish-npm.yml runs `npm version` before building). A dist/ build from the tag therefore printed `0.0.0` for -v and `update`, while the committed skill shim running the stamped agent-recall-axi.mjs printed `0.2.0` (observed). bin/agent-recall-axi.ts answers --version through axi-sdk-js/fast-path with VERSION from the leaf src/version.ts before importing src/cli.ts. Every command goes through runAxiCli and one formatError, including the unknown-command path (src/cli.ts renderUnknownCommand). Errors render as a TOON `error`/`code` block with optional `details` and `help` on stdout. USAGE, UNKNOWN_FLAG and VALIDATION_ERROR exit 2. NOT_FOUND, NO_SESSIONS, AMBIGUOUS_SESSION and UNREADABLE exit 1. Anything else is INTERNAL_ERROR, with its stack on stderr only under --debug. `bogus` printed `unknown command: bogus` with ``Run `agent-recall-axi --help` ``, exit 2 (observed)."

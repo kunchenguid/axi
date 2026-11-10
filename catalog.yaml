@@ -2093,6 +2093,34 @@ community:
         - "search.py defaults to title,url,snippet and 10 rows (1-50), validates --fields, returns an explicit count 0 with a refinement hint, and suggests a higher --limit on a full page; fetch.py shows a 1000-character preview with length, truncated: true and a --full hint, and an explicit status for empty text."
         - "transport.py sends one POST with no redirects and maps HTTP failures to specific errors with next steps (exit 1); output.py redacts the effective key from all output; config.py only accepts an https or loopback-http backend override."
       exception: "Principle 7 has no lifecycle hooks: deepsearch-axi ships a skill only (.agents/skills/deepsearch-axi/SKILL.md) and installs no session-start or session-end hooks."
+  - name: terraform-axi
+    url: https://github.com/Dematom1/terraform-axi
+    author: Dematom1
+    domain: Terraform / OpenTofu
+    description: "Inspect Terraform and OpenTofu plans, drift, state, and backend diagnostics with read-only commands and compact TOON output."
+    admission:
+      status: admitted
+      reviewed_revision: de8219e1223674c794834a3a19ab3cd24c501708
+      reviewed_components:
+        - package.json
+        - dist/bin/terraform-axi.js
+        - dist/bin/terraform-axi-ctx.js
+        - dist/src/version.js
+        - dist/src/cli.js
+        - dist/src/args.js
+        - dist/src/plan/command.js
+        - dist/src/commands/state.js
+        - dist/src/commands/drift.js
+        - dist/src/hooks.js
+        - dist/src/capture.js
+        - dist/src/opencode.js
+        - dist/src/help.js
+      source_observations:
+        - "Reviewed the published npm tarball terraform-axi@0.1.5 only (gitHead de8219e1223674c794834a3a19ab3cd24c501708; SHA-256 2135df4a1efbce24a5cbc36db1027ab278c7ad203d4531d7b62ab908a70cb2e4), installed into a scratch prefix with scripts disabled. All ten principles and required negative paths passed across 64 credential-free local CLI runs; all 61 non-version outputs decoded as TOON. No cloud provider or actual agent application was exercised; drift used a local event-replay wrapper."
+        - "Principles 1-5: dist/src/cli.js encodes TOON; plan/command.js defaults to four columns with --fields selection, aggregate risk/counts, explicit empty results, and selector-preserving --full hints. commands/state.js lists two columns, reports total resources, and previews long attributes with total size and --full recovery. commands/drift.js lists two columns and a full count, reports no drift explicitly, and expands its 20-row default to all rows with --full. Local runs recovered all 30 plan rows, 105 state rows, a 500-character attribute, and 21 drift rows; secrets remained redacted."
+        - "Principle 6: dist/src/args.js rejects unknown flags and invalid arguments; cli.js renders structured stdout errors with exit 2 for usage and exit 1 for operational failures. Missing and mode-000 plan/state files, unknown flags, and invalid arguments returned those exits without stderr leaks. Read-only home, status, state, and context commands succeeded with HOME and config unwritable, leaving HOME and local state unchanged; explicit config/capture writes failed structurally with exit 1."
+        - "Principles 7-8: dist/src/cli.js installs hooks only through explicit setup hooks; hooks.js and opencode.js provide Claude Code, Codex, and OpenCode start/end integrations. capture.js stores bounded session metadata and scopes modules by directory; terraform-axi-ctx.js reads context without writes. Repeated hook setup produced identical contents, and local context showed only the relevant module and prior-session command/file counts. The no-argument view showed local modules, binary version, wrapper, executable identification, and next actions rather than help."
+        - "Principles 9-10: plan/command.js, commands/state.js, and commands/drift.js emit complete contextual recovery commands; the truncated drift output names all 21 rows and its --full command returns them. help.js provides per-command defaults, flags, and examples, including drift --full. dist/bin/terraform-axi.js uses axi-sdk-js/fast-path with the leaf version.js before importing the command graph; -v, -V, and --version each returned bare 0.1.5 with exit 0. Help was also exercised alongside a saved-plan selector without reading the input."
   - name: ts-axi
     url: https://github.com/cmosgh/ts-axi
     author: cmosgh

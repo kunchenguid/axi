@@ -2286,3 +2286,29 @@ community:
         - "Privacy and no network: the tool reads only CLAUDE_CONFIG_DIR (default ~/.claude/projects), HOME, XDG_CACHE_HOME, XDG_CONFIG_HOME, CODEX_HOME, TMPDIR and TZ. No module under src/ or bin/ imports node:http, https, net, dns or child_process, or calls fetch. test/helpers/block-network.mjs fails any network attempt in the bin-level tests. scripts/scrub-check.sh gates CI (`194 files clean` (observed)). Every run in this review used a temp HOME holding a copy of the synthetic test/fixtures/claude tree."
         - "CI (.github/workflows/ci.yml) runs the scrub gate, a frozen install, typecheck, build, a consumer type check, vitest, check:skill, check:bundle and a dist smoke test. A second job runs the committed bundle with node alone and compares its output with dist/ byte for byte. publish-npm.yml repeats the gate at the tag. On GitHub (read-only run list/view), the CI run on the `Release: v0.2.0` PR (42695687151) and the CI push run on the stamp commit 3b563ce (42695679079) succeeded. At the tag, the main push CI run (42700731282, build-and-test; skill-bundle passed) and the `Publish npm package` gate (42700764776, attempt 1; publish-npm skipped) both failed on one unit test: test/hook.test.ts:636 `startup, clear, garbage…` (1 failed, 403 passed). The re-run of 42700764776 (attempt 2) passed after the manual publish, with publish-npm skipping the already-published version. That test compares a first home listing with later ones taken after the cache has warmed, file-mtime rows (`0s ago`, `?`) against stats-backed rows, so it is order-dependent rather than a product fault. Locally at the tag, install, typecheck, build, check:types, check:skill, check:bundle and check:scrub passed. vitest under a temp HOME passed 402 of 404 tests, including that hook-mode test and the whole unit project (observed). The 2 local failures were wall-clock budgets in the perf project (test/home-perf.test.ts, test/large.test.ts) on a host at load average ~18-22 on 8 cores. Accuracy on real Claude Code logs was not verified."
       exception: "Principle 2: two default tables keep a fifth column by design. find {id,t,kind,why,text} keeps `t` because across sessions an id names the session but not the time, and `t` tells the latest decision from superseded ones. search {id,project,last,hits,first} keeps `hits` because it ranks which session to open first when most matches are passing mentions. Principle 7 has no session-end lifecycle capture: `hook install` registers SessionStart hooks only."
+  - name: austere-axi
+    url: https://github.com/MandalorianBatman/austere-axi
+    author: MandalorianBatman
+    domain: Human review
+    description: "Review pages written in OpenUI Lang, not HTML - annotate in the browser; each note maps to a named statement and the agent patches only those, in place."
+    admission:
+      status: exception
+      reviewed_revision: 91a062b18b6fdbb2e66d038b8490c1624b2365a9
+      reviewed_components:
+        - package.json
+        - src/cli/main.js
+        - src/cli/output.js
+        - src/cli/server.js
+        - src/cli/mcp.js
+        - skills/austere/SKILL.md
+        - skills/austere-setup/SKILL.md
+        - test/cli.test.js
+        - README.md
+      source_observations:
+        - "Tag v0.5.2 is 91a062b18b6fdbb2e66d038b8490c1624b2365a9 (package.json version 0.5.2), published to npm as austere-axi@0.5.2 by .github/workflows/publish.yml. `-v`, `-V` and `--version` print the bare version with exit 0 (observed)."
+        - "src/cli/main.js COMMANDS lists, for every command, its usage line, summary, accepted flags and an example. main() resolves the command, then rejects any flag that command does not list as a `status: error` / `code: USAGE` block with the usage line and a help pointer on stdout, exit 2, before the command runs: `check t.html --bogus` printed `unknown flag for check: --bogus; valid: --fix` and did not check the page (observed). parseArgs reports a value flag with no value (`poll x.html --cursor`), and unknown commands, missing file arguments, unknown spec groups and unknown hub/components subcommands also exit 2 through usage(); failures while running (missing file, a page with check errors, server errors) exit 1 through fail(). test/cli.test.js covers these exits."
+        - "With no arguments, cmdHome prints `bin`, `description`, `server` and `open_sessions` (a count, with `N of M shown` past 12) first, then the open sessions, one line per command and a `next:` hint; the full workflow help is only printed by `--help` (observed with no server and with one open session)."
+        - "`<command> --help` and `help <command>` print that command's usage, summary, flags and one example from COMMANDS; bare `--help` prints the full workflow and file skeleton, which the MCP `spec` tool (src/cli/mcp.js) and the skills point agents at (observed for check, share, poll)."
+        - "Command results are structured blocks with `status:` and a `next:` hint naming the exact follow-up command; errors are `status: error` blocks on stdout. src/cli/server.js listens on 127.0.0.1, plus the Tailscale IP when Tailscale is up and any AUSTERE_AXI_HOST or --also-listen address; it never binds all interfaces."
+        - "skills/austere/SKILL.md is a discovery stub that points agents at `--help` and `spec`; skills/austere-setup/SKILL.md walks an agent through installation. No command installs session hooks."
+      exception: "Principle 1: output is compact YAML-shaped text from src/cli/output.js, not TOON; the GitHub Action (action/lib.mjs) and existing integrations parse this format. Principle 7 has no lifecycle hooks: austere-axi ships skills only (skills/austere, skills/austere-setup) and installs no session-start or session-end hooks."

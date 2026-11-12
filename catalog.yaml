@@ -2394,3 +2394,8 @@ community:
         - "Command results are structured blocks with `status:` and a `next:` hint naming the exact follow-up command; errors are `status: error` blocks on stdout. src/cli/server.js listens on 127.0.0.1, plus the Tailscale IP when Tailscale is up and any AUSTERE_AXI_HOST or --also-listen address; it never binds all interfaces."
         - "skills/austere/SKILL.md is a discovery stub that points agents at `--help` and `spec`; skills/austere-setup/SKILL.md walks an agent through installation. No command installs session hooks."
       exception: "Principle 1: output is compact YAML-shaped text from src/cli/output.js, not TOON; the GitHub Action (action/lib.mjs) and existing integrations parse this format. Principle 7 has no lifecycle hooks: austere-axi ships skills only (skills/austere, skills/austere-setup) and installs no session-start or session-end hooks."
+  - name: k8s-axi
+    url: https://github.com/lucashalbert/k8s-axi
+    author: lucashalbert
+    domain: Kubernetes
+    description: "Inspect, diagnose, and change Kubernetes clusters with compact TOON output, plan-first mutations, and a confirm token on delete. Go CLI built on client-go and axi-sdk-go."

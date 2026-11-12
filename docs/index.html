@@ -2109,7 +2109,28 @@
                     Definitions, references, callers, file outlines, and change
                     impact (<code>impact main...HEAD</code> or a diff on stdin)
                     for TypeScript and JavaScript from the TypeScript compiler,
-                    monorepo-aware and read-only on code, with TOON output.
+                    at the working tree or any git revision
+                    (<code>--ref</code>), with <code>anchor</code> to check
+                    review-comment file:line targets against a diff;
+                    monorepo-aware, read-only on code, TOON output.
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <a href="https://github.com/cmosgh/secrets-axi"
+                      ><code>secrets-axi</code></a
+                    >
+                  </td>
+                  <td>cmosgh</td>
+                  <td>Secrets / agent safety</td>
+                  <td>
+                    Keeps secret values out of agent transcripts: a PreToolUse
+                    Guard for Claude Code and Codex that denies reads of .env,
+                    credential files and secret-fetching CLIs with the right
+                    command instead, and a Runner that injects .env and AWS
+                    secrets into a child process with masked output, lists
+                    variable names and shapes without values, and edits one key
+                    in place; TOON output.
                   </td>
                 </tr>
                 <tr>

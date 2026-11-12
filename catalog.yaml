@@ -2399,3 +2399,26 @@ community:
     author: lucashalbert
     domain: Kubernetes
     description: "Inspect, diagnose, and change Kubernetes clusters with compact TOON output, plan-first mutations, and a confirm token on delete. Go CLI built on client-go and axi-sdk-go."
+    admission:
+      status: exception
+      reviewed_revision: a81522626427f98b8e8893fd8ec472ead7cbd074
+      reviewed_components:
+        - go.mod
+        - cmd/k8s-axi/main.go
+        - internal/app/app.go
+        - internal/kube/module.go
+        - internal/kube/home.go
+        - internal/kube/cluster.go
+        - internal/kube/setup.go
+        - internal/kube/delete.go
+        - internal/kube/mutation.go
+        - internal/kube/diagnose_logs.go
+        - skills/k8s-axi/SKILL.md
+        - README.md
+        - axi-sdk-go@v0.3.1 cli/cli.go
+      source_observations:
+        - "At tag v0.6.1, revision a81522626427f98b8e8893fd8ec472ead7cbd074 (the tag resolves to that commit, and the published darwin_arm64 archive, verified against checksums.txt, reports that commit from `version`), the tool is a Go CLI on axi-sdk-go v0.3.1 and client-go v0.37.2. cmd/k8s-axi/main.go passes build info to internal/app/app.go, which builds the root command with cli.New and returns cli.Execute. In axi-sdk-go cli/cli.go, Execute prints the bare version for --version, -V, and -v before running cobra, and renders every error on stdout in the requested format with nothing written to stderr for errors."
+        - "Built from a clean checkout of the tag with Go 1.27.4 (`go test ./...` passed for internal/app and internal/kube) and run with a temp HOME, an empty environment, and no kubeconfig. `--version`, `-V`, and `-v` each printed `0.6.1` with exit 0, matching the release archive; a build without version ldflags prints `dev`. No-argument `k8s-axi` printed `state: no-kubeconfig`, `reachable: false`, and two `next` hints with exit 0 (internal/kube/home.go reports a missing kubeconfig as data and lists contexts, capped by --limit, when none is current). `get pods --bogus` printed a TOON `error` with op, message, hint, and `exit: 2` on stdout, with --json printed the same object as JSON, and with --yaml printed it as YAML; stderr was empty and the exit code was 2 in both. An unknown command and `get pods` with no kubeconfig (`no contexts found in the kubeconfig`) also exited 2 with the error on stdout and empty stderr."
+        - "internal/kube/setup.go: `setup hooks` is explicit opt-in and installs one SessionStart hook running `k8s-axi cluster info --timeout 5s`, merging into the settings file and reporting `hook already present` on a repeat; `setup hooks --print` printed that fragment and wrote nothing, and `setup skill` copies the embedded skill. skills/k8s-axi/SKILL.md is a discovery stub that points agents to live `--help` and the no-argument home view. No session-end hook or capture exists."
+        - "Not run against a live cluster: the TOON tables, default row limit of 50 (internal/kube/module.go defaultLimit and the --limit flag), truncation hints, empty states, `plan` output, and the delete `--confirm KIND/NAME` token (internal/kube/delete.go) were read in code only, as was the `--dry-run=server` path in internal/kube/mutation.go and the crash-log selection in internal/kube/diagnose_logs.go; the kind integration tests were not run. The axi-sdk-go update notice is written to stderr after a successful command when a newer release exists (cli/cli.go notice, disabled by K8S_AXI_NO_UPDATE_CHECK); the temp-HOME runs printed none."
+      exception: "Principle 7: `setup hooks` installs only a SessionStart hook that runs `cluster info`; there is no session-end hook or capture. The skill half is covered by skills/k8s-axi/SKILL.md."

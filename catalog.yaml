@@ -2228,6 +2228,7 @@ community:
         - test/token-budget.test.ts
         - test/token-budget.json
         - README.md
+        - GLOSSARY.md
         - PLAN.md
         - docs/adr/0001-hook-is-the-nudge-masking-is-the-boundary.md
         - .github/workflows/ci.yml

@@ -182,7 +182,13 @@ export function readNearestPackageJson(
 }
 
 /** Node version managers whose own npm owns a global install. */
-export type NodeVersionManager = "nvm" | "fnm" | "asdf" | "mise" | "volta";
+export type NodeVersionManager =
+  | "nvm"
+  | "nodenv"
+  | "fnm"
+  | "asdf"
+  | "mise"
+  | "volta";
 
 /** System package databases that can own a file under `/usr`. */
 export type SystemPackageManager = "dpkg" | "rpm" | "pacman" | "apk";
@@ -543,6 +549,7 @@ function versionManagerInstall(
   const fromHome = (suffix: string) => (home ? `${home}/${suffix}` : undefined);
   const roots: Array<[NodeVersionManager, string | undefined, string]> = [
     ["nvm", root(env.NVM_DIR) ?? fromHome(".nvm"), "versions/node"],
+    ["nodenv", root(env.NODENV_ROOT) ?? fromHome(".nodenv"), "versions"],
     ["fnm", root(env.FNM_DIR) ?? fromHome(".local/share/fnm"), "node-versions"],
     ["asdf", root(env.ASDF_DATA_DIR) ?? fromHome(".asdf"), "installs/nodejs"],
     [
@@ -690,7 +697,7 @@ function projectLocalInstall(
   fs: IdentityFs,
 ): InstallMethod | undefined {
   const nodeModules = path.indexOf("/node_modules/");
-  if (nodeModules < 0 || !path.includes(`/node_modules/${packageName}/`)) {
+  if (nodeModules < 0) {
     return undefined;
   }
 

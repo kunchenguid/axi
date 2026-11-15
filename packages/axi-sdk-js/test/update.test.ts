@@ -219,6 +219,26 @@ describe("detectInstallMethod", () => {
     });
   });
 
+  it("detects nodenv globals and uses that Node's own npm", () => {
+    const method = detectInstallMethod({
+      entry:
+        "/Users/me/.nodenv/versions/22.1.0/lib/node_modules/gh-axi/bin/gh-axi.js",
+      env: { HOME: "/Users/me" },
+    });
+
+    expect(method).toEqual({
+      kind: "node-version-manager",
+      manager: "nodenv",
+      npm: "/Users/me/.nodenv/versions/22.1.0/bin/npm",
+    });
+    expect(planUpgrade(method, "gh-axi").argv).toEqual([
+      "/Users/me/.nodenv/versions/22.1.0/bin/npm",
+      "install",
+      "-g",
+      "gh-axi@latest",
+    ]);
+  });
+
   it("ties npm globals under a version manager to that Node's own npm", () => {
     expect(
       detectInstallMethod({
@@ -644,6 +664,28 @@ describe("detectInstallMethod managers", () => {
       declaresPackage: true,
     });
     expect(planUpgrade(root, "gh-axi").command).toBe("pnpm add gh-axi@latest");
+  });
+
+  it("keeps aliased node_modules installs project-local and print-only", () => {
+    const method = detectInstallMethod({
+      entry: "/repo/node_modules/my-cli/bin/x.js",
+      env: {},
+      packageName: "gh-axi",
+      fs: fakeFs({
+        "/repo/package.json": '{"dependencies":{"my-cli":"npm:gh-axi@1"}}',
+      }),
+    });
+
+    expect(method).toMatchObject({
+      kind: "project-local",
+      declaresPackage: false,
+    });
+    const plan = planUpgrade(method, "gh-axi");
+    expect(plan.command).toBeNull();
+    expect(plan.argv).toBeNull();
+    expect(plan.instruction).toBe(
+      "Update gh-axi in the package that declares it",
+    );
   });
 
   it("does not treat a transitive nested install as a root project dependency", () => {

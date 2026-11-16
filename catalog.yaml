@@ -2440,3 +2440,8 @@ community:
         - "internal/kube/setup.go: `setup hooks` is explicit opt-in and installs one SessionStart hook running `k8s-axi cluster info --timeout 5s`, merging into the settings file and reporting `hook already present` on a repeat; `setup hooks --print` printed that fragment and wrote nothing, and `setup skill` copies the embedded skill. skills/k8s-axi/SKILL.md is a discovery stub that points agents to live `--help` and the no-argument home view. No session-end hook or capture exists."
         - "Not run against a live cluster: the TOON tables, default row limit of 50 (internal/kube/module.go defaultLimit and the --limit flag), truncation hints, empty states, `plan` output, and the delete `--confirm KIND/NAME` token (internal/kube/delete.go) were read in code only, as was the `--dry-run=server` path in internal/kube/mutation.go and the crash-log selection in internal/kube/diagnose_logs.go; the kind integration tests were not run. The axi-sdk-go update notice is written to stderr after a successful command when a newer release exists (cli/cli.go notice, disabled by K8S_AXI_NO_UPDATE_CHECK); the temp-HOME runs printed none."
       exception: "Principle 7: `setup hooks` installs only a SessionStart hook that runs `cluster info`; there is no session-end hook or capture. The skill half is covered by skills/k8s-axi/SKILL.md."
+  - name: dtrywets-ha-axi
+    url: https://github.com/thelad-dev/ha-axi
+    author: thelad-dev
+    domain: Home Assistant
+    description: "Inspect states, entities, services, automations, areas and devices over Home Assistant REST and WebSocket with compact TOON output; every mutation needs `--confirm`. Published as `@dtrywets/ha-axi` (binary `ha-axi`)."

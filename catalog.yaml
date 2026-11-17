@@ -2444,7 +2444,7 @@ community:
     url: https://github.com/thelad-dev/ha-axi
     author: thelad-dev
     domain: Home Assistant
-    description: "Inspect states, entities, services, automations, areas and devices over Home Assistant REST and WebSocket with compact TOON output; every mutation needs `--confirm`. Published as `@dtrywets/ha-axi` (binary `ha-axi`)."
+    description: "Inspect states, entities, services, automations, areas and devices over Home Assistant REST and WebSocket with compact TOON output; non-interactive mutations need `--confirm`. Published as `@dtrywets/ha-axi` (binary `ha-axi`)."
     admission:
       status: exception
       reviewed_revision: 050b5de5d9d98fa70909bbf8c7bcf54b3f252ff9

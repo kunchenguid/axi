@@ -2469,3 +2469,8 @@ community:
         - "src/commands/setup.ts: setup hooks is explicit opt-in and installs only a SessionStart hook through axi-sdk-js installSessionStartHooks; there is no session-end hook. skills/ha-axi/SKILL.md is the on-demand skill."
         - "Not observed: a live Home Assistant or the WebSocket registry paths (area and device list) beyond reading ha-client.ts. When the token is missing, state list reports code NETWORK_ERROR with the message 'HA token missing', not AUTH_REQUIRED."
       exception: "Principle 6: when both stdin and stdout are a TTY, a mutation without --confirm shows an interactive y/N prompt (src/confirm.ts); the non-TTY agent path never prompts and refuses with CONFIRM_REQUIRED. Principle 7: setup hooks installs only a SessionStart hook, with no session-end hook; the skill half is skills/ha-axi/SKILL.md."
+  - name: ibmi-axi
+    url: https://github.com/thelad-dev/ibmi-axi
+    author: thelad-dev
+    domain: IBM i
+    description: "Read-only live operations on IBM i (AS/400) over SSH: doctor, ASP, CPU and MSGW checks, object details, job logs, spool files, source members and IFS listings, with TOON output."

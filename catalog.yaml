@@ -2440,3 +2440,32 @@ community:
         - "internal/kube/setup.go: `setup hooks` is explicit opt-in and installs one SessionStart hook running `k8s-axi cluster info --timeout 5s`, merging into the settings file and reporting `hook already present` on a repeat; `setup hooks --print` printed that fragment and wrote nothing, and `setup skill` copies the embedded skill. skills/k8s-axi/SKILL.md is a discovery stub that points agents to live `--help` and the no-argument home view. No session-end hook or capture exists."
         - "Not run against a live cluster: the TOON tables, default row limit of 50 (internal/kube/module.go defaultLimit and the --limit flag), truncation hints, empty states, `plan` output, and the delete `--confirm KIND/NAME` token (internal/kube/delete.go) were read in code only, as was the `--dry-run=server` path in internal/kube/mutation.go and the crash-log selection in internal/kube/diagnose_logs.go; the kind integration tests were not run. The axi-sdk-go update notice is written to stderr after a successful command when a newer release exists (cli/cli.go notice, disabled by K8S_AXI_NO_UPDATE_CHECK); the temp-HOME runs printed none."
       exception: "Principle 7: `setup hooks` installs only a SessionStart hook that runs `cluster info`; there is no session-end hook or capture. The skill half is covered by skills/k8s-axi/SKILL.md."
+  - name: dtrywets-ha-axi
+    url: https://github.com/thelad-dev/ha-axi
+    author: thelad-dev
+    domain: Home Assistant
+    description: "Inspect states, entities, services, automations, areas and devices over Home Assistant REST and WebSocket with compact TOON output; every mutation needs `--confirm`. Published as `@dtrywets/ha-axi` (binary `ha-axi`)."
+    admission:
+      status: exception
+      reviewed_revision: 050b5de5d9d98fa70909bbf8c7bcf54b3f252ff9
+      reviewed_components:
+        - package.json
+        - bin/ha-axi.ts
+        - src/cli.ts
+        - src/commands/home.ts
+        - src/commands/state.ts
+        - src/commands/service.ts
+        - src/commands/setup.ts
+        - src/confirm.ts
+        - src/ha-client.ts
+        - src/help.ts
+        - skills/ha-axi/SKILL.md
+      source_observations:
+        - "At revision 050b5de5d9d98fa70909bbf8c7bcf54b3f252ff9 (main; package.json 0.1.1), built with npm ci and tsc and run with a temp HOME. The published npm @dtrywets/ha-axi 0.1.1 reports gitHead d10666c, which is not in the public history, so only the git revision above was inspected."
+        - "src/cli.ts uses axi-sdk-js runAxiCli with TOON errors on stdout: usage, auth and confirm codes exit 2, others exit 1. -v printed 0.1.1, an unknown command and an unknown flag exited 2 and listed the valid flags, and per-command --help printed a concise reference."
+        - "src/commands/home.ts: with no arguments it printed live data against the mock (HA version, entity count, top domains, problem entities capped at 8 with problem_count, next-step help). With no token it printed an auth: missing_token home view with setup hints."
+        - "src/commands/state.ts: list defaults to 50 rows (max 500) and shows a 'count: 50 of 120 total' aggregate and a --limit hint. An empty domain filter printed '0 states found'. state get truncates attributes unless --full."
+        - "src/confirm.ts gates every mutation (service call, automation reload, config check). Without a TTY and without --confirm, service call refused with CONFIRM_REQUIRED (exit 2) and sent nothing to the mock. With --confirm it posted once. Dangerous services get warning notes."
+        - "src/commands/setup.ts: setup hooks is explicit opt-in and installs only a SessionStart hook through axi-sdk-js installSessionStartHooks; there is no session-end hook. skills/ha-axi/SKILL.md is the on-demand skill."
+        - "Not observed: a live Home Assistant or the WebSocket registry paths (area and device list) beyond reading ha-client.ts. When the token is missing, state list reports code NETWORK_ERROR with the message 'HA token missing', not AUTH_REQUIRED."
+      exception: "Principle 6: when both stdin and stdout are a TTY, a mutation without --confirm shows an interactive y/N prompt (src/confirm.ts); the non-TTY agent path never prompts and refuses with CONFIRM_REQUIRED. Principle 7: setup hooks installs only a SessionStart hook, with no session-end hook; the skill half is skills/ha-axi/SKILL.md."

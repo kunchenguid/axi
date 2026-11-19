@@ -35,6 +35,8 @@ vi.mock("../src/update.js", async () => {
 
 import { runAxiCli } from "../src/cli.js";
 import { AxiError } from "../src/errors.js";
+import { checkFlags } from "../src/flags.js";
+import { renderError } from "../src/output.js";
 
 const execFileAsync = promisify(execFile);
 
@@ -524,6 +526,263 @@ describe("runAxiCli", () => {
 
     expect(String(stdout.write.mock.calls[0]?.[0])).toContain("Missing title");
     expect(process.exitCode).toBe(2);
+  });
+});
+
+describe("runAxiCli declared flags", () => {
+  const originalArgv = [...process.argv];
+  const stdout = { write: vi.fn(() => true) };
+  const resolveContext = vi.fn();
+  const run = vi.fn(async () => "search output");
+  const bare = vi.fn(async () => "bare output");
+  const home = vi.fn(async () => "home output");
+
+  const search = {
+    flags: {
+      limit: { type: "string" as const },
+      offset: { type: "string" as const },
+      full: { type: "boolean" as const },
+      recursive: { type: "boolean" as const, short: "r" },
+      page: { type: "string" as const, default: "1" },
+      transparency: { refuse: "Use --free or --busy" },
+    },
+    run,
+  };
+
+  function firstWrite(): string {
+    return String(stdout.write.mock.calls[0]?.[0]);
+  }
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    resolveContext.mockReset();
+    process.exitCode = undefined;
+    process.argv = ["node", "tool"];
+  });
+
+  afterEach(() => {
+    process.exitCode = undefined;
+    process.argv = [...originalArgv];
+  });
+
+  async function runTool(argv: string[], extra: Record<string, unknown> = {}) {
+    await runAxiCli({
+      description: "Manage things",
+      topLevelHelp: "top help",
+      resolveContext,
+      home,
+      commands: { search, bare },
+      stdout,
+      argv,
+      ...extra,
+    });
+  }
+
+  it("passes argv to a bare function byte-identical, unchecked, with no parsed", async () => {
+    const argv = [
+      "bare",
+      "--limit=5",
+      "-r",
+      "--bogus",
+      "--offset=-5",
+      "--",
+      "-x",
+    ];
+    resolveContext.mockReturnValue({ ctx: true });
+
+    await runTool(argv);
+
+    expect(bare).toHaveBeenCalledTimes(1);
+    expect(bare.mock.calls[0]).toEqual([argv.slice(1), { ctx: true }]);
+    expect(bare.mock.calls[0]).toHaveLength(2);
+    expect(resolveContext).toHaveBeenCalledWith({
+      command: "bare",
+      args: argv.slice(1),
+    });
+    expect(stdout.write).toHaveBeenCalledWith("bare output\n");
+    expect(process.exitCode).toBeUndefined();
+  });
+
+  it("normalizes args for a declared command and passes parsed", async () => {
+    resolveContext.mockReturnValue({ ctx: true });
+
+    await runTool([
+      "search",
+      "q",
+      "--limit=5",
+      "-r",
+      "--offset=-5",
+      "--",
+      "-x",
+    ]);
+
+    const normalized = [
+      "q",
+      "--limit",
+      "5",
+      "--recursive",
+      "--offset",
+      "-5",
+      "--",
+      "-x",
+    ];
+    const parsed = {
+      values: { limit: "5", recursive: true, offset: "-5", page: "1" },
+      positionals: ["q", "-x"],
+    };
+    expect(resolveContext).toHaveBeenCalledWith({
+      command: "search",
+      args: normalized,
+      parsed,
+    });
+    expect(run).toHaveBeenCalledWith(normalized, { ctx: true }, parsed);
+    expect(stdout.write).toHaveBeenCalledWith("search output\n");
+  });
+
+  it("rejects an unknown flag with exit 2 before resolving context", async () => {
+    await runTool(["search", "q", "--bogus"]);
+
+    expect(firstWrite()).toBe(
+      `${renderError("Unknown flag --bogus for `search`", "VALIDATION_ERROR", [
+        "Valid flags for `search`: --full, --limit, --offset, --page, --recursive (--help always allowed)",
+        "Run `tool search --help` for usage",
+      ])}\n`,
+    );
+    expect(process.exitCode).toBe(2);
+    expect(resolveContext).not.toHaveBeenCalled();
+    expect(run).not.toHaveBeenCalled();
+  });
+
+  it("leads with the refuse hint for a refused flag", async () => {
+    await runTool(["search", "--transparency", "transparent"]);
+
+    expect(firstWrite()).toBe(
+      `${renderError(
+        "Unknown flag --transparency for `search`",
+        "VALIDATION_ERROR",
+        [
+          "Use --free or --busy",
+          "Valid flags for `search`: --full, --limit, --offset, --page, --recursive (--help always allowed)",
+          "Run `tool search --help` for usage",
+        ],
+      )}\n`,
+    );
+    expect(process.exitCode).toBe(2);
+    expect(run).not.toHaveBeenCalled();
+  });
+
+  it("rejects a value flag with no value", async () => {
+    await runTool(["search", "--limit"]);
+
+    expect(firstWrite()).toContain("Flag --limit for `search` needs a value");
+    expect(process.exitCode).toBe(2);
+    expect(run).not.toHaveBeenCalled();
+  });
+
+  it("rejects a boolean flag given a value", async () => {
+    await runTool(["search", "--full=yes"]);
+
+    expect(firstWrite()).toContain(
+      "Flag --full for `search` does not take a value",
+    );
+    expect(process.exitCode).toBe(2);
+  });
+
+  it("routes flag errors through formatError like any other error", async () => {
+    await runTool(["search", "--bogus"], {
+      formatError: (error: unknown) => ({
+        output: `custom: ${(error as Error).message}\n`,
+        exitCode: 7,
+      }),
+    });
+
+    expect(firstWrite()).toBe("custom: Unknown flag --bogus for `search`\n");
+    expect(process.exitCode).toBe(7);
+  });
+
+  it("still routes --help through getCommandHelp for a declared command", async () => {
+    await runTool(["search", "--help"], {
+      getCommandHelp: (command: string) =>
+        command === "search" ? "search help" : undefined,
+    });
+
+    expect(stdout.write).toHaveBeenCalledWith("search help");
+    expect(run).not.toHaveBeenCalled();
+  });
+
+  it("passes --help to the handler when no command help is registered", async () => {
+    await runTool(["search", "--help"]);
+
+    expect(run).toHaveBeenCalledWith(["--help"], undefined, {
+      values: { help: true, page: "1" },
+      positionals: [],
+    });
+    expect(process.exitCode).toBeUndefined();
+  });
+
+  it("accepts globalFlags on declared commands and lets the command win on a clash", async () => {
+    const globalFlags = {
+      account: { type: "string" as const },
+      limit: { type: "boolean" as const },
+    };
+
+    await runTool(["search", "--account", "me", "--limit", "5"], {
+      globalFlags,
+    });
+    expect(run).toHaveBeenCalledWith(
+      ["--account", "me", "--limit", "5"],
+      undefined,
+      {
+        values: { account: "me", limit: "5", page: "1" },
+        positionals: [],
+      },
+    );
+
+    vi.clearAllMocks();
+    await runTool(["search", "--bogus"], { globalFlags });
+    expect(firstWrite()).toContain(
+      "Valid flags for `search`: --account, --full, --limit, --offset, --page, --recursive (--help always allowed)",
+    );
+
+    vi.clearAllMocks();
+    await runTool(["bare", "--account", "me", "--anything"], { globalFlags });
+    expect(bare).toHaveBeenCalledWith(
+      ["--account", "me", "--anything"],
+      undefined,
+    );
+  });
+
+  it("produces the same error through checkFlags as through runAxiCli", async () => {
+    await runTool(["search", "--bogus"]);
+    const viaCli = firstWrite();
+
+    let viaHelper: AxiError | undefined;
+    try {
+      checkFlags(["--bogus"], search.flags, "search");
+    } catch (error) {
+      viaHelper = error as AxiError;
+    }
+
+    expect(viaHelper).toBeInstanceOf(AxiError);
+    expect(
+      `${renderError(viaHelper!.message, viaHelper!.code, viaHelper!.suggestions)}\n`,
+    ).toBe(viaCli);
+  });
+
+  it("leaves home and the built-in update unaffected", async () => {
+    await runTool([], {
+      globalFlags: { account: { type: "string" as const } },
+    });
+    expect(home).toHaveBeenCalledWith([], undefined);
+
+    vi.clearAllMocks();
+    await runTool(["update", "--check"], {
+      globalFlags: { account: { type: "string" as const } },
+    });
+    expect(runUpdate).toHaveBeenCalledWith(
+      expect.objectContaining({ args: ["--check"] }),
+    );
+    expect(process.exitCode).toBeUndefined();
   });
 });
 

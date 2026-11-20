@@ -2469,3 +2469,36 @@ community:
         - "src/commands/setup.ts: setup hooks is explicit opt-in and installs only a SessionStart hook through axi-sdk-js installSessionStartHooks; there is no session-end hook. skills/ha-axi/SKILL.md is the on-demand skill."
         - "Not observed: a live Home Assistant or the WebSocket registry paths (area and device list) beyond reading ha-client.ts. When the token is missing, state list reports code NETWORK_ERROR with the message 'HA token missing', not AUTH_REQUIRED."
       exception: "Principle 6: when both stdin and stdout are a TTY, a mutation without --confirm shows an interactive y/N prompt (src/confirm.ts); the non-TTY agent path never prompts and refuses with CONFIRM_REQUIRED. Principle 7: setup hooks installs only a SessionStart hook, with no session-end hook; the skill half is skills/ha-axi/SKILL.md."
+  - name: ibmi-axi
+    url: https://github.com/thelad-dev/ibmi-axi
+    author: thelad-dev
+    domain: IBM i
+    description: "Read-only live operations on IBM i (AS/400) over SSH: doctor, ASP, CPU and MSGW checks, object details, job logs, spool files, source members and IFS listings, with TOON output."
+    admission:
+      status: exception
+      reviewed_revision: f7bba994837153f7a1e22e2f953c6af6b60995e3
+      reviewed_components:
+        - package.json
+        - bin/ibmi-axi.ts
+        - src/cli.ts
+        - src/args.ts
+        - src/parse.ts
+        - src/ssh.ts
+        - src/config.ts
+        - src/help.ts
+        - src/commands/home.ts
+        - src/commands/msgw.ts
+        - src/commands/member.ts
+        - src/commands/setup.ts
+        - src/mcp.ts
+        - skills/ibmi-axi/SKILL.md
+      source_observations:
+        - "At revision f7bba994837153f7a1e22e2f953c6af6b60995e3 (tag v0.1.0; package.json 0.1.0), built with npm ci and tsc and run with a temp HOME. The dist/, package.json and skills/ibmi-axi in the published npm ibmi-axi 0.1.0 tarball are byte-identical to that build."
+        - "src/cli.ts uses axi-sdk-js runAxiCli with TOON errors on stdout: usage and validation codes exit 2, others exit 1. -v printed 0.1.0, an unknown command exited 2 with VALIDATION_ERROR, and an unknown flag exited 2 and listed the valid flags (src/args.ts rejectUnknownFlags). Per-command --help printed a concise reference with defaults."
+        - "src/commands/home.ts: with no arguments it printed host, host_status (unreachable with no SSH host), os, mode live-read and next-step help, exit 0."
+        - "src/commands/msgw.ts: default limit 20 (max 500, src/config.ts), message previews truncated with a --full hint, and an explicit '0 inquiry messages waiting for reply in QSYSOPR; 0 jobs in MSGW' empty state. It never replies to messages."
+        - "src/parse.ts validates library, object, member, type and IFS path inputs before any SQL or remote shell, and buildDb2Remote rejects SQL with quote, backslash, backtick or newline. src/ssh.ts uses BatchMode=yes, StrictHostKeyChecking=accept-new (documented in --help as TOFU) and ends ssh options with --."
+        - "src/commands/member.ts: member read has a size guard (--allow-large to override). It copies the member to a temp stream file on the host with CPYTOSTMF and removes it with rm -f afterwards, so it is not strictly zero-write."
+        - "src/commands/setup.ts: setup hooks is explicit opt-in and installs only a SessionStart hook through axi-sdk-js installSessionStartHooks; there is no session-end hook. skills/ibmi-axi/SKILL.md is the on-demand skill. src/mcp.ts is an optional SQL transport through a configured MCP server, used only when config.mcp is set."
+        - "Not observed: a live IBM i host. The SQL and SSH read paths (asp, cpu, msgw, obj, joblog, spool, member, ifs, doctor) were read in code only."
+      exception: "Principle 7: setup hooks installs only a SessionStart hook, with no session-end hook; the skill half is skills/ibmi-axi/SKILL.md."

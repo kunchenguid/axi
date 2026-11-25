@@ -2585,7 +2585,7 @@ community:
     url: https://github.com/gehariharan/wasync
     author: gehariharan
     domain: Messaging
-    description: "Read a local WhatsApp archive through wasync: chats, messages, search, threads and observe, with untrusted_* fields for other people's text; reads by default, and send, reply, react and edit work only with a scope and per-chat approval a human granted in wasync. Ships in the wasync repo (`axi/`)."
+    description: "Read a local WhatsApp archive through wasync: chats, messages, search, threads and observe, with untrusted_* fields for other people's text; reads by default, and send, reply, react and edit work only with a scope and per-chat approval a human granted in wasync. Ships in the wasync repo (`axi/`); it also installs a legacy `whatsapp-axi` alias command that conflicts with JarvusInnovations/whatsapp-axi and will be removed in a later release."
     admission:
       status: exception
       reviewed_revision: dab2b9e035c81d638e003cdbd42b640a9d9f719f

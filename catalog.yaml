@@ -2615,3 +2615,51 @@ community:
         - "Principles 7-8 (internal/cli/setup.go, internal/agentsetup): `setup hooks` is explicit opt-in. Against a temp home it added a SessionStart hook running `wasync-axi --brief` and a SessionEnd hook running `wasync-axi session-end` (timeout 10) to ~/.claude/settings.json, and `setup hooks --remove` left `{}`. Codex and OpenCode are also supported, with --dry-run. The brief prints wasync state and counts, never message text; session-end records command names and counts only. `setup skill` installs skills/wasync-axi/SKILL.md. doctor prints 12 checks across installation, service, pairing, permissions, compatibility and hooks, each with a fix."
         - "Not verified: a running wasync, pairing, live reads through the API, any write, and access approvals (no wasync account was linked); the Linux and Windows archives; the Homebrew formula install."
       exception: "send, reply, react and edit take no --confirm: the guard is the scope and per-chat allowlist a human granted in wasync, which wasync enforces, plus send-once with no retry. Offline reads through `wasync query` are not scoped by any credential; they read the archive as the OS user, and wasync-axi says so when it uses that transport. The old command name whatsapp-axi is kept as an alias binary."
+  - name: unifi-axi
+    url: https://github.com/twidtwid/unifi-axi
+    author: twidtwid
+    domain: UniFi Wi-Fi
+    description: "Diagnose UniFi Network Wi-Fi - one client's roam and disconnect timeline merged from controller events and AP syslog over SSH, drop counts, configured vs live radio channel and power, on-device verify of power and 802.11r, Qualcomm firmware kickout counts, and certificate pinning - with one guarded, device-verified tx-power write behind `--confirm`. Python, standard library only."
+    admission:
+      status: exception
+      reviewed_revision: 8ee7294afc546f873d6a13ad270cb3c530df28fd
+      reviewed_components:
+        - pyproject.toml
+        - src/unifi_axi/entry.py
+        - src/unifi_axi/_version.py
+        - src/unifi_axi/cli.py
+        - src/unifi_axi/config.py
+        - src/unifi_axi/api.py
+        - src/unifi_axi/ssh.py
+        - src/unifi_axi/askpass.sh
+        - src/unifi_axi/toon.py
+        - src/unifi_axi/timeline.py
+        - src/unifi_axi/commands/home.py
+        - src/unifi_axi/commands/common.py
+        - src/unifi_axi/commands/client.py
+        - src/unifi_axi/commands/clients.py
+        - src/unifi_axi/commands/aps.py
+        - src/unifi_axi/commands/drops.py
+        - src/unifi_axi/commands/verify.py
+        - src/unifi_axi/commands/kickout.py
+        - src/unifi_axi/commands/cert.py
+        - src/unifi_axi/commands/setpower.py
+        - skills/unifi-axi/SKILL.md
+        - tests/helpers.py
+        - tests/test_new.py
+        - tests/test_set_power.py
+        - .github/workflows/ci.yml
+        - README.md
+        - LICENSE
+      source_observations:
+        - "Tag v0.1.2 is 8ee7294afc546f873d6a13ad270cb3c530df28fd; pyproject.toml and src/unifi_axi/_version.py both say 0.1.2, and `-v` printed 0.1.2. pyproject.toml declares the `unifi-axi` console script (unifi_axi.entry:main) with no runtime dependencies. Built with `uv run` from a clone checked out at that revision and run with a temp HOME, an empty environment, and no controller; `uv run --with pytest pytest -q` passed (107 passed, 3 skipped), and with UNIFI_AXI_TOON_STRICT=1 (108 passed, 2 skipped) the test that pipes command output, including --insecure cases, through @toon-format/cli@4.4.0 --decode also passed. .github/workflows/ci.yml sets up Node 22 and runs the suite with UNIFI_AXI_TOON_STRICT=1. No live UniFi controller or AP was contacted."
+        - "src/unifi_axi/entry.py prints the bare version for a single `-v`, `-V`, or `--version` before importing src/unifi_axi/cli.py. cli.py is the single error boundary: argparse errors become `error:`/`help:` on stdout (JSON with --json) with exit 2, and an unhandled exception prints `error: internal: <type> in <cmd>` with exit 1 and no traceback. Observed with exit 2 and empty stderr: an unknown command, `clients --bogus` (named, with the command's valid flags), `--sin 1h drops` (`unknown flag --sin (before the command)` with the global flags listed), a missing flag value, an extra positional, an http:// or path-bearing UNIFI_URL, an unreadable --since, and a missing API key. Abbreviations are refused (allow_abbrev=False)."
+        - "The no-argument view (src/unifi_axi/commands/home.py) prints `bin:` (home collapsed to ~), `description:`, controller URL, site and TLS mode, an AP online/firmware/client summary, the 24 h drop count, and two help items. With no API key it printed bin and description, then `error: no API key` with a help line, exit 2; with a placeholder key and a refused connection it printed `aps: FAILED (...)`, `drops: not read`, and help pointing at `cert`, exit 1. The `clients`, `kickout`, and `set-power` controller-read errors now carry a help line."
+        - "src/unifi_axi/toon.py is an in-tree TOON encoder: toon_scalar quotes empty, padded, literal-looking, numeric-looking, and leading-`-` strings and any string with a colon, quote, backslash, bracket, brace, comma, `#`, or control character; lists print `- ` items; repeated `verify --all` groups print as one `aps[N]:` list of objects; and a `key: value` key emitted more than once (Doc.toon) prints as one `key[N]:` list at its first position. Eighteen invocations driven through the repo's fake controller (tests/helpers.py run with raw_output=True), each run plain, with --insecure, with `--fields nosuch`, and with both (72 outputs), covering the home view, aps, clients, drops, kickout, verify, verify --all, set-power preview/no-op/fuzzy --confirm, the client timeline with and without --full, a no-match client, and usage errors, all decoded with @toon-format/cli@4.4.0. Booleans print as the strings yes/no in TOON and as true/false in --json."
+        - "`set-power office 5 18 --insecure` printed `warn[2]:` with the TLS warning (cli.py) and the live-call warning (setpower.py) as `- ` items, and `aps --insecure --fields nosuch` printed `warn[2]:` with the TLS warning and the unmatched-field warning; both decoded to a `warn` array, the same shape --json gives."
+        - "Default schemas: `clients` shows five columns (name, mac, ap, band, signal) under a `summary:` count line, `aps` nine per radio (eleven for one AP), and the `client` timeline seven. `--fields` adds columns present in the rows, and a name no table has now prints `warn: --fields bogus matched no column; available: ...` (observed). Caps print a total: clients 50, drops by_client 10, kickout top_clients 10, the client timeline 40 rows (timeline.py truncate hides signal samples, then BTM rows), each with `more: N ... hidden. Add --full.`; empty results are stated, e.g. `summary: 0 wireless matching 'zzz' (4 total in stat/sta)` and `drops: 0 in 24h (...)`."
+        - "src/unifi_axi/api.py has one HTTPS layer and two callers above it: api_call refuses any method other than GET and the one system-log POST, and api_write_device is the only write, a PUT of rest/device/<24-hex id> with {radio_table} and no retry, called only from src/unifi_axi/commands/setpower.py set_power_apply. With UNIFI_CERT_SHA256 set, open_connection compares the leaf certificate's SHA-256 after the handshake and before any request bytes, so the X-API-KEY header is never sent on a mismatch; `cert` opens TLS only and sends no request. The key comes from UNIFI_API_KEY or a key file (the config file refuses an `api_key` entry); --insecure disables verification with a `warn:` line, and a pin overrides it."
+        - "src/unifi_axi/ssh.py runs three fixed read-only command strings (AP log grep, iwconfig plus hostapd_cli get_config, dmesg/syslog kickout counts) with MACs validated by regex, the AP password passed only through the child environment to askpass.sh, stdin closed, one password prompt, StrictHostKeyChecking=accept-new against the tool's own known_hosts (first contact is trusted), and an `---END` marker to detect truncated output. `kickout` only counts; README.md documents the `iwpriv wifiN sta_kickout 320` workaround, and no source path runs iwpriv."
+        - "`set-power` (src/unifi_axi/commands/setpower.py) validates band, dBm, and --tx-power before any controller read (exit 2), previews by default (exit 0), and is a no-op (exit 0, nothing sent) when the radio is already at the target (observed). --confirm needs the exact AP name or MAC (a fuzzy match is refused with exit 1, observed), SSH credentials, rest/wlanconf, a served SSID, an in-range target, and an unchanged radio_table on a re-read; it then writes before/put evidence (0700), sends one full-radio_table PUT, polls for reprovisioning, reads Tx-Power on the device, and prints a change-log stub and undo command, with exit 3 on a device mismatch or drift. The write path was read in code and exercised only by tests/test_set_power.py against the fake controller."
+        - "No session integration exists: cli.py registers client, aps, clients, drops, verify, kickout, cert, and set-power, with no `setup` command, hook, or plugin for Claude Code, Codex, or OpenCode, and README.md's principle table says ambient context is 'Not offered' because a hook would cost tokens in every session. skills/unifi-axi/SKILL.md is a hand-written discovery stub that points agents to the no-argument view and `--help`; it is not generated from the CLI and has no staleness check."
+      exception: "Principle 7: no `setup hooks` command, session-start dashboard, or session-end capture for any agent; only the hand-written skills/unifi-axi/SKILL.md stub, which is not generated from the CLI. Principle 2: `aps` prints nine columns per radio and the `client` timeline seven by default."

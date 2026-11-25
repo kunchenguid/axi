@@ -2258,6 +2258,83 @@
                     later release.
                   </td>
                 </tr>
+                <tr>
+                  <td>
+                    <a href="https://github.com/samestrin/atcr"
+                      ><code>atcr</code></a
+                    >
+                  </td>
+                  <td>samestrin</td>
+                  <td>Code review / Multi-model panel</td>
+                  <td>
+                    Fans a git range, branch or whole-repository scan out to a
+                    panel of heterogeneous LLM reviewers and deterministically
+                    reconciles their findings into one deduplicated,
+                    confidence-scored report, with TOON payloads on its AXI
+                    surfaces for an agent to consume.
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <a href="https://github.com/samestrin/llm-data-axi"
+                      ><code>llm-data-axi</code></a
+                    >
+                  </td>
+                  <td>samestrin</td>
+                  <td>Project files / YAML</td>
+                  <td>
+                    Inspects and transforms files, projects and YAML
+                    configuration with deterministic, network-free commands;
+                    across twelve command/repository pairs (24 runs) its default
+                    TOON output was 39.3% smaller than the same commands' JSON
+                    (183,846 vs 302,691 bytes).
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <a href="https://github.com/samestrin/llm-extract-axi"
+                      ><code>llm-extract-axi</code></a
+                    >
+                  </td>
+                  <td>samestrin</td>
+                  <td>Web data / Extraction</td>
+                  <td>
+                    Fetches a web page or file and returns only the ranked links
+                    or the passages relevant to a given context; on a 15 KB
+                    documentation page, <code>extract-links --axi</code> printed
+                    3.0x fewer tokens than the page itself (1,432 vs 4,240,
+                    offline benchmark, no model call).
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <a href="https://github.com/samestrin/llm-filesystem-axi"
+                      ><code>llm-filesystem-axi</code></a
+                    >
+                  </td>
+                  <td>samestrin</td>
+                  <td>Filesystem</td>
+                  <td>
+                    Read, write, edit, search and archive local files from one
+                    static Go binary, with TOON output, capped reads that name
+                    the next offset, and <code>--confirm</code> on destructive
+                    operations. Includes an MCP wrapper.
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <a href="https://github.com/samestrin/llm-semantic-axi"
+                      ><code>llm-semantic-axi</code></a
+                    >
+                  </td>
+                  <td>samestrin</td>
+                  <td>Code navigation / Semantic search</td>
+                  <td>
+                    Semantic code search over a local embedding index, with
+                    <code>callers</code> and <code>refs</code> call-edge lookup
+                    for Go, JavaScript, TypeScript, Python and Rust.
+                  </td>
+                </tr>
                 <!-- generated:catalog-community:end -->
               </tbody>
             </table>

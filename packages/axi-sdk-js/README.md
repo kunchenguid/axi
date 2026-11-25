@@ -84,6 +84,7 @@ How it works:
   - pnpm global -> `pnpm add -g <pkg>@latest`
   - Homebrew (`/Cellar/`) -> `brew upgrade <formula>`
   - npx / ephemeral cache -> reports that `npx -y <pkg>@latest` already runs the latest (print-only)
+  - linked git checkout (`pnpm link --global` / `npm link`) -> suggests `git -C <checkout> pull` plus a rebuild, or removing the global link (print-only)
   - unknown -> prints the recommended command without guessing (print-only)
 - **`update --check`** (a/k/a `--dry-run`) reports current vs latest and whether an update is available, installing nothing. When already on the latest version, `update` reports up-to-date and exits 0.
 - **Discoverability is SDK-owned.** Bare `--help` gets a compact built-in command footer when the tool has not registered its own `update`, and `<tool> update --help` shows the command reference.

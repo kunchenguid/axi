@@ -2615,3 +2615,8 @@ community:
         - "Principles 7-8 (internal/cli/setup.go, internal/agentsetup): `setup hooks` is explicit opt-in. Against a temp home it added a SessionStart hook running `wasync-axi --brief` and a SessionEnd hook running `wasync-axi session-end` (timeout 10) to ~/.claude/settings.json, and `setup hooks --remove` left `{}`. Codex and OpenCode are also supported, with --dry-run. The brief prints wasync state and counts, never message text; session-end records command names and counts only. `setup skill` installs skills/wasync-axi/SKILL.md. doctor prints 12 checks across installation, service, pairing, permissions, compatibility and hooks, each with a fix."
         - "Not verified: a running wasync, pairing, live reads through the API, any write, and access approvals (no wasync account was linked); the Linux and Windows archives; the Homebrew formula install."
       exception: "send, reply, react and edit take no --confirm: the guard is the scope and per-chat allowlist a human granted in wasync, which wasync enforces, plus send-once with no retry. Offline reads through `wasync query` are not scoped by any credential; they read the archive as the OS user, and wasync-axi says so when it uses that transport. The old command name whatsapp-axi is kept as an alias binary."
+  - name: aw-axi
+    url: https://github.com/SueBwj/aw-axi
+    author: SueBwj
+    domain: Time tracking
+    description: "Manage local ActivityWatch timers, report task totals and uncategorized time, inspect category rules, and view a read-only terminal dashboard."

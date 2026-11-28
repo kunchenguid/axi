@@ -2615,6 +2615,156 @@ community:
         - "Principles 7-8 (internal/cli/setup.go, internal/agentsetup): `setup hooks` is explicit opt-in. Against a temp home it added a SessionStart hook running `wasync-axi --brief` and a SessionEnd hook running `wasync-axi session-end` (timeout 10) to ~/.claude/settings.json, and `setup hooks --remove` left `{}`. Codex and OpenCode are also supported, with --dry-run. The brief prints wasync state and counts, never message text; session-end records command names and counts only. `setup skill` installs skills/wasync-axi/SKILL.md. doctor prints 12 checks across installation, service, pairing, permissions, compatibility and hooks, each with a fix."
         - "Not verified: a running wasync, pairing, live reads through the API, any write, and access approvals (no wasync account was linked); the Linux and Windows archives; the Homebrew formula install."
       exception: "send, reply, react and edit take no --confirm: the guard is the scope and per-chat allowlist a human granted in wasync, which wasync enforces, plus send-once with no retry. Offline reads through `wasync query` are not scoped by any credential; they read the archive as the OS user, and wasync-axi says so when it uses that transport. The old command name whatsapp-axi is kept as an alias binary."
+  - name: llm-data-axi
+    url: https://github.com/samestrin/llm-data-axi
+    author: samestrin
+    domain: Project files / YAML
+    description: "Inspects and transforms files, projects and YAML configuration with deterministic, network-free commands; across twelve command/repository pairs (24 runs) its default TOON output was 39.3% smaller than the same commands' JSON (183,846 vs 302,691 bytes)."
+    admission:
+      status: exception
+      reviewed_revision: 2e6ea2deda677235dfb5e4829a9ea79c10addbdd
+      reviewed_components:
+        - README.md
+        - docs/axi-audit.md
+        - benchmarks/RESULTS.md
+        - skills/llm-data/SKILL.md
+        - cmd/llm-data/main.go
+        - cmd/llm-data-mcp/main.go
+        - internal/data/commands/root.go
+        - internal/data/commands/moved.go
+        - internal/data/commands/grep.go
+        - internal/data/commands/multigrep.go
+        - internal/data/commands/setup.go
+        - internal/data/mcpserver/handlers.go
+        - internal/noweb_guard_test.go
+      source_observations:
+        - "llm-data --help lists 18 commands (plus cobra's completion and help); yaml has 4 yaml subcommands (get, set, multiget, multiset). --help exits 0 on every one. plan-type, project-components, tier-classifier and diff-smell moved to cadence in v2.0.0; calling one exits 2 with an error naming the cadence command that replaces it."
+        - "TOON is the default output of every command, help[] included: a run with no format flag and a run with --axi print the same bytes. --json prints JSON, --plain prints text, --min shortens --json output and has no effect on TOON; under --plain it shortens text, template included (v2.0.0 answered template --plain --min with minimal JSON; v2.0.1 fixes it), and --plain with --json or --axi is a usage error naming both flags. The MCP server (llm-data-mcp) asks the CLI for TOON unless a call asks for JSON or LLM_DATA_MCP_AXI=false, and a command that exits non-zero is an isError: true result carrying the CLI's own error output. Every value built from tool input reaches the CLI after a --, so a value spelled like an option (a yaml_multiset key --file=h.yaml) is data, not an option, and the template tool passes --literal-vars, so a vars value starting with @ is substituted as given and no file is read."
+        - "docs/axi-audit.md marks principles 1-8 and 10 as met and 9 as partly met within a stated scope. Default rows are 3-4 fields (grep {file,text}, multigrep {content,file,line}, tree {name,path,type}, stats {count,extension,size}); grep cuts lines at 200 bytes and multigrep at 80 with truncated, full_length and a --full next step; grep and multigrep always report a total, 0 included; stats, tree and catfiles report 0 on an empty directory, exit 0; a missing path is an error, exit 1, never zero matches."
+        - "Every error is on stdout in the active format with stderr empty: a TOON error/message document by default, one JSON document under --json, an Error: line under --plain (the bare message under --plain --min). Exit codes are 0 success, 1 error, 2 usage error (unknown flag, bad flag value, wrong argument count, unknown or moved command); an unknown flag's error lists the command's valid flags, and every exit-2 error carries a help list with the missing flag, the usage line and the command's --help. An unknown enum value or out-of-range number (count --mode bogus, tree --depth -1) and a yaml set key that names no value (\"\", a..b) and a template --var with no = or no key are usage errors. A partial result is an error: template --strict with an undefined variable, catfiles and grep with an unreadable entry, and multigrep --output-dir with a file it cannot write each exit 1 and list what failed. yaml set of the value a key already holds leaves the file byte-identical; a yaml write keeps the file's mode, writes a symlink's target and leaves no lock file on Linux and macOS (on Windows its <file>.lock stays), and yaml get, multiget and --dry-run write nothing. A FIFO or device is never read: named outright it is an error, found in a directory it is skipped and listed. template -o and multigrep --output-dir write only to a new path or a regular file: a FIFO, device, directory or symlink at the target is refused and nothing is written. A yaml write that adds a key keeps the file's comments and key order. Nothing prompts, and yaml's stdin reader refuses a terminal."
+        - "A bare llm-data run prints the binary path (home directory as ~), a one-sentence description, the repository root, project type and git change count, and two help[] next steps, exit 0; outside a repository it says so instead. Each git call has its own 2-second budget."
+        - "llm-data setup --target claude,codex,opencode registers a SessionStart hook in .claude/settings.json plus an Agent Skill, a SessionStart hook in .codex/hooks.json with [features] hooks = true in .codex/config.toml, and a plugin at .opencode/plugins/llm-data.js that adds the home view to each session. The default target is claude; --dry-run writes nothing; a second run changes no bytes; it writes only inside the project and never prompts. The committed skills/llm-data/SKILL.md is byte-identical to the one setup writes."
+        - "tree, stats, multigrep, grep, catfiles, highest and git-context print paths relative to the working directory by default; --absolute restores absolute paths and any other command rejects it."
+        - "Nothing in the tool makes a network call: internal/noweb_guard_test.go fails the build if a non-test file under internal/, pkg/ or cmd/ imports net, net/http or goquery."
+        - "benchmarks/RESULTS.md: six read-only commands, each run once with --json and once with --axi, on this repository and on spf13/cobra@v1.8.0. Twelve command/repository pairs, 24 runs, measured with llm-data 2.0.2 at the llm-data-axi commit RESULTS.md names, from a clean checkout. Total 302,691 JSON bytes (~75,672 tokens) against 183,846 TOON bytes (~45,961 tokens), 39.3% saved. Tokens are bytes/4, not a tokenizer count."
+      exception: "Two stated remainders, as in docs/axi-audit.md: (1) there is no session-end lifecycle-capture hook, because llm-data keeps no session state (no transcript, no record of files touched) and has nothing of its own to capture; the session-start half ships for Claude Code, Codex and OpenCode. (2) help[] next steps are scoped, not universal: the home view, an empty grep or multigrep, a truncated search line, a catfiles run cut at --max-size and every exit-2 error carry them, other commands do not."
+  - name: llm-extract-axi
+    url: https://github.com/samestrin/llm-extract-axi
+    author: samestrin
+    domain: Web data / Extraction
+    description: "Fetches a web page or file and returns only the ranked links or the passages relevant to a given context; on a 15 KB documentation page, `extract-links --axi` printed 3.0x fewer tokens than the page itself (1,432 vs 4,240, offline benchmark, no model call)."
+    admission:
+      status: exception
+      reviewed_revision: 196d6787640cf1da67d1639bec31b21fe0c2f3c8
+      reviewed_components:
+        - README.md
+        - docs/axi-audit.md
+        - docs/output.md
+        - benchmarks/README.md
+        - cmd/llm-extract/main.go
+        - pkg/output/axi.go
+        - pkg/output/exit.go
+        - internal/extract/commands/root.go
+        - internal/extract/commands/fetch.go
+        - internal/extract/commands/extract_links.go
+        - internal/extract/commands/extract_relevant.go
+        - internal/extract/commands/setup.go
+        - internal/extract/commands/setup_codex.go
+        - internal/extract/commands/setup_opencode.go
+        - internal/extract/commands/completion.go
+      source_observations:
+        - "docs/axi-audit.md marks principles 2, 4, 5, 8 and 10 as met: extract-links rows default to 4 fields (href, text, score, section) with --fields to pick others; extract-links and extract-relevant always report a total, and an extract-relevant directory run reads only regular text files inside --path, skips dotfiles and credential names, and counts what it skipped by reason; an empty success carries total 0 and a message (no links found, no relevant content found) while a failure carries an error (a failed extract-links --context ranking keeps the unranked links and their total beside it); a bare run prints the binary path, the network/model reach table and the live configuration with no network or model call; --help exits 0 on the root and all five subcommands, and fetch, extract-links, extract-relevant and setup --help each include an Examples section of runnable invocations."
+        - "TOON is the default output on the home view, fetch, extract-links, extract-relevant and setup, help[] next steps included (fetch carries help[] when its body is cut or not text), on success, on an empty result and on an error; a failed fetch's help[] names the fix for that failure (check the URL on a 4xx, --retries on a 5xx, a browser for a challenge page, --max-bytes over the cap) before the usage line. --plain prints human-readable text (--axi=false is the same; --axi stays an accepted no-op alias), --json carries no help[], and --plain with --json is a usage error. A suggested command carries none of a page-controlled link, URL or path on any platform; it names the result field that holds it (--path <links[0].href>)."
+        - "Every error is on stdout in the active format with stderr empty: a TOON error/message/help[] document by default, one {error, message} JSON document under --json, an Error: line under --plain (an error carried inside a result, such as a failed --context ranking beside its links, prints as that result's ERROR: line); a failed fetch included. A mid-run failure keeps the partial result and still exits non-zero: unranked heuristic links after a failed --context ranking, and '<n> of <total> files failed' for a partial extract-relevant directory run. A failed model call prints no secret from OPENAI_BASE_URL: its password and key-, token-, secret- or signature-named query values are REDACTED. With extract-relevant -o FILE, stdout is still one structured document: the result without the passages (they are in the file), or the error document on a failed TOON run. On a usage error the format is read from the command line the way pflag reads it: --plain (or --axi=false) over --json over the TOON default; the last occurrence of each flag sets it, and --axi, a no-op alias, never undoes an earlier --json."
+        - "A malformed invocation (unknown command or unknown flag) exits 2 with a structured error in the active format, before any network or model call; this is the go-axi usage-error convention (goaxi.ExitUsage, pkg/output/exit.go), not an exception."
+        - "llm-extract setup registers Claude Code (a SessionStart hook in .claude/settings.json and an Agent Skill in .claude/skills/llm-extract/SKILL.md), Codex (a SessionStart hook in .codex/hooks.json) and OpenCode (a V2 plugin in .opencode/plugins/llm-extract.js that adds the home view to each session) by default; --target picks a subset. It keeps other settings, is idempotent, repairs the hooks after the binary moves, has --dry-run and writes nothing outside the project directory: a --dir that is the home directory or does not exist is refused (exit 2), and so is a .claude, .codex, .opencode or settings file that is a symlink leading outside --dir, before anything is written. Its result is a TOON document (written[], unchanged[], dry_run, help[]). Nothing prompts."
+        - "fetch prints a TOON envelope by default: url, final_url, status, tier, format, content_type, bytes (the whole-body size), truncated and body (the first 4096 bytes, cut on a character boundary); when cut, help[] names --full and --output <file>. --head N sets the cut, --full returns the whole body, --plain prints body bytes alone (a cut puts a one-line size hint on stderr), --json prints the same capped document as JSON, --output FILE saves the whole raw body and leaves body out (a path that cannot be written exits 2 before the request), and --fields selects envelope fields (an unknown field exits 2; --fields with --plain exits 2). A non-text or non-UTF-8 body gets an empty body, truncated true and help[] to --output. The download cap (--max-bytes / FETCH_MAX_BYTES, default 16 MiB) is unchanged: a larger body is an error with no partial output; the same cap, set by FETCH_MAX_BYTES (--max-bytes is fetch's flag only), covers extract-links and the extract-relevant page fetch."
+        - "benchmarks/README.md: on one committed 15,411-byte documentation page served on loopback, extract-links --axi in heuristic mode printed 1432 tokens against 4240 for the raw page (3.0x). The counts are a lower bound from cl100k_base's split pattern; tiktoken gave 2.97 on the same output with both cl100k_base and o200k_base. Every count is committed in benchmarks/results-tokens.json, and a test fails when a run of the counter, benchmarks/README.md or this entry disagrees with it. One page is one data point, not an average."
+        - "The model-call paths of extract-links --context and extract-relevant were not probed end to end (no LLM endpoint on the build host); their failure and output shapes are covered by fake-endpoint tests."
+      exception: "Two stated exceptions, named by principle as in docs/axi-audit.md. Principle 3, exception (2) there: the model commands cut their model input at a fixed limit and say so in a truncated note — extract-relevant (each prompt cut at 30,000 bytes) and extract-links --context (the first 100 links, in a prompt cut at 25,000 bytes). It is an input limit on what the model reads, not output truncation, and the model commands have no --full; fetch's own output cut has a bytes size hint and --full. Principle 7: no session-end hook; the tool keeps no session state. Also under principle 7: the Agent Skill is a hand-written constant that CI checks against the committed SKILL.md rather than a file generated from the home view (which is live state), and setup writes no Codex [features].hooks = true, because Codex runs hooks by default."
+  - name: llm-filesystem-axi
+    url: https://github.com/samestrin/llm-filesystem-axi
+    author: samestrin
+    domain: Filesystem
+    description: "Read, write, edit, search and archive local files from one static Go binary, with TOON output, capped reads that name the next offset, and `--confirm` on destructive operations. Includes an MCP wrapper."
+    admission:
+      status: exception
+      reviewed_revision: 299cc3a11fefb8588c8a8e50ceef2e269345a9ce
+      reviewed_components:
+        - cmd/llm-filesystem/main.go
+        - cmd/llm-filesystem-mcp/main.go
+        - internal/filesystem/commands/root.go
+        - internal/filesystem/commands/output.go
+        - internal/filesystem/commands/home.go
+        - internal/filesystem/commands/read.go
+        - internal/filesystem/commands/search.go
+        - internal/filesystem/commands/fileops.go
+        - internal/filesystem/commands/write.go
+        - internal/filesystem/commands/setup.go
+        - internal/filesystem/core/read.go
+        - internal/filesystem/core/search.go
+        - internal/filesystem/core/fileops.go
+        - internal/filesystem/core/write.go
+        - internal/filesystem/core/utils.go
+        - internal/filesystem/mcpserver/server.go
+        - internal/filesystem/mcpserver/tools.go
+        - internal/filesystem/mcpserver/handlers.go
+        - internal/filesystem/mcpserver/binary.go
+        - integrations/claude-code/skill/SKILL.md
+        - integrations/claude-code/skill/embed.go
+      source_observations:
+        - "cmd/llm-filesystem/main.go:6 calls commands.Execute; internal/filesystem/commands/root.go:170-171 defaults --format to toon, and root.go:193-197 declares -v, -V (shorthand only) and --version on the root command, which print the bare version and exit 0 (observed: one line, the version `make build` stamps from `git describe`, and nothing else)."
+        - "root.go:582-585 renders cobra's parse failures (unknown command, unknown flag, missing required flag) through emitDiagnostic with exit 2, and OutputError (root.go:490-501) renders tool failures the same way with exit 1, or exit 2 when core refused the request before attempting it. emitDiagnostic (root.go:459-483) writes the whole diagnostic to stdout in every format (root.go:481), and execute reads --format from the arguments itself (root.go:584), so flag order does not matter. Observed: `read-file --bogus` exits 2 and `read-file --path /nope` exits 1, each with 0 bytes on stderr, and with --format text before or after the other flags both still write their diagnostic to stdout and 0 bytes to stderr."
+        - "internal/filesystem/commands/home.go:121 runHome is the no-argument view: about, bin, cwd and home (abbreviated to ~ by tildePath, home.go:45 and home.go:73-92), a listing of the working directory with total, and help[] next steps; it exits 0."
+        - "internal/filesystem/core/read.go:15 caps a read at 70000 chars by default, and internal/filesystem/commands/read.go:70-81 adds a `--start-offset` continue step when the read is truncated. Observed: a 99001-byte file reads as size: 70000, total_size: 99001, truncated: true, next_offset: 70000, with help[] naming `--start-offset 70000`."
+        - "internal/filesystem/commands/fileops.go:188-190 makes --confirm required for delete-file, and fileops.go:160-165 refuses --confirm=false with exit 2 and a step naming the confirmed command. move-file and copy-file refuse to replace an existing destination without --confirm (refuseUnconfirmedOverwrite, fileops.go:32-47, called at fileops.go:81 and fileops.go:117), and batch-file-operations refuses a delete, or a move or copy onto an existing path, without it (fileops.go:257-280). write-file (write.go:24) replaces an existing file without --confirm (core/write.go:66 opens it with O_TRUNC). Even with --confirm, delete-file refuses the filesystem root, HOME, the working directory and any directory holding one of them, with exit 2 (CheckDeletable, internal/filesystem/core/utils.go:212-244). Observed: delete-file, move-file and copy-file without --confirm each exit 2 and leave the files as they were; `delete-file --path . --recursive --confirm` exits 2 and the working directory is still there; write-file onto an existing file exits 0 and the file holds the new content."
+        - "internal/filesystem/core/search.go:108-111 and core/search.go:277-289 keep counting past --max-results (default 1000, commands/search.go:78 and commands/search.go:171), so total and total_matches are exact; core/search.go:136-139 and core/search.go:307-310 add shown and truncated: true when the cap cut the list, and commands/search.go:182-185 adds a help[] line naming the --max-results that lists them all. A search with no match prints matches[0]: (JSON []) beside a total of 0 (core/search.go:78-79 and core/search.go:241-242). Observed: a file with 1500 matching lines gives total_matches: 1500, shown: 1000, truncated: true and `Showing 1000 of 1500: raise --max-results (e.g. --max-results 1500)`, exit 0."
+        - "internal/filesystem/commands/setup.go:104 `setup` registers with Claude Code, Codex and OpenCode in the working directory: it merges a SessionStart hook into .claude/settings.json and into .codex/hooks.json (setup.go:239 and setup.go:245), writes the skill to .claude/skills/llm-filesystem/SKILL.md (setup.go:251; the content is integrations/claude-code/skill/SKILL.md, embedded by integrations/claude-code/skill/embed.go:13-14), and writes an OpenCode plugin to .opencode/plugins/llm-filesystem.js (setup.go:263). The hook runs the bare `llm-filesystem` only when that name on PATH is this binary, and the absolute path otherwise (setup.go:296-312). It refuses to run in the home directory (setup.go:202-206). Observed: in an empty project it writes those four files and exits 0; in the home directory it exits 1 and writes nothing. No session-end hook is set up."
+        - "cmd/llm-filesystem-mcp/main.go:23-50 starts the MCP stdio server llm-filesystem-mcp. internal/filesystem/mcpserver/server.go:20-49 registers one tool per CLI command, named with the llm_filesystem_ prefix (mcpserver/tools.go:25) and skipping completion, help and setup (mcpserver/tools.go:31); each call runs the CLI binary (mcpserver/handlers.go:65-101), found through LLM_FILESYSTEM_BINARY, then PATH, then beside the server (mcpserver/binary.go:27-67). A non-zero exit is an MCP error result carrying the CLI's own output and exit_code (mcpserver/handlers.go:96-97 and 115-116). Observed: tools/list returns 28 tools; llm_filesystem_read_file on a missing path returns isError: true with the CLI's TOON error and `exit_code: 1`."
+      exception: "Principle 7: `setup` registers Claude Code (a SessionStart hook in the project's .claude/settings.json plus the skill), Codex (a SessionStart hook in the project's .codex/hooks.json) and OpenCode (a plugin in the project's .opencode/plugins/ that adds the home view to the system context); there is no session-end capture, because this CLI keeps no session history. Principle 6: write-file replaces an existing destination without --confirm; delete-file requires it, and so do move-file and copy-file when the destination already exists, compress-files when --output already exists, sync-directories when it would replace a file in the destination, and any batch-file-operations entry that destroys something: a delete, or a move or copy onto a path that already exists."
+  - name: llm-semantic-axi
+    url: https://github.com/samestrin/llm-semantic-axi
+    author: samestrin
+    domain: Code navigation / Semantic search
+    description: "Semantic code search over a local embedding index, with `callers` and `refs` call-edge lookup for Go, JavaScript, TypeScript, Python and Rust."
+    admission:
+      status: exception
+      reviewed_revision: f021e852e6aefa06cd129eab26f3460a6935e415
+      reviewed_components:
+        - README.md
+        - skills/llm-semantic/SKILL.md
+        - docs/axi-conformance.md
+        - benchmarks/results-tokens.md
+        - cmd/llm-semantic/main.go
+        - pkg/output/axi.go
+        - pkg/output/exit.go
+        - pkg/output/formatter.go
+        - internal/semantic/commands/axi.go
+        - internal/semantic/commands/root.go
+        - internal/semantic/commands/index.go
+        - internal/semantic/commands/index_update.go
+        - internal/semantic/commands/search.go
+        - internal/semantic/commands/refs.go
+        - internal/semantic/commands/setup.go
+        - internal/semantic/commands/collection.go
+        - internal/semantic/commands/memory.go
+        - internal/semantic/mcpserver/handlers.go
+        - internal/semantic/refs_go.go
+        - internal/semantic/treesitter/refs_javascript.go
+        - internal/semantic/treesitter/chunker_python.go
+        - internal/semantic/treesitter/chunker_rust.go
+      source_observations:
+        - "TOON is the default output: every command prints TOON unless --json or --plain replaces it (internal/semantic/commands/axi.go, resolveOutputMode). --axi is still accepted as an alias for TOON; contradictory format flags, such as --plain --json or --axi with --json or --plain, exit 2. TOON is encoded through go-axi (pkg/output/axi.go), and the MCP server runs the CLI in TOON, passing each tool's path, query, symbol or id after `--` and refusing one that starts with `-`, so tool input cannot become a CLI option (internal/semantic/mcpserver/handlers.go)."
+        - "A default search row carries four fields (file as path:line, name, score, content), and content over 200 characters is cut with a note of how many characters were left out and --full for the rest (internal/semantic/commands/search.go, axiSearchRows and axiCut). Default callers rows carry three fields (file as path:line, name, ref) and refs rows four (file as path:line, ref, resolved, type, external references omitting file), with --full restoring every field (internal/semantic/commands/refs.go, writeCallersJSON and writeRefsJSON). memory list rows carry id, question, status and the cut answer (as does the answer memory store echoes back), and memory stats rows id, question, retrieval_count, avg_score, with --full restoring every field (internal/semantic/commands/memory.go, axiMemoryListRows and axiMemoryStatsRows)."
+        - "A default search result list states its total, and an empty answer carries status index_empty when the index has no chunks or no_match otherwise (search.go, axiResultList and markZeroResults). callers and refs state their total in the default TOON output and say 'not indexed for edges' instead of returning a bare empty list (internal/semantic/commands/refs.go). memory list and memory stats state a total and carry status store_empty with a message over an empty store, no_match when a filter excludes every entry or nothing has been retrieved yet (internal/semantic/commands/memory.go, markMemoryListZeroResults and markMemoryStatsZeroResults)."
+        - "Errors go to stdout in the active format: a TOON or JSON object with error: true, or `Error: ...` under --plain (pkg/output/formatter.go, PrintError); stderr carries only diagnostics. Malformed invocations exit 2: an unknown flag or command names it and lists the valid choices; a missing or extra argument, a missing required flag or a bad flag value names it and shows the right form; contradictory format flags name the conflicting flags; other failures exit 1 (pkg/output/exit.go). index and index-update exit 1 when any file failed, printing the counts and the errors list in one document with error: true (internal/semantic/commands/index.go, incompleteError). Output of `llm-semantic --bogus` and `llm-semantic index-status 2>/dev/null` in an empty directory shows both."
+        - "No command prompts: collection delete without --force and memory stats --prune without --yes refuse with an error naming the flag and exit 1 (internal/semantic/commands/collection.go, memory.go)."
+        - "setup registers a SessionStart hook with Claude Code (.claude/settings.json) and Codex (.codex/hooks.json, with [features] hooks = true in .codex/config.toml), and an OpenCode plugin (.opencode/plugins/llm-semantic.ts) on session.created; each runs `llm-semantic index-status || true`, so a session starts with the directory's index status. It also writes the Agent Skill to .claude/skills/llm-semantic/. --target (repeatable) narrows to the named agents; only files under the current directory are written: a .claude, .codex or .opencode path that is a symlink out of it is refused (exit 1), and so is the home directory (exit 2) (internal/semantic/commands/setup.go; `llm-semantic setup --dry-run` lists the five files)."
+        - "A bare `llm-semantic` run shows live data: the executable path and the index status of the current directory; unindexed, it prints status not_indexed with `llm-semantic index .` as the next step and exits 0 (internal/semantic/commands/root.go)."
+        - "--json keeps its pre-AXI schema so existing scripts keep working: a bare result array with full, untruncated fields and no total, status or help (search.go, outputJSON); callers and refs keep their object with count and full fields (refs.go). It is printed only when --json is passed."
+        - "Only the Go, JavaScript, TypeScript, Python and Rust chunkers implement ExtractRefs (internal/semantic/refs_go.go, treesitter/refs_javascript.go, treesitter/chunker_python.go, treesitter/chunker_rust.go), so callers and refs have call edges for those five languages only."
+        - "benchmarks/results-tokens.md, re-checked by `make bench-tokens`: over 10 searches of this repository, TOON printed 11,241 cl100k tokens and --json 43,477 (25.9%). The embeddings were an offline stand-in, so only the comparison between renderings is meaningful."
+      exception: "--json is an opt-in compatibility mode that keeps its pre-AXI schema (no truncation, total, status or help) so existing scripts keep working; principles 2-5 are met in the default TOON output but not under --json. callers and refs have call edges for Go, JavaScript, TypeScript, Python and Rust only; in other languages they report 'not indexed for edges' rather than an empty answer. setup installs a session-start hook only and no session-end hook, so principle 7's lifecycle capture is not done: the tool keeps no session state to capture."
   - name: aw-axi
     url: https://github.com/SueBwj/aw-axi
     author: SueBwj

@@ -79,13 +79,8 @@ How it works:
 
 - **Identity is auto-derived.** The package name and version are read from the nearest `package.json` (walking up from the realpath-resolved entrypoint). `version` from `runAxiCli()` is preferred when present. No wiring needed.
 - **The latest version comes from the registry.** It queries `https://registry.npmjs.org/<pkg>/latest`, falling back to `npm view <pkg> version`, and compares with proper semver. Network, registry, and not-found failures surface as structured `AxiError`s.
-- **The upgrade matches the install method**, detected from the entrypoint path and environment:
-  - npm global -> `npm install -g <pkg>@latest`
-  - pnpm global -> `pnpm add -g <pkg>@latest`
-  - Homebrew (`/Cellar/`) -> `brew upgrade <formula>`
-  - npx / ephemeral cache -> reports that `npx -y <pkg>@latest` already runs the latest (print-only)
-  - unknown -> prints the recommended command without guessing (print-only)
-- **`update --check`** (a/k/a `--dry-run`) reports current vs latest and whether an update is available, installing nothing. When already on the latest version, `update` reports up-to-date and exits 0.
+- **The upgrade matches whoever manages the installation**, detected from the realpath-resolved entrypoint and environment. Only the owning manager is ever run; Nix-store installs are print-only and direct users to update their Nix configuration or flake inputs and rebuild. Project-local installs are also print-only: `help` gives an add command only when the package manifest declares the dependency. See [`update.ts`](src/update.ts) for the manager-to-action mapping. Manual plans name the manager and next step in `manager`, `reason`, and `help`.
+- **`update --check`** (a/k/a `--dry-run`) reports current vs latest, whether an update is available, and the detected `manager` and `path`, installing nothing. Its `help` is the manual step when `update` would not install. When already on the latest version, `update` reports up-to-date and exits 0.
 - **Discoverability is SDK-owned.** Bare `--help` gets a compact built-in command footer when the tool has not registered its own `update`, and `<tool> update --help` shows the command reference.
 
 `update` is a **reserved command name**. A tool that registers its own `update` in `commands` keeps full control - the built-in never shadows it. Pass `packageName` to `runAxiCli()` only as an escape hatch when the package name cannot be derived from `package.json`:
@@ -97,6 +92,32 @@ await runAxiCli({
   packageName: "gh-axi", // optional override; normally auto-derived
 });
 ```
+
+## Credentials
+
+`resolveSecret()` gives every tool the same three ways to supply a secret, so users can keep tokens in a file or a secret manager instead of a plain environment variable:
+
+| Variable       | Meaning                                                                                                 |
+| -------------- | ------------------------------------------------------------------------------------------------------- |
+| `NAME`         | The secret itself                                                                                       |
+| `NAME_FILE`    | Path to a file holding the secret; one trailing newline is stripped                                     |
+| `NAME_COMMAND` | Command run through the platform shell that prints the secret, such as `op read ...` or `pass show ...` |
+
+`NAME_FILE` is read and `NAME_COMMAND` is executed with the caller's privileges
+and environment—the same trust level as setting `NAME` directly. Resolve only
+the variable names your tool documents.
+
+```ts
+import { resolveSecret } from "axi-sdk-js";
+
+const token = await resolveSecret({ name: "DEMO_AXI_TOKEN" });
+// -> { value, source: "env" | "file" | "command", variable: "DEMO_AXI_TOKEN_FILE" } | undefined
+```
+
+- Empty variables count as unset. Setting more than one throws `CredentialConflictError` (`CREDENTIAL_CONFLICT`), which names the variables.
+- Every other failure throws `CredentialSourceError` (`CREDENTIAL_ERROR`) with a `reason`: `env-empty`, `file-missing`, `file-unreadable`, `file-empty`, `command-failed`, `command-timeout`, `command-output-too-large`, or `command-empty`.
+- The command runs with stdin closed, a 10 second default timeout (`timeoutMs`), and a 1 MiB stdout limit; its process group is killed on timeout or when output exceeds the limit. Its stderr is discarded and errors report only the variable name and failure, so neither the secret nor the command text reaches output.
+- `variable` is safe to print, for example as a `source:` field in a setup status view. `readFile` and `exec` are test seams.
 
 ## Reference
 
@@ -114,20 +135,21 @@ full command graph.
 
 Most AXI authors should not need these directly.
 
-| API                                      | Description                                                                                     |
-| ---------------------------------------- | ----------------------------------------------------------------------------------------------- |
-| `AxiError`                               | Throw structured AXI errors from command handlers                                               |
-| `RESERVED_COMMANDS`                      | SDK-owned built-in command names, currently `update`                                            |
-| `runUpdate()`                            | The built-in self-update flow (registry lookup, install-method detection, upgrade)              |
-| `fetchLatestVersion()`                   | Resolve the latest npm version through the registry endpoint with an `npm view` fallback        |
-| `detectInstallMethod()`, `planUpgrade()` | Inspect an entrypoint path and map it to the upgrade command the built-in updater would use     |
-| `compareSemver()`, `isUpdateAvailable()` | Semver helpers used by the updater, including prerelease ordering                               |
-| `installSessionStartHooks()`             | Install or repair Claude Code hooks, Codex hooks, and OpenCode ambient context plugins directly |
-| `sessionStartHookStatus()`               | Report install status for Claude Code, Codex, and OpenCode at a given scope, without writing    |
-| `uninstallSessionStartHooks()`           | Remove marker-matched managed hooks/plugin at a given scope, without touching unrelated entries |
-| `resolvePortableHookCommand()`           | Resolve a hook command to a safe binary name or absolute path                                   |
-| `PortableHookCommandContext`             | Context for resolving portable hook commands                                                    |
-| `shouldInstallHooksForNodeAxiExecPath()` | Check whether an executable path is safe for hook installation                                  |
+| API                                      | Description                                                                                             |
+| ---------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| `AxiError`                               | Throw structured AXI errors from command handlers                                                       |
+| `RESERVED_COMMANDS`                      | SDK-owned built-in command names, currently `update`                                                    |
+| `runUpdate()`                            | The built-in self-update flow (registry lookup, install-method detection, upgrade)                      |
+| `fetchLatestVersion()`                   | Resolve the latest npm version through the registry endpoint with an `npm view` fallback                |
+| `detectInstallMethod()`, `planUpgrade()` | Inspect an entrypoint path and map it to the manager and upgrade command the built-in updater would use |
+| `resolveSecret()`                        | Resolve a secret from `NAME`, `NAME_FILE`, or `NAME_COMMAND`                                            |
+| `compareSemver()`, `isUpdateAvailable()` | Semver helpers used by the updater, including prerelease ordering                                       |
+| `installSessionStartHooks()`             | Install or repair Claude Code hooks, Codex hooks, and OpenCode ambient context plugins directly         |
+| `sessionStartHookStatus()`               | Report install status for Claude Code, Codex, and OpenCode at a given scope, without writing            |
+| `uninstallSessionStartHooks()`           | Remove marker-matched managed hooks/plugin at a given scope, without touching unrelated entries         |
+| `resolvePortableHookCommand()`           | Resolve a hook command to a safe binary name or absolute path                                           |
+| `PortableHookCommandContext`             | Context for resolving portable hook commands                                                            |
+| `shouldInstallHooksForNodeAxiExecPath()` | Check whether an executable path is safe for hook installation                                          |
 
 ### Session Hook Setup
 

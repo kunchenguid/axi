@@ -2765,3 +2765,29 @@ community:
         - "Only the Go, JavaScript, TypeScript, Python and Rust chunkers implement ExtractRefs (internal/semantic/refs_go.go, treesitter/refs_javascript.go, treesitter/chunker_python.go, treesitter/chunker_rust.go), so callers and refs have call edges for those five languages only."
         - "benchmarks/results-tokens.md, re-checked by `make bench-tokens`: over 10 searches of this repository, TOON printed 11,241 cl100k tokens and --json 43,477 (25.9%). The embeddings were an offline stand-in, so only the comparison between renderings is meaningful."
       exception: "--json is an opt-in compatibility mode that keeps its pre-AXI schema (no truncation, total, status or help) so existing scripts keep working; principles 2-5 are met in the default TOON output but not under --json. callers and refs have call edges for Go, JavaScript, TypeScript, Python and Rust only; in other languages they report 'not indexed for edges' rather than an empty answer. setup installs a session-start hook only and no session-end hook, so principle 7's lifecycle capture is not done: the tool keeps no session state to capture."
+  - name: aw-axi
+    url: https://github.com/SueBwj/aw-axi
+    author: SueBwj
+    domain: Time tracking
+    description: "Manage local ActivityWatch timers, report task totals and uncategorized time, inspect category rules, and view a read-only terminal dashboard."
+    admission:
+      status: exception
+      reviewed_revision: 22d810393854f48644df8589cc549a59ca3249a5
+      reviewed_components:
+        - package.json
+        - bin/aw-axi.js
+        - src/cli.js
+        - src/args.js
+        - src/options.js
+        - src/client.js
+        - src/lock.js
+        - src/timer.js
+        - src/totals.js
+        - src/version.js
+      source_observations:
+        - "At revision 22d810393854f48644df8589cc549a59ca3249a5 (package.json activitywatch-axi 0.1.0, private, bin aw-axi), cloned and run on Node 24 after npm ci, with a temp HOME. There is no published package; the pinned source is the artifact."
+        - "src/cli.js uses axi-sdk-js runAxiCli with TOON output on stdout. No arguments printed bin, description, server not-configured, running_count unknown and next-step help, exit 0. -v printed 0.1.0. An unknown command and an unknown flag exited 2 with VALIDATION_ERROR (the flag error listed the valid flags); an unreachable server exited 1 with DISCONNECTED and said nothing was queued. Per-command --help prints usage, flags and defaults (src/cli.js HELP)."
+        - "src/options.js and src/cli.js: every server command requires --base-url (or AWAXI_BASE_URL); there is no default port, so no command reaches a server by surprise. Writes (timer start/stop/switch, rules apply, views add-stopwatch) additionally require --state or --backup, take a private lock (src/lock.js, mode 0700 state dir) and do not resend a write whose response was lost."
+        - "Against a mock ActivityWatch server (empty bucket list), timer status printed running: 0 running timers, totals --label printed explicit zero totals, the range and automatic_activity: excluded, and the bare home query issued only GET /api/0/buckets/. No hooks, telemetry or background process: src/cli.js states the build does not self-update or install session hooks, and the update command exits UNSUPPORTED."
+        - "Not verified: a real ActivityWatch server, any write path beyond the code read, rules.js and native-rules.js edits, and the --tui dashboard."
+      exception: "Principle 7: there is no setup hooks command or session-start integration, and the tool is not published to a package registry; it is run from the pinned clone with node bin/aw-axi.js."

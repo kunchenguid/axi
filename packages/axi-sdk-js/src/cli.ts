@@ -1,5 +1,11 @@
-import { basename } from "node:path";
+import { resolveBinName } from "./bin.js";
 import { AxiError, exitCodeForError } from "./errors.js";
+import {
+  checkFlags,
+  type AxiCheckedArgs,
+  type AxiFlags,
+  type AxiParsedArgs,
+} from "./flags.js";
 import {
   homeHeaderOutput,
   renderError,
@@ -19,14 +25,51 @@ type MaybePromise<T> = T | Promise<T>;
 
 const stdoutWithErrorHandler = new WeakSet<object>();
 
+/**
+ * A command handler. `parsed` is only present when the command declares
+ * `flags` (see `AxiCliCommandSpec`); handlers may ignore it.
+ */
 export type AxiCliCommand<TContext> = (
   args: string[],
   context: TContext | undefined,
+  parsed?: AxiParsedArgs,
 ) => MaybePromise<AxiRenderable>;
+
+/**
+ * The handler of a declared command: `parsed` is always present. A plain
+ * `(args, context) => ...` handler is assignable here too.
+ */
+export type AxiCliDeclaredCommand<TContext> = (
+  args: string[],
+  context: TContext | undefined,
+  parsed: AxiParsedArgs,
+) => MaybePromise<AxiRenderable>;
+
+/**
+ * A command that declares its flags. Before `resolveContext` and the handler
+ * run, `args` are checked against `flags` (plus `globalFlags`) and rewritten
+ * into canonical `--flag value` form; an unknown or malformed flag is a
+ * `VALIDATION_ERROR` (exit 2). `flags: {}` means the command takes no flags.
+ */
+export interface AxiCliCommandSpec<TContext> {
+  flags: AxiFlags;
+  run: AxiCliDeclaredCommand<TContext>;
+}
+
+/**
+ * Either a bare handler (unchecked, receives argv exactly as given) or a
+ * declared command. Behaviour only changes when a command declares `flags`.
+ */
+export type AxiCliCommandEntry<TContext> =
+  | AxiCliCommand<TContext>
+  | AxiCliCommandSpec<TContext>;
 
 export interface AxiResolveContextInput {
   command: string | undefined;
+  /** Normalized when the command declares `flags`; otherwise argv as given. */
   args: string[];
+  /** Present only when the command declares `flags`. */
+  parsed?: AxiParsedArgs;
 }
 
 export interface AxiCliOptions<TContext = undefined> {
@@ -39,8 +82,14 @@ export interface AxiCliOptions<TContext = undefined> {
   packageName?: string;
   argv?: string[];
   topLevelHelp: string;
-  commands: Record<string, AxiCliCommand<TContext>>;
+  commands: Record<string, AxiCliCommandEntry<TContext>>;
   home: AxiCliCommand<TContext>;
+  /**
+   * Flags merged into every command that declares `flags` (e.g. an account
+   * selector). A command's own declaration wins on a name clash. Has no
+   * effect on bare-function commands.
+   */
+  globalFlags?: AxiFlags;
   getCommandHelp?: (command: string) => string | null | undefined;
   initialize?: () => MaybePromise<void>;
   resolveContext?: (input: AxiResolveContextInput) => MaybePromise<TContext>;
@@ -151,8 +200,8 @@ export async function runAxiCli<TContext = undefined>(
     }
   }
 
-  const handler = options.commands[command];
-  if (!handler) {
+  const entry = options.commands[command];
+  if (!entry) {
     stdout.write(
       (options.renderUnknownCommand ?? defaultUnknownCommand)(command),
     );
@@ -160,7 +209,32 @@ export async function runAxiCli<TContext = undefined>(
     return;
   }
 
-  await runHandler(handler, args, { command, args }, stdout, options, false);
+  if (typeof entry === "function") {
+    await runHandler(entry, args, { command, args }, stdout, options, false);
+    return;
+  }
+
+  // A declared command is checked before any context resolution or work, so
+  // an unknown flag never reaches a dependency call.
+  let checked: AxiCheckedArgs;
+  try {
+    checked = checkFlags(args, entry.flags, command, {
+      globalFlags: options.globalFlags,
+    });
+  } catch (error) {
+    writeFormattedError(error, stdout, options);
+    return;
+  }
+
+  await runHandler(
+    entry.run,
+    checked.args,
+    { command, args: checked.args, parsed: checked.parsed },
+    stdout,
+    options,
+    false,
+    checked.parsed,
+  );
 }
 
 function handleStdoutErrors(stdout: {
@@ -194,19 +268,23 @@ function handleStdoutErrors(stdout: {
 }
 
 async function runHandler<TContext>(
-  handler: AxiCliCommand<TContext>,
+  handler: AxiCliCommand<TContext> | AxiCliDeclaredCommand<TContext>,
   args: string[],
   contextInput: AxiResolveContextInput,
   stdout: { write: (chunk: string) => unknown },
   options: AxiCliOptions<TContext>,
   isHomeView: boolean,
+  parsed?: AxiParsedArgs,
 ): Promise<void> {
   try {
     // Context resolution stays inside this boundary so a failing `resolveContext`
     // reports through the same structured-error contract as the handler itself,
     // and still only runs for views that actually need a context.
     const context = await options.resolveContext?.(contextInput);
-    const output = await handler(args, context);
+    // A bare function is called with exactly the two arguments it always got.
+    const output = parsed
+      ? await handler(args, context, parsed)
+      : await (handler as AxiCliCommand<TContext>)(args, context);
     stdout.write(`${renderCommandOutput(output, options, isHomeView)}\n`);
   } catch (error) {
     writeFormattedError(error, stdout, options);
@@ -246,10 +324,6 @@ function writeFormattedError<TContext>(
   process.exitCode = formatted.exitCode;
 }
 
-function resolveBinName(): string {
-  return basename(process.argv[1] ?? "tool") || "tool";
-}
-
 function builtinCommandsHelp(): string {
   const bin = resolveBinName();
   return `${renderOutput({
@@ -273,7 +347,7 @@ function builtinUpdateHelp(): string {
 }
 
 function renderLeadingFlagError(flag: string): string {
-  const bin = basename(process.argv[1] ?? "tool") || "tool";
+  const bin = resolveBinName();
   return `${renderError(
     "Flags must come after the command",
     "VALIDATION_ERROR",
